@@ -1,0 +1,45 @@
+Roadmap
+=======
+
+1. Zero-copy RX ring
+2. Zero-copy TX ring
+3. Traffic generation
+4. BPF support
+5. Multithreading
+6. Thread Communication
+7. Thread Management
+8. PCAP read/write/validation
+9. PCAP file rolling
+10. Scatter-Gather I/O
+
+Feature implementation
+======================
+
+Each feature will developed in its own branch.
+
+Its implementation must follow this order:
+ - Coding the actual implementation
+ - Coding test cases which will cover this specific feature
+ - Doxygen based documentation
+
+After the feature is stabilized, it will merged back on the master branch.
+Each feature will bring its own set of test cases to check the stability
+status and to provide a quick way to perform regression tests.
+
+When the desired set of feature a implemented and merged back to the master
+branch, a tag will be created which can be then released.
+
+Coding style
+============
+
+C source code and header file must be indent using
+indent -linux
+
+Resources
+=========
+
+The whole project management will be based on GitHub.
+It regroups wiki, ticket system, code review and
+statistics.
+
+A mirror of the project can be found on repo.or.cz.
