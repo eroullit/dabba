@@ -1,0 +1,71 @@
+What is daba?
+====================
+
+daba is a set of network tools written in C for Linux.
+
+Its main use is to gather or scatter actions on a network such as
+traffic capture, traffic replay or traffic generation on a network.
+
+This is inspired on the Daba Walla system present in Mumbai where
+meals are regrouped and dispatched throughout the city with a
+high efficency rate, every day of the year.
+
+What is libdaba's goal?
+====================
+
+libdaba's goal is to prepare a clear and simple API for future networking tools.
+
+Those then can be for high performance network tooling which
+focus on usability, robustness and functionality. Its aim is to support
+the daily work for networking engineers, developers, admins or Linux
+users by providing support with or in network monitoring, protocol
+analysis, reverse engineering, network debugging and penetration testing.
+
+
+What is a zero-copy * ring?
+==========================
+
+Zero-copy rings are memory-mapped ring buffers common to kernelspace and userspace where
+packets can be directly read or written.
+This direct way drastically reduces the processing overhead as packets are not hard-copied
+between spaces.
+When using a RX ring, received packets are quicker available to the userspace.
+When a TX ring is used, packets to transmit can be placed to medium within shorter time.
+
+What is a PCAP file?
+====================
+
+A PCAP file is a file where previously recorded packets are saved.
+It can be then read to perform protocol analysis, reverse engineering or network debugging.
+libnetcore-ng will stay independant of libpcap, but nevertheless offer PCAP file support
+to capture, replay and perform offline analysis on recorded traffic.
+
+Some use cases and features
+===========================
+
+* Open source project and free licensing
+* Analyzing and debugging of network problems or protocol implementations
+* Reverse engineering of (proprietary) network protocols
+* Dumping, replaying and offline analysis of pcap traces
+* Integrated high performance capabilities
+* Focus on usability, robustness, security and functionality
+
+Development
+===========
+
+There's a public Git repository at http://github.com/eroullit/daba
+where you can check out the latest code base.
+
+git clone git://github.com/eroullit/daba.git
+
+Coding conventions can be found in CODING.
+
+Contact
+=======
+
+For questions:
+    Send me a message to @eroullit on GitHub
+
+For bugs:
+    https://github.com/eroullit/daba and open an issue.
+
