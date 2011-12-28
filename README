@@ -1,19 +1,19 @@
-What is daba?
+What is dabba?
 ====================
 
-daba is a set of network tools written in C for Linux.
+dabba is a set of network tools written in C for Linux.
 
 Its main use is to gather or scatter actions on a network such as
 traffic capture, traffic replay or traffic generation on a network.
 
-This is inspired on the Daba Walla system present in Mumbai where
+This is inspired on the Dabba Walla system present in Mumbai where
 meals are regrouped and dispatched throughout the city with a
 high efficency rate, every day of the year.
 
-What is libdaba's goal?
+What is libdabba's goal?
 ====================
 
-libdaba's goal is to prepare a clear and simple API for future networking tools.
+libdabba's goal is to prepare a clear and simple API for future networking tools.
 
 Those then can be for high performance network tooling which
 focus on usability, robustness and functionality. Its aim is to support
@@ -37,7 +37,7 @@ What is a PCAP file?
 
 A PCAP file is a file where previously recorded packets are saved.
 It can be then read to perform protocol analysis, reverse engineering or network debugging.
-libnetcore-ng will stay independant of libpcap, but nevertheless offer PCAP file support
+dabba will stay independant of libpcap, but nevertheless offer PCAP file support
 to capture, replay and perform offline analysis on recorded traffic.
 
 Some use cases and features
@@ -53,10 +53,10 @@ Some use cases and features
 Development
 ===========
 
-There's a public Git repository at http://github.com/eroullit/daba
+There's a public Git repository at http://github.com/eroullit/dabba
 where you can check out the latest code base.
 
-git clone git://github.com/eroullit/daba.git
+git clone git://github.com/eroullit/dabba.git
 
 Coding conventions can be found in CODING.
 
@@ -67,5 +67,5 @@ For questions:
     Send me a message to @eroullit on GitHub
 
 For bugs:
-    https://github.com/eroullit/daba and open an issue.
+    https://github.com/eroullit/dabba and open an issue.
 
