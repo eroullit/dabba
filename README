@@ -60,6 +60,28 @@ git clone git://github.com/eroullit/dabba.git
 
 Coding conventions can be found in CODING.
 
+Installalation
+==============
+
+You need to fulfill these prerequisites in order to build dabba:
+	- Linux kernel >= 2.6.31
+	- cmake
+	- setcap (within libcap package)
+
+To build out-of-tree:
+	$ mkdir build
+	$ cd build
+	$ cmake ..
+	$ make
+	# make install
+
+Some unit tests need the following extra capabilities:
+	- CAP_NET_ADMIN - To allow various network-related operations
+	- CAP_NET_RAW - To allow use of RAW and PACKET sockets.
+
+To grant them run in your build directory:
+	# make setcap
+
 Contact
 =======
 
