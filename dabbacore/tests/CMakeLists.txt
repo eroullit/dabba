@@ -9,4 +9,6 @@ ADD_EXECUTABLE(test_strlcpy test_strlcpy.c)
 TARGET_LINK_LIBRARIES (test_strlcpy ${PROJECT_NAME})
 ADD_TEST(test_strlcpy test_strlcpy)
 
-ADD_CUSTOM_TARGET(setcap COMMAND setcap cap_net_raw,cap_net_admin=eip test_packet_mmap)
+IF(SETCAP_FOUND)
+	ADD_CUSTOM_TARGET(setcap COMMAND ${SETCAP_EXECUTABLE} cap_net_raw,cap_net_admin=eip test_packet_mmap)
+ENDIF(SETCAP_FOUND)
