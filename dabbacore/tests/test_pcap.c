@@ -68,23 +68,15 @@ int main(void)
 {
 	int fd;
 
-	/* Create PCAP file */
 	assert((fd = pcap_create(test_path, LINKTYPE_EN10MB)) > 0);
-
-	/* Write payload */
 	assert(test_pcap_write(fd, icmp_dns, sizeof(icmp_dns)) == 0);
-
 	assert(pcap_close(fd) == 0);
 
 	assert((fd = pcap_open(test_path, O_RDONLY)) > 0);
-
 	assert(pcap_close(fd) == 0);
 
 	assert((fd = pcap_open(test_path, O_RDWR | O_APPEND)) > 0);
-
-	/* Write payload */
 	assert(test_pcap_write(fd, icmp_dns, sizeof(icmp_dns)) == 0);
-
 	assert(pcap_close(fd) == 0);
 
 	assert((fd = pcap_open(test_path, O_RDONLY)) > 0);
