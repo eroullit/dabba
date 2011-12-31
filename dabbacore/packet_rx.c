@@ -81,13 +81,16 @@ int packet_rx(const struct packet_mmap *pkt_rx, const int pcap_fd)
 
 			if ((mmap_hdr->tp_h.tp_status & TP_STATUS_USER) ==
 			    TP_STATUS_USER) {
-				pcap_write(pcap_fd,
-					   (uint8_t *) mmap_hdr +
-					   mmap_hdr->tp_h.tp_mac,
-					   mmap_hdr->tp_h.tp_len,
-					   mmap_hdr->tp_h.tp_snaplen,
-					   mmap_hdr->tp_h.tp_sec,
-					   mmap_hdr->tp_h.tp_usec);
+				if (pcap_fd > 0) {
+					pcap_write(pcap_fd,
+						   (uint8_t *) mmap_hdr +
+						   mmap_hdr->tp_h.tp_mac,
+						   mmap_hdr->tp_h.tp_len,
+						   mmap_hdr->tp_h.tp_snaplen,
+						   mmap_hdr->tp_h.tp_sec,
+						   mmap_hdr->tp_h.tp_usec);
+				}
+
 				mmap_hdr->tp_h.tp_status = TP_STATUS_KERNEL;
 			}
 		}
