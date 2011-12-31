@@ -37,10 +37,12 @@
 
 #include <dabbacore/macros.h>
 #include <dabbacore/packet_mmap.h>
+#include <dabbacore/pcap.h>
 
 /**
  * \brief Receive packets coming from a packet mmap RX ring
  * \param[in] pkt_rx	packet mmap RX ring
+ * \param[in] pcap_fd	PCAP file where to dump received packets
  * \return 0 on success, else on failure
  *
  * This function will poll(2) until some packets are received on the configured
@@ -48,7 +50,7 @@
  * for PCAP function to dump the frames into a file or for a packet dissectors.
  */
 
-int packet_rx(const struct packet_mmap *pkt_rx)
+int packet_rx(const struct packet_mmap *pkt_rx, const int pcap_fd)
 {
 	struct pollfd pfd[2];
 	size_t index = 0;
@@ -78,8 +80,16 @@ int packet_rx(const struct packet_mmap *pkt_rx)
 			}
 
 			if ((mmap_hdr->tp_h.tp_status & TP_STATUS_USER) ==
-			    TP_STATUS_USER)
+			    TP_STATUS_USER) {
+				pcap_write(pcap_fd,
+					   (uint8_t *) mmap_hdr +
+					   mmap_hdr->tp_h.tp_mac,
+					   mmap_hdr->tp_h.tp_len,
+					   mmap_hdr->tp_h.tp_snaplen,
+					   mmap_hdr->tp_h.tp_sec,
+					   mmap_hdr->tp_h.tp_usec);
 				mmap_hdr->tp_h.tp_status = TP_STATUS_KERNEL;
+			}
 		}
 	}
 
