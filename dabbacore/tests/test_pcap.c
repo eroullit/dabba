@@ -87,6 +87,10 @@ int main(void)
 
 	assert(pcap_close(fd) == 0);
 
+	assert((fd = pcap_open(test_path, O_RDONLY)) > 0);
+	assert(pcap_is_valid(fd) == 0);
+	assert(pcap_close(fd) == 0);
+
 	pcap_destroy(fd, test_path);
 
 	return (EXIT_SUCCESS);
