@@ -46,6 +46,7 @@ int main(int argc, char **argv)
 	int rc;
 	size_t a, i, size;
 	int pf_sock = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
+	int page_size = getpagesize();
 	struct packet_mmap pkt_rx;
 
 	enum packet_mmap_frame_size test_size[] = {
@@ -62,10 +63,10 @@ int main(int argc, char **argv)
 	for (size = MIN_SIZE; size <= MAX_SIZE; size *= 2)
 		for (a = 0; a < ARRAY_SIZE(test_size); a++)
 			for (i = 0; i <= MAX_ORDER; i++) {
-				if ((getpagesize() << i) < (int)test_size[a])
+				if ((page_size << i) < (int)test_size[a])
 					continue;
 
-				if ((int)size < (getpagesize() << i))
+				if ((int)size < (page_size << i))
 					continue;
 
 				rc = packet_mmap_create(&pkt_rx, "lo", pf_sock,
