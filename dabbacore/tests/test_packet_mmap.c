@@ -69,9 +69,10 @@ int main(int argc, char **argv)
 				if ((int)size < (page_size << i))
 					continue;
 
-				rc = packet_mmap_create(&pkt_rx, "lo", pf_sock,
+				rc = packet_mmap_create(&pkt_rx, "all", pf_sock,
 							PACKET_MMAP_RX,
 							test_size[a], i, size);
+
 				printf("RX packet mmap: frame size=%i",
 				       test_size[a]);
 				printf(" page order=%zu size=%zu rc=%i\n", i,
