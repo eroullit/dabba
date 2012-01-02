@@ -55,6 +55,7 @@ int devname_to_ifindex(const char *const dev, int *index)
 	struct ifreq ethreq;
 
 	assert(dev);
+	assert(index);
 
 	if (strcmp(dev, "all") == 0) {
 		*index = 0;
