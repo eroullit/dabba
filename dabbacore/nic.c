@@ -56,6 +56,11 @@ int devname_to_ifindex(const char *const dev, int *index)
 
 	assert(dev);
 
+	if (strcmp(dev, "all") == 0) {
+		*index = 0;
+		return (0);
+	}
+
 	sock = socket(AF_INET, SOCK_DGRAM, 0);
 
 	if (sock < 0)
