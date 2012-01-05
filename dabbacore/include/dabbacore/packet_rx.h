@@ -30,8 +30,16 @@
 #ifndef PACKET_RX_H
 #define	PACKET_RX_H
 
+#include <pthread.h>
+
 #include <dabbacore/packet_mmap.h>
 
-int packet_rx(const struct packet_mmap *pkt_rx);
+struct packet_rx_thread {
+	struct packet_mmap pkt_rx;
+	pthread_t thread;
+	int pcap_fd;
+};
+
+void *packet_rx(void *arg);
 
 #endif				/* PACKET_RX_H */

@@ -36,26 +36,28 @@
 #include <poll.h>
 
 #include <dabbacore/macros.h>
-#include <dabbacore/packet_mmap.h>
+#include <dabbacore/packet_rx.h>
 #include <dabbacore/pcap.h>
 
 /**
  * \brief Receive packets coming from a packet mmap RX ring
- * \param[in] pkt_rx	packet mmap RX ring
- * \param[in] pcap_fd	PCAP file where to dump received packets
- * \return 0 on success, else on failure
+ * \param[in] arg	Pointer to packet rx thread structure
+ * \return Always return NULL
  *
  * This function will poll(2) until some packets are received on the configured
  * interface. For now this function does not much but it can be starting point
  * for PCAP function to dump the frames into a file or for a packet dissectors.
  */
 
-int packet_rx(const struct packet_mmap *pkt_rx, const int pcap_fd)
+void *packet_rx(void *arg)
 {
+	struct packet_rx_thread *thread = arg;
+	struct packet_mmap *pkt_rx = &thread->pkt_rx;
 	struct pollfd pfd[2];
 	size_t index = 0;
 
-	assert(pkt_rx);
+	if (!arg)
+		goto out;
 
 	memset(pfd, 0, sizeof(pfd));
 
@@ -81,8 +83,8 @@ int packet_rx(const struct packet_mmap *pkt_rx, const int pcap_fd)
 
 			if ((mmap_hdr->tp_h.tp_status & TP_STATUS_USER) ==
 			    TP_STATUS_USER) {
-				if (pcap_fd > 0) {
-					pcap_write(pcap_fd,
+				if (thread->pcap_fd > 0) {
+					pcap_write(thread->pcap_fd,
 						   (uint8_t *) mmap_hdr +
 						   mmap_hdr->tp_h.tp_mac,
 						   mmap_hdr->tp_h.tp_len,
@@ -97,5 +99,5 @@ int packet_rx(const struct packet_mmap *pkt_rx, const int pcap_fd)
 	}
 
  out:
-	return (0);
+	pthread_exit(NULL);
 }
