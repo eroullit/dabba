@@ -59,6 +59,8 @@ void *packet_rx(void *arg)
 	if (!arg)
 		goto out;
 
+	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+
 	memset(pfd, 0, sizeof(pfd));
 
 	pfd[0].events = POLLIN | POLLRDNORM | POLLERR;
