@@ -1,0 +1,5 @@
+PROJECT(dabbad C)
+
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/include)
+
+ADD_EXECUTABLE(dabbad dabbad.c)
