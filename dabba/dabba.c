@@ -32,9 +32,30 @@
 
 #include <dabbad/dabbad.h>
 
+void dabba_prepare_query(struct dabba_ipc_msg *msg)
+{
+	assert(msg);
+
+	msg->msg.type = DABBA_IFCONF;
+}
+
+void dabba_display_msg(const struct dabba_ipc_msg const *msg)
+{
+	assert(msg);
+
+	switch (msg->msg.type) {
+	case DABBA_IFCONF:
+		printf("ifname: %s\n", msg->msg.msg.ifconf[0].if_name);
+		break;
+	default:
+		break;
+	}
+}
+
 int main(int argc, char **argv)
 {
 	int qid;
+	ssize_t rcv;
 	int snd;
 	struct dabba_ipc_msg msg;
 
@@ -48,7 +69,7 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 
-	/* TODO Build message here */
+	dabba_prepare_query(&msg);
 
 	snd = msgsnd(qid, &msg, sizeof(msg.msg), 0);
 
@@ -56,6 +77,15 @@ int main(int argc, char **argv)
 		perror("Error while sending IPC msg");
 		return EXIT_FAILURE;
 	}
+
+	rcv = msgrcv(qid, &msg, sizeof(msg.msg), 0, 0);
+
+	if (rcv <= 0) {
+		perror("Error while receiving IPC msg");
+		return EXIT_FAILURE;
+	}
+
+	dabba_display_msg(&msg);
 
 	return (EXIT_SUCCESS);
 }

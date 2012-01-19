@@ -25,12 +25,31 @@
 #define	DABBAD_H
 
 #include <stdint.h>
+#include <net/if.h>
+
+enum dabba_msg_type {
+	DABBA_IFCONF
+};
+
+struct dabba_msg_buf {
+	char buf[1024];
+};
+
+struct dabba_ifconf {
+	char if_name[IFNAMSIZ];
+};
 
 struct dabba_ipc_msg {
 	long mtype;
+
 	struct dabba_msg {
-		size_t len;
-		char buf[1024];
+		uint16_t type;
+		union {
+			struct dabba_msg_buf buf;
+			struct dabba_ifconf ifconf[sizeof(struct dabba_msg_buf)
+						   /
+						   sizeof(struct dabba_ifconf)];
+		} msg;
 	} msg;
 };
 

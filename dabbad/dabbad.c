@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <assert.h>
+#include <errno.h>
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
@@ -33,10 +34,43 @@
 
 #include <dabbad/dabbad.h>
 
+int dabbad_ifconf_get(struct dabba_ipc_msg *msg)
+{
+	int rc = 0;
+	struct ifconf ifconf;
+
+	memset(&ifconf, 0, sizeof(ifconf));
+
+	/*XXX dummy function for now */
+
+	strcpy(msg->msg.msg.ifconf[0].if_name, "dummy_nic");
+
+	return rc;
+}
+
+int dabbad_handle_msg(struct dabba_ipc_msg *msg)
+{
+	int rc;
+	assert(msg);
+
+	switch (msg->msg.type) {
+	case DABBA_IFCONF:
+		rc = dabbad_ifconf_get(msg);
+		break;
+	default:
+		rc = -1;
+		errno = EINVAL;
+		break;
+	}
+
+	return rc;
+}
+
 int main(int argc, char **argv)
 {
 	int qid;
 	ssize_t rcv;
+	int snd;
 	struct dabba_ipc_msg msg;
 
 	assert(argc);
@@ -62,7 +96,18 @@ int main(int argc, char **argv)
 			return EXIT_FAILURE;
 		}
 
-		/* TODO Message handling */
+		rcv = dabbad_handle_msg(&msg);
+
+		if (rcv != 0) {
+			perror("Error while handling IPC msg");
+		}
+
+		snd = msgsnd(qid, &msg, sizeof(msg.msg), 0);
+
+		if (snd < 0) {
+			perror("Error while sending back IPC msg");
+			return EXIT_FAILURE;
+		}
 	}
 
 	return EXIT_SUCCESS;
