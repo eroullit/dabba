@@ -32,25 +32,27 @@ enum dabba_msg_type {
 };
 
 struct dabba_msg_buf {
-	char buf[1024];
+	uint8_t buf[1024];
 };
 
 struct dabba_ifconf {
-	char if_name[IFNAMSIZ];
+	char name[IFNAMSIZ];
 };
+
+#define DABBA_IFCONF_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_ifconf))
 
 struct dabba_ipc_msg {
 	long mtype;
 
 	struct dabba_msg {
 		uint16_t type;
-		union {
+		uint16_t elem_nr;
+
+		union dabba_info {
 			struct dabba_msg_buf buf;
-			struct dabba_ifconf ifconf[sizeof(struct dabba_msg_buf)
-						   /
-						   sizeof(struct dabba_ifconf)];
+			struct dabba_ifconf ifconf[DABBA_IFCONF_MAX_SIZE];
 		} msg;
-	} msg;
+	} msg_body;
 };
 
 static inline int dabba_get_ipc_queue_id(int flags)

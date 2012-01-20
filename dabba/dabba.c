@@ -30,22 +30,28 @@
 #include <sys/ipc.h>
 #include <sys/msg.h>
 
+#include <dabbacore/macros.h>
 #include <dabbad/dabbad.h>
 
 void dabba_prepare_query(struct dabba_ipc_msg *msg)
 {
 	assert(msg);
-
-	msg->msg.type = DABBA_IFCONF;
+	msg->msg_body.type = DABBA_IFCONF;
 }
 
 void dabba_display_msg(const struct dabba_ipc_msg const *msg)
 {
+	size_t a;
 	assert(msg);
 
-	switch (msg->msg.type) {
+	switch (msg->msg_body.type) {
 	case DABBA_IFCONF:
-		printf("ifname: %s\n", msg->msg.msg.ifconf[0].if_name);
+		for (a = 0;
+		     a < msg->msg_body.elem_nr
+		     && a < ARRAY_SIZE(msg->msg_body.msg.ifconf); a++) {
+			printf("%zu/%u %s\n", a + 1, msg->msg_body.elem_nr,
+			       msg->msg_body.msg.ifconf[a].name);
+		}
 		break;
 	default:
 		break;
@@ -71,14 +77,14 @@ int main(int argc, char **argv)
 
 	dabba_prepare_query(&msg);
 
-	snd = msgsnd(qid, &msg, sizeof(msg.msg), 0);
+	snd = msgsnd(qid, &msg, sizeof(msg.msg_body), 0);
 
 	if (snd < 0) {
 		perror("Error while sending IPC msg");
 		return EXIT_FAILURE;
 	}
 
-	rcv = msgrcv(qid, &msg, sizeof(msg.msg), 0, 0);
+	rcv = msgrcv(qid, &msg, sizeof(msg.msg_body), 0, 0);
 
 	if (rcv <= 0) {
 		perror("Error while receiving IPC msg");

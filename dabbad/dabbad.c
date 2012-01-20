@@ -31,21 +31,37 @@
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <sys/param.h>
+#include <sys/types.h>
+#include <ifaddrs.h>
 
+#include <dabbacore/macros.h>
+#include <dabbacore/strlcpy.h>
 #include <dabbad/dabbad.h>
 
 int dabbad_ifconf_get(struct dabba_ipc_msg *msg)
 {
-	int rc = 0;
-	struct ifconf ifconf;
+	size_t a = 0;
+	struct ifaddrs *ifaddr, *ifa;
 
-	memset(&ifconf, 0, sizeof(ifconf));
+	if (getifaddrs(&ifaddr) != 0)
+		return -1;
 
-	/*XXX dummy function for now */
+	for (ifa = ifaddr;
+	     ifa != NULL && a < ARRAY_SIZE(msg->msg_body.msg.ifconf);
+	     ifa = ifa->ifa_next) {
+		if (ifa->ifa_addr->sa_family != AF_PACKET)
+			continue;
 
-	strcpy(msg->msg.msg.ifconf[0].if_name, "dummy_nic");
+		strlcpy(msg->msg_body.msg.ifconf[a].name, ifa->ifa_name,
+			IFNAMSIZ);
+		a++;
+	}
 
-	return rc;
+	msg->msg_body.elem_nr = a;
+
+	freeifaddrs(ifaddr);
+
+	return 0;
 }
 
 int dabbad_handle_msg(struct dabba_ipc_msg *msg)
@@ -53,7 +69,7 @@ int dabbad_handle_msg(struct dabba_ipc_msg *msg)
 	int rc;
 	assert(msg);
 
-	switch (msg->msg.type) {
+	switch (msg->msg_body.type) {
 	case DABBA_IFCONF:
 		rc = dabbad_ifconf_get(msg);
 		break;
@@ -89,7 +105,7 @@ int main(int argc, char **argv)
 	}
 
 	for (;;) {
-		rcv = msgrcv(qid, &msg, sizeof(msg.msg), 0, 0);
+		rcv = msgrcv(qid, &msg, sizeof(msg.msg_body), 0, 0);
 
 		if (rcv <= 0) {
 			perror("Error while receiving IPC msg");
@@ -102,7 +118,7 @@ int main(int argc, char **argv)
 			perror("Error while handling IPC msg");
 		}
 
-		snd = msgsnd(qid, &msg, sizeof(msg.msg), 0);
+		snd = msgsnd(qid, &msg, sizeof(msg.msg_body), 0);
 
 		if (snd < 0) {
 			perror("Error while sending back IPC msg");
