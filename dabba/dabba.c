@@ -39,19 +39,30 @@ void dabba_prepare_query(struct dabba_ipc_msg *msg)
 	msg->msg_body.type = DABBA_IFCONF;
 }
 
+void dabba_display_ifconf(const struct dabba_ipc_msg const *msg)
+{
+	size_t a, elem_nr;
+
+	assert(msg);
+
+	elem_nr =
+	    min(msg->msg_body.elem_nr, ARRAY_SIZE(msg->msg_body.msg.ifconf));
+
+	printf("---\n");
+	printf("  Available interfaces:\n");
+
+	for (a = 0; a < elem_nr; a++) {
+		printf("    - %s\n", msg->msg_body.msg.ifconf[a].name);
+	}
+}
+
 void dabba_display_msg(const struct dabba_ipc_msg const *msg)
 {
-	size_t a;
 	assert(msg);
 
 	switch (msg->msg_body.type) {
 	case DABBA_IFCONF:
-		for (a = 0;
-		     a < msg->msg_body.elem_nr
-		     && a < ARRAY_SIZE(msg->msg_body.msg.ifconf); a++) {
-			printf("%zu/%u %s\n", a + 1, msg->msg_body.elem_nr,
-			       msg->msg_body.msg.ifconf[a].name);
-		}
+		dabba_display_ifconf(msg);
 		break;
 	default:
 		break;

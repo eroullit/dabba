@@ -35,7 +35,7 @@
 /**
  * \brief Abort build when expression is equal zero
  * \param e expression
- *  
+ *
  * Force a compilation error if condition is true, but also produce a
  * result (of value 0 and type size_t), so the expression can be used
  * e.g. in a structure initializer (or where-ever else comma expressions
@@ -47,7 +47,7 @@
 /**
  * \brief Check if the variable is an array
  * \param e variable to check
- *  
+ *
  * Force a compilation error if the variable is not an array
  */
 
@@ -57,7 +57,7 @@
 /**
  * \brief Returns the amount of element the array holds
  * \param arr input array
- *  
+ *
  * Force a compilation error if the variable is not an array
  */
 
@@ -73,5 +73,8 @@ static inline int is_power_of_2(const uint64_t n)
 {
 	return (n != 0 && ((n & (n - 1)) == 0));
 }
+
+#define min(x, y) x < y ? x : y;
+#define max(x, y) x > y ? x : y;
 
 #endif				/* MACROS_H */
