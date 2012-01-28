@@ -14,5 +14,5 @@ TARGET_LINK_LIBRARIES (test_pcap ${PROJECT_NAME})
 ADD_TEST(test_pcap test_pcap)
 
 IF(SETCAP_FOUND)
-	ADD_CUSTOM_TARGET(setcap COMMAND ${SETCAP_EXECUTABLE} cap_net_raw,cap_net_admin=eip test_packet_mmap)
+	ADD_CUSTOM_TARGET(setcap COMMAND ${SETCAP_EXECUTABLE} cap_net_raw,cap_ipc_lock,cap_net_admin=eip test_packet_mmap)
 ENDIF(SETCAP_FOUND)
