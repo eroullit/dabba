@@ -96,7 +96,7 @@ static int packet_mmap_mmap(struct packet_mmap *pkt_mmap)
 	    mmap(0,
 		 pkt_mmap->layout.tp_block_size *
 		 pkt_mmap->layout.tp_block_nr, PROT_READ | PROT_WRITE,
-		 MAP_SHARED, pkt_mmap->pf_sock, 0);
+		 MAP_SHARED | MAP_LOCKED, pkt_mmap->pf_sock, 0);
 
 	if (pkt_mmap->buf == MAP_FAILED)
 		return (EINVAL);
