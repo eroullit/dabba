@@ -22,10 +22,11 @@
 /* __LICENSE_HEADER_END__ */
 
 #include <stdio.h>
+#include <string.h>
 #include <assert.h>
 #include <dabbacore/macros.h>
 
-const char dabba_usage_string[] = "git [--help] <command> [<args>]\n";
+const char dabba_usage_string[] = "dabba [--help] <command> [<args>]\n";
 const char dabba_more_info_string[] =
     "See 'dabba help <command>' for more info on a specific command.";
 
@@ -53,11 +54,11 @@ void list_common_cmds_help(void)
 			longest = strlen(common_cmds[i].name);
 	}
 
-	printf("The most commonly used git commands are:");
+	printf("The most commonly used dabba commands are:\n");
 	for (i = 0; i < ARRAY_SIZE(common_cmds); i++) {
 		printf("   %s   ", common_cmds[i].name);
 		mput_char(' ', longest - strlen(common_cmds[i].name));
-		printf("%s", common_cmds[i].help);
+		printf("%s\n", common_cmds[i].help);
 	}
 }
 
