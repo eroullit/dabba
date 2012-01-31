@@ -26,12 +26,92 @@
 #include <string.h>
 #include <unistd.h>
 #include <assert.h>
+#include <errno.h>
 #include <sys/param.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
+#include <sys/stat.h>
 
 #include <dabbacore/macros.h>
 #include <dabbad/dabbad.h>
+#include <dabba/help.h>
+
+struct cmd_struct {
+	const char *cmd;
+	int (*fn) (int, const char **);
+	int option;
+};
+
+static int run_builtin(struct cmd_struct *p, int argc, const char **argv)
+{
+	int status;
+	struct stat st;
+
+	assert(p);
+	assert(argc);
+	assert(argv);
+
+	status = p->fn(argc, argv);
+	if (status)
+		return status;
+
+	/* Somebody closed stdout? */
+	if (fstat(fileno(stdout), &st))
+		return 0;
+	/* Ignore write errors for pipes and sockets.. */
+	if (S_ISFIFO(st.st_mode) || S_ISSOCK(st.st_mode))
+		return 0;
+
+	/* Check for ENOSPC and EIO errors.. */
+	if (fflush(stdout)) {
+		perror("write failure on standard output");
+		return (errno);
+	}
+
+	if (ferror(stdout)) {
+		perror("unknown write failure on standard output");
+		return (1);
+	}
+
+	if (fclose(stdout)) {
+		perror("close failed on standard output");
+		return (errno);
+	}
+
+	return 0;
+}
+
+/* Dummy function */
+int cmd_list(int argc, const char **argv)
+{
+	assert(argc);
+	assert(argv);
+
+	return 0;
+}
+
+static void handle_internal_command(int argc, const char **argv)
+{
+	size_t i;
+	const char *cmd = argv[0];
+	static struct cmd_struct commands[] = {
+		{"list", cmd_list, 0},
+		{"help", cmd_help, 0}
+	};
+
+	/* Turn "dabba cmd --help" into "dabba help cmd" */
+	if (argc > 1 && !strcmp(argv[1], "--help")) {
+		argv[1] = argv[0];
+		argv[0] = cmd = "help";
+	}
+
+	for (i = 0; i < ARRAY_SIZE(commands); i++) {
+		struct cmd_struct *p = commands + i;
+		if (strcmp(p->cmd, cmd))
+			continue;
+		exit(run_builtin(p, argc, argv));
+	}
+}
 
 void dabba_prepare_query(struct dabba_ipc_msg *msg)
 {
