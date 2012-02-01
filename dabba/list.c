@@ -28,7 +28,7 @@
 #include <dabbacore/macros.h>
 #include <dabba/ipc.h>
 
-void dabba_display_ifconf(const struct dabba_ipc_msg const *msg)
+void display_interface_list(const struct dabba_ipc_msg const *msg)
 {
 	size_t a, elem_nr;
 
@@ -45,20 +45,20 @@ void dabba_display_ifconf(const struct dabba_ipc_msg const *msg)
 	}
 }
 
-void dabba_prepare_query(struct dabba_ipc_msg *msg)
+void prepare_list_query(struct dabba_ipc_msg *msg)
 {
 	assert(msg);
 	msg->mtype = 1;
 	msg->msg_body.type = DABBA_IFCONF;
 }
 
-void dabba_display_msg(const struct dabba_ipc_msg const *msg)
+void display_list_msg(const struct dabba_ipc_msg const *msg)
 {
 	assert(msg);
 
 	switch (msg->msg_body.type) {
 	case DABBA_IFCONF:
-		dabba_display_ifconf(msg);
+		display_interface_list(msg);
 		break;
 	default:
 		break;
@@ -74,14 +74,14 @@ int cmd_list(int argc, const char **argv)
 	assert(argv);
 
 	memset(&msg, 0, sizeof(msg));
-	dabba_prepare_query(&msg);
+	prepare_list_query(&msg);
 
 	rc = dabba_ipc_msg(&msg);
 
 	if (rc)
 		return rc;
 
-	dabba_display_msg(&msg);
+	display_list_msg(&msg);
 
 	return 0;
 }
