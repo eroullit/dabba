@@ -21,45 +21,40 @@
 
 /* __LICENSE_HEADER_END__ */
 
-#ifndef DABBAD_H
-#define	DABBAD_H
+#include <stdio.h>
+#include <string.h>
+#include <assert.h>
+#include <errno.h>
+#include <dabba/ipc.h>
 
-#include <stdint.h>
-#include <net/if.h>
-#include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/msg.h>
-
-enum dabba_msg_type {
-	DABBA_IFCONF
-};
-
-struct dabba_msg_buf {
-	uint8_t buf[1024];
-};
-
-struct dabba_ifconf {
-	char name[IFNAMSIZ];
-};
-
-#define DABBA_IFCONF_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_ifconf))
-
-struct dabba_ipc_msg {
-	long mtype;
-
-	struct dabba_msg {
-		uint16_t type;
-		uint16_t elem_nr;
-
-		union dabba_info {
-			struct dabba_msg_buf buf;
-			struct dabba_ifconf ifconf[DABBA_IFCONF_MAX_SIZE];
-		} msg;
-	} msg_body;
-};
-
-static inline int dabba_get_ipc_queue_id(int flags)
+int dabba_ipc_msg(struct dabba_ipc_msg *msg)
 {
-	return msgget(ftok("/tmp/dabba", 0xDABADABA), flags);
+	int qid;
+	ssize_t rcv;
+	int snd;
+
+	assert(msg);
+
+	qid = dabba_get_ipc_queue_id(0660);
+
+	if (qid < 0) {
+		perror("Cannot get IPC id");
+		return errno;
+	}
+
+	snd = msgsnd(qid, msg, sizeof(msg->msg_body), 0);
+
+	if (snd < 0) {
+		perror("Error while sending IPC msg");
+		return errno;
+	}
+
+	rcv = msgrcv(qid, msg, sizeof(msg->msg_body), 0, 0);
+
+	if (rcv <= 0) {
+		perror("Error while receiving IPC msg");
+		return errno;
+	}
+
+	return 0;
 }
-#endif				/* DABBAD_H */

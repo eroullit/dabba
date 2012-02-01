@@ -21,45 +21,9 @@
 
 /* __LICENSE_HEADER_END__ */
 
-#ifndef DABBAD_H
-#define	DABBAD_H
+#ifndef LIST_H
+#define	LIST_H
 
-#include <stdint.h>
-#include <net/if.h>
-#include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/msg.h>
+int cmd_list(int argc, const char **argv);
 
-enum dabba_msg_type {
-	DABBA_IFCONF
-};
-
-struct dabba_msg_buf {
-	uint8_t buf[1024];
-};
-
-struct dabba_ifconf {
-	char name[IFNAMSIZ];
-};
-
-#define DABBA_IFCONF_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_ifconf))
-
-struct dabba_ipc_msg {
-	long mtype;
-
-	struct dabba_msg {
-		uint16_t type;
-		uint16_t elem_nr;
-
-		union dabba_info {
-			struct dabba_msg_buf buf;
-			struct dabba_ifconf ifconf[DABBA_IFCONF_MAX_SIZE];
-		} msg;
-	} msg_body;
-};
-
-static inline int dabba_get_ipc_queue_id(int flags)
-{
-	return msgget(ftok("/tmp/dabba", 0xDABADABA), flags);
-}
-#endif				/* DABBAD_H */
+#endif				/* LIST_H */

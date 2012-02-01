@@ -27,14 +27,12 @@
 #include <unistd.h>
 #include <assert.h>
 #include <errno.h>
-#include <sys/param.h>
-#include <sys/ipc.h>
-#include <sys/msg.h>
 #include <sys/stat.h>
 
 #include <dabbacore/macros.h>
 #include <dabbad/dabbad.h>
 #include <dabba/help.h>
+#include <dabba/list.h>
 
 struct cmd_struct {
 	const char *cmd;
@@ -77,82 +75,6 @@ static int run_builtin(struct cmd_struct *p, int argc, const char **argv)
 		perror("close failed on standard output");
 		return (errno);
 	}
-
-	return 0;
-}
-
-void dabba_display_ifconf(const struct dabba_ipc_msg const *msg)
-{
-	size_t a, elem_nr;
-
-	assert(msg);
-
-	elem_nr =
-	    min(msg->msg_body.elem_nr, ARRAY_SIZE(msg->msg_body.msg.ifconf));
-
-	printf("---\n");
-	printf("  Available interfaces:\n");
-
-	for (a = 0; a < elem_nr; a++) {
-		printf("    - %s\n", msg->msg_body.msg.ifconf[a].name);
-	}
-}
-
-void dabba_prepare_query(struct dabba_ipc_msg *msg)
-{
-	assert(msg);
-	msg->mtype = 1;
-	msg->msg_body.type = DABBA_IFCONF;
-}
-
-void dabba_display_msg(const struct dabba_ipc_msg const *msg)
-{
-	assert(msg);
-
-	switch (msg->msg_body.type) {
-	case DABBA_IFCONF:
-		dabba_display_ifconf(msg);
-		break;
-	default:
-		break;
-	}
-}
-
-int cmd_list(int argc, const char **argv)
-{
-	int qid;
-	ssize_t rcv;
-	int snd;
-	struct dabba_ipc_msg msg;
-
-	assert(argc >= 0);
-	assert(argv);
-
-	qid = dabba_get_ipc_queue_id(0660);
-
-	if (qid < 0) {
-		perror("Cannot get IPC id");
-		return EXIT_FAILURE;
-	}
-
-	memset(&msg, 0, sizeof(msg));
-	dabba_prepare_query(&msg);
-
-	snd = msgsnd(qid, &msg, sizeof(msg.msg_body), 0);
-
-	if (snd < 0) {
-		perror("Error while sending IPC msg");
-		return EXIT_FAILURE;
-	}
-
-	rcv = msgrcv(qid, &msg, sizeof(msg.msg_body), 0, 0);
-
-	if (rcv <= 0) {
-		perror("Error while receiving IPC msg");
-		return EXIT_FAILURE;
-	}
-
-	dabba_display_msg(&msg);
 
 	return 0;
 }

@@ -27,9 +27,6 @@
 #include <unistd.h>
 #include <assert.h>
 #include <errno.h>
-#include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/msg.h>
 #include <sys/param.h>
 #include <sys/types.h>
 #include <ifaddrs.h>
