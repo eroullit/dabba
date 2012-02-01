@@ -64,7 +64,7 @@ void list_common_cmds_help(void)
 
 int cmd_help(int argc, const char **argv)
 {
-	assert(argc);
+	assert(argc >= 0);
 	assert(argv);
 
 	if (!argv[0]) {

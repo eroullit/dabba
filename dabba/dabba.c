@@ -48,7 +48,7 @@ static int run_builtin(struct cmd_struct *p, int argc, const char **argv)
 	struct stat st;
 
 	assert(p);
-	assert(argc);
+	assert(argc >= 0);
 	assert(argv);
 
 	status = p->fn(argc, argv);
@@ -125,7 +125,7 @@ int cmd_list(int argc, const char **argv)
 	int snd;
 	struct dabba_ipc_msg msg;
 
-	assert(argc);
+	assert(argc >= 0);
 	assert(argv);
 
 	qid = dabba_get_ipc_queue_id(0660);
@@ -164,6 +164,9 @@ static int handle_internal_command(int argc, const char **argv)
 		{"list", cmd_list, 0},
 		{"help", cmd_help, 0}
 	};
+
+	if (argc == 0 || cmd == NULL)
+		cmd = "help";
 
 	/* Turn "dabba cmd --help" into "dabba help cmd" */
 	if (argc > 1 && !strcmp(argv[1], "--help")) {
