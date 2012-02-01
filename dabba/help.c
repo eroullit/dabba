@@ -41,7 +41,7 @@ static inline void mput_char(char c, uint32_t num)
 		putchar(c);
 }
 
-void list_common_cmds_help(void)
+static void list_common_cmds_help(void)
 {
 	size_t i, longest = 0;
 

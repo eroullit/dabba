@@ -28,7 +28,7 @@
 #include <dabbacore/macros.h>
 #include <dabba/ipc.h>
 
-void display_interface_list(const struct dabba_ipc_msg const *msg)
+static void display_interface_list(const struct dabba_ipc_msg const *msg)
 {
 	size_t a, elem_nr;
 
@@ -45,14 +45,14 @@ void display_interface_list(const struct dabba_ipc_msg const *msg)
 	}
 }
 
-void prepare_list_query(struct dabba_ipc_msg *msg)
+static void prepare_list_query(struct dabba_ipc_msg *msg)
 {
 	assert(msg);
 	msg->mtype = 1;
 	msg->msg_body.type = DABBA_IFCONF;
 }
 
-void display_list_msg(const struct dabba_ipc_msg const *msg)
+static void display_list_msg(const struct dabba_ipc_msg const *msg)
 {
 	assert(msg);
 
