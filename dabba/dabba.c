@@ -135,6 +135,7 @@ int cmd_list(int argc, const char **argv)
 		return EXIT_FAILURE;
 	}
 
+	memset(&msg, 0, sizeof(msg));
 	dabba_prepare_query(&msg);
 
 	snd = msgsnd(qid, &msg, sizeof(msg.msg_body), 0);

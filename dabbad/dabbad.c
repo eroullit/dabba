@@ -105,6 +105,7 @@ int main(int argc, char **argv)
 	}
 
 	for (;;) {
+		memset(&msg, 0, sizeof(msg));
 		rcv = msgrcv(qid, &msg, sizeof(msg.msg_body), 0, 0);
 
 		if (rcv <= 0) {
