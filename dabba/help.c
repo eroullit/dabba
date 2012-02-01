@@ -67,14 +67,8 @@ int cmd_help(int argc, const char **argv)
 	assert(argc >= 0);
 	assert(argv);
 
-	if (!argv[0]) {
-		printf("usage: %s\n\n", dabba_usage_string);
-		list_common_cmds_help();
-		printf("\n%s\n", dabba_more_info_string);
-		return 0;
-	}
-
+	printf("usage: %s\n\n", dabba_usage_string);
 	list_common_cmds_help();
-
+	printf("\n%s\n", dabba_more_info_string);
 	return 0;
 }
