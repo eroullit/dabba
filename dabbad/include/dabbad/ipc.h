@@ -21,18 +21,12 @@
 
 /* __LICENSE_HEADER_END__ */
 
-#include <unistd.h>
-#include <assert.h>
+#ifndef IPC_H
+#define	IPC_H
 
-#include <dabbad/ipc.h>
+#include <dabbad/dabbad.h>
 
-int main(int argc, char **argv)
-{
-	assert(argc);
-	assert(argv);
-	assert(daemon(0, 0) == 0);
+int dabbad_ipc_msg_init(void);
+int dabbad_ipc_msg_poll(void);
 
-	dabbad_ipc_msg_init();
-
-	return dabbad_ipc_msg_poll();
-}
+#endif				/* IPC_H */
