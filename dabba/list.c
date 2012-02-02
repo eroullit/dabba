@@ -38,7 +38,7 @@ static void display_interface_list(const struct dabba_ipc_msg const *msg)
 	    min(msg->msg_body.elem_nr, ARRAY_SIZE(msg->msg_body.msg.ifconf));
 
 	printf("---\n");
-	printf("  Available interfaces:\n");
+	printf("  interfaces:\n");
 
 	for (a = 0; a < elem_nr; a++) {
 		printf("    - %s\n", msg->msg_body.msg.ifconf[a].name);
