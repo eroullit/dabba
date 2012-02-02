@@ -78,6 +78,7 @@ To build out-of-tree:
 Some unit tests need the following extra capabilities:
 	- CAP_NET_ADMIN - To allow various network-related operations
 	- CAP_NET_RAW - To allow use of RAW and PACKET sockets.
+	- CAP_IPC_LOCK - To allow to lock than 64kB of mmap'ed memory
 
 To grant them run in your build directory:
 	# make setcap
