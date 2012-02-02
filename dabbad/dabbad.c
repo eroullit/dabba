@@ -27,39 +27,8 @@
 #include <unistd.h>
 #include <assert.h>
 #include <errno.h>
-#include <sys/param.h>
-#include <sys/types.h>
-#include <ifaddrs.h>
 
-#include <dabbacore/macros.h>
-#include <dabbacore/strlcpy.h>
-#include <dabbad/dabbad.h>
-
-int dabbad_ifconf_get(struct dabba_ipc_msg *msg)
-{
-	size_t a = 0;
-	struct ifaddrs *ifaddr, *ifa;
-
-	if (getifaddrs(&ifaddr) != 0)
-		return -1;
-
-	for (ifa = ifaddr;
-	     ifa != NULL && a < ARRAY_SIZE(msg->msg_body.msg.ifconf);
-	     ifa = ifa->ifa_next) {
-		if (ifa->ifa_addr->sa_family != AF_PACKET)
-			continue;
-
-		strlcpy(msg->msg_body.msg.ifconf[a].name, ifa->ifa_name,
-			IFNAMSIZ);
-		a++;
-	}
-
-	msg->msg_body.elem_nr = a;
-
-	freeifaddrs(ifaddr);
-
-	return 0;
-}
+#include <dabbad/list.h>
 
 int dabbad_handle_msg(struct dabba_ipc_msg *msg)
 {
