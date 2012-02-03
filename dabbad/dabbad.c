@@ -21,16 +21,58 @@
 
 /* __LICENSE_HEADER_END__ */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
 #include <unistd.h>
 #include <assert.h>
+#include <getopt.h>
 
 #include <dabbad/ipc.h>
 
+enum dabbad_opts {
+	OPT_DAEMONIZE
+};
+
+const struct option *dabbad_options_get(void)
+{
+	static const struct option dabbad_long_options[] = {
+		{"daemonize", no_argument, NULL, OPT_DAEMONIZE},
+		{NULL, 0, NULL, 0}
+	};
+
+	return (dabbad_long_options);
+}
+
 int main(int argc, char **argv)
 {
+	int opt, opt_idx;
+	int daemonize = 0;
+
 	assert(argc);
 	assert(argv);
-	assert(daemon(0, 0) == 0);
+
+	while ((opt =
+		getopt_long_only(argc, argv, "", dabbad_options_get(),
+				 &opt_idx)) != EOF) {
+		switch (opt) {
+		case OPT_DAEMONIZE:
+			daemonize = 1;
+			break;
+		default:
+			printf("Unknown parameter\n");
+			return EXIT_FAILURE;
+			break;
+
+		}
+	}
+
+	if (daemonize) {
+		if (daemon(0, 0)) {
+			perror("Could not daemonize process");
+			return errno;
+		}
+	}
 
 	dabbad_ipc_msg_init();
 
