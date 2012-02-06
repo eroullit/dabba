@@ -28,6 +28,12 @@
 #include <dabbacore/macros.h>
 #include <dabba/ipc.h>
 
+static void display_interface_list_header(void)
+{
+	printf("---\n");
+	printf("  interfaces:\n");
+}
+
 static void display_interface_list(const struct dabba_ipc_msg const *msg)
 {
 	size_t a, elem_nr;
@@ -36,9 +42,6 @@ static void display_interface_list(const struct dabba_ipc_msg const *msg)
 
 	elem_nr =
 	    min(msg->msg_body.elem_nr, ARRAY_SIZE(msg->msg_body.msg.ifconf));
-
-	printf("---\n");
-	printf("  interfaces:\n");
 
 	for (a = 0; a < elem_nr; a++) {
 		printf("    - %s\n", msg->msg_body.msg.ifconf[a].name);
@@ -50,6 +53,19 @@ static void prepare_list_query(struct dabba_ipc_msg *msg)
 	assert(msg);
 	msg->mtype = 1;
 	msg->msg_body.type = DABBA_IFCONF;
+}
+
+static void display_list_msg_header(const struct dabba_ipc_msg const *msg)
+{
+	assert(msg);
+
+	switch (msg->msg_body.type) {
+	case DABBA_IFCONF:
+		display_interface_list_header();
+		break;
+	default:
+		break;
+	}
 }
 
 static void display_list_msg(const struct dabba_ipc_msg const *msg)
@@ -75,13 +91,17 @@ int cmd_list(int argc, const char **argv)
 
 	memset(&msg, 0, sizeof(msg));
 	prepare_list_query(&msg);
+	display_list_msg_header(&msg);
 
-	rc = dabba_ipc_msg(&msg);
+	do {
+		msg.msg_body.offset += msg.msg_body.elem_nr;
+		rc = dabba_ipc_msg(&msg);
 
-	if (rc)
-		return rc;
+		if (rc)
+			break;
 
-	display_list_msg(&msg);
+		display_list_msg(&msg);
+	} while (msg.msg_body.elem_nr);
 
-	return 0;
+	return rc;
 }

@@ -32,15 +32,20 @@
 
 int dabbad_ifconf_get(struct dabba_ipc_msg *msg)
 {
-	size_t a = 0;
+	size_t a, offset, ifconf_size;
 	struct ifaddrs *ifaddr, *ifa;
 
 	if (getifaddrs(&ifaddr) != 0)
 		return -1;
 
-	for (ifa = ifaddr;
-	     ifa != NULL && a < ARRAY_SIZE(msg->msg_body.msg.ifconf);
-	     ifa = ifa->ifa_next) {
+	ifconf_size = ARRAY_SIZE(msg->msg_body.msg.ifconf);
+	ifa = ifaddr;
+
+	for (offset = 0; ifa && offset < msg->msg_body.offset; offset++) {
+		ifa = ifa->ifa_next;
+	}
+
+	for (a = 0; ifa && a < ifconf_size; ifa = ifa->ifa_next) {
 		if (ifa->ifa_addr->sa_family != AF_PACKET)
 			continue;
 
@@ -50,8 +55,6 @@ int dabbad_ifconf_get(struct dabba_ipc_msg *msg)
 	}
 
 	msg->msg_body.elem_nr = a;
-
 	freeifaddrs(ifaddr);
-
 	return 0;
 }

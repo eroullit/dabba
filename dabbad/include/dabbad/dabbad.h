@@ -50,6 +50,7 @@ struct dabba_ipc_msg {
 	struct dabba_msg {
 		uint16_t type;
 		uint16_t elem_nr;
+		uint16_t offset;
 
 		union dabba_info {
 			struct dabba_msg_buf buf;
