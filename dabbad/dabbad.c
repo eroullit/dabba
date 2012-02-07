@@ -29,15 +29,18 @@
 #include <getopt.h>
 
 #include <dabbad/ipc.h>
+#include <dabbad/help.h>
 
 enum dabbad_opts {
-	OPT_DAEMONIZE
+	OPT_DAEMONIZE,
+	OPT_HELP
 };
 
 const struct option *dabbad_options_get(void)
 {
 	static const struct option dabbad_long_options[] = {
 		{"daemonize", no_argument, NULL, OPT_DAEMONIZE},
+		{"help", no_argument, NULL, OPT_HELP},
 		{NULL, 0, NULL, 0}
 	};
 
@@ -59,8 +62,9 @@ int main(int argc, char **argv)
 		case OPT_DAEMONIZE:
 			daemonize = 1;
 			break;
+		case OPT_HELP:
 		default:
-			printf("Unknown parameter\n");
+			show_usage(dabbad_options_get());
 			return EXIT_FAILURE;
 			break;
 
