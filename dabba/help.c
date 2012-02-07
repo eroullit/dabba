@@ -26,8 +26,8 @@
 #include <assert.h>
 #include <dabbacore/macros.h>
 
-const char dabba_usage_string[] = "dabba [--help] <command> [<args>]\n";
-const char dabba_more_info_string[] =
+static const char dabba_usage_string[] = "dabba [--help] <command> [<args>]\n";
+static const char dabba_more_info_string[] =
     "See 'dabba help <command>' for more info on a specific command.";
 
 struct cmdname_help {
