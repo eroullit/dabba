@@ -25,5 +25,6 @@
 #define	HELP_H
 
 int cmd_help(int argc, const char **argv);
+void help_unknown_cmd(const char const *cmd);
 
 #endif				/* HELP_H */

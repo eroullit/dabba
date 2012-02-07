@@ -104,6 +104,8 @@ static int handle_internal_command(int argc, const char **argv)
 		return (run_builtin(p, argc, argv));
 	}
 
+	help_unknown_cmd(cmd);
+
 	return ENOSYS;
 }
 

@@ -41,6 +41,12 @@ static inline void mput_char(char c, uint32_t num)
 		putchar(c);
 }
 
+void help_unknown_cmd(const char const *cmd)
+{
+	assert(cmd);
+	printf("'%s' is not a dabba command. See 'dabba --help'.\n", cmd);
+}
+
 static void list_common_cmds_help(void)
 {
 	size_t i, longest = 0;
