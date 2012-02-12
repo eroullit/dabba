@@ -88,7 +88,7 @@ static int handle_internal_command(int argc, const char **argv)
 		{"help", cmd_help, 0}
 	};
 
-	if (argc == 0 || cmd == NULL)
+	if (argc == 0 || cmd == NULL || !strcmp(cmd, "--help"))
 		cmd = "help";
 
 	/* Turn "dabba cmd --help" into "dabba help cmd" */
