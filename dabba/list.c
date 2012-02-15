@@ -95,6 +95,8 @@ int cmd_list(int argc, const char **argv)
 
 	do {
 		msg.msg_body.offset += msg.msg_body.elem_nr;
+		msg.msg_body.elem_nr = 0;
+
 		rc = dabba_ipc_msg(&msg);
 
 		if (rc)
