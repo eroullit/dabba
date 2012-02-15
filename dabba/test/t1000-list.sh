@@ -26,6 +26,7 @@ EOF
 test_expect_failure 'invoke dabba list w/o dabbad' "$DABBA_PATH/dabba list"
 test_expect_success 'invoke dabba list with dabbad' "
     $DABBAD_PATH/dabbad --daemonize &&
+    sleep 0.1 &&
     $DABBA_PATH/dabba list > result &&
     killall dabbad &&
     generate_yaml_list > expected &&
