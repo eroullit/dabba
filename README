@@ -83,6 +83,10 @@ Some unit tests need the following extra capabilities:
 To grant them run in your build directory:
 	# make setcap
 
+When the code is compiled and capabilities are granted, unit tests
+can be executed by this command:
+	$ make test
+
 Contact
 =======
 
