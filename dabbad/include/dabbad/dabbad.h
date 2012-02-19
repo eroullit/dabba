@@ -25,6 +25,7 @@
 #define	DABBAD_H
 
 #include <stdint.h>
+#include <limits.h>
 #include <net/if.h>
 #include <sys/types.h>
 #include <sys/ipc.h>
@@ -32,7 +33,8 @@
 #include <sys/msg.h>
 
 enum dabba_msg_type {
-	DABBA_IFCONF
+	DABBA_IFCONF,
+	DABBA_CAPTURE
 };
 
 struct dabba_msg_buf {
@@ -41,6 +43,14 @@ struct dabba_msg_buf {
 
 struct dabba_ifconf {
 	char name[IFNAMSIZ];
+};
+
+struct dabba_capture {
+	char pcap_name[NAME_MAX];	/* find name length limit */
+	char dev_name[IFNAMSIZ];
+	uint64_t size;
+	uint32_t frame_size;
+	uint8_t page_order;
 };
 
 #define DABBA_IFCONF_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_ifconf))
@@ -56,6 +66,7 @@ struct dabba_ipc_msg {
 		union dabba_info {
 			struct dabba_msg_buf buf;
 			struct dabba_ifconf ifconf[DABBA_IFCONF_MAX_SIZE];
+			struct dabba_capture capture;
 		} msg;
 	} msg_body;
 };

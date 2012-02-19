@@ -28,6 +28,7 @@
 #include <dabbacore/macros.h>
 #include <dabbad/ipc.h>
 #include <dabbad/list.h>
+#include <dabbad/capture.h>
 
 static int dabbad_handle_msg(struct dabba_ipc_msg *msg)
 {
@@ -37,6 +38,9 @@ static int dabbad_handle_msg(struct dabba_ipc_msg *msg)
 	switch (msg->msg_body.type) {
 	case DABBA_IFCONF:
 		rc = dabbad_ifconf_get(msg);
+		break;
+	case DABBA_CAPTURE:
+		rc = dabbad_capture_start(msg);
 		break;
 	default:
 		rc = -1;
