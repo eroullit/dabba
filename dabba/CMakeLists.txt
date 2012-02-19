@@ -4,6 +4,6 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/include)
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/dabbacore/include)
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/dabbad/include)
 
-ADD_EXECUTABLE(dabba dabba.c help.c list.c ipc.c)
+ADD_EXECUTABLE(dabba dabba.c help.c list.c ipc.c capture.c)
 
 ADD_SUBDIRECTORY(test)

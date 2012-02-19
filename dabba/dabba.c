@@ -33,6 +33,7 @@
 #include <dabbad/dabbad.h>
 #include <dabba/help.h>
 #include <dabba/list.h>
+#include <dabba/capture.h>
 
 struct cmd_struct {
 	const char *cmd;
@@ -85,6 +86,7 @@ static int handle_internal_command(int argc, const char **argv)
 	const char *cmd = argv[0];
 	static struct cmd_struct commands[] = {
 		{"list", cmd_list, 0},
+		{"capture", cmd_capture, 0},
 		{"help", cmd_help, 0}
 	};
 
