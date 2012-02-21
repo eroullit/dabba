@@ -6,4 +6,6 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/dabbad/include)
 
 ADD_EXECUTABLE(dabba dabba.c help.c list.c ipc.c capture.c)
 
+TARGET_LINK_LIBRARIES(dabba dabbacore)
+
 ADD_SUBDIRECTORY(test)

@@ -23,6 +23,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <getopt.h>
 #include <assert.h>
 #include <dabbacore/macros.h>
 
@@ -34,6 +35,26 @@ struct cmdname_help {
 	char name[16];
 	char help[80];
 };
+
+void show_usage(const struct option const *opt)
+{
+	assert(opt);
+
+	printf("%s", dabba_usage_string);
+
+	if (opt != NULL) {
+		while (opt->name != NULL) {
+			printf("  --%s", opt->name);
+			if (opt->has_arg == required_argument)
+				printf(" <arg>\n");
+			else if (opt->has_arg == optional_argument)
+				printf(" [arg]\n");
+			else
+				printf("\n");
+			opt++;
+		}
+	}
+}
 
 static inline void mput_char(char c, uint32_t num)
 {
@@ -52,7 +73,8 @@ static void list_common_cmds_help(void)
 	size_t i, longest = 0;
 
 	static struct cmdname_help common_cmds[] = {
-		{"list", "list available network interfaces"}
+		{"list", "list available network interfaces"},
+		{"capture", "capture live traffic from an interface"}
 	};
 
 	for (i = 0; i < ARRAY_SIZE(common_cmds); i++) {
