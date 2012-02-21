@@ -66,4 +66,17 @@ int packet_mmap_create(struct packet_mmap *pkt_mmap,
 
 void packet_mmap_destroy(struct packet_mmap *pkt_mmap);
 
+static inline int packet_mmap_frame_size_is_valid(const uint64_t frame_size)
+{
+	switch (frame_size) {
+	case PACKET_MMAP_ETH_FRAME_LEN:
+	case PACKET_MMAP_JUMBO_FRAME_LEN:
+	case PACKET_MMAP_SUPER_JUMBO_FRAME_LEN:
+		return 1;
+		break;
+	default:
+		return 0;
+	}
+}
+
 #endif				/* PACKET_MMAP_H */
