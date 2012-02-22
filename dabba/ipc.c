@@ -26,11 +26,13 @@
 #include <unistd.h>
 #include <assert.h>
 #include <errno.h>
+#include <dabbacore/macros.h>
 #include <dabba/ipc.h>
 
 int dabba_ipc_msg(struct dabba_ipc_msg *msg)
 {
-	int qid;
+	struct sembuf semops[1];
+	int qid, semid, rc;
 	ssize_t rcv;
 	int snd;
 
@@ -43,6 +45,17 @@ int dabba_ipc_msg(struct dabba_ipc_msg *msg)
 		return errno;
 	}
 
+	semid = semget(qid, 1, 0660);
+
+	if (semid < 0) {
+		perror("Cannot get IPC semaphore");
+		return errno;
+	}
+
+	semops[0].sem_num = 0;
+	semops[0].sem_op = -1;
+	semops[0].sem_flg = 0;
+
 	snd = msgsnd(qid, msg, sizeof(msg->msg_body), 0);
 
 	if (snd < 0) {
@@ -50,7 +63,12 @@ int dabba_ipc_msg(struct dabba_ipc_msg *msg)
 		return errno;
 	}
 
-	usleep(100);
+	rc = semop(semid, semops, ARRAY_SIZE(semops));
+
+	if (rc) {
+		perror("Error on IPC semaphore operation");
+		return errno;
+	}
 
 	rcv = msgrcv(qid, msg, sizeof(msg->msg_body), 0, 0);
 
