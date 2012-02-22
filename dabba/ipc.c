@@ -23,6 +23,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 #include <assert.h>
 #include <errno.h>
 #include <dabba/ipc.h>
@@ -48,6 +49,8 @@ int dabba_ipc_msg(struct dabba_ipc_msg *msg)
 		perror("Error while sending IPC msg");
 		return errno;
 	}
+
+	usleep(100);
 
 	rcv = msgrcv(qid, msg, sizeof(msg->msg_body), 0, 0);
 
