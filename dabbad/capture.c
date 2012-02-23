@@ -23,14 +23,83 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <errno.h>
 #include <assert.h>
-#include <inttypes.h>
+#include <arpa/inet.h>
+#include <linux/if_ether.h>
 #include <dabbacore/packet_rx.h>
+#include <dabbacore/pcap.h>
 #include <dabbad/dabbad.h>
+
+static int capture_msg_is_valid(struct dabba_ipc_msg *msg)
+{
+	struct dabba_capture *capture_msg = &msg->msg_body.msg.capture;
+
+	if (!msg)
+		return 0;
+
+	if (strlen(capture_msg->dev_name) >= sizeof(capture_msg->dev_name))
+		return 0;
+
+	if (strlen(capture_msg->pcap_name) >= sizeof(capture_msg->pcap_name))
+		return 0;
+
+	/* refuse pcap name with '/' to not change directory */
+	if (strchr(capture_msg->pcap_name, '/'))
+		return 0;
+
+	if (!packet_mmap_frame_size_is_valid(capture_msg->frame_size))
+		return 0;
+
+	if (!capture_msg->page_order)
+		return 0;
+
+	return 1;
+}
 
 int dabbad_capture_start(struct dabba_ipc_msg *msg)
 {
-	assert(msg);
-	return 0;
+	struct packet_rx_thread *pkt_capture;
+	struct dabba_capture *capture_msg = &msg->msg_body.msg.capture;
+	int rc;
+	int sock = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
+
+	printf("sock %i\n", sock);
+
+	if (!capture_msg_is_valid(msg)) {
+		return EINVAL;
+	}
+
+	pkt_capture = calloc(1, sizeof(*pkt_capture));
+
+	if (!pkt_capture) {
+		return ENOMEM;
+	}
+
+	/* TODO: Secure file path */
+	pkt_capture->pcap_fd =
+	    pcap_create(msg->msg_body.msg.capture.pcap_name, LINKTYPE_EN10MB);
+
+	rc = packet_mmap_create(&pkt_capture->pkt_rx, capture_msg->dev_name,
+				sock, PACKET_MMAP_RX, capture_msg->frame_size,
+				capture_msg->page_order, capture_msg->size);
+	printf("rc = %i\n", rc);
+
+	if (rc) {
+		free(pkt_capture);
+		goto out;
+	}
+
+	/* TODO: Add pthread attribute support */
+	rc = pthread_create(&pkt_capture->thread, NULL, packet_rx, pkt_capture);
+
+	if (rc) {
+		packet_mmap_destroy(&pkt_capture->pkt_rx);
+		free(pkt_capture);
+	}
+
+ out:
+	printf("Start capture? %i\n", rc);
+	return rc;
 }
