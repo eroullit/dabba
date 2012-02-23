@@ -5,4 +5,4 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/include
 
 ADD_EXECUTABLE(dabbad dabbad.c list.c ipc.c help.c capture.c)
 
-TARGET_LINK_LIBRARIES (dabbad dabbacore)
+TARGET_LINK_LIBRARIES (dabbad dabbacore ${CMAKE_THREAD_LIBS_INIT})
