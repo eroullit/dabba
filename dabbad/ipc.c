@@ -44,7 +44,7 @@ static int dabbad_handle_msg(struct dabba_ipc_msg *msg)
 		break;
 	default:
 		rc = -1;
-		errno = EINVAL;
+		errno = ENOSYS;
 		break;
 	}
 
