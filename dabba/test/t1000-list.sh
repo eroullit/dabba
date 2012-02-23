@@ -42,7 +42,10 @@ cat <<EOF
 EOF
 }
 
-test_expect_failure 'invoke dabba list w/o dabbad' "$DABBA_PATH/dabba list"
+test_expect_success 'invoke dabba list w/o dabbad' "
+    test_must_fail $DABBA_PATH/dabba list
+"
+
 test_expect_success 'invoke dabba list with dabbad' "
     $DABBAD_PATH/dabbad --daemonize &&
     sleep 0.1 &&
