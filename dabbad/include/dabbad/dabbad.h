@@ -62,6 +62,11 @@ struct dabba_ipc_msg {
 
 static inline int dabba_get_ipc_queue_id(int flags)
 {
-	return msgget(ftok("/tmp/dabba", 0xDABADABA), flags);
+	key_t key = ftok("/tmp/dabba", 0xDABADABA);
+
+	if (key == -1)
+		return key;
+
+	return msgget(key, flags);
 }
 #endif				/* DABBAD_H */
