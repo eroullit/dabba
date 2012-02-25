@@ -21,14 +21,26 @@ test_description='Test dabba list command'
 
 . ./sharness.sh
 
+max_interface_nr=4095
+interface_nr=100
+
 DABBAD_PATH="$TEST_DIRECTORY/../../dabbad"
 DABBA_PATH="$TEST_DIRECTORY/../../dabba"
 
+flush_test_interface()
+{
+    for i in `seq $max_interface_nr`
+    do
+        sudo vconfig rem lo.$i > /dev/null 2>&1
+    done
+}
+
 generate_list(){
-for dev in `sed '1,2d' /proc/net/dev | awk -F ':' '{ print $1 }' | tr -d ' '`
-do
-    echo "    - $dev" >> dev_list
-done
+        rm dev_list
+        for dev in `sed '1,2d' /proc/net/dev | awk -F ':' '{ print $1 }' | tr -d ' '`
+        do
+            echo "    - $dev" >> dev_list
+        done
 }
 
 generate_yaml_list()
@@ -46,7 +58,9 @@ test_expect_success 'invoke dabba list w/o dabbad' "
     test_must_fail $DABBA_PATH/dabba list
 "
 
-test_expect_success 'invoke dabba list with dabbad' "
+flush_test_interface
+
+test_expect_success "invoke dabba list with dabbad" "
     $DABBAD_PATH/dabbad --daemonize &&
     sleep 0.1 &&
     $DABBA_PATH/dabba list > result &&
@@ -54,6 +68,21 @@ test_expect_success 'invoke dabba list with dabbad' "
     generate_yaml_list > expected &&
     test_cmp expected result
 "
+
+for i in `seq $interface_nr`
+do
+        test_expect_success "invoke dabba list with dabbad with $i extra interfaces" "
+            sudo vconfig add lo $i &&
+            $DABBAD_PATH/dabbad --daemonize &&
+            sleep 0.1 &&
+            $DABBA_PATH/dabba list > result &&
+            killall dabbad &&
+            generate_yaml_list > expected &&
+            test_cmp expected result
+        "
+done
+
+flush_test_interface
 
 test_done
 
