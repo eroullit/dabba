@@ -54,9 +54,9 @@ cat <<EOF
 EOF
 }
 
-test_expect_success 'invoke dabba list w/o dabbad' "
-    test_must_fail $DABBA_PATH/dabba list
-"
+#test_expect_success 'invoke dabba list w/o dabbad' "
+#    test_must_fail $DABBA_PATH/dabba list
+#"
 
 flush_test_interface
 
