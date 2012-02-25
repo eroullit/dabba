@@ -25,7 +25,6 @@
 #include <string.h>
 #include <errno.h>
 #include <assert.h>
-#include <dabbacore/macros.h>
 #include <dabbad/ipc.h>
 #include <dabbad/list.h>
 #include <dabbad/capture.h>
@@ -51,21 +50,6 @@ static int dabbad_handle_msg(struct dabba_ipc_msg *msg)
 	return rc;
 }
 
-static int dabbad_ipc_sem_init(int qid)
-{
-	int semid;
-	union semun {
-		int val;
-	} argument;
-
-	semid = semget(qid, 1, IPC_CREAT | 0660);
-
-	if (semid < 0)
-		return semid;
-
-	return semctl(semid, 0, SETVAL, argument);
-}
-
 int dabbad_ipc_msg_init(void)
 {
 	return msgctl(dabba_get_ipc_queue_id(0), IPC_RMID, NULL);
@@ -73,8 +57,7 @@ int dabbad_ipc_msg_init(void)
 
 int dabbad_ipc_msg_poll(void)
 {
-	struct sembuf semops[1];
-	int qid, semid, rc;
+	int qid;
 	ssize_t rcv;
 	int snd;
 	struct dabba_ipc_msg msg;
@@ -83,18 +66,6 @@ int dabbad_ipc_msg_poll(void)
 
 	if (qid < 0) {
 		perror("Cannot get IPC id");
-		return errno;
-	}
-
-	if (dabbad_ipc_sem_init(qid)) {
-		perror("Cannot initialise IPC semaphore");
-		return errno;
-	}
-
-	semid = semget(qid, 1, 0660);
-
-	if (semid < 0) {
-		perror("Cannot get IPC semaphore");
 		return errno;
 	}
 
@@ -117,17 +88,6 @@ int dabbad_ipc_msg_poll(void)
 
 		if (snd < 0) {
 			perror("Error while sending back IPC msg");
-			return errno;
-		}
-
-		semops[0].sem_num = 0;
-		semops[0].sem_op = 1;
-		semops[0].sem_flg = 0;
-
-		rc = semop(semid, semops, ARRAY_SIZE(semops));
-
-		if (rc) {
-			perror("Error on IPC semaphore operation");
 			return errno;
 		}
 	}
