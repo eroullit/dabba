@@ -42,13 +42,13 @@ int dabbad_ifconf_get(struct dabba_ipc_msg *msg)
 	ifa = ifaddr;
 
 	for (off = 0; ifa && off < msg->msg_body.offset; ifa = ifa->ifa_next) {
-		if (ifa->ifa_addr->sa_family != AF_PACKET)
+		if (!ifa->ifa_addr || ifa->ifa_addr->sa_family != AF_PACKET)
 			continue;
 		off++;
 	}
 
 	for (a = 0; ifa && a < ifconf_size; ifa = ifa->ifa_next) {
-		if (ifa->ifa_addr->sa_family != AF_PACKET)
+		if (!ifa->ifa_addr || ifa->ifa_addr->sa_family != AF_PACKET)
 			continue;
 
 		strlcpy(msg->msg_body.msg.ifconf[a].name, ifa->ifa_name,
