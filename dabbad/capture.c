@@ -65,8 +65,6 @@ int dabbad_capture_start(struct dabba_ipc_msg *msg)
 	int rc;
 	int sock = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
 
-	printf("sock %i\n", sock);
-
 	if (!capture_msg_is_valid(msg)) {
 		return EINVAL;
 	}
@@ -84,7 +82,6 @@ int dabbad_capture_start(struct dabba_ipc_msg *msg)
 	rc = packet_mmap_create(&pkt_capture->pkt_rx, capture_msg->dev_name,
 				sock, PACKET_MMAP_RX, capture_msg->frame_size,
 				capture_msg->page_order, capture_msg->size);
-	printf("rc = %i\n", rc);
 
 	if (rc) {
 		free(pkt_capture);
@@ -100,6 +97,5 @@ int dabbad_capture_start(struct dabba_ipc_msg *msg)
 	}
 
  out:
-	printf("Start capture? %i\n", rc);
 	return rc;
 }
