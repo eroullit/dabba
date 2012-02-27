@@ -75,7 +75,6 @@ int dabbad_capture_start(struct dabba_ipc_msg *msg)
 		return ENOMEM;
 	}
 
-	/* TODO: Secure file path */
 	pkt_capture->pcap_fd =
 	    pcap_create(msg->msg_body.msg.capture.pcap_name, LINKTYPE_EN10MB);
 
