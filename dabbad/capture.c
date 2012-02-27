@@ -62,16 +62,20 @@ int dabbad_capture_start(struct dabba_ipc_msg *msg)
 {
 	struct packet_rx_thread *pkt_capture;
 	struct dabba_capture *capture_msg = &msg->msg_body.msg.capture;
-	int rc;
-	int sock = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
+	int rc, sock;
 
-	if (!capture_msg_is_valid(msg)) {
+	if (!capture_msg_is_valid(msg))
 		return EINVAL;
-	}
+
+	sock = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
+
+	if (sock < 0)
+		return errno;
 
 	pkt_capture = calloc(1, sizeof(*pkt_capture));
 
 	if (!pkt_capture) {
+		close(sock);
 		return ENOMEM;
 	}
 
@@ -84,7 +88,8 @@ int dabbad_capture_start(struct dabba_ipc_msg *msg)
 
 	if (rc) {
 		free(pkt_capture);
-		goto out;
+		close(sock);
+		return rc;
 	}
 
 	/* TODO: Add pthread attribute support */
@@ -93,8 +98,8 @@ int dabbad_capture_start(struct dabba_ipc_msg *msg)
 	if (rc) {
 		packet_mmap_destroy(&pkt_capture->pkt_rx);
 		free(pkt_capture);
+		close(sock);
 	}
 
- out:
 	return rc;
 }
