@@ -55,6 +55,18 @@ int dabbad_ipc_msg_init(void)
 	return msgctl(dabba_get_ipc_queue_id(0), IPC_RMID, NULL);
 }
 
+void dabbad_ipc_msg_flush(int qid)
+{
+	struct dabba_ipc_msg msg;
+	ssize_t rcv;
+
+	do {
+		rcv =
+		    msgrcv(qid, &msg, sizeof(msg.msg_body), 0,
+			   IPC_NOWAIT | MSG_NOERROR);
+	} while (rcv > 0);
+}
+
 int dabbad_ipc_msg_poll(void)
 {
 	int qid;
@@ -68,6 +80,8 @@ int dabbad_ipc_msg_poll(void)
 		perror("Cannot get IPC id");
 		return errno;
 	}
+
+	dabbad_ipc_msg_flush(qid);
 
 	for (;;) {
 		memset(&msg, 0, sizeof(msg));
