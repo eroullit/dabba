@@ -21,7 +21,6 @@ test_description='Test dabba list command'
 
 . ./sharness.sh
 
-max_interface_nr=4095
 interface_nr=100
 
 DABBAD_PATH="$TEST_DIRECTORY/../../dabbad"
@@ -29,10 +28,12 @@ DABBA_PATH="$TEST_DIRECTORY/../../dabba"
 
 flush_test_interface()
 {
-    for i in `seq $max_interface_nr`
-    do
-        sudo vconfig rem lo.$i > /dev/null 2>&1
-    done
+        sudo rmmod dummy
+}
+
+create_test_interface()
+{
+        sudo modprobe dummy numdummies=$interface_nr
 }
 
 generate_list(){
@@ -69,18 +70,16 @@ test_expect_success "invoke dabba list with dabbad" "
     test_cmp expected result
 "
 
-for i in `seq $interface_nr`
-do
-        test_expect_success "invoke dabba list with dabbad with $i extra interfaces" "
-            sudo vconfig add lo $i &&
-            $DABBAD_PATH/dabbad --daemonize &&
-            sleep 0.1 &&
-            $DABBA_PATH/dabba list > result &&
-            killall dabbad &&
-            generate_yaml_list > expected &&
-            test_cmp expected result
-        "
-done
+create_test_interface
+
+test_expect_success "invoke dabba list with dabbad with $interface_nr extra interfaces" "
+    $DABBAD_PATH/dabbad --daemonize &&
+    sleep 0.1 &&
+    $DABBA_PATH/dabba list > result &&
+    killall dabbad &&
+    generate_yaml_list > expected &&
+    test_cmp expected result
+"
 
 flush_test_interface
 
