@@ -26,6 +26,8 @@ interface_nr=100
 DABBAD_PATH="$TEST_DIRECTORY/../../dabbad"
 DABBA_PATH="$TEST_DIRECTORY/../../dabba"
 
+modinfo dummy 2>&1 > /dev/null && test_set_prereq DUMMY_DEV
+
 flush_test_interface()
 {
         sudo rmmod dummy
@@ -59,7 +61,9 @@ EOF
 #    test_must_fail $DABBA_PATH/dabba list
 #"
 
-flush_test_interface
+test_expect_success DUMMY_DEV "Setup: Remove all dummy interfaces" "
+    test_might_fail flush_test_interface
+"
 
 test_expect_success "invoke dabba list with dabbad" "
     $DABBAD_PATH/dabbad --daemonize &&
@@ -70,9 +74,11 @@ test_expect_success "invoke dabba list with dabbad" "
     test_cmp expected result
 "
 
-create_test_interface
+test_expect_success DUMMY_DEV "Setup: Create $interface_nr dummy interfaces" "
+    create_test_interface
+"
 
-test_expect_success "invoke dabba list with dabbad with $interface_nr extra interfaces" "
+test_expect_success DUMMY_DEV "invoke dabba list with dabbad with $interface_nr extra interfaces" "
     $DABBAD_PATH/dabbad --daemonize &&
     sleep 0.1 &&
     $DABBA_PATH/dabba list > result &&
@@ -81,7 +87,9 @@ test_expect_success "invoke dabba list with dabbad with $interface_nr extra inte
     test_cmp expected result
 "
 
-flush_test_interface
+test_expect_success DUMMY_DEV "Cleanup: Remove all dummy interfaces" "
+    flush_test_interface
+"
 
 test_done
 
