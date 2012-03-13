@@ -70,9 +70,13 @@ struct dabba_ipc_msg {
 	} msg_body;
 };
 
+#ifndef DABBAD_PID_FILE
+#define DABBAD_PID_FILE "/tmp/dabba.pid"
+#endif /* DABBAD_PID_FILE */
+
 static inline int dabba_get_ipc_queue_id(int flags)
 {
-	key_t key = ftok("/tmp/dabba", 0xDABADABA);
+	key_t key = ftok(DABBAD_PID_FILE, 0xDABADABA);
 
 	if (key == -1)
 		return key;

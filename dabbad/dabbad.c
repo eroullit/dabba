@@ -27,6 +27,10 @@
 #include <unistd.h>
 #include <assert.h>
 #include <getopt.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 
 #include <dabbad/ipc.h>
 #include <dabbad/help.h>
@@ -45,6 +49,28 @@ const struct option *dabbad_options_get(void)
 	};
 
 	return (dabbad_long_options);
+}
+
+static inline int dabbad_pidfile_create(void)
+{
+	int rc = EIO;
+	int pidfd = -1;
+	char pidstr[8] = {0};
+	ssize_t pidstrlen = 0;
+
+	pidfd = creat(DABBAD_PID_FILE, 0600);
+
+	if (pidfd < 0)
+		return errno;
+
+	pidstrlen = snprintf(pidstr, sizeof(pidstr), "%i\n", getpid());
+
+	if (write(pidfd, pidstr, pidstrlen) != pidstrlen) {
+		rc = EIO;
+	}
+
+	close(pidfd);
+	return rc;
 }
 
 int main(int argc, char **argv)
@@ -78,6 +104,7 @@ int main(int argc, char **argv)
 		}
 	}
 
+	assert(dabbad_pidfile_create());
 	dabbad_ipc_msg_init();
 
 	return dabbad_ipc_msg_poll();
