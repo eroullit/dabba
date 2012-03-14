@@ -36,6 +36,7 @@ flush_test_interface()
 create_test_interface()
 {
         sudo modprobe dummy numdummies=$interface_nr
+        sleep 1
 }
 
 generate_list(){
