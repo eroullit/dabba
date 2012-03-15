@@ -27,11 +27,20 @@
 #include <unistd.h>
 #include <errno.h>
 #include <assert.h>
+#include <sys/queue.h>
 #include <arpa/inet.h>
 #include <linux/if_ether.h>
 #include <dabbacore/packet_rx.h>
 #include <dabbacore/pcap.h>
 #include <dabbad/dabbad.h>
+
+struct capture_thread_node
+{
+	pthread_t thread_id;
+	SLIST_ENTRY(capture_thread_node) entry;
+};
+
+static SLIST_HEAD(capture_thread_head, capture_thread_node) thread_head;
 
 static int capture_msg_is_valid(struct dabba_ipc_msg *msg)
 {
@@ -62,6 +71,7 @@ static int capture_msg_is_valid(struct dabba_ipc_msg *msg)
 int dabbad_capture_start(struct dabba_ipc_msg *msg)
 {
 	struct packet_rx_thread *pkt_capture;
+	struct capture_thread_node *thread_node;
 	struct dabba_capture *capture_msg = &msg->msg_body.msg.capture;
 	int rc, sock;
 
@@ -74,8 +84,11 @@ int dabbad_capture_start(struct dabba_ipc_msg *msg)
 		return errno;
 
 	pkt_capture = calloc(1, sizeof(*pkt_capture));
+	thread_node = calloc(1, sizeof(*thread_node));
 
-	if (!pkt_capture) {
+	if (!pkt_capture || !thread_node) {
+		free(pkt_capture);
+		free(thread_node);
 		close(sock);
 		return ENOMEM;
 	}
@@ -96,9 +109,14 @@ int dabbad_capture_start(struct dabba_ipc_msg *msg)
 	/* TODO: Add pthread attribute support */
 	rc = pthread_create(&pkt_capture->thread, NULL, packet_rx, pkt_capture);
 
-	if (rc) {
+	if (!rc) {
+		thread_node->thread_id = pkt_capture->thread;
+		SLIST_INSERT_HEAD(&thread_head, thread_node, entry);
+	}
+	else {
 		packet_mmap_destroy(&pkt_capture->pkt_rx);
 		free(pkt_capture);
+		free(thread_node);
 		close(sock);
 	}
 
