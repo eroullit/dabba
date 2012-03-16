@@ -30,21 +30,22 @@
 #include <sys/queue.h>
 #include <arpa/inet.h>
 #include <linux/if_ether.h>
+
+#include <dabbacore/macros.h>
 #include <dabbacore/packet_rx.h>
 #include <dabbacore/pcap.h>
 #include <dabbad/dabbad.h>
 
-struct capture_thread_node
-{
+struct capture_thread_node {
 	pthread_t thread_id;
-	SLIST_ENTRY(capture_thread_node) entry;
+	 SLIST_ENTRY(capture_thread_node) entry;
 };
 
 static SLIST_HEAD(capture_thread_head, capture_thread_node) thread_head;
 
 static int capture_msg_is_valid(struct dabba_ipc_msg *msg)
 {
-	struct dabba_capture *capture_msg = &msg->msg_body.msg.capture;
+	struct dabba_capture *capture_msg = msg->msg_body.msg.capture;
 
 	if (!msg)
 		return 0;
@@ -72,7 +73,7 @@ int dabbad_capture_start(struct dabba_ipc_msg *msg)
 {
 	struct packet_rx_thread *pkt_capture;
 	struct capture_thread_node *thread_node;
-	struct dabba_capture *capture_msg = &msg->msg_body.msg.capture;
+	struct dabba_capture *capture_msg = msg->msg_body.msg.capture;
 	int rc, sock;
 
 	if (!capture_msg_is_valid(msg))
@@ -94,7 +95,7 @@ int dabbad_capture_start(struct dabba_ipc_msg *msg)
 	}
 
 	pkt_capture->pcap_fd =
-	    pcap_create(msg->msg_body.msg.capture.pcap_name, LINKTYPE_EN10MB);
+	    pcap_create(msg->msg_body.msg.capture->pcap_name, LINKTYPE_EN10MB);
 
 	rc = packet_mmap_create(&pkt_capture->pkt_rx, capture_msg->dev_name,
 				sock, PACKET_MMAP_RX, capture_msg->frame_size,
@@ -112,8 +113,7 @@ int dabbad_capture_start(struct dabba_ipc_msg *msg)
 	if (!rc) {
 		thread_node->thread_id = pkt_capture->thread;
 		SLIST_INSERT_HEAD(&thread_head, thread_node, entry);
-	}
-	else {
+	} else {
 		packet_mmap_destroy(&pkt_capture->pkt_rx);
 		free(pkt_capture);
 		free(thread_node);
@@ -121,4 +121,29 @@ int dabbad_capture_start(struct dabba_ipc_msg *msg)
 	}
 
 	return rc;
+}
+
+int dabbad_capture_list(struct dabba_ipc_msg *msg)
+{
+	struct capture_thread_node *node;
+	struct dabba_capture *capture;
+	size_t a = 0, off = 0, thread_list_size;
+
+	capture = msg->msg_body.msg.capture;
+	thread_list_size = ARRAY_SIZE(msg->msg_body.msg.capture);
+
+	SLIST_FOREACH(node, &thread_head, entry) {
+		if (off < msg->msg_body.offset) {
+			off++;
+			continue;
+		}
+
+		if (a >= thread_list_size)
+			break;
+
+		capture->thread_id = node->thread_id;
+		a++;
+	}
+
+	return 0;
 }

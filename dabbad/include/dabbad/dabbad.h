@@ -47,12 +47,14 @@ struct dabba_ifconf {
 struct dabba_capture {
 	char pcap_name[NAME_MAX];	/* find name length limit */
 	char dev_name[IFNAMSIZ];
+	pthread_t thread_id;
 	uint64_t size;
 	uint32_t frame_size;
 	uint8_t page_order;
 };
 
 #define DABBA_IFCONF_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_ifconf))
+#define DABBA_CAPTURE_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_capture))
 
 struct dabba_ipc_msg {
 	long mtype;
@@ -65,14 +67,14 @@ struct dabba_ipc_msg {
 		union dabba_info {
 			struct dabba_msg_buf buf;
 			struct dabba_ifconf ifconf[DABBA_IFCONF_MAX_SIZE];
-			struct dabba_capture capture;
+			struct dabba_capture capture[DABBA_CAPTURE_MAX_SIZE];
 		} msg;
 	} msg_body;
 };
 
 #ifndef DABBAD_PID_FILE
 #define DABBAD_PID_FILE "/tmp/dabba.pid"
-#endif /* DABBAD_PID_FILE */
+#endif				/* DABBAD_PID_FILE */
 
 static inline int dabba_get_ipc_queue_id(int flags)
 {

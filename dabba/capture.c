@@ -53,7 +53,7 @@ static struct option *capture_options_get(void)
 static int prepare_capture_query(int argc, char **argv,
 				 struct dabba_ipc_msg *msg)
 {
-	struct dabba_capture *capture_msg = &msg->msg_body.msg.capture;
+	struct dabba_capture *capture_msg = msg->msg_body.msg.capture;
 	int ret = 0;
 	int rc = 0;
 
