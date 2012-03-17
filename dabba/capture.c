@@ -59,7 +59,7 @@ static int prepare_capture_query(int argc, char **argv,
 
 	assert(msg);
 	msg->mtype = 1;
-	msg->msg_body.type = DABBA_CAPTURE;
+	msg->msg_body.type = DABBA_CAPTURE_START;
 
 	while ((ret =
 		getopt_long_only(argc, argv, "", capture_options_get(),

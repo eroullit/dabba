@@ -38,7 +38,7 @@ static int dabbad_handle_msg(struct dabba_ipc_msg *msg)
 	case DABBA_IFCONF:
 		rc = dabbad_ifconf_get(msg);
 		break;
-	case DABBA_CAPTURE:
+	case DABBA_CAPTURE_START:
 		rc = dabbad_capture_start(msg);
 		break;
 	default:

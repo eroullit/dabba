@@ -33,7 +33,7 @@
 
 enum dabba_msg_type {
 	DABBA_IFCONF,
-	DABBA_CAPTURE
+	DABBA_CAPTURE_START
 };
 
 struct dabba_msg_buf {
