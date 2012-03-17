@@ -26,34 +26,38 @@
 #include <string.h>
 #include <assert.h>
 #include <getopt.h>
+#include <errno.h>
+
+#include <dabbacore/macros.h>
 #include <dabbacore/strlcpy.h>
 #include <dabbacore/packet_mmap.h>
+#include <dabba/dabba.h>
 #include <dabba/help.h>
 #include <dabba/ipc.h>
 #include <dabbad/dabbad.h>
 
-enum capture_option {
+enum capture_start_option {
 	OPT_CAPTURE_DEVICE,
 	OPT_CAPTURE_PCAP,
 	OPT_CAPTURE_SIZE
 };
 
-static struct option *capture_options_get(void)
+static struct option *capture_start_options_get(void)
 {
-	static struct option capture_option[] = {
+	static struct option capture_start_option[] = {
 		{"device", required_argument, NULL, OPT_CAPTURE_DEVICE},
 		{"pcap", required_argument, NULL, OPT_CAPTURE_PCAP},
 		{"size", required_argument, NULL, OPT_CAPTURE_SIZE},
 		{NULL, 0, NULL, 0},
 	};
 
-	return capture_option;
+	return capture_start_option;
 }
 
-static int prepare_capture_query(int argc, char **argv,
-				 struct dabba_ipc_msg *msg)
+static int prepare_capture_start_query(int argc, char **argv,
+				       struct dabba_ipc_msg *msg)
 {
-	struct dabba_capture *capture_msg = msg->msg_body.msg.capture;
+	struct dabba_capture *capture_start_msg = msg->msg_body.msg.capture;
 	int ret = 0;
 	int rc = 0;
 
@@ -62,36 +66,36 @@ static int prepare_capture_query(int argc, char **argv,
 	msg->msg_body.type = DABBA_CAPTURE_START;
 
 	while ((ret =
-		getopt_long_only(argc, argv, "", capture_options_get(),
+		getopt_long_only(argc, argv, "", capture_start_options_get(),
 				 NULL)) != EOF) {
 		switch (ret) {
 		case OPT_CAPTURE_DEVICE:
-			strlcpy(capture_msg->dev_name, optarg,
-				sizeof(capture_msg->dev_name));
+			strlcpy(capture_start_msg->dev_name, optarg,
+				sizeof(capture_start_msg->dev_name));
 			break;
 
 		case OPT_CAPTURE_PCAP:
-			strlcpy(capture_msg->pcap_name, optarg,
-				sizeof(capture_msg->pcap_name));
+			strlcpy(capture_start_msg->pcap_name, optarg,
+				sizeof(capture_start_msg->pcap_name));
 			break;
 		case OPT_CAPTURE_SIZE:
-			capture_msg->size = strtoull(optarg, NULL, 10);
+			capture_start_msg->size = strtoull(optarg, NULL, 10);
 			break;
 		default:
-			show_usage(capture_options_get());
+			show_usage(capture_start_options_get());
 			rc = -1;
 			break;
 		}
 	}
 
 	/* Assume conservative values for now */
-	capture_msg->page_order = 10;
-	capture_msg->frame_size = PACKET_MMAP_ETH_FRAME_LEN;
+	capture_start_msg->page_order = 10;
+	capture_start_msg->frame_size = PACKET_MMAP_ETH_FRAME_LEN;
 
 	return rc;
 }
 
-int cmd_capture(int argc, const char **argv)
+int cmd_capture_start(int argc, const char **argv)
 {
 	struct dabba_ipc_msg msg;
 	int rc;
@@ -101,7 +105,7 @@ int cmd_capture(int argc, const char **argv)
 
 	memset(&msg, 0, sizeof(msg));
 
-	rc = prepare_capture_query(argc, (char **)argv, &msg);
+	rc = prepare_capture_start_query(argc, (char **)argv, &msg);
 
 	if (rc)
 		return rc;
@@ -110,4 +114,33 @@ int cmd_capture(int argc, const char **argv)
 	msg.msg_body.elem_nr = 1;
 
 	return dabba_ipc_msg(&msg);
+}
+
+int cmd_capture_list(int argc, const char **argv)
+{
+	assert(argc >= 0);
+	assert(argv);
+
+	return ENOSYS;
+}
+
+int cmd_capture(int argc, const char **argv)
+{
+	const char *cmd = argv[0];
+	size_t i;
+	static struct cmd_struct capture_commands[] = {
+		{"list", cmd_capture_list, 0},
+		{"start", cmd_capture_start, 0}
+	};
+
+	/* TODO --help handling here */
+
+	for (i = 0; ARRAY_SIZE(capture_commands); i++) {
+		struct cmd_struct *p = capture_commands + i;
+		if (strcmp(p->cmd, cmd))
+			continue;
+		return (run_builtin(p, argc, argv));
+	}
+
+	return ENOSYS;
 }

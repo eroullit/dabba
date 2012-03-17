@@ -31,17 +31,12 @@
 
 #include <dabbacore/macros.h>
 #include <dabbad/dabbad.h>
+#include <dabba/dabba.h>
 #include <dabba/help.h>
 #include <dabba/list.h>
 #include <dabba/capture.h>
 
-struct cmd_struct {
-	const char *cmd;
-	int (*fn) (int, const char **);
-	int option;
-};
-
-static int run_builtin(struct cmd_struct *p, int argc, const char **argv)
+int run_builtin(struct cmd_struct *p, int argc, const char **argv)
 {
 	int status;
 	struct stat st;
@@ -103,6 +98,10 @@ static int handle_internal_command(int argc, const char **argv)
 		struct cmd_struct *p = commands + i;
 		if (strcmp(p->cmd, cmd))
 			continue;
+
+		argc--;
+		argv++;
+
 		return (run_builtin(p, argc, argv));
 	}
 

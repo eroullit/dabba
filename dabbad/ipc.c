@@ -41,6 +41,9 @@ static int dabbad_handle_msg(struct dabba_ipc_msg *msg)
 	case DABBA_CAPTURE_START:
 		rc = dabbad_capture_start(msg);
 		break;
+	case DABBA_CAPTURE_LIST:
+		rc = dabbad_capture_list(msg);
+		break;
 	default:
 		rc = -1;
 		errno = ENOSYS;
