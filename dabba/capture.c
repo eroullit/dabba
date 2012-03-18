@@ -95,6 +95,34 @@ static int prepare_capture_start_query(int argc, char **argv,
 	return rc;
 }
 
+static void prepare_capture_list_query(struct dabba_ipc_msg *msg)
+{
+	assert(msg);
+	msg->mtype = 1;
+	msg->msg_body.type = DABBA_CAPTURE_LIST;
+}
+
+static void display_capture_list_msg_header(void)
+{
+	printf("---\n");
+	printf("  captures:\n");
+}
+
+static void display_capture_list(const struct dabba_ipc_msg const *msg)
+{
+	size_t a, elem_nr;
+
+	assert(msg);
+
+	elem_nr =
+	    min(msg->msg_body.elem_nr, ARRAY_SIZE(msg->msg_body.msg.capture));
+
+	for (a = 0; a < elem_nr; a++) {
+		printf("    - %u\n",
+		       (uint32_t) msg->msg_body.msg.capture[a].thread_id);
+	}
+}
+
 int cmd_capture_start(int argc, const char **argv)
 {
 	struct dabba_ipc_msg msg;
@@ -118,10 +146,29 @@ int cmd_capture_start(int argc, const char **argv)
 
 int cmd_capture_list(int argc, const char **argv)
 {
+	int rc;
+	struct dabba_ipc_msg msg;
+
 	assert(argc >= 0);
 	assert(argv);
 
-	return ENOSYS;
+	memset(&msg, 0, sizeof(msg));
+	prepare_capture_list_query(&msg);
+	display_capture_list_msg_header();
+
+	do {
+		msg.msg_body.offset += msg.msg_body.elem_nr;
+		msg.msg_body.elem_nr = 0;
+
+		rc = dabba_ipc_msg(&msg);
+
+		if (rc)
+			break;
+
+		display_capture_list(&msg);
+	} while (msg.msg_body.elem_nr);
+
+	return rc;
 }
 
 int cmd_capture(int argc, const char **argv)
