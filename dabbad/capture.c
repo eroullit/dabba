@@ -141,7 +141,7 @@ int dabbad_capture_list(struct dabba_ipc_msg *msg)
 		if (a >= thread_list_size)
 			break;
 
-		capture->thread_id = node->thread_id;
+		capture[a].thread_id = node->thread_id;
 		a++;
 	}
 
