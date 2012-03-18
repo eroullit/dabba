@@ -145,5 +145,7 @@ int dabbad_capture_list(struct dabba_ipc_msg *msg)
 		a++;
 	}
 
+	msg->msg_body.elem_nr = a;
+
 	return 0;
 }
