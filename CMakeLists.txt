@@ -20,7 +20,7 @@ FIND_PACKAGE(Doxygen)
 FIND_PACKAGE(Setcap)
 
 IF(NOT SETCAP_FOUND)
-	MESSAGE("WARNING! It is highly recommanded to have setcap. See README")
+	MESSAGE(FATAL ERROR "setcap could not be found. See README for further information")
 ENDIF(NOT SETCAP_FOUND)
 
 INCLUDE(CheckBPFAttach)
