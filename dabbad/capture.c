@@ -37,7 +37,7 @@
 #include <dabbad/dabbad.h>
 
 struct capture_thread_node {
-	pthread_t thread_id;
+	struct packet_rx_thread *pkt_capture;
 	 SLIST_ENTRY(capture_thread_node) entry;
 };
 
@@ -111,7 +111,7 @@ int dabbad_capture_start(struct dabba_ipc_msg *msg)
 	rc = pthread_create(&pkt_capture->thread, NULL, packet_rx, pkt_capture);
 
 	if (!rc) {
-		thread_node->thread_id = pkt_capture->thread;
+		thread_node->pkt_capture = pkt_capture;
 		SLIST_INSERT_HEAD(&thread_head, thread_node, entry);
 	} else {
 		packet_mmap_destroy(&pkt_capture->pkt_rx);
@@ -141,7 +141,7 @@ int dabbad_capture_list(struct dabba_ipc_msg *msg)
 		if (a >= thread_list_size)
 			break;
 
-		capture[a].thread_id = node->thread_id;
+		capture[a].thread_id = node->pkt_capture->thread;
 		a++;
 	}
 
