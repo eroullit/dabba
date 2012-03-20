@@ -34,7 +34,7 @@
 
 /**
  * \brief Abort build when expression is equal zero
- * \param e expression
+ * \param[in] e expression
  *
  * Force a compilation error if condition is true, but also produce a
  * result (of value 0 and type size_t), so the expression can be used
@@ -46,7 +46,7 @@
 
 /**
  * \brief Check if the variable is an array
- * \param e variable to check
+ * \param[in] e variable to check
  *
  * Force a compilation error if the variable is not an array
  */
@@ -56,7 +56,7 @@
 
 /**
  * \brief Returns the amount of element the array holds
- * \param arr input array
+ * \param[in] arr input array
  *
  * Force a compilation error if the variable is not an array
  */
@@ -76,8 +76,8 @@ static inline int is_power_of_2(const uint64_t n)
 
 /**
  * \brief Returns the minimum value between two variables
- * \param x First variable
- * \param y Second variable
+ * \param[in] x First variable
+ * \param[in] y Second variable
  * \return minimum value between the two variable
  * \note Force a compilation error if the variable types don't match
  */
@@ -92,8 +92,8 @@ static inline int is_power_of_2(const uint64_t n)
 
 /**
  * \brief Returns the maximum value between two variables
- * \param x First variable
- * \param y Second variable
+ * \param[in] x First variable
+ * \param[in] y Second variable
  * \return maximum value between the two variable
  * \note Force a compilation error if the variable types don't match
  */
