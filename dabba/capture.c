@@ -110,14 +110,12 @@ static void display_capture_list_msg_header(void)
 
 static void display_capture_list(const struct dabba_ipc_msg const *msg)
 {
-	size_t a, elem_nr;
+	size_t a;
 
 	assert(msg);
+	assert(msg->msg_body.elem_nr <= ARRAY_SIZE(msg->msg_body.msg.capture));
 
-	elem_nr =
-	    min(msg->msg_body.elem_nr, ARRAY_SIZE(msg->msg_body.msg.capture));
-
-	for (a = 0; a < elem_nr; a++) {
+	for (a = 0; a < msg->msg_body.elem_nr; a++) {
 		printf("    - %u\n",
 		       (uint32_t) msg->msg_body.msg.capture[a].thread_id);
 	}

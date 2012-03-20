@@ -36,14 +36,12 @@ static void display_interface_list_header(void)
 
 static void display_interface_list(const struct dabba_ipc_msg const *msg)
 {
-	size_t a, elem_nr;
+	size_t a;
 
 	assert(msg);
+	assert(msg->msg_body.elem_nr <= ARRAY_SIZE(msg->msg_body.msg.ifconf));
 
-	elem_nr =
-	    min(msg->msg_body.elem_nr, ARRAY_SIZE(msg->msg_body.msg.ifconf));
-
-	for (a = 0; a < elem_nr; a++) {
+	for (a = 0; a < msg->msg_body.elem_nr; a++) {
 		printf("    - %s\n", msg->msg_body.msg.ifconf[a].name);
 	}
 }
