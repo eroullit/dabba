@@ -74,7 +74,7 @@ static inline int is_power_of_2(const uint64_t n)
 	return (n != 0 && ((n & (n - 1)) == 0));
 }
 
-#define min(x, y) x < y ? x : y;
-#define max(x, y) x > y ? x : y;
+#define min(x, y) (x < y ? x : y);
+#define max(x, y) (x > y ? x : y);
 
 #endif				/* MACROS_H */
