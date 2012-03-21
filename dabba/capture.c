@@ -26,6 +26,7 @@
 #include <string.h>
 #include <assert.h>
 #include <getopt.h>
+#include <inttypes.h>
 #include <errno.h>
 
 #include <dabbacore/macros.h>
@@ -116,8 +117,10 @@ static void display_capture_list(const struct dabba_ipc_msg const *msg)
 	assert(msg->msg_body.elem_nr <= ARRAY_SIZE(msg->msg_body.msg.capture));
 
 	for (a = 0; a < msg->msg_body.elem_nr; a++) {
-		printf("    - %u\n",
+		printf("    - id: %u\n",
 		       (uint32_t) msg->msg_body.msg.capture[a].thread_id);
+		printf("      packet mmap size: %" PRIu64 "\n",
+		       msg->msg_body.msg.capture[a].size);
 	}
 }
 

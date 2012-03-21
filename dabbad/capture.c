@@ -142,6 +142,9 @@ int dabbad_capture_list(struct dabba_ipc_msg *msg)
 			break;
 
 		capture[a].thread_id = node->pkt_capture->thread;
+		capture[a].size =
+		    node->pkt_capture->pkt_rx.layout.tp_frame_size *
+		    node->pkt_capture->pkt_rx.layout.tp_frame_nr;
 		a++;
 	}
 
