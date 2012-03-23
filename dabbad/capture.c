@@ -32,6 +32,7 @@
 #include <linux/if_ether.h>
 
 #include <dabbacore/macros.h>
+#include <dabbacore/nic.h>
 #include <dabbacore/packet_rx.h>
 #include <dabbacore/pcap.h>
 #include <dabbad/dabbad.h>
@@ -150,6 +151,9 @@ int dabbad_capture_list(struct dabba_ipc_msg *msg)
 		/* TODO error handling */
 		fd_to_path(node->pkt_capture->pcap_fd, capture[a].pcap_name,
 			   sizeof(capture[a].pcap_name));
+		ifindex_to_devname(node->pkt_capture->pkt_rx.ifindex,
+				   capture[a].dev_name,
+				   sizeof(capture[a].dev_name));
 
 		a++;
 	}
