@@ -121,6 +121,8 @@ static void display_capture_list(const struct dabba_ipc_msg const *msg)
 		       (uint32_t) msg->msg_body.msg.capture[a].thread_id);
 		printf("      packet mmap size: %" PRIu64 "\n",
 		       msg->msg_body.msg.capture[a].size);
+		printf("      pcap file: %s\n",
+		       msg->msg_body.msg.capture[a].pcap_name);
 	}
 }
 
