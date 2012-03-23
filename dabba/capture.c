@@ -123,6 +123,8 @@ static void display_capture_list(const struct dabba_ipc_msg const *msg)
 		       msg->msg_body.msg.capture[a].size);
 		printf("      pcap file: %s\n",
 		       msg->msg_body.msg.capture[a].pcap_name);
+		printf("      interface: %s\n",
+		       msg->msg_body.msg.capture[a].dev_name);
 	}
 }
 
