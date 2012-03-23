@@ -25,7 +25,7 @@
  *
  */
 
- /* __LICENSE_HEADER_END__ */
+/* __LICENSE_HEADER_END__ */
 
 #include <assert.h>
 #include <errno.h>
@@ -78,6 +78,41 @@ int devname_to_ifindex(const char *const dev, int *index)
 		return (errno);
 
 	*index = ethreq.ifr_ifindex;
+
+	return (0);
+}
+
+int ifindex_to_devname(const int index, char *dev, size_t dev_len)
+{
+	const char alldev[] = "all";
+	struct ifreq ethreq;
+	int ret, sock;
+
+	assert(index >= 0);
+	assert(dev);
+	assert(dev_len >= IFNAMSIZ);
+
+	if (index == 0) {
+		strlcpy(dev, alldev, dev_len);
+		return (0);
+	}
+
+	sock = socket(AF_INET, SOCK_DGRAM, 0);
+
+	if (sock < 0)
+		return (errno);
+
+	memset(&ethreq, 0, sizeof(ethreq));
+	ethreq.ifr_ifindex = index;
+
+	ret = ioctl(sock, SIOCGIFNAME, &ethreq);
+
+	close(sock);
+
+	if (ret < 0)
+		return (errno);
+
+	strlcpy(dev, ethreq.ifr_name, dev_len);
 
 	return (0);
 }

@@ -31,5 +31,6 @@
 #define	NIC_H
 
 int devname_to_ifindex(const char *const dev, int *index);
+int ifindex_to_devname(const int index, char *dev, size_t dev_len);
 
 #endif				/* NIC_H */
