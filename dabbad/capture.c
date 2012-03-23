@@ -35,6 +35,7 @@
 #include <dabbacore/packet_rx.h>
 #include <dabbacore/pcap.h>
 #include <dabbad/dabbad.h>
+#include <dabbad/misc.h>
 
 struct capture_thread_node {
 	struct packet_rx_thread *pkt_capture;
@@ -145,6 +146,11 @@ int dabbad_capture_list(struct dabba_ipc_msg *msg)
 		capture[a].size =
 		    node->pkt_capture->pkt_rx.layout.tp_frame_size *
 		    node->pkt_capture->pkt_rx.layout.tp_frame_nr;
+
+		/* TODO error handling */
+		fd_to_path(node->pkt_capture->pcap_fd, capture[a].pcap_name,
+			   sizeof(capture[a].pcap_name));
+
 		a++;
 	}
 
