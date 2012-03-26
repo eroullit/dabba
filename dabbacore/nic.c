@@ -36,6 +36,7 @@
 #include <sys/ioctl.h>
 #include <net/if.h>
 
+#include <dabbacore/nic.h>
 #include <dabbacore/strlcpy.h>
 
 /**
@@ -57,7 +58,7 @@ int devname_to_ifindex(const char *const dev, int *index)
 	assert(dev);
 	assert(index);
 
-	if (strcmp(dev, "all") == 0) {
+	if (strcmp(dev, ANY_DEVICE) == 0) {
 		*index = 0;
 		return (0);
 	}
@@ -84,7 +85,7 @@ int devname_to_ifindex(const char *const dev, int *index)
 
 int ifindex_to_devname(const int index, char *dev, size_t dev_len)
 {
-	const char alldev[] = "all";
+	const char alldev[] = ANY_DEVICE;
 	struct ifreq ethreq;
 	int ret, sock;
 

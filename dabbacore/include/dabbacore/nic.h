@@ -30,6 +30,8 @@
 #ifndef NIC_H
 #define	NIC_H
 
+#define ANY_DEVICE "any"
+
 int devname_to_ifindex(const char *const dev, int *index);
 int ifindex_to_devname(const int index, char *dev, size_t dev_len);
 
