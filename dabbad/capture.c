@@ -162,3 +162,30 @@ int dabbad_capture_list(struct dabba_ipc_msg *msg)
 
 	return 0;
 }
+
+int dabbad_capture_stop(struct dabba_ipc_msg *msg)
+{
+	struct capture_thread_node *node;
+	struct dabba_capture *capture_msg = msg->msg_body.msg.capture;
+	int rc = 0;
+
+	SLIST_FOREACH(node, &thread_head, entry) {
+		if (capture_msg->thread_id == node->pkt_capture->thread)
+			break;
+	}
+
+	if (node) {
+		SLIST_REMOVE(&thread_head, node, capture_thread_node, entry);
+		rc = pthread_cancel(node->pkt_capture->thread);
+		close(node->pkt_capture->pcap_fd);
+		packet_mmap_destroy(&node->pkt_capture->pkt_rx);
+		free(node->pkt_capture);
+		free(node);
+	}
+
+	/* TODO pthread_cancel() error is should issue a warning
+	 * even if the user cannot do anything about it...
+	 */
+
+	return rc;
+}
