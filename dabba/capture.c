@@ -43,6 +43,10 @@ enum capture_start_option {
 	OPT_CAPTURE_SIZE
 };
 
+enum capture_stop_option {
+	OPT_CAPTURE_ID
+};
+
 static struct option *capture_start_options_get(void)
 {
 	static struct option capture_start_option[] = {
@@ -176,13 +180,73 @@ int cmd_capture_list(int argc, const char **argv)
 	return rc;
 }
 
+static struct option *capture_stop_options_get(void)
+{
+	static struct option capture_stop_option[] = {
+		{"id", required_argument, NULL, OPT_CAPTURE_ID},
+		{NULL, 0, NULL, 0},
+	};
+
+	return capture_stop_option;
+}
+
+static int prepare_capture_stop_query(int argc, char **argv,
+				      struct dabba_ipc_msg *msg)
+{
+	struct dabba_capture *capture_stop_msg = msg->msg_body.msg.capture;
+	int ret, rc = 0;
+
+	assert(msg);
+
+	msg->mtype = 1;
+	msg->msg_body.type = DABBA_CAPTURE_STOP;
+
+	while ((ret =
+		getopt_long_only(argc, argv, "", capture_stop_options_get(),
+				 NULL)) != EOF) {
+		switch (ret) {
+		case OPT_CAPTURE_ID:
+			capture_stop_msg->thread_id = strtoul(optarg, NULL, 10);
+			break;
+		default:
+			show_usage(capture_stop_options_get());
+			rc = -1;
+			break;
+		}
+	}
+
+	return rc;
+}
+
+int cmd_capture_stop(int argc, const char **argv)
+{
+	struct dabba_ipc_msg msg;
+	int rc;
+
+	assert(argc >= 0);
+	assert(argv);
+
+	memset(&msg, 0, sizeof(msg));
+
+	rc = prepare_capture_stop_query(argc, (char **)argv, &msg);
+
+	if (rc)
+		return rc;
+
+	/* For now, just one capture request at a time */
+	msg.msg_body.elem_nr = 1;
+
+	return dabba_ipc_msg(&msg);
+}
+
 int cmd_capture(int argc, const char **argv)
 {
 	const char *cmd = argv[0];
 	size_t i;
 	static struct cmd_struct capture_commands[] = {
 		{"list", cmd_capture_list, 0},
-		{"start", cmd_capture_start, 0}
+		{"start", cmd_capture_start, 0},
+		{"stop", cmd_capture_stop, 0},
 	};
 
 	/* TODO --help handling here */
