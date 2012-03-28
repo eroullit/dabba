@@ -31,6 +31,7 @@
 #include <linux/if_ether.h>
 
 #include <dabbacore/macros.h>
+#include <dabbacore/nic.h>
 #include <dabbacore/packet_mmap.h>
 
 /* Find a way to know the target's MAX_ORDER */
@@ -69,8 +70,8 @@ int main(int argc, char **argv)
 				if ((int)size < (page_size << i))
 					continue;
 
-				rc = packet_mmap_create(&pkt_rx, "all", pf_sock,
-							PACKET_MMAP_RX,
+				rc = packet_mmap_create(&pkt_rx, ANY_DEVICE,
+							pf_sock, PACKET_MMAP_RX,
 							test_size[a], i, size);
 
 				printf("RX packet mmap: frame size=%i",
