@@ -19,25 +19,9 @@
 
 test_description='Test dabba list command'
 
-. ./sharness.sh
+. ./dabba-test-lib.sh
 
 interface_nr=100
-
-DABBAD_PATH="$TEST_DIRECTORY/../../dabbad"
-DABBA_PATH="$TEST_DIRECTORY/../../dabba"
-
-modinfo dummy 2>&1 > /dev/null && test_set_prereq DUMMY_DEV
-
-flush_test_interface()
-{
-        sudo rmmod dummy
-}
-
-create_test_interface()
-{
-        sudo modprobe dummy numdummies=$interface_nr
-        sleep 1
-}
 
 generate_list(){
         rm dev_list
@@ -78,7 +62,7 @@ test_expect_success "invoke dabba list with dabbad" "
 "
 
 test_expect_success DUMMY_DEV "Setup: Create $interface_nr dummy interfaces" "
-    create_test_interface
+    create_test_interface $interface_nr
 "
 
 test_expect_success DUMMY_DEV "invoke dabba list with dabbad with $interface_nr extra interfaces" "
