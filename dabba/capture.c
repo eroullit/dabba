@@ -121,8 +121,8 @@ static void display_capture_list(const struct dabba_ipc_msg const *msg)
 	assert(msg->msg_body.elem_nr <= ARRAY_SIZE(msg->msg_body.msg.capture));
 
 	for (a = 0; a < msg->msg_body.elem_nr; a++) {
-		printf("    - id: %u\n",
-		       (uint32_t) msg->msg_body.msg.capture[a].thread_id);
+		printf("    - id: %" PRIu64 "\n",
+		       (uint64_t) msg->msg_body.msg.capture[a].thread_id);
 		printf("      packet mmap size: %" PRIu64 "\n",
 		       msg->msg_body.msg.capture[a].size);
 		printf("      pcap: %s\n",
@@ -206,7 +206,8 @@ static int prepare_capture_stop_query(int argc, char **argv,
 				 NULL)) != EOF) {
 		switch (ret) {
 		case OPT_CAPTURE_ID:
-			capture_stop_msg->thread_id = strtoul(optarg, NULL, 10);
+			capture_stop_msg->thread_id =
+			    strtoull(optarg, NULL, 10);
 			break;
 		default:
 			show_usage(capture_stop_options_get());
