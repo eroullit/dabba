@@ -78,9 +78,6 @@ void *packet_rx(void *arg)
 			    TP_STATUS_KERNEL) {
 				if (poll(pfd, ARRAY_SIZE(pfd), -1) < 0)
 					continue;
-
-				if ((pfd[1].revents & POLLIN) == POLLIN)
-					goto out;
 			}
 
 			if ((mmap_hdr->tp_h.tp_status & TP_STATUS_USER) ==
