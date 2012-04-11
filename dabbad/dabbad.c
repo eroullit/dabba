@@ -31,7 +31,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-
 #include <dabbad/ipc.h>
 #include <dabbad/help.h>
 
@@ -55,7 +54,7 @@ static inline int dabbad_pidfile_create(void)
 {
 	int rc = EIO;
 	int pidfd = -1;
-	char pidstr[8] = {0};
+	char pidstr[8] = { 0 };
 	ssize_t pidstrlen = 0;
 
 	pidfd = creat(DABBAD_PID_FILE, 0600);
@@ -98,7 +97,7 @@ int main(int argc, char **argv)
 	}
 
 	if (daemonize) {
-		if (daemon(0, 0)) {
+		if (daemon(-1, 0)) {
 			perror("Could not daemonize process");
 			return errno;
 		}
