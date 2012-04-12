@@ -22,24 +22,26 @@ ring_size=$((16*1024*1024))
 
 . ./dabba-test-lib.sh
 
+capture_thread_nr_get()
+{
+    local file="$1"
+    python -c "import yaml; y = yaml.load(open('$file')); print len(y['captures']);"
+}
+
 test_expect_success "Setup: Start dabbad" "
     $DABBAD_PATH/dabbad --daemonize
 "
 
 test_expect_success "Start a capture thread on loopback" "
-    $DABBA_PATH/dabba capture start --device lo --pcap test1.pcap --size $ring_size
-"
-
-test_expect_success "List created capture thread" "
-    $DABBA_PATH/dabba capture list > result
+    $DABBA_PATH/dabba capture start --device lo --pcap test1.pcap --size $ring_size &&
+    $DABBA_PATH/dabba capture list > result &&
+    test `capture_thread_nr_get result` = 1
 "
 
 test_expect_success "Start a second capture thread on loopback" "
-    $DABBA_PATH/dabba capture start --device lo --pcap test2.pcap --size $ring_size
-"
-
-test_expect_success "List created capture thread" "
-    $DABBA_PATH/dabba capture list > result
+    $DABBA_PATH/dabba capture start --device lo --pcap test2.pcap --size $ring_size &&
+    $DABBA_PATH/dabba capture list > result &&
+    test `capture_thread_nr_get result` = 2
 "
 
 test_expect_success "Cleanup: Stop dabbad" "
