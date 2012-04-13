@@ -22,27 +22,26 @@ ring_size=$((16*1024*1024))
 
 . ./dabba-test-lib.sh
 
-capture_thread_nr_get()
+check_capture_thread_nr()
 {
-    local file="$1"
-    python -c "import yaml; y = yaml.load(open('$file')); print len(y['captures']);"
+    local expected_thread_nr="$1"
+    local result_file="$2"
+    local result_thread_nr=$(python -c "import yaml; y = yaml.load(open('$result_file')); print len(y['captures']);")
+    return $(test $result_thread_nr = $expected_thread_nr)
 }
 
 test_expect_success "Setup: Start dabbad" "
     $DABBAD_PATH/dabbad --daemonize
 "
 
-test_expect_success "Start a capture thread on loopback" "
-    $DABBA_PATH/dabba capture start --device lo --pcap test1.pcap --size $ring_size &&
-    $DABBA_PATH/dabba capture list > result &&
-    test `capture_thread_nr_get result` = 1
-"
-
-test_expect_success "Start a second capture thread on loopback" "
-    $DABBA_PATH/dabba capture start --device lo --pcap test2.pcap --size $ring_size &&
-    $DABBA_PATH/dabba capture list > result &&
-    test `capture_thread_nr_get result` = 2
-"
+for i in `seq 10`
+do
+        test_expect_success "Start a capture thread #$i on loopback" "
+            $DABBA_PATH/dabba capture start --device lo --pcap test$i.pcap --size $ring_size &&
+            $DABBA_PATH/dabba capture list > result &&
+            check_capture_thread_nr $i result
+        "
+done
 
 test_expect_success "Cleanup: Stop dabbad" "
     killall dabbad
