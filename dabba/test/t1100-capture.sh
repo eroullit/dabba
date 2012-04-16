@@ -26,7 +26,7 @@ check_capture_thread_nr()
 {
     local expected_thread_nr="$1"
     local result_file="$2"
-    local result_thread_nr=$(python -c "import yaml; y = yaml.load(open('$result_file')); print len(y['captures']);")
+    local result_thread_nr="$(python -c "import yaml; y = yaml.load(open('$result_file')); print len(y['captures']);")"
     return $(test "$expected_thread_nr" = "$result_thread_nr")
 }
 
@@ -34,7 +34,7 @@ check_capture_thread_id()
 {
     local thread_nr="$1"
     local result_file="$2"
-    local result_thread_id=$(python -c "import yaml; y = yaml.load(open('$result_file')); print y['captures'][$thread_nr]['id'];")
+    local result_thread_id="$(python -c "import yaml; y = yaml.load(open('$result_file')); print y['captures'][$thread_nr]['id'];")"
     return $(echo "$result_thread_id" | grep -w -q -E "^[0-9]+")
 }
 
@@ -43,7 +43,7 @@ check_capture_thread_interface()
     local thread_nr="$1"
     local expected_interface="$2"
     local result_file="$3"
-    local result_interface=$(python -c "import yaml; y = yaml.load(open('$result_file')); print y['captures'][$thread_nr]['interface'];")
+    local result_interface="$(python -c "import yaml; y = yaml.load(open('$result_file')); print y['captures'][$thread_nr]['interface'];")"
     return $(test "$expected_interface" = "$result_interface")
 }
 
@@ -52,7 +52,7 @@ check_capture_thread_pcap()
     local thread_nr="$1"
     local expected_pcap="$2"
     local result_file="$3"
-    local result_pcap=$(python -c "import yaml; y = yaml.load(open('$result_file')); print y['captures'][$thread_nr]['pcap'];")
+    local result_pcap="$(python -c "import yaml; y = yaml.load(open('$result_file')); print y['captures'][$thread_nr]['pcap'];")"
     return $(test "$expected_pcap" = "$result_pcap")
 }
 
@@ -61,7 +61,7 @@ check_capture_thread_packet_mmap_size()
     local thread_nr="$1"
     local expected_packet_mmap_size="$2"
     local result_file="$3"
-    local result_packet_mmap_size=$(python -c "import yaml; y = yaml.load(open('$result_file')); print y['captures'][$thread_nr]['packet mmap size'];")
+    local result_packet_mmap_size="$(python -c "import yaml; y = yaml.load(open('$result_file')); print y['captures'][$thread_nr]['packet mmap size'];")"
     return $(test "$expected_packet_mmap_size" = "$result_packet_mmap_size")
 }
 
