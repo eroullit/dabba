@@ -40,10 +40,11 @@
 
 struct capture_thread_node {
 	struct packet_rx_thread *pkt_capture;
-	 SLIST_ENTRY(capture_thread_node) entry;
+	 TAILQ_ENTRY(capture_thread_node) entry;
 };
 
-static SLIST_HEAD(capture_thread_head, capture_thread_node) thread_head;
+static TAILQ_HEAD(capture_thread_head, capture_thread_node) thread_head =
+TAILQ_HEAD_INITIALIZER(thread_head);
 
 static int capture_msg_is_valid(struct dabba_ipc_msg *msg)
 {
@@ -114,7 +115,7 @@ int dabbad_capture_start(struct dabba_ipc_msg *msg)
 
 	if (!rc) {
 		thread_node->pkt_capture = pkt_capture;
-		SLIST_INSERT_HEAD(&thread_head, thread_node, entry);
+		TAILQ_INSERT_TAIL(&thread_head, thread_node, entry);
 	} else {
 		packet_mmap_destroy(&pkt_capture->pkt_rx);
 		free(pkt_capture);
@@ -134,7 +135,7 @@ int dabbad_capture_list(struct dabba_ipc_msg *msg)
 	capture = msg->msg_body.msg.capture;
 	thread_list_size = ARRAY_SIZE(msg->msg_body.msg.capture);
 
-	SLIST_FOREACH(node, &thread_head, entry) {
+	TAILQ_FOREACH(node, &thread_head, entry) {
 		if (off < msg->msg_body.offset) {
 			off++;
 			continue;
@@ -169,13 +170,13 @@ int dabbad_capture_stop(struct dabba_ipc_msg *msg)
 	struct dabba_capture *capture_msg = msg->msg_body.msg.capture;
 	int rc = 0;
 
-	SLIST_FOREACH(node, &thread_head, entry) {
+	TAILQ_FOREACH(node, &thread_head, entry) {
 		if (capture_msg->thread_id == node->pkt_capture->thread)
 			break;
 	}
 
 	if (node) {
-		SLIST_REMOVE(&thread_head, node, capture_thread_node, entry);
+		TAILQ_REMOVE(&thread_head, node, entry);
 		rc = pthread_cancel(node->pkt_capture->thread);
 		close(node->pkt_capture->pcap_fd);
 		packet_mmap_destroy(&node->pkt_capture->pkt_rx);
