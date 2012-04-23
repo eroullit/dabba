@@ -22,6 +22,13 @@ ring_size=$((16*1024*1024))
 
 . ./dabba-test-lib.sh
 
+get_capture_thread_id()
+{
+    local thread_nr="$1"
+    local result_file="$2"
+    python -c "import yaml; y = yaml.load(open('$result_file')); print y['captures'][$thread_nr]['id'];"
+}
+
 check_capture_thread_nr()
 {
     local expected_thread_nr="$1"
@@ -34,7 +41,7 @@ check_capture_thread_id()
 {
     local thread_nr="$1"
     local result_file="$2"
-    local result_thread_id="$(python -c "import yaml; y = yaml.load(open('$result_file')); print y['captures'][$thread_nr]['id'];")"
+    local result_thread_id="$(get_capture_thread_id $thread_nr \"$result_file\")"
     return $(echo "$result_thread_id" | grep -w -q -E "^[0-9]+")
 }
 
