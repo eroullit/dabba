@@ -110,6 +110,10 @@ test_expect_success "Start capture thread with an invalid pcap path" "
     test_must_fail $DABBAD_PATH/dabba capture start --device lo --pcap /tmp/test.pcap --size $ring_size
 "
 
+test_expect_success "Start capture thread on an invalid interface" "
+    test_must_fail $DABBAD_PATH/dabba capture start --device lolololololololololololololololololololo --pcap test.pcap --size $ring_size
+"
+
 test_expect_success "Cleanup: Stop dabbad" "
     killall dabbad
 "
