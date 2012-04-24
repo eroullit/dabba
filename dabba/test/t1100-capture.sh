@@ -100,7 +100,9 @@ for i in `seq 10`
 do
         test_expect_success "Start a capture thread #$i on loopback" "
             $DABBA_PATH/dabba capture list > result &&
-            $DABBA_PATH/dabba capture stop --id `get_capture_thread_id 0 result`
+            $DABBA_PATH/dabba capture stop --id `get_capture_thread_id 0 result` &&
+            $DABBA_PATH/dabba capture list > after &&
+            test_must_fail grep -wq `get_capture_thread_id 0 result` after
         "
 done
 
