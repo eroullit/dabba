@@ -42,8 +42,6 @@ int run_builtin(struct cmd_struct *p, int argc, const char **argv)
 	struct stat st;
 
 	assert(p);
-	assert(argc >= 0);
-	assert(argv);
 
 	status = p->fn(argc, argv);
 	if (status)

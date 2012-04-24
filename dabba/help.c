@@ -92,11 +92,13 @@ static void list_common_cmds_help(void)
 
 int cmd_help(int argc, const char **argv)
 {
-	assert(argc >= 0);
-	assert(argv);
+	/* cast here to avoid argc and argv unused GCC warning */
+	(void)argc;
+	(void)argv;
 
 	printf("usage: %s\n\n", dabba_usage_string);
 	list_common_cmds_help();
 	printf("\n%s\n", dabba_more_info_string);
+
 	return 1;
 }
