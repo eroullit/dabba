@@ -114,6 +114,18 @@ test_expect_success "Start capture thread on an invalid interface" "
     test_must_fail $DABBAD_PATH/dabba capture start --device lolololololololololololololololololololo --pcap test.pcap --size $ring_size
 "
 
+test_expect_success "Start capture thread with a missing interface" "
+    test_must_fail $DABBAD_PATH/dabba capture start --pcap test.pcap --size $ring_size
+"
+
+test_expect_success "Start capture thread with a missing pcap path" "
+    test_must_fail $DABBAD_PATH/dabba capture start --device lo --size $ring_size
+"
+
+test_expect_success "Start capture thread with a missing ring size" "
+    test_must_fail $DABBAD_PATH/dabba capture start --device lo --pcap test.pcap
+"
+
 test_expect_success "Cleanup: Stop dabbad" "
     killall dabbad
 "
