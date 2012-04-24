@@ -107,27 +107,27 @@ do
 done
 
 test_expect_success "Start capture thread with an invalid pcap path" "
-    test_must_fail $DABBAD_PATH/dabba capture start --interface lo --pcap /tmp/test.pcap --size $ring_size
+    test_must_fail $DABBA_PATH/dabba capture start --interface lo --pcap /tmp/test.pcap --size $ring_size
 "
 
 test_expect_success "Start capture thread on an invalid interface" "
-    test_must_fail $DABBAD_PATH/dabba capture start --interface lolololololololololololololololololololo --pcap test.pcap --size $ring_size
+    test_must_fail $DABBA_PATH/dabba capture start --interface lolololololololololololololololololololo --pcap test.pcap --size $ring_size
 "
 
 test_expect_success "Start capture thread with a missing interface" "
-    test_must_fail $DABBAD_PATH/dabba capture start --pcap test.pcap --size $ring_size
+    test_must_fail $DABBA_PATH/dabba capture start --pcap test.pcap --size $ring_size
 "
 
 test_expect_success "Start capture thread with a missing pcap path" "
-    test_must_fail $DABBAD_PATH/dabba capture start --interface lo --size $ring_size
+    test_must_fail $DABBA_PATH/dabba capture start --interface lo --size $ring_size
 "
 
 test_expect_success "Start capture thread with a missing ring size" "
-    test_must_fail $DABBAD_PATH/dabba capture start --interface lo --pcap test.pcap
+    test_must_fail $DABBA_PATH/dabba capture start --interface lo --pcap test.pcap
 "
 
 test_expect_success "Invoke capture command w/o any parameters" "
-    test_expect_code 38 $DABBAD_PATH/dabba capture
+    test_expect_code 38 $DABBA_PATH/dabba capture
 "
 
 test_expect_success "Cleanup: Stop dabbad" "
