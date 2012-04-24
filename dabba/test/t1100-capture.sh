@@ -85,7 +85,7 @@ test_expect_success "Setup: Start dabbad" "
 
 for i in `seq 0 9`
 do
-        test_expect_success "Start a capture thread #$(($i+1)) on loopback" "
+        test_expect_success "Start capture thread #$(($i+1)) on loopback" "
             $DABBA_PATH/dabba capture start --device lo --pcap test$i.pcap --size $ring_size &&
             $DABBA_PATH/dabba capture list > result &&
             check_capture_thread_nr $i result &&
@@ -98,7 +98,7 @@ done
 
 for i in `seq 10`
 do
-        test_expect_success "Start a capture thread #$i on loopback" "
+        test_expect_success "Stop capture thread #$i on loopback" "
             $DABBA_PATH/dabba capture list > result &&
             $DABBA_PATH/dabba capture stop --id `get_capture_thread_id 0 result` &&
             $DABBA_PATH/dabba capture list > after &&
