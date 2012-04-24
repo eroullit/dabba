@@ -70,7 +70,7 @@ int main(int argc, char **argv)
 				if ((int)size < (page_size << i))
 					continue;
 
-				rc = packet_mmap_create(&pkt_rx, ANY_DEVICE,
+				rc = packet_mmap_create(&pkt_rx, ANY_INTERFACE,
 							pf_sock, PACKET_MMAP_RX,
 							test_size[a], i, size);
 

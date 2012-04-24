@@ -84,7 +84,7 @@ int fd_to_path(const int fd, char *path, const size_t path_len)
 		goto out;
 	}
 
-	/* filenames are not accurate, device and inode ID need to checked too */
+	/* filenames are not accurate, interface and inode ID need to checked too */
 	if (fd_stat.st_dev != path_stat.st_dev
 	    || fd_stat.st_ino != path_stat.st_ino) {
 		rc = EINVAL;

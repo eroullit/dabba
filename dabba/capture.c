@@ -38,7 +38,7 @@
 #include <dabbad/dabbad.h>
 
 enum capture_start_option {
-	OPT_CAPTURE_DEVICE,
+	OPT_CAPTURE_INTERFACE,
 	OPT_CAPTURE_PCAP,
 	OPT_CAPTURE_SIZE
 };
@@ -50,7 +50,7 @@ enum capture_stop_option {
 static struct option *capture_start_options_get(void)
 {
 	static struct option capture_start_option[] = {
-		{"device", required_argument, NULL, OPT_CAPTURE_DEVICE},
+		{"interface", required_argument, NULL, OPT_CAPTURE_INTERFACE},
 		{"pcap", required_argument, NULL, OPT_CAPTURE_PCAP},
 		{"size", required_argument, NULL, OPT_CAPTURE_SIZE},
 		{NULL, 0, NULL, 0},
@@ -74,7 +74,7 @@ static int prepare_capture_start_query(int argc, char **argv,
 		getopt_long_only(argc, argv, "", capture_start_options_get(),
 				 NULL)) != EOF) {
 		switch (ret) {
-		case OPT_CAPTURE_DEVICE:
+		case OPT_CAPTURE_INTERFACE:
 			strlcpy(capture_start_msg->dev_name, optarg,
 				sizeof(capture_start_msg->dev_name));
 			break;

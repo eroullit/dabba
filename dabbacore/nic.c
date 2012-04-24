@@ -40,13 +40,13 @@
 #include <dabbacore/strlcpy.h>
 
 /**
- * \brief Get the interface index of a specific device
+ * \brief Get the interface index of a specific interface
  * \param[in]	dev	Device name
- * \param[out]	index	Interface index of the device
+ * \param[out]	index	Interface index of the interface
  * \return 0 on success, errno from socket(2), ioctl(2) or close(2) on failure
  *
  * This function queries the kernel about the interface
- * index related to the device name.
+ * index related to the interface name.
  */
 
 int devname_to_ifindex(const char *const dev, int *index)
@@ -58,7 +58,7 @@ int devname_to_ifindex(const char *const dev, int *index)
 	assert(dev);
 	assert(index);
 
-	if (strcmp(dev, ANY_DEVICE) == 0) {
+	if (strcmp(dev, ANY_INTERFACE) == 0) {
 		*index = 0;
 		return (0);
 	}
@@ -85,7 +85,7 @@ int devname_to_ifindex(const char *const dev, int *index)
 
 int ifindex_to_devname(const int index, char *dev, size_t dev_len)
 {
-	const char alldev[] = ANY_DEVICE;
+	const char alldev[] = ANY_INTERFACE;
 	struct ifreq ethreq;
 	int ret, sock;
 
