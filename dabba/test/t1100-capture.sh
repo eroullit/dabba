@@ -126,6 +126,10 @@ test_expect_success "Start capture thread with a missing ring size" "
     test_must_fail $DABBAD_PATH/dabba capture start --interface lo --pcap test.pcap
 "
 
+test_expect_success "Invoke capture command w/o any parameters" "
+    test_expect_code 38 $DABBAD_PATH/dabba capture
+"
+
 test_expect_success "Cleanup: Stop dabbad" "
     killall dabbad
 "
