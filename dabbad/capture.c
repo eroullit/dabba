@@ -53,6 +53,14 @@ static int capture_msg_is_valid(struct dabba_ipc_msg *msg)
 	if (!msg)
 		return 0;
 
+	/* Names are empty */
+	if (strlen(capture_msg->dev_name) == 0)
+		return 0;
+
+	if (strlen(capture_msg->pcap_name) == 0)
+		return 0;
+
+	/* Names are too long / not terminated properly */
 	if (strlen(capture_msg->dev_name) >= sizeof(capture_msg->dev_name))
 		return 0;
 
