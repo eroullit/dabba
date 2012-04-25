@@ -111,7 +111,7 @@ test_expect_success "Start capture thread with an invalid pcap path" "
 "
 
 test_expect_success "Start capture thread on an invalid interface" "
-    test_expect_code 22 $DABBA_PATH/dabba capture start --interface lolololololololololololololololololololo --pcap test.pcap --size $ring_size
+    test_expect_code 19 $DABBA_PATH/dabba capture start --interface lolololololololololololololololololololo --pcap test.pcap --size $ring_size
 "
 
 test_expect_success "Start capture thread with a missing interface" "
