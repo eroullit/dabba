@@ -100,6 +100,8 @@ int dabbad_ipc_msg_poll(void)
 
 		rcv = dabbad_handle_msg(&msg);
 
+		msg.msg_body.error = rcv;
+
 		if (rcv != 0) {
 			perror("Error while handling IPC msg");
 		}
