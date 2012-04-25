@@ -233,10 +233,9 @@ int packet_mmap_create(struct packet_mmap *pkt_mmap,
 
 	assert(pkt_mmap);
 	assert(dev);
-	assert(is_power_of_2(frame_size));
-	assert(is_power_of_2(size));
 
-	/* assert frame_size and page_per_block are ^2 */
+	if (!is_power_of_2(frame_size) || !is_power_of_2(size))
+		return EINVAL;
 
 	memset(pkt_mmap, 0, sizeof(*pkt_mmap));
 
