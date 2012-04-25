@@ -59,5 +59,11 @@ int dabba_ipc_msg(struct dabba_ipc_msg *msg)
 		return errno;
 	}
 
+	if (msg->msg_body.error != 0) {
+		printf("The daemon reported: %s\n",
+		       strerror(msg->msg_body.error));
+		return msg->msg_body.error;
+	}
+
 	return 0;
 }
