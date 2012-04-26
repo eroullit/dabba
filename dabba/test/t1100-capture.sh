@@ -86,11 +86,11 @@ test_expect_success "Setup: Start dabbad" "
 for i in `seq 0 9`
 do
         test_expect_success "Start capture thread #$(($i+1)) on loopback" "
-            $DABBA_PATH/dabba capture start --interface lo --pcap test$i.pcap --size $ring_size &&
+            $DABBA_PATH/dabba capture start --interface any --pcap test$i.pcap --size $ring_size &&
             $DABBA_PATH/dabba capture list > result &&
             check_capture_thread_nr $i result &&
             check_capture_thread_id $i result &&
-            check_capture_thread_interface $i lo result &&
+            check_capture_thread_interface $i any result &&
             check_capture_thread_pcap $i \"$PWD/test$i.pcap\" result &&
             check_capture_thread_packet_mmap_size $i $ring_size result
         "
@@ -107,11 +107,15 @@ do
 done
 
 test_expect_success "Start capture thread with an invalid pcap path" "
-    test_expect_code 22 $DABBA_PATH/dabba capture start --interface lo --pcap /tmp/test.pcap --size $ring_size
+    test_expect_code 22 $DABBA_PATH/dabba capture start --interface any --pcap /tmp/test.pcap --size $ring_size
 "
 
-test_expect_success "Start capture thread on an invalid interface" "
-    test_expect_code 19 $DABBA_PATH/dabba capture start --interface lolololololololololololololololololololo --pcap test.pcap --size $ring_size
+test_expect_success "Start capture thread on an invalid interface (too long)" "
+    test_expect_code 22 $DABBA_PATH/dabba capture start --interface lorem-ipsum-dolor-sit --pcap test.pcap --size $ring_size
+"
+
+test_expect_success "Start capture thread on an invalid interface (does not exist)" "
+    test_expect_code 19 $DABBA_PATH/dabba capture start --interface lorem-ipsum --pcap test.pcap --size $ring_size
 "
 
 test_expect_success "Start capture thread with a missing interface" "
@@ -119,11 +123,11 @@ test_expect_success "Start capture thread with a missing interface" "
 "
 
 test_expect_success "Start capture thread with a missing pcap path" "
-    test_expect_code 22 $DABBA_PATH/dabba capture start --interface lo --size $ring_size
+    test_expect_code 22 $DABBA_PATH/dabba capture start --interface any --size $ring_size
 "
 
 test_expect_success "Start capture thread with a missing ring size" "
-    test_expect_code 22 $DABBA_PATH/dabba capture start --interface lo --pcap test.pcap
+    test_expect_code 22 $DABBA_PATH/dabba capture start --interface any --pcap test.pcap
 "
 
 test_expect_success "Invoke capture command w/o any parameters" "
