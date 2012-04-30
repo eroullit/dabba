@@ -90,23 +90,23 @@ do
             $DABBA_PATH/dabba capture list > result
         "
 
-        test_expect_success "Check thread number" "
+        test_expect_success PYTHON_YAML "Check thread number" "
             check_capture_thread_nr $i result
         "
 
-        test_expect_success "Check thread ID" "
+        test_expect_success PYTHON_YAML "Check thread ID" "
             check_capture_thread_id $i result
         "
 
-        test_expect_success "Check thread capture interface" "
+        test_expect_success PYTHON_YAML "Check thread capture interface" "
             check_capture_thread_interface $i any result
         "
 
-        test_expect_success "Check thread capture pcap file" "
+        test_expect_success PYTHON_YAML "Check thread capture pcap file" "
             check_capture_thread_pcap $i \"$PWD/test$i.pcap\" result
         "
 
-        test_expect_success "Check thread capture packet mmap size" "
+        test_expect_success PYTHON_YAML "Check thread capture packet mmap size" "
             check_capture_thread_packet_mmap_size $i $ring_size result
         "
 done

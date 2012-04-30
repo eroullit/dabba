@@ -23,6 +23,7 @@ DABBAD_PATH="$TEST_DIRECTORY/../../dabbad"
 DABBA_PATH="$TEST_DIRECTORY/../../dabba"
 
 modinfo dummy 2>&1 > /dev/null && test_set_prereq DUMMY_DEV
+python -c "import yaml" 2>&1 > /dev/null && test_set_prereq PYTHON_YAML
 
 flush_test_interface()
 {
