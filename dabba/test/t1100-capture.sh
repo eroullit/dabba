@@ -24,8 +24,7 @@ ring_size=$((16*1024*1024))
 
 get_capture_thread_nr()
 {
-    local thread_nr="$1"
-    local result_file="$2"
+    local result_file="$1"
     python -c "import yaml; y = yaml.load(open('$result_file')); print len(y['captures']);"
 }
 
