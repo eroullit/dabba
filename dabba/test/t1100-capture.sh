@@ -87,11 +87,26 @@ for i in `seq 0 9`
 do
         test_expect_success "Start capture thread #$(($i+1)) on loopback" "
             $DABBA_PATH/dabba capture start --interface any --pcap test$i.pcap --size $ring_size &&
-            $DABBA_PATH/dabba capture list > result &&
-            check_capture_thread_nr $i result &&
-            check_capture_thread_id $i result &&
-            check_capture_thread_interface $i any result &&
-            check_capture_thread_pcap $i \"$PWD/test$i.pcap\" result &&
+            $DABBA_PATH/dabba capture list > result
+        "
+
+        test_expect_success "Check thread number" "
+            check_capture_thread_nr $i result
+        "
+
+        test_expect_success "Check thread ID" "
+            check_capture_thread_id $i result
+        "
+
+        test_expect_success "Check thread capture interface" "
+            check_capture_thread_interface $i any result
+        "
+
+        test_expect_success "Check thread capture pcap file" "
+            check_capture_thread_pcap $i \"$PWD/test$i.pcap\" result
+        "
+
+        test_expect_success "Check thread capture packet mmap size" "
             check_capture_thread_packet_mmap_size $i $ring_size result
         "
 done
