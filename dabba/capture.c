@@ -75,11 +75,19 @@ static int prepare_capture_start_query(int argc, char **argv,
 				 NULL)) != EOF) {
 		switch (ret) {
 		case OPT_CAPTURE_INTERFACE:
+			if (strlen(optarg) >=
+			    sizeof(capture_start_msg->dev_name))
+				rc = EINVAL;
+
 			strlcpy(capture_start_msg->dev_name, optarg,
 				sizeof(capture_start_msg->dev_name));
 			break;
 
 		case OPT_CAPTURE_PCAP:
+			if (strlen(optarg) >=
+			    sizeof(capture_start_msg->pcap_name))
+				rc = EINVAL;
+
 			strlcpy(capture_start_msg->pcap_name, optarg,
 				sizeof(capture_start_msg->pcap_name));
 			break;
