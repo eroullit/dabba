@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Copyright (C) 2009-2012	Emmanuel Roullit <emmanuel.roullit@gmail.com>
+# Copyright (C) 2012	Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
