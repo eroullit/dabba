@@ -35,7 +35,6 @@
 #include <sys/uio.h>
 #include <poll.h>
 
-#include <dabbacore/macros.h>
 #include <dabbacore/packet_rx.h>
 #include <dabbacore/pcap.h>
 
@@ -53,7 +52,7 @@ void *packet_rx(void *arg)
 {
 	struct packet_rx_thread *thread = arg;
 	struct packet_mmap *pkt_rx = &thread->pkt_rx;
-	struct pollfd pfd[2];
+	struct pollfd pfd;
 	size_t index = 0;
 
 	if (!arg)
@@ -61,13 +60,10 @@ void *packet_rx(void *arg)
 
 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 
-	memset(pfd, 0, sizeof(pfd));
+	memset(&pfd, 0, sizeof(pfd));
 
-	pfd[0].events = POLLIN | POLLRDNORM | POLLERR;
-	pfd[0].fd = pkt_rx->pf_sock;
-
-	pfd[1].events = POLLIN;
-	pfd[1].fd = STDIN_FILENO;
+	pfd.events = POLLIN | POLLRDNORM | POLLERR;
+	pfd.fd = pkt_rx->pf_sock;
 
 	for (;;) {
 		for (index = 0; index < pkt_rx->layout.tp_frame_nr; index++) {
@@ -76,7 +72,7 @@ void *packet_rx(void *arg)
 
 			if ((mmap_hdr->tp_h.tp_status & TP_STATUS_KERNEL) ==
 			    TP_STATUS_KERNEL) {
-				if (poll(pfd, ARRAY_SIZE(pfd), -1) < 0)
+				if (poll(&pfd, 1, -1) < 0)
 					continue;
 			}
 
