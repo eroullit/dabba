@@ -30,6 +30,10 @@
 #ifndef NIC_H
 #define	NIC_H
 
+/**
+ * \brief Pseudo-interface name to indicate that all interfaces must be used
+ */
+
 #define ANY_INTERFACE "any"
 
 int devname_to_ifindex(const char *const dev, int *index);

@@ -1,5 +1,5 @@
 /**
- * \file packet_rx.c
+ * \file packet_rx.h
  * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2011
  * \date 2011
  */
@@ -34,10 +34,14 @@
 
 #include <dabbacore/packet_mmap.h>
 
+/**
+ * \brief Packet mmap structure
+ */
+
 struct packet_rx_thread {
-	struct packet_mmap pkt_rx;
-	pthread_t thread;
-	int pcap_fd;
+	struct packet_mmap pkt_rx; /**< packet mmap structure */
+	pthread_t thread; /**< thread structure */
+	int pcap_fd; /**< pcap file descriptor */
 };
 
 void *packet_rx(void *arg);

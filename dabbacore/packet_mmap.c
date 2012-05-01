@@ -210,13 +210,13 @@ void packet_mmap_destroy(struct packet_mmap *pkt_mmap)
 
 /**
  * \brief Create a packet mmap
- * \param pkt_mmap[in,out]	packet mmap to create
- * \param dev[in]		Device name
- * \param pf_sock[in]		Open PF_PACKET socket
- * \param type[in]		Packet mmap type to create
- * \param frame_size[in]	Maximun packet mmap frame size
- * \param page_order[in]	Page order to use to create a block
- * \param size[in]		Total size of the packet mmap
+ * \param[in,out]       pkt_mmap	packet mmap to create
+ * \param[in]           dev		Device name
+ * \param[in]           pf_sock		Open PF_PACKET socket
+ * \param[in]           type		Packet mmap type to create
+ * \param[in]           frame_size	Maximun packet mmap frame size
+ * \param[in]           page_order	Page order to use to create a block
+ * \param[in]           size		Total size of the packet mmap
  * \return 0 on success, else on failure
  *
  * To create a packet mmap, the input frame_size and the size must be a power of

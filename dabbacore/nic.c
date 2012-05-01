@@ -83,6 +83,17 @@ int devname_to_ifindex(const char *const dev, int *index)
 	return (0);
 }
 
+/**
+ * \brief Get the interface name from an interface index
+ * \param[in]	index	Interface index of the interface
+ * \param[out]	dev	Device name
+ * \param[in]	dev_len	Device name buffer length
+ * \return 0 on success, errno from socket(2), ioctl(2) or close(2) on failure
+ *
+ * This function queries the kernel about the interface
+ * index related to the interface name.
+ */
+
 int ifindex_to_devname(const int index, char *dev, size_t dev_len)
 {
 	const char alldev[] = ANY_INTERFACE;

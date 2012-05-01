@@ -1,5 +1,5 @@
 /**
- * \file packet_rx.c
+ * \file pcap.h
  * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2011
  * \date 2011
  */
@@ -34,9 +34,16 @@
 #include <netinet/if_ether.h>
 #include <linux/if_packet.h>
 
+/** \brief pcap file magic value */
 #define TCPDUMP_MAGIC               0xa1b2c3d4
+
+/** \brief pcap version major */
 #define PCAP_VERSION_MAJOR          2
+
+/** \brief pcap version minor */
 #define PCAP_VERSION_MINOR          4
+
+/** \brief pcap default snapshot packet length */
 #define PCAP_DEFAULT_SNAPSHOT_LEN   65535
 
 /** \brief Enum regrouping all possible PCAP link types */

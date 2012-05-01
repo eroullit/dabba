@@ -46,7 +46,7 @@
 
 /**
  * \brief Check if the variable is an array
- * \param[in] e variable to check
+ * \param[in] a variable to check
  *
  * Force a compilation error if the variable is not an array
  */
