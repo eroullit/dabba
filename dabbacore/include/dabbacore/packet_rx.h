@@ -35,12 +35,12 @@
 #include <dabbacore/packet_mmap.h>
 
 /**
- * \brief Packet mmap structure
+ * \brief Packet capture structure
  */
 
 struct packet_rx_thread {
-	struct packet_mmap pkt_rx; /**< packet mmap structure */
-	pthread_t thread; /**< thread structure */
+	struct packet_mmap pkt_rx; /**< capture packet mmap structure */
+	pthread_t thread; /**< thread handle */
 	int pcap_fd; /**< pcap file descriptor */
 };
 

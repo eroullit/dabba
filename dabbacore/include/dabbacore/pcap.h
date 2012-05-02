@@ -64,7 +64,7 @@ struct pcap_file_header {
 };
 
 /**
- * \brief PCAP specifix timestamp
+ * \brief PCAP specific timestamp
  *
  * This is a timeval as stored in a savefile.
  * It has to use the same types everywhere, independent of the actual
@@ -95,9 +95,15 @@ struct pcap_timeval {
 
 struct pcap_sf_pkthdr {
 	struct pcap_timeval ts;	/**< timestamp */
-	uint32_t caplen;	/**< length of portion present */
+	uint32_t caplen;	/**< length of portion captured */
 	int32_t len;		/**< length this packet (off wire) */
 };
+
+/**
+ * \brief Tells if the input linktype is valid
+ * \param[in] linktype Linktype to validate
+ * \return 1 if the linktype is valid, 0 if invalid
+ */
 
 static inline int is_linktype_valid(uint32_t linktype)
 {
