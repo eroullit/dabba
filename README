@@ -85,7 +85,7 @@ To grant them run in your build directory:
 
 When the code is compiled and capabilities are granted, unit tests
 can be executed by this command:
-	$ make test
+	$ ctest --output-on-failure
 
 Contact
 =======
