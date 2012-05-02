@@ -105,7 +105,7 @@ struct pcap_sf_pkthdr {
  * \return 1 if the linktype is valid, 0 if invalid
  */
 
-static inline int is_linktype_valid(uint32_t linktype)
+static inline int is_linktype_valid(const uint32_t linktype)
 {
 	return (linktype == LINKTYPE_EN10MB);
 }
