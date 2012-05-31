@@ -33,16 +33,21 @@ ADD_DEFINITIONS(
 	-Wextra
 	-Wall
 	-Werror
-	-pedantic
-	-pedantic-errors
 	-std=gnu99
 	-O2
-	-z relo
-	-pie
-	-fstack-protector
 	-D_REENTRANT
 	-D_FORTIFY_SOURCE=2
+	-fstack-protector
 )
+
+IF(CMAKE_C_COMPILER_ID STREQUAL GNU)
+	ADD_DEFINITIONS(
+		-pedantic
+		-pedantic-errors
+		-z relo
+		-pie
+	)
+ENDIF(CMAKE_C_COMPILER_ID STREQUAL GNU)
 
 IF (CMAKE_BUILD_TYPE STREQUAL profile)
 	ADD_DEFINITIONS(-g -pg)
