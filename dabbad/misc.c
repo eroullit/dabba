@@ -1,3 +1,9 @@
+/**
+ * \file misc.c
+ * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2012
+ * \date 2012
+ */
+
 /* __LICENSE_HEADER_BEGIN__ */
 
 /*
@@ -32,7 +38,23 @@
 
 #include <dabbacore/strlcpy.h>
 
+/**
+ * \brief Path to current process open file descriptor information
+ */
+
 #define PROC_FD_PATH "/proc/self/fd/"
+
+/**
+ * \brief Get file path from an open file descriptor
+ * \param[in]           fd	        File descriptor
+ * \param[out]          path		Pointer to the path string buffer
+ * \param[in]           path_len	Path string buffer size in bytes
+ * \return 0 on success, else on failure.
+ *
+ * This function retrieves the absolute path of a file from its file descriptor.
+ * It mainly checks the device/inode numbers of the file descriptor and the file
+ * to correlate them.
+ */
 
 int fd_to_path(const int fd, char *path, const size_t path_len)
 {
