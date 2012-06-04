@@ -1,3 +1,9 @@
+/**
+ * \file ipc.c
+ * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2012
+ * \date 2012
+ */
+
 /* __LICENSE_HEADER_BEGIN__ */
 
 /*
@@ -29,6 +35,15 @@
 #include <dabbad/list.h>
 #include <dabbad/capture.h>
 
+/**
+ * \internal
+ * \brief Handle request received in incoming IPC message
+ * \return 0 on success, -1 on failure. Set errno accordingly on failure.
+ *
+ * This function checks the operation to perform in the IPC message and passes 
+ * it to the right processing function.
+ */
+
 static int dabbad_handle_msg(struct dabba_ipc_msg *msg)
 {
 	int rc;
@@ -56,10 +71,24 @@ static int dabbad_handle_msg(struct dabba_ipc_msg *msg)
 	return rc;
 }
 
+/**
+ * \brief Initialize dabbad Inter Process Communication message queue
+ * \return 0 on success, msgctl(2) return code on failure.
+ *
+ * This function removes all previously created IPC message queue.
+ */
+
 int dabbad_ipc_msg_init(void)
 {
 	return msgctl(dabba_get_ipc_queue_id(0), IPC_RMID, NULL);
 }
+
+/**
+ * \brief Flush dabbad Inter Process Communication message queue
+ * \param[in]       qid	        Dabba daemon message queue
+ *
+ * This function removes all previously created IPC message queue.
+ */
 
 void dabbad_ipc_msg_flush(int qid)
 {
@@ -72,6 +101,18 @@ void dabbad_ipc_msg_flush(int qid)
 			   IPC_NOWAIT | MSG_NOERROR);
 	} while (rcv > 0);
 }
+
+/**
+ * \brief Wait for IPC messages for dabbad.
+ * \return 0 on success, else otherwise.
+ *
+ * Dabbad main loop. It awaits for incoming IPC messages.
+ * When a message has been received, it is passed to a message handler which
+ * performs the request.
+ * 
+ * When done, an IPC message is sent back with the requested information, 
+ * error code, etc.
+ */
 
 int dabbad_ipc_msg_poll(void)
 {
