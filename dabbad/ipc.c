@@ -90,7 +90,7 @@ int dabbad_ipc_msg_init(void)
  * This function removes all previously created IPC message queue.
  */
 
-void dabbad_ipc_msg_flush(int qid)
+void dabbad_ipc_msg_flush(const int qid)
 {
 	struct dabba_ipc_msg msg;
 	ssize_t rcv;
