@@ -1,3 +1,8 @@
+/**
+ * \file list.c
+ * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2012
+ * \date 2012
+ */
 
 /* __LICENSE_HEADER_BEGIN__ */
 
@@ -29,6 +34,14 @@
 #include <dabbacore/macros.h>
 #include <dabbacore/strlcpy.h>
 #include <dabbad/list.h>
+
+/**
+ * \brief Get the list of usable interfaces by dabbad and give it to the user
+ * \param[in,out]       msg	        Dabba daemon IPC message
+ * \return 0 on success, -1 if the interface list could not be fetched.
+ *
+ * This function only retrieves interfaces which belong to the packet family.
+ */
 
 int dabbad_ifconf_get(struct dabba_ipc_msg *msg)
 {
