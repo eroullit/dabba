@@ -1,3 +1,9 @@
+/**
+ * \file help.c
+ * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2012
+ * \date 2012
+ */
+
 /* __LICENSE_HEADER_BEGIN__ */
 
 /*
@@ -27,6 +33,10 @@
 
 static const char _usage[] =
     "usage: dabbad [<args>]\n\n" "The available options are:\n";
+
+/**
+ * \brief Show dabbad usage options
+ */
 
 void show_usage(const struct option const *opt)
 {
