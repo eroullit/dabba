@@ -116,7 +116,7 @@ struct dabba_ipc_msg {
  * \return IPC message queue id or -1 on failure.
  */
 
-static inline int dabba_get_ipc_queue_id(int flags)
+static inline int dabba_get_ipc_queue_id(const int flags)
 {
 	key_t key = ftok(DABBAD_PID_FILE, 0xDABADABA);
 
