@@ -1,3 +1,9 @@
+/**
+ * \file capture.c
+ * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2012
+ * \date 2012
+ */
+
 /* __LICENSE_HEADER_BEGIN__ */
 
 /*
@@ -38,13 +44,36 @@
 #include <dabbad/dabbad.h>
 #include <dabbad/misc.h>
 
+/**
+ * \brief Capture thread management element
+ */
+
 struct capture_thread_node {
-	struct packet_rx_thread *pkt_capture;
-	 TAILQ_ENTRY(capture_thread_node) entry;
+	struct packet_rx_thread *pkt_capture; /**< Packet capture thread */
+	 TAILQ_ENTRY(capture_thread_node) entry; /**< tail queue list entry */
 };
+
+/**
+ * \internal
+ * \brief Capture thread management list
+ */
 
 static TAILQ_HEAD(capture_thread_head, capture_thread_node) thread_head =
 TAILQ_HEAD_INITIALIZER(thread_head);
+
+/**
+ * \internal
+ * \brief Capture thread message validator
+ * \param[in] msg Capture thread message to check
+ * \return 0 if the message is invalid, 1 if it is valid.
+ * 
+ * A valid capture message must fulfill these requirements:
+ *      - Interface name length longer than zero, shorter than IFNAMESIZ
+ *      - PCAP file name length longer than zero, shorter than IFNAMESIZ
+ *      - PCAP file must not contain '/' character
+ *      - Frame size must be in supported
+ *      - The memory page order must be greater than zero
+ */
 
 static int capture_msg_is_valid(struct dabba_ipc_msg *msg)
 {
@@ -79,6 +108,13 @@ static int capture_msg_is_valid(struct dabba_ipc_msg *msg)
 
 	return 1;
 }
+
+/**
+ * \brief Start a capture thread 
+ * \param[in,out] msg Capture thread message
+ * \return 0 on success, else on failure.
+ * \warning This function requires the CAP_NET_RAW capability
+ */
 
 int dabbad_capture_start(struct dabba_ipc_msg *msg)
 {
@@ -134,6 +170,12 @@ int dabbad_capture_start(struct dabba_ipc_msg *msg)
 	return rc;
 }
 
+/**
+ * \brief List currently running capture thread
+ * \param[in,out] msg Capture thread message
+ * \return 0 on success, else on failure.
+ */
+
 int dabbad_capture_list(struct dabba_ipc_msg *msg)
 {
 	struct capture_thread_node *node;
@@ -171,6 +213,12 @@ int dabbad_capture_list(struct dabba_ipc_msg *msg)
 
 	return 0;
 }
+
+/**
+ * \brief Stop a running capture thread
+ * \param[in,out] msg Capture thread message
+ * \return 0 on success, else on failure.
+ */
 
 int dabbad_capture_stop(struct dabba_ipc_msg *msg)
 {
