@@ -1,3 +1,9 @@
+/**
+ * \file dabbad.c
+ * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2012
+ * \date 2012
+ */
+
 /* __LICENSE_HEADER_BEGIN__ */
 
 /*
@@ -39,6 +45,11 @@ enum dabbad_opts {
 	OPT_HELP
 };
 
+/**
+ * \brief Dabbad options getter
+ * \return Dabbad option data structure
+ */
+
 const struct option *dabbad_options_get(void)
 {
 	static const struct option dabbad_long_options[] = {
@@ -49,6 +60,14 @@ const struct option *dabbad_options_get(void)
 
 	return (dabbad_long_options);
 }
+
+/**
+ * \internal
+ * \brief Create dabbad pidfile
+ * \return 0 on success, else on failure.
+ *
+ * This function creates start time a file containing dabbad process id.
+ */
 
 static inline int dabbad_pidfile_create(void)
 {
@@ -71,6 +90,17 @@ static inline int dabbad_pidfile_create(void)
 	close(pidfd);
 	return rc;
 }
+
+/**
+ * \brief Dabbad entry point
+ * \param[in]       argc	        Argument counter
+ * \param[in]       argv	        Argument vector
+ * \return 0 on success, else on failure
+ * 
+ * This function is dabbad entry point.
+ * It parses given arguments, configure the daemon accordingly and start
+ * IPC message polling.
+ */
 
 int main(int argc, char **argv)
 {
