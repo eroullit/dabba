@@ -1,3 +1,9 @@
+/**
+ * \file dabbad.h
+ * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2012
+ * \date 2012
+ */
+
 /* __LICENSE_HEADER_BEGIN__ */
 
 /*
@@ -31,6 +37,10 @@
 #include <sys/ipc.h>
 #include <sys/msg.h>
 
+/**
+ * \brief Supported dabbad IPC message types
+ */
+
 enum dabba_msg_type {
 	DABBA_IFCONF,
 	DABBA_CAPTURE_START,
@@ -38,46 +48,73 @@ enum dabba_msg_type {
 	DABBA_CAPTURE_STOP
 };
 
+/**
+ * \brief Dabbad raw message buffer
+ */
+
 struct dabba_msg_buf {
 	uint8_t buf[1024];
 };
+
+/**
+ * \brief Dabbad interface name buffer
+ */
 
 struct dabba_ifconf {
 	char name[IFNAMSIZ];
 };
 
+/**
+ * \brief Dabbad capture message buffer
+ */
+
 struct dabba_capture {
-	char pcap_name[NAME_MAX];	/* find name length limit */
-	char dev_name[IFNAMSIZ];
-	pthread_t thread_id;
-	uint64_t size;
-	uint32_t frame_size;
-	uint8_t page_order;
+	char pcap_name[NAME_MAX]; /**< pcap file name */
+	char dev_name[IFNAMSIZ]; /**< interface name */
+	pthread_t thread_id; /**< thread id */
+	uint64_t size; /**< capture thread buffer size */
+	uint32_t frame_size; /**< maximum frame size to support */
+	uint8_t page_order; /**< memory page order to use */
 };
 
 #define DABBA_IFCONF_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_ifconf))
 #define DABBA_CAPTURE_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_capture))
 
+/**
+ * \brief Dabbad IPC message structure
+ */
+
 struct dabba_ipc_msg {
-	long mtype;
+	long mtype; /**< IPC internal message type. Must be first. */
 
 	struct dabba_msg {
-		uint16_t type;
-		uint16_t elem_nr;
-		uint16_t offset;
-		int16_t error;
+		uint16_t type; /**< dabbad message type */
+		uint16_t elem_nr; /**< dabbad #element present in the message */
+		uint16_t offset; /**< dabbad element offset to start with */
+		int16_t error; /**< error code when processing the message */
 
 		union dabba_info {
 			struct dabba_msg_buf buf;
 			struct dabba_ifconf ifconf[DABBA_IFCONF_MAX_SIZE];
 			struct dabba_capture capture[DABBA_CAPTURE_MAX_SIZE];
-		} msg;
+		} msg; /**< message data */
 	} msg_body;
 };
 
 #ifndef DABBAD_PID_FILE
+
+/**
+ * \brief Dabbad pid file path
+ */
+
 #define DABBAD_PID_FILE "/tmp/dabba.pid"
 #endif				/* DABBAD_PID_FILE */
+
+/**
+ * \brief Dabbad IPC message queue id getter
+ * \param[in] flags to use on msgget(2)
+ * \return IPC message queue id or -1 on failure.
+ */
 
 static inline int dabba_get_ipc_queue_id(int flags)
 {
