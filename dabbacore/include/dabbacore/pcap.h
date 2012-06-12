@@ -60,7 +60,7 @@ struct pcap_file_header {
 	int32_t thiszone;	/**< GMT to local correction leave it zero */
 	uint32_t sigfigs;	/**< accuracy of timestamps. Set on 0 */
 	uint32_t snaplen;	/**< max length saved portion of each pkt. */
-	uint32_t linktype;	/**< data link type (LINKTYPE_*) */
+	uint32_t linktype;	/**< data link type (\c LINKTYPE_*) */
 };
 
 /**
@@ -68,11 +68,11 @@ struct pcap_file_header {
  *
  * This is a timeval as stored in a savefile.
  * It has to use the same types everywhere, independent of the actual
- * `struct timeval'; `struct timeval' has 32-bit tv_sec values on some
- * platforms and 64-bit tv_sec values on other platforms, and writing
- * out native `struct timeval' values would mean files could only be
- * read on systems with the same tv_sec size as the system on which
- * the file was written.
+ * <tt>struct timeval</tt>; <tt>struct timeval</tt> has 32-bit \c tv_sec
+ * values on some platforms and 64-bit \c tv_sec values on other platforms,
+ * and writing out native <tt>struct timeval</tt> values would mean files
+ * could only be read on systems with the same \c tv_sec size as the system
+ * on which the file was written.
  */
 
 struct pcap_timeval {
@@ -83,13 +83,13 @@ struct pcap_timeval {
 /**
  * \brief Structure describing per-packet information
  *
- * The time stamp can and should be a "struct timeval", regardless of
- * whether your system supports 32-bit tv_sec in "struct timeval",
- * 64-bit tv_sec in "struct timeval", or both if it supports both 32-bit
+ * The time stamp can and should be a <tt>struct timeval</tt>, regardless of
+ * whether your system supports 32-bit \c tv_sec in <tt>struct timeval</tt>,
+ * 64-bit \ ctv_sec in <tt>struct timeval</tt>, or both if it supports both 32-bit
  * and 64-bit applications.  The on-disk format of savefiles uses 32-bit
- * tv_sec (and tv_usec); this structure is irrelevant to that.  32-bit
+ * \c tv_sec (and \c tv_usec); this structure is irrelevant to that.  32-bit
  * and 64-bit versions of libpcap, even if they're on the same platform,
- * should supply the appropriate version of "struct timeval", even if
+ * should supply the appropriate version of <tt>struct timeval</tt>, even if
  * that's not what the underlying packet capture mechanism supplies.
  */
 

@@ -35,7 +35,7 @@
  * Compatible with *BSD: the result is always a valid
  * NUL-terminated string that fits in the buffer (unless,
  * of course, the buffer size is zero). It does not pad
- * out the result like strncpy() does.
+ * out the result like \c strncpy(3) does.
  */
 
 size_t strlcpy(char *dest, const char *src, size_t size)

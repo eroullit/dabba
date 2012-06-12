@@ -43,7 +43,8 @@
  * \brief Get the interface index of a specific interface
  * \param[in]	dev	Device name
  * \param[out]	index	Interface index of the interface
- * \return 0 on success, errno from socket(2), ioctl(2) or close(2) on failure
+ * \return 0 on success, errno from \c socket(2), \c ioctl(2) 
+ * \return or \c close(2) on failure
  *
  * This function queries the kernel about the interface
  * index related to the interface name.
@@ -88,7 +89,8 @@ int devname_to_ifindex(const char *const dev, int *index)
  * \param[in]	index	Interface index of the interface
  * \param[out]	dev	Device name
  * \param[in]	dev_len	Device name buffer length
- * \return 0 on success, errno from socket(2), ioctl(2) or close(2) on failure
+ * \return 0 on success, errno from \c socket(2), \c ioctl(2) 
+ * \return or \c close(2) on failure
  *
  * This function queries the kernel about the interface
  * index related to the interface name.

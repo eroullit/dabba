@@ -111,7 +111,7 @@ int pcap_link_type_get(int arp_type, enum pcap_linktype *pcap_link_type)
  * \param[in] fd PCAP file descriptor
  * \return	0 if the PCAP file header is not valid \n
  * 		1 if it is. \n
- * 		If PCAP file header is invalid, errno is set to \n
+ * 		If PCAP file header is invalid, \c errno is set to \n
  * 		\c EINVAL if PCAP file descriptor or file header is invalid \n
  * 		\c EIO if PCAP file header could not be read
  */

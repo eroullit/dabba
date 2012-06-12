@@ -43,7 +43,7 @@
  * \param[in] arg	Pointer to packet rx thread structure
  * \return Always return NULL
  *
- * This function will poll(2) until some packets are received on the configured
+ * This function will \c poll(2) until some packets are received on the configured
  * interface. For now this function does not much but it can be starting point
  * for PCAP function to dump the frames into a file or for a packet dissectors.
  */

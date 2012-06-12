@@ -48,7 +48,7 @@
  * \internal
  * \brief Register a packet mmap to the kernel
  * \param[in] pkt_mmap	packet mmap to register
- * \return 0 on success, error code of setsockopt(2) on failure
+ * \return 0 on success, error code of \c setsockopt(2) on failure
  */
 
 static int packet_mmap_register(const struct packet_mmap *const pkt_mmap)
@@ -68,7 +68,7 @@ static int packet_mmap_register(const struct packet_mmap *const pkt_mmap)
  * \internal
  * \brief Unregister a packet mmap from the kernel
  * \param[in] pkt_mmap	packet mmap to unregister
- * \return 0 on success, error code of setsockopt(2) on failure
+ * \return 0 on success, error code of \c setsockopt(2) on failure
  */
 
 static void packet_mmap_unregister(struct packet_mmap *pkt_mmap)
@@ -127,7 +127,7 @@ static void packet_mmap_munmap(struct packet_mmap *pkt_mmap)
  * \internal
  * \brief Bind a packet mmap socket to the interface
  * \param[in] pkt_mmap	packet mmap to bind to the interface
- * \return 0 on success, error code from bind(2) on failure
+ * \return 0 on success, error code from \c bind(2) on failure
  */
 
 static int packet_mmap_bind(const struct packet_mmap *const pkt_mmap)
