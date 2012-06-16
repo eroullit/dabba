@@ -84,9 +84,9 @@ static int handle_internal_command(int argc, const char **argv)
 	size_t i;
 	const char *cmd = argv[0];
 	static struct cmd_struct commands[] = {
-		{"list", cmd_list, 0},
-		{"capture", cmd_capture, 0},
-		{"help", cmd_help, 0}
+		{"list", cmd_list},
+		{"capture", cmd_capture},
+		{"help", cmd_help}
 	};
 
 	if (argc == 0 || cmd == NULL || !strcmp(cmd, "--help"))

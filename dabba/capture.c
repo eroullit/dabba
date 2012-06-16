@@ -291,9 +291,9 @@ int cmd_capture(int argc, const char **argv)
 	const char *cmd = argv[0];
 	size_t i;
 	static struct cmd_struct capture_commands[] = {
-		{"list", cmd_capture_list, 0},
-		{"start", cmd_capture_start, 0},
-		{"stop", cmd_capture_stop, 0},
+		{"list", cmd_capture_list},
+		{"start", cmd_capture_start},
+		{"stop", cmd_capture_stop},
 	};
 
 	if (argc == 0 || cmd == NULL || !strcmp(cmd, "--help"))

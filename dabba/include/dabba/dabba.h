@@ -37,7 +37,6 @@
 struct cmd_struct {
 	const char *cmd; /**< Pointer to the command string */
 	int (*fn) (int, const char **);	/**< Command function pointer */
-	int option;
 };
 
 int run_builtin(struct cmd_struct *p, int argc, const char **argv);
