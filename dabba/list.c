@@ -1,3 +1,9 @@
+/**
+ * \file list.c
+ * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2012
+ * \date 2012
+ */
+
 /* __LICENSE_HEADER_BEGIN__ */
 
 /*
@@ -78,6 +84,17 @@ static void display_list_msg(const struct dabba_ipc_msg const *msg)
 		break;
 	}
 }
+
+/**
+ * \brief Request the current supported interface list
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv		Argument vector
+ * \return 0 on success, else on failure.
+ *
+ * This function prepares an IPC message to query the supported network
+ * interfaces present on the system. Once the message is sent, it waits for the
+ * dabba daemon to reply.
+ */
 
 int cmd_list(int argc, const char **argv)
 {

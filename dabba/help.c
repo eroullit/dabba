@@ -1,3 +1,9 @@
+/**
+ * \file help.c
+ * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2012
+ * \date 2012
+ */
+
 /* __LICENSE_HEADER_BEGIN__ */
 
 /*
@@ -89,6 +95,16 @@ static void list_common_cmds_help(void)
 		printf("%s\n", common_cmds[i].help);
 	}
 }
+
+/**
+ * \brief Print help
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv		Argument vector
+ * \return Always returns 1.
+ *
+ * This function prints the basic dabba usage help message.
+ * Furthermore, it lists all available command.
+ */
 
 int cmd_help(int argc, const char **argv)
 {

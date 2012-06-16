@@ -1,3 +1,9 @@
+/**
+ * \file ipc.c
+ * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2012
+ * \date 2012
+ */
+
 /* __LICENSE_HEADER_BEGIN__ */
 
 /*
@@ -27,6 +33,17 @@
 #include <assert.h>
 #include <errno.h>
 #include <dabba/ipc.h>
+
+/**
+ * \brief Communicate via IPC to the dabba daemon
+ * \param[in,out]       msg	        IPC message
+ * \return 0 on success, else on failure.
+ *
+ * This function coordinates the communication between dabba and the dabba
+ * daemon. It first sends a command request packed in an IPC message and
+ * awaits for a response from the dabba daemon which contains the request error
+ * code and the requested data.
+ */
 
 int dabba_ipc_msg(struct dabba_ipc_msg *msg)
 {

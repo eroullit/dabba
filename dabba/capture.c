@@ -1,3 +1,9 @@
+/**
+ * \file capture.c
+ * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2012
+ * \date 2012
+ */
+
 /* __LICENSE_HEADER_BEGIN__ */
 
 /*
@@ -140,6 +146,13 @@ static void display_capture_list(const struct dabba_ipc_msg const *msg)
 	}
 }
 
+/**
+ * \brief Prepare a command to start a capture.
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv		Argument vector
+ * \return 0 on success, else on failure.
+ */
+
 int cmd_capture_start(int argc, const char **argv)
 {
 	struct dabba_ipc_msg msg;
@@ -160,6 +173,13 @@ int cmd_capture_start(int argc, const char **argv)
 
 	return dabba_ipc_msg(&msg);
 }
+
+/**
+ * \brief Prepare a command to list current captures.
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv		Argument vector
+ * \return 0 on success, else on failure.
+ */
 
 int cmd_capture_list(int argc, const char **argv)
 {
@@ -227,6 +247,13 @@ static int prepare_capture_stop_query(int argc, char **argv,
 	return rc;
 }
 
+/**
+ * \brief Prepare a command to stop a active capture.
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv		Argument vector
+ * \return 0 on success, else on failure.
+ */
+
 int cmd_capture_stop(int argc, const char **argv)
 {
 	struct dabba_ipc_msg msg;
@@ -247,6 +274,17 @@ int cmd_capture_stop(int argc, const char **argv)
 
 	return dabba_ipc_msg(&msg);
 }
+
+/**
+ * \brief Parse which capture sub-command.
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv		Argument vector
+ * \return 0 on success, ENOSYS if the sub-command does not exist,
+ * else on failure.
+ *
+ * This function parses the capture sub-command string and the rest of the
+ * argument vector to the proper sub-command handler.
+ */
 
 int cmd_capture(int argc, const char **argv)
 {
