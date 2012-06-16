@@ -1,3 +1,9 @@
+/**
+ * \file dabba.h
+ * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2012
+ * \date 2012
+ */
+
 /* __LICENSE_HEADER_BEGIN__ */
 
 /*
@@ -24,9 +30,13 @@
 #ifndef DABBA_H
 #define	DABBA_H
 
+/**
+ * \brief Dabba command structure
+ */
+
 struct cmd_struct {
-	const char *cmd;
-	int (*fn) (int, const char **);
+	const char *cmd; /**< Pointer to the command string */
+	int (*fn) (int, const char **);	/**< Command function pointer */
 	int option;
 };
 
