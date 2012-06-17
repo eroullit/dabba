@@ -1,6 +1,7 @@
 PROJECT(dabbad C)
 
 FIND_PACKAGE(Doxygen)
+FIND_PACKAGE(Setcap REQUIRED)
 
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/include
                         ${CMAKE_SOURCE_DIR}/dabbacore/include)

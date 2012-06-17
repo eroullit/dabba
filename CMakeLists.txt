@@ -16,12 +16,6 @@ ELSE(CMAKE_HAVE_PTHREAD_CREATE)
 	MESSAGE(FATAL_ERROR "The framework only supports pthread")
 ENDIF(CMAKE_HAVE_PTHREAD_CREATE)
 
-FIND_PACKAGE(Setcap)
-
-IF(NOT SETCAP_FOUND)
-	MESSAGE(FATAL ERROR "setcap could not be found. See README for further information")
-ENDIF(NOT SETCAP_FOUND)
-
 INCLUDE(CheckBPFAttach)
 INCLUDE(CheckPFPacket)
 INCLUDE(CheckStrictAlign)
