@@ -79,7 +79,7 @@ static void list_common_cmds_help(void)
 	size_t i, longest = 0;
 
 	static struct cmdname_help common_cmds[] = {
-		{"list", "list available network interfaces"},
+		{"interface", "perform an interface related command"},
 		{"capture", "capture live traffic from an interface"}
 	};
 

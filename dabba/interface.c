@@ -1,5 +1,5 @@
 /**
- * \file list.c
+ * \file interface.c
  * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2012
  * \date 2012
  */
@@ -32,6 +32,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <dabbacore/macros.h>
+#include <dabba/dabba.h>
 #include <dabba/ipc.h>
 
 static void display_interface_list_header(void)
@@ -52,14 +53,14 @@ static void display_interface_list(const struct dabba_ipc_msg const *msg)
 	}
 }
 
-static void prepare_list_query(struct dabba_ipc_msg *msg)
+static void prepare_interface_list_query(struct dabba_ipc_msg *msg)
 {
 	assert(msg);
 	msg->mtype = 1;
 	msg->msg_body.type = DABBA_IFCONF;
 }
 
-static void display_list_msg_header(const struct dabba_ipc_msg const *msg)
+static void display_interface_list_msg_header(const struct dabba_ipc_msg const *msg)
 {
 	assert(msg);
 
@@ -72,7 +73,7 @@ static void display_list_msg_header(const struct dabba_ipc_msg const *msg)
 	}
 }
 
-static void display_list_msg(const struct dabba_ipc_msg const *msg)
+static void display_interface_list_msg(const struct dabba_ipc_msg const *msg)
 {
 	assert(msg);
 
@@ -96,7 +97,7 @@ static void display_list_msg(const struct dabba_ipc_msg const *msg)
  * dabba daemon to reply.
  */
 
-int cmd_list(int argc, const char **argv)
+int cmd_interface_list(int argc, const char **argv)
 {
 	int rc;
 	struct dabba_ipc_msg msg;
@@ -105,8 +106,8 @@ int cmd_list(int argc, const char **argv)
 	assert(argv);
 
 	memset(&msg, 0, sizeof(msg));
-	prepare_list_query(&msg);
-	display_list_msg_header(&msg);
+	prepare_interface_list_query(&msg);
+	display_interface_list_msg_header(&msg);
 
 	do {
 		msg.msg_body.offset += msg.msg_body.elem_nr;
@@ -117,8 +118,40 @@ int cmd_list(int argc, const char **argv)
 		if (rc)
 			break;
 
-		display_list_msg(&msg);
+		display_interface_list_msg(&msg);
 	} while (msg.msg_body.elem_nr);
 
 	return rc;
+}
+
+/**
+ * \brief Parse which interface sub-command.
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv		Argument vector
+ * \return 0 on success, ENOSYS if the sub-command does not exist,
+ * else on failure.
+ *
+ * This function parses the interface sub-command string and the rest of the
+ * argument vector to the proper sub-command handler.
+ */
+
+int cmd_interface(int argc, const char **argv)
+{
+	const char *cmd = argv[0];
+	size_t i;
+	static struct cmd_struct interface_commands[] = {
+		{"list", cmd_interface_list}
+	};
+
+	if (argc == 0 || cmd == NULL || !strcmp(cmd, "--help"))
+		cmd = "help";
+
+	for (i = 0; i < ARRAY_SIZE(interface_commands); i++) {
+		struct cmd_struct *p = interface_commands + i;
+		if (strcmp(p->cmd, cmd))
+			continue;
+		return (run_builtin(p, argc, argv));
+	}
+
+	return ENOSYS;
 }

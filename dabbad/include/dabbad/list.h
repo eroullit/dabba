@@ -21,8 +21,8 @@
 
 /* __LICENSE_HEADER_END__ */
 
-#ifndef LIST_H
-#define	LIST_H
+#ifndef INTERFACE_H
+#define	INTERFACE_H
 
 #include <dabbad/dabbad.h>
 

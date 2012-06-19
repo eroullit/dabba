@@ -39,7 +39,7 @@
 #include <dabbad/dabbad.h>
 #include <dabba/dabba.h>
 #include <dabba/help.h>
-#include <dabba/list.h>
+#include <dabba/interface.h>
 #include <dabba/capture.h>
 
 int run_builtin(struct cmd_struct *p, int argc, const char **argv)
@@ -84,7 +84,7 @@ static int handle_internal_command(int argc, const char **argv)
 	size_t i;
 	const char *cmd = argv[0];
 	static struct cmd_struct commands[] = {
-		{"list", cmd_list},
+		{"interface", cmd_interface},
 		{"capture", cmd_capture},
 		{"help", cmd_help}
 	};

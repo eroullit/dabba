@@ -21,9 +21,9 @@
 
 /* __LICENSE_HEADER_END__ */
 
-#ifndef LIST_H
-#define	LIST_H
+#ifndef INTERFACE_H
+#define	INTERFACE_H
 
-int cmd_list(int argc, const char **argv);
+int cmd_interface(int argc, const char **argv);
 
-#endif				/* LIST_H */
+#endif				/* INTERFACE_H */
