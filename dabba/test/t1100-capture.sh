@@ -113,7 +113,7 @@ done
 
 for i in `seq 10`
 do
-        test_expect_success "Stop capture thread #$i on loopback" "
+        test_expect_success PYTHON_YAML "Stop capture thread #$i on loopback" "
             $DABBA_PATH/dabba capture list > result &&
             $DABBA_PATH/dabba capture stop --id `get_capture_thread_id 0 result` &&
             $DABBA_PATH/dabba capture list > after &&
