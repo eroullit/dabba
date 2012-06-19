@@ -17,7 +17,7 @@
 # 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 #
 
-test_description='Test dabba list command'
+test_description='Test dabba interface list command'
 
 . ./dabba-test-lib.sh
 
@@ -42,18 +42,18 @@ cat <<EOF
 EOF
 }
 
-#test_expect_success 'invoke dabba list w/o dabbad' "
-#    test_must_fail $DABBA_PATH/dabba list
+#test_expect_success 'invoke dabba interface list w/o dabbad' "
+#    test_must_fail $DABBA_PATH/dabba interface list
 #"
 
 test_expect_success DUMMY_DEV "Setup: Remove all dummy interfaces" "
     test_might_fail flush_test_interface
 "
 
-test_expect_success "invoke dabba list with dabbad" "
+test_expect_success "invoke dabba interface list with dabbad" "
     $DABBAD_PATH/dabbad --daemonize &&
     sleep 0.1 &&
-    $DABBA_PATH/dabba list > result &&
+    $DABBA_PATH/dabba interface list > result &&
     killall dabbad &&
     generate_yaml_list > expected &&
     sort -o expected_sorted expected &&
@@ -65,10 +65,10 @@ test_expect_success DUMMY_DEV "Setup: Create $interface_nr dummy interfaces" "
     create_test_interface $interface_nr
 "
 
-test_expect_success DUMMY_DEV "invoke dabba list with dabbad with $interface_nr extra interfaces" "
+test_expect_success DUMMY_DEV "invoke dabba interface list with dabbad with $interface_nr extra interfaces" "
     $DABBAD_PATH/dabbad --daemonize &&
     sleep 0.1 &&
-    $DABBA_PATH/dabba list > result &&
+    $DABBA_PATH/dabba interface list > result &&
     killall dabbad &&
     generate_yaml_list > expected &&
     sort -o expected_sorted expected &&
