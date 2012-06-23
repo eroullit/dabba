@@ -23,6 +23,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <assert.h>
 #include <sys/socket.h>
@@ -35,54 +36,60 @@
 #include <dabbacore/nic.h>
 #include <dabbacore/packet_mmap.h>
 
-/* Find a way to know the target's MAX_ORDER */
-#ifndef MAX_ORDER
-#define MAX_ORDER 11
-#endif
-
-#define MIN_SIZE 8 * 1024
-#define MAX_SIZE 1024 * 1024
+#define MIN_FRAME_NR 1<<3
+#define MAX_FRAME_NR 1<<16
 
 int main(int argc, char **argv)
 {
 	int rc;
-	size_t a, i, size;
+	size_t a;
 	int pf_sock = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
-	int page_size = getpagesize();
 	struct packet_mmap pkt_rx;
-
-	enum packet_mmap_frame_size test_size[] = {
-		PACKET_MMAP_ETH_FRAME_LEN,
-		PACKET_MMAP_JUMBO_FRAME_LEN,
-		PACKET_MMAP_SUPER_JUMBO_FRAME_LEN
-	};
 
 	assert(argc);
 	assert(argv);
 
 	assert(pf_sock > 0);
 
-	for (size = MIN_SIZE; size <= MAX_SIZE; size *= 2)
-		for (a = 0; a < ARRAY_SIZE(test_size); a++)
-			for (i = 0; i <= MAX_ORDER; i++) {
-				if ((page_size << i) < (int)test_size[a])
-					continue;
+	for (a = 1 << 3; a < 1 << 16; a <<= 1) {
+		rc = packet_mmap_create(&pkt_rx, ANY_INTERFACE,
+					pf_sock, PACKET_MMAP_RX,
+					PACKET_MMAP_ETH_FRAME_LEN, a);
 
-				if ((int)size < (page_size << i))
-					continue;
+		printf("RX packet mmap: frame number=%zu", a);
+		printf(" frame size=%zu rc=%s\n", PACKET_MMAP_ETH_FRAME_LEN,
+		       strerror(rc));
 
-				rc = packet_mmap_create(&pkt_rx, ANY_INTERFACE,
-							pf_sock, PACKET_MMAP_RX,
-							test_size[a], i, size);
+		assert(rc == 0);
+		packet_mmap_destroy(&pkt_rx);
+	}
 
-				printf("RX packet mmap: frame size=%i",
-				       test_size[a]);
-				printf(" page order=%zu size=%zu rc=%i\n", i,
-				       size, rc);
+	for (a = 1 << 3; a < 1 << 15; a <<= 1) {
+		rc = packet_mmap_create(&pkt_rx, ANY_INTERFACE,
+					pf_sock, PACKET_MMAP_RX,
+					PACKET_MMAP_JUMBO_FRAME_LEN, a);
 
-				assert(rc == 0);
-				packet_mmap_destroy(&pkt_rx);
-			}
+		printf("RX packet mmap: frame number=%zu", a);
+		printf(" frame size=%zu rc=%s\n", PACKET_MMAP_JUMBO_FRAME_LEN,
+		       strerror(rc));
+
+		assert(rc == 0);
+		packet_mmap_destroy(&pkt_rx);
+	}
+
+	for (a = 1 << 3; a < 1 << 14; a <<= 1) {
+		rc = packet_mmap_create(&pkt_rx, ANY_INTERFACE,
+					pf_sock, PACKET_MMAP_RX,
+					PACKET_MMAP_SUPER_JUMBO_FRAME_LEN, a);
+
+		printf("RX packet mmap: frame number=%zu", a);
+		printf(" frame size=%zu rc=%s\n",
+		       PACKET_MMAP_SUPER_JUMBO_FRAME_LEN, strerror(rc));
+
+		assert(rc == 0);
+		packet_mmap_destroy(&pkt_rx);
+
+	}
 
 	return (EXIT_SUCCESS);
 }
