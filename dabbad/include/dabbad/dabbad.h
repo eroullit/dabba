@@ -72,9 +72,8 @@ struct dabba_capture {
 	char pcap_name[NAME_MAX]; /**< pcap file name */
 	char dev_name[IFNAMSIZ]; /**< interface name */
 	pthread_t thread_id; /**< thread id */
-	uint64_t size; /**< capture thread buffer size */
+	uint64_t frame_nr; /**< number of frames to allocate */
 	uint32_t frame_size; /**< maximum frame size to support */
-	uint8_t page_order; /**< memory page order to use */
 };
 
 #define DABBA_IFCONF_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_ifconf))

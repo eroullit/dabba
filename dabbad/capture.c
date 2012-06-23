@@ -103,7 +103,7 @@ static int capture_msg_is_valid(struct dabba_ipc_msg *msg)
 	if (!packet_mmap_frame_size_is_valid(capture_msg->frame_size))
 		return 0;
 
-	if (!capture_msg->page_order)
+	if (!capture_msg->frame_nr)
 		return 0;
 
 	return 1;
@@ -146,7 +146,7 @@ int dabbad_capture_start(struct dabba_ipc_msg *msg)
 
 	rc = packet_mmap_create(&pkt_capture->pkt_rx, capture_msg->dev_name,
 				sock, PACKET_MMAP_RX, capture_msg->frame_size,
-				capture_msg->page_order, capture_msg->size);
+				capture_msg->frame_nr);
 
 	if (rc) {
 		free(pkt_capture);
@@ -180,6 +180,7 @@ int dabbad_capture_list(struct dabba_ipc_msg *msg)
 {
 	struct capture_thread_node *node;
 	struct dabba_capture *capture;
+	struct tpacket_req *layout;
 	size_t a = 0, off = 0, thread_list_size;
 
 	capture = msg->msg_body.msg.capture;
@@ -194,10 +195,11 @@ int dabbad_capture_list(struct dabba_ipc_msg *msg)
 		if (a >= thread_list_size)
 			break;
 
+		layout = &node->pkt_capture->pkt_rx.layout;
+
 		capture[a].thread_id = node->pkt_capture->thread;
-		capture[a].size =
-		    node->pkt_capture->pkt_rx.layout.tp_frame_size *
-		    node->pkt_capture->pkt_rx.layout.tp_frame_nr;
+		capture[a].frame_size = layout->tp_frame_size;
+		capture[a].frame_nr = layout->tp_frame_nr;
 
 		/* TODO error handling */
 		fd_to_path(node->pkt_capture->pcap_fd, capture[a].pcap_name,
