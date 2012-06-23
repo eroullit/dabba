@@ -46,7 +46,7 @@
 enum capture_start_option {
 	OPT_CAPTURE_INTERFACE,
 	OPT_CAPTURE_PCAP,
-	OPT_CAPTURE_SIZE
+	OPT_CAPTURE_FRAME_NUMBER
 };
 
 enum capture_stop_option {
@@ -58,7 +58,8 @@ static struct option *capture_start_options_get(void)
 	static struct option capture_start_option[] = {
 		{"interface", required_argument, NULL, OPT_CAPTURE_INTERFACE},
 		{"pcap", required_argument, NULL, OPT_CAPTURE_PCAP},
-		{"size", required_argument, NULL, OPT_CAPTURE_SIZE},
+		{"frame-number", required_argument, NULL,
+		 OPT_CAPTURE_FRAME_NUMBER},
 		{NULL, 0, NULL, 0},
 	};
 
@@ -97,8 +98,9 @@ static int prepare_capture_start_query(int argc, char **argv,
 			strlcpy(capture_start_msg->pcap_name, optarg,
 				sizeof(capture_start_msg->pcap_name));
 			break;
-		case OPT_CAPTURE_SIZE:
-			capture_start_msg->size = strtoull(optarg, NULL, 10);
+		case OPT_CAPTURE_FRAME_NUMBER:
+			capture_start_msg->frame_nr =
+			    strtoull(optarg, NULL, 10);
 			break;
 		default:
 			show_usage(capture_start_options_get());
@@ -108,7 +110,6 @@ static int prepare_capture_start_query(int argc, char **argv,
 	}
 
 	/* Assume conservative values for now */
-	capture_start_msg->page_order = 10;
 	capture_start_msg->frame_size = PACKET_MMAP_ETH_FRAME_LEN;
 
 	return rc;
@@ -138,7 +139,10 @@ static void display_capture_list(const struct dabba_ipc_msg const *msg)
 		printf("    - id: %" PRIu64 "\n",
 		       (uint64_t) msg->msg_body.msg.capture[a].thread_id);
 		printf("      packet mmap size: %" PRIu64 "\n",
-		       msg->msg_body.msg.capture[a].size);
+		       msg->msg_body.msg.capture[a].frame_nr *
+		       msg->msg_body.msg.capture[a].frame_size);
+		printf("      frame number: %" PRIu64 "\n",
+		       msg->msg_body.msg.capture[a].frame_nr);
 		printf("      pcap: %s\n",
 		       msg->msg_body.msg.capture[a].pcap_name);
 		printf("      interface: %s\n",
