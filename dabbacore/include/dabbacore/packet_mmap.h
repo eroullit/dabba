@@ -78,7 +78,7 @@ int packet_mmap_create(struct packet_mmap *pkt_mmap,
 		       const char *const dev, const int pf_sock,
 		       const enum packet_mmap_type type,
 		       const enum packet_mmap_frame_size frame_size,
-		       const uint8_t page_order, const size_t size);
+		       const size_t frame_nr);
 
 void packet_mmap_destroy(struct packet_mmap *pkt_mmap);
 

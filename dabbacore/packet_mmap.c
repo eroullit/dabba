@@ -216,7 +216,7 @@ void packet_mmap_destroy(struct packet_mmap *pkt_mmap)
  * \param[in]           type		Packet mmap type to create
  * \param[in]           frame_size	Maximum packet mmap frame size
  * \param[in]           page_order	Page order to use to create a block
- * \param[in]           size		Total size of the packet mmap
+ * \param[in]           frame_nr	Total amount of frame in the packet mmap
  * \return 0 on success, else on failure
  *
  * To create a packet mmap, the input frame_size and the size must be a power of
@@ -227,14 +227,14 @@ int packet_mmap_create(struct packet_mmap *pkt_mmap,
 		       const char *const dev, const int pf_sock,
 		       const enum packet_mmap_type type,
 		       const enum packet_mmap_frame_size frame_size,
-		       const uint8_t page_order, const size_t size)
+		       const size_t frame_nr)
 {
 	int rc = 0;
 
 	assert(pkt_mmap);
 	assert(dev);
 
-	if (!is_power_of_2(frame_size) || !is_power_of_2(size))
+	if (!is_power_of_2(frame_size) || !is_power_of_2(frame_nr))
 		return EINVAL;
 
 	memset(pkt_mmap, 0, sizeof(*pkt_mmap));
@@ -248,11 +248,9 @@ int packet_mmap_create(struct packet_mmap *pkt_mmap,
 	pkt_mmap->pf_sock = pf_sock;
 
 	pkt_mmap->layout.tp_frame_size = frame_size;
-	pkt_mmap->layout.tp_block_size = getpagesize() << page_order;
-	pkt_mmap->layout.tp_block_nr = (size / pkt_mmap->layout.tp_block_size);
-	pkt_mmap->layout.tp_frame_nr =
-	    pkt_mmap->layout.tp_block_size / pkt_mmap->layout.tp_frame_size *
-	    pkt_mmap->layout.tp_block_nr;
+	pkt_mmap->layout.tp_block_nr = frame_nr / 8;
+	pkt_mmap->layout.tp_block_size = 8 * frame_size;
+	pkt_mmap->layout.tp_frame_nr = frame_nr;
 
 	if (pkt_mmap->layout.tp_frame_nr == 0
 	    || pkt_mmap->layout.tp_block_nr == 0) {
