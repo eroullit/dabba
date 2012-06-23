@@ -18,7 +18,6 @@
 #
 
 test_description='Test dabba capture command'
-ring_size=$((16*1024*1024))
 
 . ./dabba-test-lib.sh
 
@@ -79,31 +78,43 @@ check_capture_thread_packet_mmap_size()
     return $(test "$expected_packet_mmap_size" = "$result_packet_mmap_size")
 }
 
+check_capture_thread_frame_nr()
+{
+    local thread_nr=$1
+    local expected_frame_nr=$2
+    local result_file=$3
+    local result_frame_nr="$(python -c "import yaml; y = yaml.load(open('$result_file')); print y['captures'][$thread_nr]['frame number'];")"
+    return $(test "$expected_frame_nr" = "$result_frame_nr")
+}
+
+frame_nr="16"
+ring_size="$(($frame_nr * 2048))" # 2kB are allocated for one ethernet frame
+
 test_expect_success "Setup: Start dabbad" "
     $DABBAD_PATH/dabbad --daemonize
 "
 
 test_expect_success "Start capture thread with an invalid pcap path" "
-    test_expect_code 22 $DABBA_PATH/dabba capture start --interface any --pcap /tmp/test.pcap --size $ring_size
+    test_expect_code 22 $DABBA_PATH/dabba capture start --interface any --pcap /tmp/test.pcap --frame-number $frame_nr
 "
 
 test_expect_success "Start capture thread on an invalid interface (too long)" "
-    test_expect_code 22 $DABBA_PATH/dabba capture start --interface lorem-ipsum-dolor-sit --pcap test.pcap --size $ring_size
+    test_expect_code 22 $DABBA_PATH/dabba capture start --interface lorem-ipsum-dolor-sit --pcap test.pcap --frame-number $frame_nr
 "
 
 test_expect_success "Start capture thread on an invalid interface (does not exist)" "
-    test_expect_code 19 $DABBA_PATH/dabba capture start --interface lorem-ipsum --pcap test.pcap --size $ring_size
+    test_expect_code 19 $DABBA_PATH/dabba capture start --interface lorem-ipsum --pcap test.pcap --frame-number $frame_nr
 "
 
 test_expect_success "Start capture thread with a missing interface" "
-    test_expect_code 22 $DABBA_PATH/dabba capture start --pcap test.pcap --size $ring_size
+    test_expect_code 22 $DABBA_PATH/dabba capture start --pcap test.pcap --frame-number $frame_nr
 "
 
 test_expect_success "Start capture thread with a missing pcap path" "
-    test_expect_code 22 $DABBA_PATH/dabba capture start --interface any --size $ring_size
+    test_expect_code 22 $DABBA_PATH/dabba capture start --interface any --frame-number $frame_nr
 "
 
-test_expect_success "Start capture thread with a missing ring size" "
+test_expect_success "Start capture thread with a missing frame number" "
     test_expect_code 22 $DABBA_PATH/dabba capture start --interface any --pcap test.pcap
 "
 
@@ -114,7 +125,7 @@ test_expect_success "Invoke capture command w/o any parameters" "
 for i in `seq 0 9`
 do
         test_expect_success "Start capture thread #$(($i+1)) on loopback" "
-            $DABBA_PATH/dabba capture start --interface any --pcap test$i.pcap --size $ring_size &&
+            $DABBA_PATH/dabba capture start --interface any --pcap test$i.pcap --frame-number $frame_nr &&
             $DABBA_PATH/dabba capture list > result
         "
 
@@ -136,6 +147,10 @@ do
 
         test_expect_success PYTHON_YAML "Check thread #$(($i+1)) capture packet mmap size" "
             check_capture_thread_packet_mmap_size $i $ring_size result
+        "
+
+        test_expect_success PYTHON_YAML "Check thread #$(($i+1)) capture frame number" "
+            check_capture_thread_frame_nr $i $frame_nr result
         "
 done
 
