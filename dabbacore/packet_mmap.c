@@ -27,7 +27,6 @@
 
  /* __LICENSE_HEADER_END__ */
 
-#include <assert.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
