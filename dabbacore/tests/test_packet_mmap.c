@@ -57,7 +57,7 @@ int main(int argc, char **argv)
 					PACKET_MMAP_ETH_FRAME_LEN, a);
 
 		printf("RX packet mmap: frame number=%zu", a);
-		printf(" frame size=%zu rc=%s\n", PACKET_MMAP_ETH_FRAME_LEN,
+		printf(" frame size=%i rc=%s\n", PACKET_MMAP_ETH_FRAME_LEN,
 		       strerror(rc));
 
 		assert(rc == 0);
@@ -70,7 +70,7 @@ int main(int argc, char **argv)
 					PACKET_MMAP_JUMBO_FRAME_LEN, a);
 
 		printf("RX packet mmap: frame number=%zu", a);
-		printf(" frame size=%zu rc=%s\n", PACKET_MMAP_JUMBO_FRAME_LEN,
+		printf(" frame size=%i rc=%s\n", PACKET_MMAP_JUMBO_FRAME_LEN,
 		       strerror(rc));
 
 		assert(rc == 0);
@@ -83,7 +83,7 @@ int main(int argc, char **argv)
 					PACKET_MMAP_SUPER_JUMBO_FRAME_LEN, a);
 
 		printf("RX packet mmap: frame number=%zu", a);
-		printf(" frame size=%zu rc=%s\n",
+		printf(" frame size=%i rc=%s\n",
 		       PACKET_MMAP_SUPER_JUMBO_FRAME_LEN, strerror(rc));
 
 		assert(rc == 0);
