@@ -16,4 +16,6 @@ ADD_EXECUTABLE(dabba dabba.c help.c interface.c ipc.c capture.c)
 
 TARGET_LINK_LIBRARIES(dabba dabbacore)
 
+INSTALL(TARGETS dabba DESTINATION /usr/sbin)
+
 ADD_SUBDIRECTORY(test)
