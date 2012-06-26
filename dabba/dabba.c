@@ -35,7 +35,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 
-#include <dabbacore/macros.h>
+#include <libdabba/macros.h>
 #include <dabbad/dabbad.h>
 #include <dabba/dabba.h>
 #include <dabba/help.h>

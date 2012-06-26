@@ -1,4 +1,4 @@
-PROJECT(dabbacore C)
+PROJECT(libdabba C)
 
 FIND_PACKAGE(Doxygen)
 FIND_PACKAGE(Setcap REQUIRED)

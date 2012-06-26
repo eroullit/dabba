@@ -32,7 +32,7 @@
 
 #include <pthread.h>
 
-#include <dabbacore/packet_mmap.h>
+#include <libdabba/packet_mmap.h>
 
 /**
  * \brief Packet capture structure

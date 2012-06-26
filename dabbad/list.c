@@ -31,8 +31,8 @@
 #include <net/if.h>
 #include <sys/types.h>
 #include <ifaddrs.h>
-#include <dabbacore/macros.h>
-#include <dabbacore/strlcpy.h>
+#include <libdabba/macros.h>
+#include <libdabba/strlcpy.h>
 #include <dabbad/list.h>
 
 /**

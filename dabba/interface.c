@@ -31,7 +31,7 @@
 #include <string.h>
 #include <assert.h>
 #include <errno.h>
-#include <dabbacore/macros.h>
+#include <libdabba/macros.h>
 #include <dabba/dabba.h>
 #include <dabba/ipc.h>
 
@@ -60,7 +60,8 @@ static void prepare_interface_list_query(struct dabba_ipc_msg *msg)
 	msg->msg_body.type = DABBA_IFCONF;
 }
 
-static void display_interface_list_msg_header(const struct dabba_ipc_msg const *msg)
+static void display_interface_list_msg_header(const struct dabba_ipc_msg const
+					      *msg)
 {
 	assert(msg);
 

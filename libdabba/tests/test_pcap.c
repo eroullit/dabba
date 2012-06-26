@@ -29,8 +29,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include <dabbacore/pcap.h>
-#include <dabbacore/macros.h>
+#include <libdabba/pcap.h>
+#include <libdabba/macros.h>
 
 static const uint8_t icmp_dns[] = {
 	0x00, 0x1e, 0x65, 0x93, 0x1b, 0x6c, 0x00, 0x1d,

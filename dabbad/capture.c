@@ -37,10 +37,10 @@
 #include <arpa/inet.h>
 #include <linux/if_ether.h>
 
-#include <dabbacore/macros.h>
-#include <dabbacore/nic.h>
-#include <dabbacore/packet_rx.h>
-#include <dabbacore/pcap.h>
+#include <libdabba/macros.h>
+#include <libdabba/nic.h>
+#include <libdabba/packet_rx.h>
+#include <libdabba/pcap.h>
 #include <dabbad/dabbad.h>
 #include <dabbad/misc.h>
 

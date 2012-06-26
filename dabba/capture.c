@@ -35,9 +35,9 @@
 #include <inttypes.h>
 #include <errno.h>
 
-#include <dabbacore/macros.h>
-#include <dabbacore/strlcpy.h>
-#include <dabbacore/packet_mmap.h>
+#include <libdabba/macros.h>
+#include <libdabba/strlcpy.h>
+#include <libdabba/packet_mmap.h>
 #include <dabba/dabba.h>
 #include <dabba/help.h>
 #include <dabba/ipc.h>

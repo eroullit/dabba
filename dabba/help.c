@@ -31,7 +31,7 @@
 #include <string.h>
 #include <getopt.h>
 #include <assert.h>
-#include <dabbacore/macros.h>
+#include <libdabba/macros.h>
 
 static const char dabba_usage_string[] = "dabba [--help] <command> [<args>]\n";
 static const char dabba_more_info_string[] =

@@ -39,9 +39,9 @@
 #include <arpa/inet.h>
 #include <linux/if_ether.h>
 
-#include <dabbacore/macros.h>
-#include <dabbacore/packet_mmap.h>
-#include <dabbacore/nic.h>
+#include <libdabba/macros.h>
+#include <libdabba/packet_mmap.h>
+#include <libdabba/nic.h>
 
 /**
  * \internal

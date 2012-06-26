@@ -35,8 +35,8 @@
 #include <sys/uio.h>
 #include <poll.h>
 
-#include <dabbacore/packet_rx.h>
-#include <dabbacore/pcap.h>
+#include <libdabba/packet_rx.h>
+#include <libdabba/pcap.h>
 
 /**
  * \brief Receive packets coming from a packet mmap RX ring

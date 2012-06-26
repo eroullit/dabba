@@ -32,9 +32,9 @@
 
 #include <linux/if_ether.h>
 
-#include <dabbacore/macros.h>
-#include <dabbacore/nic.h>
-#include <dabbacore/packet_mmap.h>
+#include <libdabba/macros.h>
+#include <libdabba/nic.h>
+#include <libdabba/packet_mmap.h>
 
 #define MIN_FRAME_NR 1<<3
 #define MAX_FRAME_NR 1<<16

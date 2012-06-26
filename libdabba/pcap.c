@@ -38,7 +38,7 @@
 
 #include <sys/stat.h>
 
-#include <dabbacore/pcap.h>
+#include <libdabba/pcap.h>
 
 /**
  * \internal

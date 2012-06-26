@@ -26,7 +26,7 @@
 #include <string.h>
 #include <assert.h>
 
-#include <dabbacore/strlcpy.h>
+#include <libdabba/strlcpy.h>
 #include <stdint.h>
 
 #define LOREM_BEGIN "Lorem"

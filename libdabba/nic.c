@@ -36,8 +36,8 @@
 #include <sys/ioctl.h>
 #include <net/if.h>
 
-#include <dabbacore/nic.h>
-#include <dabbacore/strlcpy.h>
+#include <libdabba/nic.h>
+#include <libdabba/strlcpy.h>
 
 /**
  * \brief Get the interface index of a specific interface

@@ -36,7 +36,7 @@
 #include <sys/stat.h>
 #include <dirent.h>
 
-#include <dabbacore/strlcpy.h>
+#include <libdabba/strlcpy.h>
 
 /**
  * \brief Path to current process open file descriptor information
