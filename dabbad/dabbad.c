@@ -120,7 +120,7 @@ int main(int argc, char **argv)
 		case OPT_HELP:
 		default:
 			show_usage(dabbad_options_get());
-			return EXIT_FAILURE;
+			return EXIT_SUCCESS;
 			break;
 
 		}

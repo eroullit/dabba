@@ -100,7 +100,7 @@ static void list_common_cmds_help(void)
  * \brief Print help
  * \param[in]           argc	        Argument counter
  * \param[in]           argv		Argument vector
- * \return Always returns 1.
+ * \return Always returns 0.
  *
  * This function prints the basic dabba usage help message.
  * Furthermore, it lists all available command.
@@ -116,5 +116,5 @@ int cmd_help(int argc, const char **argv)
 	list_common_cmds_help();
 	printf("\n%s\n", dabba_more_info_string);
 
-	return 1;
+	return 0;
 }
