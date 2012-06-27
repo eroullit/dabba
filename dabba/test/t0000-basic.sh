@@ -21,15 +21,7 @@ test_description='Test the basic'
 
 . ./sharness.sh
 
-check_presence()
-{
-    local ret
-    $TEST_DIRECTORY/../dabba > /dev/null
-    ret=$?
-    return $(test $ret -eq 1)
-}
-
-test_expect_success 'check dabba executable presence' 'check_presence'
+test_expect_success 'check dabba executable presence' "$TEST_DIRECTORY/../dabba > /dev/null"
 test_expect_success 'success is reported like this' ':'
 test_expect_failure 'pretend we have a known breakage' 'false'
 
