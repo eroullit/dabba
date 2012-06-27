@@ -33,6 +33,9 @@ ADD_DEFINITIONS(
 	-fstack-protector
 )
 
+# Only strip executable on release
+SET(CMAKE_C_FLAGS_RELEASE "-s")
+
 IF(CMAKE_C_COMPILER_ID STREQUAL GNU)
 	ADD_DEFINITIONS(
 		-pedantic
