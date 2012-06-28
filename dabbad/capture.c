@@ -96,10 +96,6 @@ static int capture_msg_is_valid(struct dabba_ipc_msg *msg)
 	if (strlen(capture_msg->pcap_name) >= sizeof(capture_msg->pcap_name))
 		return 0;
 
-	/* refuse pcap name with '/' to not change directory */
-	if (strchr(capture_msg->pcap_name, '/'))
-		return 0;
-
 	if (!packet_mmap_frame_size_is_valid(capture_msg->frame_size))
 		return 0;
 
