@@ -94,10 +94,6 @@ test_expect_success "Setup: Start dabbad" "
     $DABBAD_PATH/dabbad --daemonize
 "
 
-test_expect_success "Start capture thread with an invalid pcap path" "
-    test_expect_code 22 $DABBA_PATH/dabba capture start --interface any --pcap /tmp/test.pcap --frame-number $frame_nr
-"
-
 test_expect_success "Start capture thread on an invalid interface (too long)" "
     test_expect_code 22 $DABBA_PATH/dabba capture start --interface lorem-ipsum-dolor-sit --pcap test.pcap --frame-number $frame_nr
 "
