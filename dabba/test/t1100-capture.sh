@@ -24,8 +24,7 @@ test_description='Test dabba capture command'
 get_capture_thread_nr()
 {
     local result_file=$1
-    echo "python -c \"import yaml; y = yaml.load(open('$result_file')); print len(y['captures']);\"" >> plop
-    python -c "import yaml; y = yaml.load(open('$result_file')); print len(y['captures']);" >> plop
+    python -c "import yaml; y = yaml.load(open('$result_file')); print len(y['captures']);"
 }
 
 get_capture_thread_id()
