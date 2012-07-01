@@ -39,7 +39,7 @@ check_capture_thread_nr()
     local expected_thread_nr=$1
     local result_file=$2
     local result_thread_nr="$(get_capture_thread_nr $result_file)"
-    return $(test "$expected_thread_nr" = "$result_thread_nr")
+    test "$expected_thread_nr" = "$result_thread_nr"
 }
 
 check_capture_thread_id()
@@ -47,7 +47,7 @@ check_capture_thread_id()
     local thread_nr=$1
     local result_file=$2
     local result_thread_id="$(get_capture_thread_id $thread_nr $result_file)"
-    return $(echo "$result_thread_id" | grep -w -q -E "^[0-9]+")
+    echo "$result_thread_id" | grep -w -q -E "^[0-9]+"
 }
 
 check_capture_thread_interface()
@@ -56,7 +56,7 @@ check_capture_thread_interface()
     local expected_interface=$2
     local result_file=$3
     local result_interface="$(python -c "import yaml; y = yaml.load(open('$result_file')); print y['captures'][$thread_nr]['interface'];")"
-    return $(test "$expected_interface" = "$result_interface")
+    test "$expected_interface" = "$result_interface"
 }
 
 check_capture_thread_pcap()
@@ -65,7 +65,7 @@ check_capture_thread_pcap()
     local expected_pcap="$2"
     local result_file=$3
     local result_pcap="$(python -c "import yaml; y = yaml.load(open('$result_file')); print y['captures'][$thread_nr]['pcap'];")"
-    return $(test "$expected_pcap" = "$result_pcap")
+    test "$expected_pcap" = "$result_pcap"
 }
 
 check_capture_thread_packet_mmap_size()
@@ -74,7 +74,7 @@ check_capture_thread_packet_mmap_size()
     local expected_packet_mmap_size=$2
     local result_file=$3
     local result_packet_mmap_size="$(python -c "import yaml; y = yaml.load(open('$result_file')); print y['captures'][$thread_nr]['packet mmap size'];")"
-    return $(test "$expected_packet_mmap_size" = "$result_packet_mmap_size")
+    test "$expected_packet_mmap_size" = "$result_packet_mmap_size"
 }
 
 check_capture_thread_frame_nr()
@@ -83,7 +83,7 @@ check_capture_thread_frame_nr()
     local expected_frame_nr=$2
     local result_file=$3
     local result_frame_nr="$(python -c "import yaml; y = yaml.load(open('$result_file')); print y['captures'][$thread_nr]['frame number'];")"
-    return $(test "$expected_frame_nr" = "$result_frame_nr")
+    test "$expected_frame_nr" = "$result_frame_nr"
 }
 
 frame_nr="16"
