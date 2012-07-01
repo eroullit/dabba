@@ -125,7 +125,7 @@ do
         "
 
         test_expect_success PYTHON_YAML "Check thread #$(($i+1)) number" "
-            check_capture_thread_nr $i result
+            check_capture_thread_nr $(($i+1)) result
         "
 
         test_expect_success PYTHON_YAML "Check thread #$(($i+1)) ID" "
