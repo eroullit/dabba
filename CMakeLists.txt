@@ -30,6 +30,7 @@ ADD_DEFINITIONS(
 	-O2
 	-D_REENTRANT
 	-D_FORTIFY_SOURCE=2
+	-D_FILE_OFFSET_BITS=64
 	-fstack-protector
 )
 
