@@ -96,7 +96,7 @@ struct pcap_timeval {
 struct pcap_sf_pkthdr {
 	struct pcap_timeval ts;	/**< timestamp */
 	uint32_t caplen;	/**< length of portion captured */
-	int32_t len;		/**< length this packet (off wire) */
+	uint32_t len;		/**< length this packet (off wire) */
 };
 
 /**
