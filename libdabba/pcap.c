@@ -273,7 +273,7 @@ ssize_t pcap_write(const int fd, const uint8_t * const pkt,
 		return (-1);
 	}
 
-	if ((written = write(fd, pkt, sf_hdr.len)) != sf_hdr.len) {
+	if ((written = write(fd, pkt, sf_hdr.caplen)) != (ssize_t) sf_hdr.caplen) {
 		return (-1);
 	}
 
