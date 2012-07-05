@@ -16,7 +16,7 @@ script:
 
 # Run Tests
 after_script:
- - ctest --output-on-failure
+ - sudo ctest --output-on-failure
 
 # Only watch the master branch
 branches:
