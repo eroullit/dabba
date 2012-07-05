@@ -67,15 +67,27 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 
 =head1 BUGS
 
-Please report bugs to <https://github.com/eroullit/dabba/issues>
-dabba project project page: <https://github.com/eroullit/dabba>
+=over
+
+=item Please report bugs to <https://github.com/eroullit/dabba/issues>
+
+=item dabba project project page: <https://github.com/eroullit/dabba>
+
+=back
 
 =head1 COPYRIGHT
 
-Copyright © 2012 Emmanuel Roullit.
-License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.
-This is free software: you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.
+=over
+
+=item Copyright © 2012 Emmanuel Roullit.
+
+=item License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.
+
+=item This is free software: you are free to change and redistribute it.
+
+=item There is NO WARRANTY, to the extent permitted by law.
+
+=back
 
 =cut
 
