@@ -1,7 +1,7 @@
 language: erlang # no C/shell language support; use least-loaded worker(s)
 
 # Make sure CMake is installed on target
-install: sudo apt-get install cmake
+install: sudo apt-get install cmake libcap
 
 # Build a release version and get verbose output
 env:
