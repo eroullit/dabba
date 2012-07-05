@@ -37,6 +37,7 @@
 
 #include <libdabba/packet_rx.h>
 #include <libdabba/pcap.h>
+#include <libdabba/macros.h>
 
 /**
  * \brief Receive packets coming from a packet mmap RX ring
@@ -78,14 +79,12 @@ void *packet_rx(void *arg)
 
 			if ((mmap_hdr->tp_h.tp_status & TP_STATUS_USER) ==
 			    TP_STATUS_USER) {
-				if (thread->pcap_fd > 0
-				    && mmap_hdr->tp_h.tp_len <
-				    pkt_rx->layout.tp_frame_size) {
+				if (thread->pcap_fd > 0) {
 					pcap_write(thread->pcap_fd,
 						   (uint8_t *) mmap_hdr +
 						   mmap_hdr->tp_h.tp_mac,
 						   mmap_hdr->tp_h.tp_len,
-						   mmap_hdr->tp_h.tp_snaplen,
+						   min(mmap_hdr->tp_h.tp_snaplen, pkt_rx->layout.tp_frame_size),
 						   mmap_hdr->tp_h.tp_sec,
 						   mmap_hdr->tp_h.tp_usec);
 				}
