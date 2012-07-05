@@ -5,15 +5,13 @@ install: sudo apt-get install cmake
 
 # Build a release version and get verbose output
 env:
-  - TEST_OPTS=-v
-  - DEFAULT_TEST_TARGET=prove
-  - OPTIONS="-DCMAKE_BUILD_TYPE=Release"
+  - TEST_OPTS="-v"
 
 # Run the Build script
 script:
  - mkdir _build
  - cd _build
- - cmake .. -DCMAKE_INSTALL_PREFIX=../_install $OPTIONS
+ - cmake .. -DCMAKE_INSTALL_PREFIX=../_install -DCMAKE_BUILD_TYPE=Release $OPTIONS
  - sudo make install
 
 # Run Tests
