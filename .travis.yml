@@ -1,0 +1,34 @@
+language: erlang # no C/shell language support; use least-loaded worker(s)
+
+# Make sure CMake is installed on target
+install: sudo apt-get install cmake
+
+# Build a release version and get verbose output
+env:
+  - TEST_OPTS=-v
+  - DEFAULT_TEST_TARGET=prove
+  - OPTIONS="-DCMAKE_BUILD_TYPE=Release"
+
+# Run the Build script
+script:
+ - mkdir _build
+ - cd _build
+ - cmake .. -DCMAKE_INSTALL_PREFIX=../_install $OPTIONS
+ - sudo make install
+
+# Run Tests
+after_script:
+ - ctest --output-on-failure
+
+# Only watch the master branch
+branches:
+  only:
+    - master
+
+# Notify the LuaDist Dev group if needed
+notifications:
+  recipients:
+    - emmanuel.roullit@gmail.com
+  email:
+    on_success: change
+    on_failure: always
