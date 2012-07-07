@@ -29,6 +29,7 @@ SET(CPACK_PACKAGE_CONTACT "${CPACK_PACKAGE_VENDOR} <emmanuel.roullit@gmail.com>"
 set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_SOURCE_DIR}/postinst")
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Multithreaded zero-copy network tools")
 SET(CPACK_PACKAGE_DESCRIPTION "dabba is a set of multithreaded network tools using zero-copy features.")
+SET(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
 
 INCLUDE(CPack)
 INCLUDE(CheckBPFAttach)
