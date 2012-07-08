@@ -31,7 +31,7 @@
 
 =head1 NAME
 
-dabbad
+dabbad - Multithreaded packet mmap daemon
 
 =head1 SYNOPSIS
 
