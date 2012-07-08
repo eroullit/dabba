@@ -31,7 +31,7 @@
 
 =head1 NAME
 
-dabba
+dabba - Send queries to dabbad and process its replies.
 
 =head1 SYNOPSIS
 
