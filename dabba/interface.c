@@ -31,7 +31,7 @@
 
 =head1 NAME
 
-dabba interface - Manage network interface
+dabba-interface - Manage network interface
 
 =head1 SYNOPSIS
 

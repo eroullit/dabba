@@ -31,7 +31,7 @@
 
 =head1 NAME
 
-dabba capture - Manage capture threads
+dabba-capture - Manage capture threads
 
 =head1 SYNOPSIS
 
