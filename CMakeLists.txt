@@ -28,7 +28,12 @@ SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.11.3-3), libcap2 (>= 1:2.22-1.1)")
 SET(CPACK_PACKAGE_VENDOR "Emmanuel Roullit")
 SET(CPACK_PACKAGE_CONTACT "${CPACK_PACKAGE_VENDOR} <emmanuel.roullit@gmail.com>")
 SET(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_SOURCE_DIR}/postinst")
-SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Multithreaded zero-copy network tools")
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY
+"Suite of low-level multithreaded zero-copy network tools.
+ dabba is based on two parts:
+  - dabbad: network task manager and process IPC background queries
+  - dabba: CLI 'à la git' to communicate with the daemon and submit tasks"
+)
 SET(CPACK_PACKAGE_DESCRIPTION "dabba is a set of multithreaded network tools using zero-copy features.")
 SET(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
 SET(CPACK_DEBIAN_PACKAGE_SECTION "net")
