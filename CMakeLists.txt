@@ -84,4 +84,5 @@ ADD_SUBDIRECTORY(libdabba)
 ADD_SUBDIRECTORY(dabbad)
 ADD_SUBDIRECTORY(dabba)
 
-INSTALL(FILES debian/copyright DESTINATION /usr/share/doc/${PROJECT_NAME})
+# HACK
+INSTALL(FILES debian/copyright debian/changelog.gz DESTINATION /usr/share/doc/${PROJECT_NAME})
