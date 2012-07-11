@@ -21,6 +21,6 @@ POD2MAN(${CMAKE_CURRENT_SOURCE_DIR}/dabba.c dabba 1)
 POD2MAN(${CMAKE_CURRENT_SOURCE_DIR}/interface.c dabba-interface 1)
 POD2MAN(${CMAKE_CURRENT_SOURCE_DIR}/capture.c dabba-capture 1)
 
-INSTALL(TARGETS dabba DESTINATION /usr/sbin COMPONENT applications)
+INSTALL(TARGETS dabba DESTINATION sbin COMPONENT applications)
 
 ADD_SUBDIRECTORY(test)
