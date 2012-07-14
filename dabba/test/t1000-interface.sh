@@ -51,9 +51,9 @@ test_expect_success DUMMY_DEV "Setup: Remove all dummy interfaces" "
 "
 
 test_expect_success "invoke dabba interface list with dabbad" "
-    $DABBAD_PATH/dabbad --daemonize &&
+    '$DABBAD_PATH'/dabbad --daemonize &&
     sleep 0.1 &&
-    $DABBA_PATH/dabba interface list > result &&
+    '$DABBA_PATH'/dabba interface list > result &&
     killall dabbad &&
     generate_yaml_list > expected &&
     sort -o expected_sorted expected &&
@@ -66,9 +66,9 @@ test_expect_success DUMMY_DEV "Setup: Create $interface_nr dummy interfaces" "
 "
 
 test_expect_success DUMMY_DEV "invoke dabba interface list with dabbad with $interface_nr extra interfaces" "
-    $DABBAD_PATH/dabbad --daemonize &&
+    '$DABBAD_PATH'/dabbad --daemonize &&
     sleep 0.1 &&
-    $DABBA_PATH/dabba interface list > result &&
+    '$DABBA_PATH'/dabba interface list > result &&
     killall dabbad &&
     generate_yaml_list > expected &&
     sort -o expected_sorted expected &&
