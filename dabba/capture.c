@@ -27,6 +27,118 @@
 
 /* __LICENSE_HEADER_END__ */
 
+/*
+
+=head1 NAME
+
+dabba-capture - Manage capture threads
+
+=head1 SYNOPSIS
+
+dabba capture <command> [<arguments>...] [--help]
+
+=head1 DESCRIPTION
+
+Give the user the possibility to manage capture threads on the system
+and to list information about currently running captures.
+
+=head1 COMMANDS
+
+=over
+
+=item list
+
+Fetch and print information about currenty running captures.
+The output is formatted in YAML.
+
+=item start
+
+Start a new capture.
+
+=item stop
+
+Stop a running capture.
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item --interface <name>
+
+Precise on which interface the capture must run.
+Use "dabba interface list" to see the list of supported interfaces.
+(the special interface "any" captures on all up and running interfaces).
+
+=item --pcap <path>
+
+Write all captured traffic in pcap file at <path>.
+
+=item --frame-number <number>
+
+Configure the packet mmap area to contain <number> of frames.
+This number must be a power of two.
+
+=item --id <thread-id>
+
+Reference a capture by its unique thread id.
+The capture id can be fetched using "dabba capture list".
+
+=back
+
+=head1 EXAMPLES
+
+=over
+
+=item dabba capture list
+
+Output information about all running captures
+
+=item dabba capture start --interface eth0 --pcap eth0.pcap --frame-number 128
+
+Starts a capture listening on eth0 and dumps all data in
+the pcap file "eth0.pcap". The allocated packet mmap area can
+contain 128 frames.
+
+=item dabba capture stop --id 123456789
+
+Stop running capture which has the id "123456789"
+
+=back
+
+=head1 AUTHOR
+
+Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
+
+=head1 BUGS
+
+=over
+
+=item Please report bugs to <https://github.com/eroullit/dabba/issues>
+
+=item dabba project project page: <https://github.com/eroullit/dabba>
+
+=back
+
+=head1 COPYRIGHT
+
+=over
+
+=item Copyright © 2012 Emmanuel Roullit.
+
+=item License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.
+
+=item This is free software: you are free to change and redistribute it.
+
+=item There is NO WARRANTY, to the extent permitted by law.
+
+=back
+
+=cut
+
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

@@ -1,6 +1,7 @@
 PROJECT(dabba C)
 
 FIND_PACKAGE(Doxygen)
+INCLUDE(Pod2Man)
 
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/include)
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/libdabba/include)
@@ -16,6 +17,10 @@ ADD_EXECUTABLE(${PROJECT_NAME} dabba.c help.c interface.c ipc.c capture.c)
 
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} libdabba)
 
-INSTALL(TARGETS dabba DESTINATION /usr/sbin)
+POD2MAN(${CMAKE_CURRENT_SOURCE_DIR}/dabba.c dabba 1)
+POD2MAN(${CMAKE_CURRENT_SOURCE_DIR}/interface.c dabba-interface 1)
+POD2MAN(${CMAKE_CURRENT_SOURCE_DIR}/capture.c dabba-capture 1)
+
+INSTALL(TARGETS dabba DESTINATION sbin COMPONENT applications)
 
 ADD_SUBDIRECTORY(test)

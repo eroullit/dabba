@@ -27,6 +27,73 @@
 
 /* __LICENSE_HEADER_END__ */
 
+/*
+
+=head1 NAME
+
+dabba-interface - Manage network interface
+
+=head1 SYNOPSIS
+
+dabba interface <command> [<arguments>...] [--help]
+
+=head1 DESCRIPTION
+
+Give the user the possibility to manage the available network interfaces.
+
+=head1 COMMANDS
+
+=over
+
+=item list
+
+Fetch and print information about currenty supported interfaces.
+The output is formatted in YAML.
+
+=back
+
+=head1 EXAMPLES
+
+=over
+
+=item dabba interface list
+
+Output the list of network interface which can be used by dabba.
+
+=back
+
+=head1 AUTHOR
+
+Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
+
+=head1 BUGS
+
+=over
+
+=item Please report bugs to <https://github.com/eroullit/dabba/issues>
+
+=item dabba project project page: <https://github.com/eroullit/dabba>
+
+=back
+
+=head1 COPYRIGHT
+
+=over
+
+=item Copyright © 2012 Emmanuel Roullit.
+
+=item License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.
+
+=item This is free software: you are free to change and redistribute it.
+
+=item There is NO WARRANTY, to the extent permitted by law.
+
+=back
+
+=cut
+
+*/
+
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>

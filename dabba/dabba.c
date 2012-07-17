@@ -27,6 +27,63 @@
 
 /* __LICENSE_HEADER_END__ */
 
+/*
+
+=head1 NAME
+
+dabba - Send queries to dabbad and process its replies.
+
+=head1 SYNOPSIS
+
+dabba <command> <arguments> [--help]
+
+=head1 DESCRIPTION
+
+dabba is here to generate IPC queries to dabbad and output its
+replies formatted in a YAML output
+
+=head1 OPTIONS
+
+=over
+
+=item --help
+
+Prints help output and the currently supported commands.
+
+=back
+
+=head1 AUTHOR
+
+Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
+
+=head1 BUGS
+
+=over
+
+=item Please report bugs to <https://github.com/eroullit/dabba/issues>
+
+=item dabba project project page: <https://github.com/eroullit/dabba>
+
+=back
+
+=head1 COPYRIGHT
+
+=over
+
+=item Copyright © 2012 Emmanuel Roullit.
+
+=item License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.
+
+=item This is free software: you are free to change and redistribute it.
+
+=item There is NO WARRANTY, to the extent permitted by law.
+
+=back
+
+=cut
+
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

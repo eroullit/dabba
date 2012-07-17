@@ -27,6 +27,72 @@
 
 /* __LICENSE_HEADER_END__ */
 
+/*
+
+=head1 NAME
+
+dabbad - Multithreaded packet mmap daemon
+
+=head1 SYNOPSIS
+
+dabbad [--daemonize][--help]
+
+=head1 DESCRIPTION
+
+dabbad (dabba daemon) is here to manage multithreaded network captures.
+It listens an IPC interface and waits for commands to execute.
+
+=head1 EXAMPLES
+
+=over
+
+=item dabbad
+
+Start dabbad in a classic process mode. It allows the user to
+see debug messages.
+
+=item dabbad --daemonize
+
+Start dabbad as a daemon.
+
+=item dabbad --help
+
+Prints help content.
+
+=back
+
+=head1 AUTHOR
+
+Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
+
+=head1 BUGS
+
+=over
+
+=item Please report bugs to <https://github.com/eroullit/dabba/issues>
+
+=item dabba project project page: <https://github.com/eroullit/dabba>
+
+=back
+
+=head1 COPYRIGHT
+
+=over
+
+=item Copyright © 2012 Emmanuel Roullit.
+
+=item License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.
+
+=item This is free software: you are free to change and redistribute it.
+
+=item There is NO WARRANTY, to the extent permitted by law.
+
+=back
+
+=cut
+
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
