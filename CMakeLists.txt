@@ -43,6 +43,7 @@ SET(CPACK_PACKAGE_DESCRIPTION "dabba is a set of multithreaded network tools usi
 SET(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
 SET(CPACK_DEBIAN_PACKAGE_SECTION "net")
 SET(CPACK_STRIP_FILES ON)
+set(CPACK_SOURCE_IGNORE_FILES "/build/;/.git/;/.gitignore;/*.swp;~$;${CPACK_SOURCE_IGNORE_FILES}")
 
 INCLUDE(CPack)
 INCLUDE(CheckBPFAttach)
