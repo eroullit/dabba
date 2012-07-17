@@ -21,7 +21,7 @@ SET(CMAKE_INSTALL_PREFIX "/usr")
 INCLUDE(FindDebArch)
 
 SET(CPACK_SOURCE_GENERATOR "TGZ")
-SET(CPACK_GENERATOR "TGZ;DEB")
+SET(CPACK_GENERATOR "TGZ;DEB;RPM")
 SET(CPACK_RESOURCE_FILE_README "${CMAKE_SOURCE_DIR}/README")
 SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
 SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CPACK_RESOURCE_FILE_README}")
@@ -34,12 +34,13 @@ SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6, libcap2")
 SET(CPACK_PACKAGE_VENDOR "Emmanuel Roullit")
 SET(CPACK_PACKAGE_CONTACT "${CPACK_PACKAGE_VENDOR} <emmanuel.roullit@gmail.com>")
 SET(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_SOURCE_DIR}/debian/postinst;${CMAKE_SOURCE_DIR}/debian/shlibs")
-SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY
+SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION
 "Suite of low-level multithreaded zero-copy network tools.
  dabba is based on two parts:
   - dabbad: network task manager and process IPC background queries
   - dabba: CLI 'à la git' to communicate with the daemon and submit tasks"
 )
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Suite of low-level multithreaded zero-copy network tools.")
 SET(CPACK_PACKAGE_DESCRIPTION "dabba is a set of multithreaded network tools using zero-copy features.")
 SET(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
 SET(CPACK_DEBIAN_PACKAGE_SECTION "net")
