@@ -1,54 +1,59 @@
+                     dabba
+
+       Distributed network monitoring tools
+
+       Copyright (C) 2011 Emmanuel Roullit
+
+        https://github.com/eroullit/dabba
+
 What is dabba?
 ====================
 
-dabba is a set of network tools written in C for Linux.
+dabba is a set of network tools written for Linux.
 
 Its main use is to gather or scatter actions on a network such as
-traffic capture, traffic replay or traffic generation on a network.
+traffic capture, replay, generation or monitoring on a network.
 
 This is inspired on the Dabba Walla system present in Mumbai where
 meals are regrouped and dispatched throughout the city with a
-high efficency rate, every day of the year.
+high efficiency rate, every day of the year.
+
+The project has 3 main components:
+    - libdabba - low-level zero-copy network library
+    - dabbad - multi-threaded task manager and IPC query processor
+    - dabba - CLI 'à la git' to communicate with dabbad and submit tasks
 
 What is libdabba's goal?
 ====================
 
 libdabba's goal is to prepare a clear and simple API for future networking tools.
+It uses low-level zero-copy kernel features to bring traffic between the
+userspace and the kernelspace with very low overhead.
 
-Those then can be for high performance network tooling which
-focus on usability, robustness and functionality. Its aim is to support
-the daily work for networking engineers, developers, admins or Linux
-users by providing support with or in network monitoring, protocol
-analysis, reverse engineering, network debugging and penetration testing.
+Right now, it provides functions to perform:
+    - Multi-threaded traffic capture
+    - PCAP file support
 
-
-What is a zero-copy * ring?
+What is a zero-copy feature?
 ==========================
 
-Zero-copy rings are memory-mapped ring buffers common to kernelspace and userspace where
-packets can be directly read or written.
-This direct way drastically reduces the processing overhead as packets are not hard-copied
-between spaces.
-When using a RX ring, received packets are quicker available to the userspace.
-When a TX ring is used, packets to transmit can be placed to medium within shorter time.
+Zero-copy packet rings are memory-mapped buffers common to kernelspace and
+userspace where packets can be directly read or written.
+This direct way of data access drastically reduces the processing overhead 
+as packets are not hard-copied between spaces.
+When using a RX packet ring, received packets are quicker available
+to the userspace.
+When a TX packet ring is used, packets to transmit can be placed to
+medium within shorter time.
 
 What is a PCAP file?
 ====================
 
 A PCAP file is a file where previously recorded packets are saved.
-It can be then read to perform protocol analysis, reverse engineering or network debugging.
-dabba will stay independant of libpcap, but nevertheless offer PCAP file support
-to capture, replay and perform offline analysis on recorded traffic.
-
-Some use cases and features
-===========================
-
-* Open source project and free licensing
-* Analyzing and debugging of network problems or protocol implementations
-* Reverse engineering of (proprietary) network protocols
-* Dumping, replaying and offline analysis of pcap traces
-* Integrated high performance capabilities
-* Focus on usability, robustness, security and functionality
+It can be then read to perform protocol analysis, reverse engineering
+or network debugging.
+dabba will stay independent of libpcap, but nevertheless offer PCAP file support
+to capture, replay and perform off-line analysis on recorded traffic.
 
 Development
 ===========
@@ -60,13 +65,17 @@ git clone git://github.com/eroullit/dabba.git
 
 Coding conventions can be found in CODING.
 
-Installalation
+Installation
 ==============
 
 You need to fulfill these prerequisites in order to build dabba:
 	- Linux kernel >= 2.6.31
 	- cmake
 	- setcap (within libcap package)
+
+The following are optional but recommended:
+	- python-yaml
+	- doxygen
 
 To build out-of-tree:
 	$ mkdir build
@@ -86,6 +95,20 @@ To grant them run in your build directory:
 When the code is compiled and capabilities are granted, unit tests
 can be executed by this command:
 	$ ctest --output-on-failure
+
+Packaging
+=========
+
+RPM and DEB packages can be generated this way:
+	# make package
+
+It can be then installed with:
+	# dpkg -i dabba*.deb
+or
+	# rpm -i dabba*.rpm
+
+Source code can be packaged with this command:
+	$ make package_source
 
 Contact
 =======
