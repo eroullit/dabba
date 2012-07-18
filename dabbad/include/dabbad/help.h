@@ -24,6 +24,6 @@
 #ifndef HELP_H
 #define	HELP_H
 
-void show_usage(const struct option const *opt);
+void show_usage(const struct option *opt);
 
 #endif				/* HELP_H */

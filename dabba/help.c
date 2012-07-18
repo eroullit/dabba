@@ -42,7 +42,7 @@ struct cmdname_help {
 	char help[80];
 };
 
-void show_usage(const struct option const *opt)
+void show_usage(const struct option *opt)
 {
 	assert(opt);
 
@@ -68,7 +68,7 @@ static inline void mput_char(char c, uint32_t num)
 		putchar(c);
 }
 
-void help_unknown_cmd(const char const *cmd)
+void help_unknown_cmd(const char *const cmd)
 {
 	assert(cmd);
 	printf("'%s' is not a dabba command. See 'dabba --help'.\n", cmd);

@@ -128,7 +128,7 @@ static void display_capture_list_msg_header(void)
 	printf("  captures:\n");
 }
 
-static void display_capture_list(const struct dabba_ipc_msg const *msg)
+static void display_capture_list(const struct dabba_ipc_msg *const msg)
 {
 	size_t a;
 

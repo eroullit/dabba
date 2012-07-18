@@ -41,7 +41,7 @@ static void display_interface_list_header(void)
 	printf("  interfaces:\n");
 }
 
-static void display_interface_list(const struct dabba_ipc_msg const *msg)
+static void display_interface_list(const struct dabba_ipc_msg *const msg)
 {
 	size_t a;
 
@@ -60,8 +60,7 @@ static void prepare_interface_list_query(struct dabba_ipc_msg *msg)
 	msg->msg_body.type = DABBA_IFCONF;
 }
 
-static void display_interface_list_msg_header(const struct dabba_ipc_msg const
-					      *msg)
+static void display_interface_list_msg_header(const struct dabba_ipc_msg *const msg)
 {
 	assert(msg);
 
@@ -74,7 +73,7 @@ static void display_interface_list_msg_header(const struct dabba_ipc_msg const
 	}
 }
 
-static void display_interface_list_msg(const struct dabba_ipc_msg const *msg)
+static void display_interface_list_msg(const struct dabba_ipc_msg *const msg)
 {
 	assert(msg);
 
