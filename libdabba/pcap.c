@@ -51,8 +51,9 @@
  * \return 0 on success, -1 if PCAP file header could not be written
  */
 
-static int pcap_file_header_write(const int fd, const int linktype,
-				  const int thiszone, const int snaplen)
+static int
+pcap_file_header_write(const int fd, const int linktype,
+		       const int thiszone, const int snaplen)
 {
 	struct pcap_file_header hdr;
 
@@ -260,9 +261,10 @@ int pcap_close(const int fd)
  * 		-1 if either the packet header or packet payload could not be written
  */
 
-ssize_t pcap_write(const int fd, const uint8_t * const pkt,
-		   const size_t pkt_len, const size_t pkt_snaplen,
-		   const uint64_t tv_sec, const uint64_t tv_usec)
+ssize_t
+pcap_write(const int fd, const uint8_t * const pkt,
+	   const size_t pkt_len, const size_t pkt_snaplen,
+	   const uint64_t tv_sec, const uint64_t tv_usec)
 {
 	struct pcap_sf_pkthdr sf_hdr;
 	ssize_t written = 0;
