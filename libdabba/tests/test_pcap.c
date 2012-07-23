@@ -22,8 +22,11 @@
  /* __LICENSE_HEADER_END__ */
 
 #include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 #include <assert.h>
 #include <fcntl.h>
+#include <byteswap.h>
 
 #include <sys/time.h>
 #include <sys/types.h>
@@ -31,6 +34,7 @@
 
 #include <libdabba/pcap.h>
 #include <libdabba/macros.h>
+#include <linux/if_link.h>
 
 static const uint8_t icmp_dns[] = {
 	0x00, 0x1e, 0x65, 0x93, 0x1b, 0x6c, 0x00, 0x1d,
@@ -50,8 +54,23 @@ static const uint8_t icmp_dns[] = {
 
 static const char test_path[] = "res.pcap";
 
+void swapped_pcap_file_header_init(struct pcap_file_header *pcap_hdr)
+{
+	assert(pcap_hdr);
+
+        memset(pcap_hdr, 0, sizeof(*pcap_hdr));
+
+	pcap_hdr->magic = bswap_32(TCPDUMP_MAGIC);
+	pcap_hdr->version_major = bswap_16(PCAP_VERSION_MAJOR);
+	pcap_hdr->version_minor = bswap_16(PCAP_VERSION_MINOR);
+	pcap_hdr->thiszone = 0;
+	pcap_hdr->sigfigs = 0;
+	pcap_hdr->snaplen = bswap_32(PCAP_DEFAULT_SNAPSHOT_LEN);
+	pcap_hdr->linktype = bswap_32(LINKTYPE_EN10MB);
+}
+
 int test_pcap_write(const int fd, const uint8_t * const payload,
-		    const ssize_t len)
+			    const ssize_t len)
 {
 	struct timeval tv;
 
@@ -66,7 +85,10 @@ int test_pcap_write(const int fd, const uint8_t * const payload,
 
 int main(void)
 {
+        struct pcap_file_header pcap_hdr;
 	int fd;
+
+        swapped_pcap_file_header_init(&pcap_hdr);
 
 	assert((fd = pcap_create(test_path, LINKTYPE_EN10MB)) > 0);
 	assert(test_pcap_write(fd, icmp_dns, sizeof(icmp_dns)) == 0);
@@ -80,10 +102,18 @@ int main(void)
 	assert(pcap_close(fd) == 0);
 
 	assert((fd = pcap_open(test_path, O_RDONLY)) > 0);
-	assert(pcap_is_valid(fd) == 0);
+	assert(pcap_close(fd) == 0);
+
+        /* Test swapped PCAP file header support */
+        assert((fd = open(test_path, O_WRONLY)) > 0);
+        assert(write(fd, &pcap_hdr, sizeof(pcap_hdr)) == sizeof(pcap_hdr));
+        assert(test_pcap_write(fd, icmp_dns, sizeof(icmp_dns)) == 0);
+        assert(close(fd) == 0);
+        
+        assert((fd = pcap_open(test_path, O_RDONLY)) > 0);
 	assert(pcap_close(fd) == 0);
 
 	pcap_destroy(fd, test_path);
 
-	return (EXIT_SUCCESS);
+        return (EXIT_SUCCESS);
 }

@@ -35,6 +35,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <byteswap.h>
 
 #include <sys/stat.h>
 
@@ -128,6 +129,14 @@ int pcap_is_valid(const int fd)
 	if (read(fd, (char *)&hdr, sizeof(hdr)) != sizeof(hdr)) {
 		errno = EIO;
 		return (0);
+	}
+
+	/* PCAP might have been created on a system with another endianness */
+	if (hdr.magic != TCPDUMP_MAGIC) {
+		hdr.magic = bswap_32(hdr.magic);
+		hdr.linktype = bswap_32(hdr.linktype);
+		hdr.version_major = bswap_16(hdr.version_major);
+		hdr.version_minor = bswap_16(hdr.version_minor);
 	}
 
 	if (hdr.magic != TCPDUMP_MAGIC
@@ -269,14 +278,14 @@ ssize_t pcap_write(const int fd, const uint8_t * const pkt,
 	sf_hdr.caplen = pkt_snaplen;
 	sf_hdr.len = pkt_len;
 
-        written = write(fd, &sf_hdr, sizeof(sf_hdr));
-        
+	written = write(fd, &sf_hdr, sizeof(sf_hdr));
+
 	if (written != sizeof(sf_hdr)) {
 		return (-1);
 	}
 
-        written = write(fd, pkt, sf_hdr.caplen);
-        
+	written = write(fd, pkt, sf_hdr.caplen);
+
 	if (written != (ssize_t) sf_hdr.caplen) {
 		return (-1);
 	}
