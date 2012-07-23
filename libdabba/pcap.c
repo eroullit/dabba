@@ -104,6 +104,18 @@ int pcap_link_type_get(int arp_type, enum pcap_linktype *pcap_link_type)
 
 /**
  * \internal
+ * \brief Tells if the input linktype is valid
+ * \param[in] linktype Linktype to validate
+ * \return 1 if the linktype is valid, 0 if invalid
+ */
+
+static int pcap_linktype_is_valid(const uint32_t linktype)
+{
+	return (linktype == LINKTYPE_EN10MB);
+}
+
+/**
+ * \internal
  * \brief Validate PCAP file header
  * Every PCAP file has a file header which contains:
  * 	- the PCAP magic (\c 0xa1b2c3d4)
@@ -144,7 +156,7 @@ static int pcap_is_valid(const int fd)
 	if (hdr.magic != TCPDUMP_MAGIC
 	    || hdr.version_major != PCAP_VERSION_MAJOR
 	    || hdr.version_minor != PCAP_VERSION_MINOR
-	    || !is_linktype_valid(hdr.linktype)) {
+	    || !pcap_linktype_is_valid(hdr.linktype)) {
 		errno = EINVAL;
 		return (0);
 	}
