@@ -118,6 +118,5 @@ void pcap_destroy(const int fd, const char *const pcap_path);
 int pcap_create(const char *const pcap_path, const enum pcap_linktype linktype);
 int pcap_open(const char *const pcap_path, int flags);
 int pcap_close(const int fd);
-int pcap_is_valid(const int fd);
 
 #endif				/* PCAP_H */

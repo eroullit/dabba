@@ -103,6 +103,7 @@ int pcap_link_type_get(int arp_type, enum pcap_linktype *pcap_link_type)
 }
 
 /**
+ * \internal
  * \brief Validate PCAP file header
  * Every PCAP file has a file header which contains:
  * 	- the PCAP magic (\c 0xa1b2c3d4)
@@ -118,7 +119,7 @@ int pcap_link_type_get(int arp_type, enum pcap_linktype *pcap_link_type)
  * 		\c EIO if PCAP file header could not be read
  */
 
-int pcap_is_valid(const int fd)
+static int pcap_is_valid(const int fd)
 {
 	struct pcap_file_header hdr;
 
