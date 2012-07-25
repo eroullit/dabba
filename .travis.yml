@@ -1,4 +1,4 @@
-language: erlang # no C/shell language support; use least-loaded worker(s)
+language: c
 
 # Make sure CMake is installed on target
 install: sudo apt-get install cmake
