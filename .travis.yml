@@ -1,5 +1,10 @@
 language: c
 
+# Run tests on tools compiled with gcc and clang
+compiler:
+  - gcc
+  - clang
+
 # Make sure CMake is installed on target
 install: sudo apt-get install cmake
 
