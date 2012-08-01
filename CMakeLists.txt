@@ -54,6 +54,8 @@ INCLUDE(CheckStrictAlign)
 INCLUDE(CheckTxRing)
 INCLUDE(Pod2Man)
 
+SET(CMAKE_C_FLAGS_RELEASE "")
+
 ADD_DEFINITIONS(
 	-W
 	-Wextra
