@@ -108,6 +108,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 
 enum dabbad_opts {
 	OPT_DAEMONIZE,
+	OPT_VERSION,
 	OPT_HELP
 };
 
@@ -120,6 +121,7 @@ const struct option *dabbad_options_get(void)
 {
 	static const struct option dabbad_long_options[] = {
 		{"daemonize", no_argument, NULL, OPT_DAEMONIZE},
+		{"version", no_argument, NULL, OPT_VERSION},
 		{"help", no_argument, NULL, OPT_HELP},
 		{NULL, 0, NULL, 0}
 	};
@@ -182,6 +184,10 @@ int main(int argc, char **argv)
 		switch (opt) {
 		case OPT_DAEMONIZE:
 			daemonize = 1;
+			break;
+		case OPT_VERSION:
+			print_version();
+			return EXIT_SUCCESS;
 			break;
 		case OPT_HELP:
 		default:

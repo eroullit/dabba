@@ -38,7 +38,7 @@ static const char _usage[] =
  * \brief Show dabbad usage options
  */
 
-void show_usage(const struct option * opt)
+void show_usage(const struct option *opt)
 {
 	assert(opt);
 
@@ -56,4 +56,10 @@ void show_usage(const struct option * opt)
 			opt++;
 		}
 	}
+}
+
+int print_version(void)
+{
+	printf("dabbad version %s\n", DABBA_VERSION);
+	return 0;
 }
