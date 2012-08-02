@@ -82,7 +82,7 @@ To build out-of-tree:
 	$ cd build
 	$ cmake ..
 	$ make
-	# make install
+	# make install/strip
 
 Some unit tests need the following extra capabilities:
 	- CAP_NET_ADMIN - To allow various network-related operations
