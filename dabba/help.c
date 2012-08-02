@@ -35,7 +35,8 @@
 #include <assert.h>
 #include <libdabba/macros.h>
 
-static const char dabba_usage_string[] = "dabba [--help] <command> [<args>]\n";
+static const char dabba_usage_string[] =
+    "dabba [--help] [--version] <command> [<args>]\n";
 static const char dabba_more_info_string[] =
     "See 'dabba help <command>' for more info on a specific command.";
 
@@ -123,4 +124,13 @@ int cmd_help(int argc, const char **argv)
 	}
 
 	return rc ? errno : rc;
+}
+
+int cmd_version(int argc, const char **argv)
+{
+	(void)argc;
+	(void)argv;
+
+	printf("dabba version %s\n", DABBA_VERSION);
+	return 0;
 }

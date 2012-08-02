@@ -82,7 +82,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 
 =cut
 
-*/
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -143,11 +143,15 @@ static int handle_internal_command(int argc, const char **argv)
 	static struct cmd_struct commands[] = {
 		{"interface", cmd_interface},
 		{"capture", cmd_capture},
+		{"version", cmd_version},
 		{"help", cmd_help}
 	};
 
 	if (argc == 0 || cmd == NULL || !strcmp(cmd, "--help"))
 		cmd = "help";
+
+	if (argc == 0 || cmd == NULL || !strcmp(cmd, "--version"))
+		cmd = "version";
 
 	/* Turn "dabba cmd --help" into "dabba help cmd" */
 	if (argc > 1 && !strcmp(argv[1], "--help")) {
