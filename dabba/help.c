@@ -29,6 +29,8 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
+#include <errno.h>
 #include <getopt.h>
 #include <assert.h>
 #include <libdabba/macros.h>
@@ -100,7 +102,7 @@ static void list_common_cmds_help(void)
  * \brief Print help
  * \param[in]           argc	        Argument counter
  * \param[in]           argv		Argument vector
- * \return Always returns 0.
+ * \return Returns 0 when the help could be printed, \c errno otherwise
  *
  * This function prints the basic dabba usage help message.
  * Furthermore, it lists all available command.
@@ -108,13 +110,17 @@ static void list_common_cmds_help(void)
 
 int cmd_help(int argc, const char **argv)
 {
-	/* cast here to avoid argc and argv unused GCC warning */
-	(void)argc;
-	(void)argv;
+	char help_name[32];
+	int rc = 0;
 
-	printf("usage: %s\n\n", dabba_usage_string);
-	list_common_cmds_help();
-	printf("\n%s\n", dabba_more_info_string);
+	if (argc < 1 || !argv[0]) {
+		printf("usage: %s\n\n", dabba_usage_string);
+		list_common_cmds_help();
+		printf("\n%s\n", dabba_more_info_string);
+	} else {
+		snprintf(help_name, sizeof(help_name), "dabba-%s", argv[0]);
+		rc = execlp("man", "man", help_name, (char *)NULL);
+	}
 
-	return 0;
+	return rc ? errno : rc;
 }
