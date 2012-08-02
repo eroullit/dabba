@@ -50,6 +50,15 @@ test_expect_success DUMMY_DEV "Setup: Remove all dummy interfaces" "
     test_might_fail flush_test_interface
 "
 
+test_expect_success "Check 'dabba interface' help output" "
+    '$DABBA_PATH/dabba' help interface | cat <<EOF
+    q
+    EOF &&
+    '$DABBA_PATH/dabba' interface --help | cat <<EOF
+    q
+    EOF
+"
+
 test_expect_success "invoke dabba interface list with dabbad" "
     '$DABBAD_PATH'/dabbad --daemonize &&
     sleep 0.1 &&
