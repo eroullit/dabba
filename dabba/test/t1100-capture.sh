@@ -93,6 +93,15 @@ test_expect_success "Setup: Start dabbad" "
     $DABBAD_PATH/dabbad --daemonize
 "
 
+test_expect_success "Check 'dabba capture' help output" "
+    '$DABBA_PATH/dabba' help capture | cat <<EOF
+    q
+    EOF &&
+    '$DABBA_PATH/dabba' capture --help | cat <<EOF
+    q
+    EOF
+"
+
 test_expect_success "Start capture thread on an invalid interface (too long)" "
     test_expect_code 22 $DABBA_PATH/dabba capture start --interface lorem-ipsum-dolor-sit --pcap test.pcap --frame-number $frame_nr
 "
