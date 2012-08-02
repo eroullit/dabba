@@ -1,0 +1,153 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Dabba by eroullit</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/eroullit/dabba">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/eroullit/dabba/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/eroullit/dabba/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>Dabba</h1>
+          <p></p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/eroullit">eroullit</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h1>What is dabba?</h1>
+
+<p>dabba is a set of network tools written for Linux.</p>
+
+<p>Its main use is to gather or scatter actions on a network such as
+traffic capture, replay, generation or monitoring on a network.</p>
+
+<p>This is inspired on the Dabba Walla system present in Mumbai where
+meals are regrouped and dispatched throughout the city with a
+high efficiency rate, every day of the year.</p>
+
+<p>The project has 3 main components:</p>
+
+<ul>
+<li>
+<code>libdabba</code> - low-level zero-copy network library</li>
+<li>
+<code>dabbad</code> - multi-threaded task manager and IPC query processor</li>
+<li>
+<code>dabba</code> - CLI 'à la git' to communicate with dabbad and submit tasks</li>
+</ul><h1>What is libdabba's goal?</h1>
+
+<p>libdabba's goal is to prepare a clear and simple API for future networking tools.
+It uses low-level zero-copy kernel features to bring traffic between the
+userspace and the kernelspace with very low overhead.</p>
+
+<p>Right now, it provides functions to perform:</p>
+
+<ul>
+<li>Multi-threaded traffic capture</li>
+<li>PCAP file support</li>
+</ul><h1>What is a zero-copy feature?</h1>
+
+<p>Zero-copy packet rings are memory-mapped buffers common to kernelspace and
+userspace where packets can be directly read or written.
+This direct way of data access drastically reduces the processing overhead 
+as packets are not hard-copied between spaces.
+When using a RX packet ring, received packets are quicker available
+to the userspace.
+When a TX packet ring is used, packets to transmit can be placed to
+medium within shorter time.</p>
+
+<h1>What is a PCAP file?</h1>
+
+<p>A PCAP file is a file where previously recorded packets are saved.
+It can be then read to perform protocol analysis, reverse engineering
+or network debugging.
+dabba will stay independent of libpcap, but nevertheless offer PCAP file support
+to capture, replay and perform off-line analysis on recorded traffic.</p>
+
+<h1>Development</h1>
+
+<p>There is a <a href="http://github.com/eroullit/dabba">public Git repository</a>
+where you can check out the latest code base.</p>
+
+<pre><code>git clone git://github.com/eroullit/dabba.git
+</code></pre>
+
+<h1>Installation</h1>
+
+<p>You need to fulfill these prerequisites in order to build dabba:</p>
+
+<ul>
+<li>Linux kernel &gt;= 2.6.31</li>
+<li><code>cmake</code></li>
+<li>
+<code>setcap</code> (within libcap package)</li>
+</ul><p>The following are optional but recommended:</p>
+
+<ul>
+<li><code>python-yaml</code></li>
+<li><code>doxygen</code></li>
+</ul><p>To build out-of-tree:</p>
+
+<pre><code>$ mkdir build
+$ cd build
+$ cmake ..
+$ make
+# make install/strip
+</code></pre>
+
+<h1>Copyright</h1>
+
+<p>Copyright (C) 2012  Emmanuel Roullit <a href="mailto:emmanuel.roullit@gmail.com">emmanuel.roullit@gmail.com</a></p>
+
+<p>This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or (at
+your option) any later version.</p>
+
+<p>This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.</p>
+
+<p>You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+51 Franklin St, Fifth Floor, Boston, MA 02110, USA</p>
+
+<h1>Contact</h1>
+
+<p>For questions:
+    Send me a message <a href="https://github.com/eroullit">on GitHub</a></p>
+
+<p>For bugs:
+    Open an issue on the <a href="https://github.com/eroullit/dabba/issues">bug tracker</a>.</p>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+    
+  </body>
+</html>
