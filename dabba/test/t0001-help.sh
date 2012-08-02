@@ -22,7 +22,7 @@ test_description='Test dabba help output'
 . ./dabba-test-lib.sh
 
 cat > expect <<EOF
-usage: dabba [--help] <command> [<args>]
+usage: dabba [--help] [--version] <command> [<args>]
 
 
 The most commonly used dabba commands are:
