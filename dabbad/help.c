@@ -38,7 +38,7 @@ static const char _usage[] =
  * \brief Show dabbad usage options
  */
 
-void show_usage(const struct option const *opt)
+void show_usage(const struct option * opt)
 {
 	assert(opt);
 

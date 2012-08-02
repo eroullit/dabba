@@ -35,6 +35,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <byteswap.h>
 
 #include <sys/stat.h>
 
@@ -50,8 +51,9 @@
  * \return 0 on success, -1 if PCAP file header could not be written
  */
 
-static int pcap_file_header_write(const int fd, const int linktype,
-				  const int thiszone, const int snaplen)
+static int
+pcap_file_header_write(const int fd, const int linktype,
+		       const int thiszone, const int snaplen)
 {
 	struct pcap_file_header hdr;
 
@@ -101,6 +103,19 @@ int pcap_link_type_get(int arp_type, enum pcap_linktype *pcap_link_type)
 }
 
 /**
+ * \internal
+ * \brief Tells if the input linktype is valid
+ * \param[in] linktype Linktype to validate
+ * \return 1 if the linktype is valid, 0 if invalid
+ */
+
+static int pcap_linktype_is_valid(const uint32_t linktype)
+{
+	return (linktype == LINKTYPE_EN10MB);
+}
+
+/**
+ * \internal
  * \brief Validate PCAP file header
  * Every PCAP file has a file header which contains:
  * 	- the PCAP magic (\c 0xa1b2c3d4)
@@ -116,7 +131,7 @@ int pcap_link_type_get(int arp_type, enum pcap_linktype *pcap_link_type)
  * 		\c EIO if PCAP file header could not be read
  */
 
-int pcap_is_valid(const int fd)
+static int pcap_is_valid(const int fd)
 {
 	struct pcap_file_header hdr;
 
@@ -130,10 +145,18 @@ int pcap_is_valid(const int fd)
 		return (0);
 	}
 
+	/* PCAP might have been created on a system with another endianness */
+	if (hdr.magic != TCPDUMP_MAGIC) {
+		hdr.magic = bswap_32(hdr.magic);
+		hdr.linktype = bswap_32(hdr.linktype);
+		hdr.version_major = bswap_16(hdr.version_major);
+		hdr.version_minor = bswap_16(hdr.version_minor);
+	}
+
 	if (hdr.magic != TCPDUMP_MAGIC
 	    || hdr.version_major != PCAP_VERSION_MAJOR
 	    || hdr.version_minor != PCAP_VERSION_MINOR
-	    || !is_linktype_valid(hdr.linktype)) {
+	    || !pcap_linktype_is_valid(hdr.linktype)) {
 		errno = EINVAL;
 		return (0);
 	}
@@ -251,9 +274,10 @@ int pcap_close(const int fd)
  * 		-1 if either the packet header or packet payload could not be written
  */
 
-ssize_t pcap_write(const int fd, const uint8_t * const pkt,
-		   const size_t pkt_len, const size_t pkt_snaplen,
-		   const uint64_t tv_sec, const uint64_t tv_usec)
+ssize_t
+pcap_write(const int fd, const uint8_t * const pkt,
+	   const size_t pkt_len, const size_t pkt_snaplen,
+	   const uint64_t tv_sec, const uint64_t tv_usec)
 {
 	struct pcap_sf_pkthdr sf_hdr;
 	ssize_t written = 0;
@@ -269,14 +293,14 @@ ssize_t pcap_write(const int fd, const uint8_t * const pkt,
 	sf_hdr.caplen = pkt_snaplen;
 	sf_hdr.len = pkt_len;
 
-        written = write(fd, &sf_hdr, sizeof(sf_hdr));
-        
+	written = write(fd, &sf_hdr, sizeof(sf_hdr));
+
 	if (written != sizeof(sf_hdr)) {
 		return (-1);
 	}
 
-        written = write(fd, pkt, sf_hdr.caplen);
-        
+	written = write(fd, pkt, sf_hdr.caplen);
+
 	if (written != (ssize_t) sf_hdr.caplen) {
 		return (-1);
 	}

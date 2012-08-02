@@ -99,17 +99,6 @@ struct pcap_sf_pkthdr {
 	uint32_t len;		/**< length this packet (off wire) */
 };
 
-/**
- * \brief Tells if the input linktype is valid
- * \param[in] linktype Linktype to validate
- * \return 1 if the linktype is valid, 0 if invalid
- */
-
-static inline int is_linktype_valid(const uint32_t linktype)
-{
-	return (linktype == LINKTYPE_EN10MB);
-}
-
 int pcap_link_type_get(int arp_type, enum pcap_linktype *pcap_link_type);
 ssize_t pcap_write(const int fd, const uint8_t * const pkt,
 		   const size_t pkt_len, const size_t pkt_snaplen,
@@ -118,6 +107,5 @@ void pcap_destroy(const int fd, const char *const pcap_path);
 int pcap_create(const char *const pcap_path, const enum pcap_linktype linktype);
 int pcap_open(const char *const pcap_path, int flags);
 int pcap_close(const int fd);
-int pcap_is_valid(const int fd);
 
 #endif				/* PCAP_H */

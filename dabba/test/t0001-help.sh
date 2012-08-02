@@ -33,7 +33,7 @@ See 'dabba help <command>' for more info on a specific command.
 EOF
 
 test_expect_success "Check dabba help output" "
-    $TEST_DIRECTORY/../dabba --help > result &&
+    '$DABBA_PATH'/dabba --help > result &&
     test_cmp expect result
 "
 

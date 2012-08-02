@@ -90,38 +90,38 @@ frame_nr="16"
 ring_size="$(($frame_nr * 2048))" # 2kB are allocated for one ethernet frame
 
 test_expect_success "Setup: Start dabbad" "
-    $DABBAD_PATH/dabbad --daemonize
+    '$DABBAD_PATH'/dabbad --daemonize
 "
 
 test_expect_success "Start capture thread on an invalid interface (too long)" "
-    test_expect_code 22 $DABBA_PATH/dabba capture start --interface lorem-ipsum-dolor-sit --pcap test.pcap --frame-number $frame_nr
+    test_expect_code 22 '$DABBA_PATH'/dabba capture start --interface lorem-ipsum-dolor-sit --pcap test.pcap --frame-number $frame_nr
 "
 
 test_expect_success "Start capture thread on an invalid interface (does not exist)" "
-    test_expect_code 19 $DABBA_PATH/dabba capture start --interface lorem-ipsum --pcap test.pcap --frame-number $frame_nr
+    test_expect_code 19 '$DABBA_PATH'/dabba capture start --interface lorem-ipsum --pcap test.pcap --frame-number $frame_nr
 "
 
 test_expect_success "Start capture thread with a missing interface" "
-    test_expect_code 22 $DABBA_PATH/dabba capture start --pcap test.pcap --frame-number $frame_nr
+    test_expect_code 22 '$DABBA_PATH'/dabba capture start --pcap test.pcap --frame-number $frame_nr
 "
 
 test_expect_success "Start capture thread with a missing pcap path" "
-    test_expect_code 22 $DABBA_PATH/dabba capture start --interface any --frame-number $frame_nr
+    test_expect_code 22 '$DABBA_PATH'/dabba capture start --interface any --frame-number $frame_nr
 "
 
 test_expect_success "Start capture thread with a missing frame number" "
-    test_expect_code 22 $DABBA_PATH/dabba capture start --interface any --pcap test.pcap
+    test_expect_code 22 '$DABBA_PATH'/dabba capture start --interface any --pcap test.pcap
 "
 
 test_expect_success "Invoke capture command w/o any parameters" "
-    test_expect_code 38 $DABBA_PATH/dabba capture
+    test_expect_code 38 '$DABBA_PATH'/dabba capture
 "
 
 for i in `seq 0 9`
 do
         test_expect_success "Start capture thread #$(($i+1)) on loopback" "
-            $DABBA_PATH/dabba capture start --interface any --pcap test$i.pcap --frame-number $frame_nr &&
-            $DABBA_PATH/dabba capture list > result
+            '$DABBA_PATH'/dabba capture start --interface any --pcap test$i.pcap --frame-number $frame_nr &&
+            '$DABBA_PATH'/dabba capture list > result
         "
 
         test_expect_success PYTHON_YAML "Check thread #$(($i+1)) number" "
@@ -152,9 +152,9 @@ done
 for i in `seq 10`
 do
         test_expect_success PYTHON_YAML "Stop capture thread #$i on loopback" "
-            $DABBA_PATH/dabba capture list > result &&
-            $DABBA_PATH/dabba capture stop --id `get_capture_thread_id 0 result` &&
-            $DABBA_PATH/dabba capture list > after &&
+            '$DABBA_PATH'/dabba capture list > result &&
+            '$DABBA_PATH'/dabba capture stop --id `get_capture_thread_id 0 result` &&
+            '$DABBA_PATH'/dabba capture list > after &&
             test_must_fail grep -wq `get_capture_thread_id 0 result` after
         "
 done
