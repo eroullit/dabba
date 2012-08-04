@@ -62,6 +62,18 @@ struct capture_thread_node {
 static TAILQ_HEAD(capture_thread_head, capture_thread_node) thread_head =
 TAILQ_HEAD_INITIALIZER(thread_head);
 
+struct packet_thread *dabbad_capture_thread_data_get(const pthread_t thread_id)
+{
+	struct capture_thread_node *node;
+
+	TAILQ_FOREACH(node, &thread_head, entry) {
+		if (thread_id == node->pkt_capture->thread.id)
+			break;
+	}
+
+	return node ? &node->pkt_capture->thread : NULL;
+}
+
 /**
  * \internal
  * \brief Capture thread message validator

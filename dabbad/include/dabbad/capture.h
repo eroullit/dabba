@@ -24,6 +24,8 @@
 #ifndef CAPTURE_H
 #define	CAPTURE_H
 
+struct packet_thread *dabbad_capture_thread_data_get(const pthread_t thread_id);
+
 int dabbad_capture_start(struct dabba_ipc_msg *msg);
 int dabbad_capture_list(struct dabba_ipc_msg *msg);
 int dabbad_capture_stop(struct dabba_ipc_msg *msg);
