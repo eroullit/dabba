@@ -42,6 +42,7 @@
 #include <libdabba/packet_rx.h>
 #include <libdabba/pcap.h>
 #include <dabbad/dabbad.h>
+#include <dabbad/thread.h>
 #include <dabbad/misc.h>
 
 /**
@@ -150,9 +151,7 @@ int dabbad_capture_start(struct dabba_ipc_msg *msg)
 		return rc;
 	}
 
-	/* TODO: Add pthread attribute support */
-	rc = pthread_create(&pkt_capture->thread.id, NULL, packet_rx,
-			    pkt_capture);
+	rc = dabbad_thread_start(&pkt_capture->thread, packet_rx, pkt_capture);
 
 	if (!rc) {
 		thread_node->pkt_capture = pkt_capture;
@@ -232,14 +231,14 @@ int dabbad_capture_stop(struct dabba_ipc_msg *msg)
 
 	if (node) {
 		TAILQ_REMOVE(&thread_head, node, entry);
-		rc = pthread_cancel(node->pkt_capture->thread.id);
+		rc = dabbad_thread_stop(&node->pkt_capture->thread);
 		close(node->pkt_capture->pcap_fd);
 		packet_mmap_destroy(&node->pkt_capture->pkt_rx);
 		free(node->pkt_capture);
 		free(node);
 	}
 
-	/* TODO pthread_cancel() error is should issue a warning
+	/* TODO dabbad_thread_stop() error should issue a warning
 	 * even if the user cannot do anything about it...
 	 */
 

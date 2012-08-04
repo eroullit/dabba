@@ -15,7 +15,7 @@ IF(DOXYGEN_FOUND)
 	ADD_DEPENDENCIES(doc ${PROJECT_NAME}-doc)
 ENDIF(DOXYGEN_FOUND)
 
-ADD_EXECUTABLE(${PROJECT_NAME} dabbad.c list.c ipc.c help.c capture.c misc.c)
+ADD_EXECUTABLE(${PROJECT_NAME} dabbad.c list.c ipc.c help.c capture.c misc.c thread.c)
 
 TARGET_LINK_LIBRARIES (${PROJECT_NAME} libdabba ${CMAKE_THREAD_LIBS_INIT})
 
