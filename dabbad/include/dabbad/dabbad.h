@@ -64,6 +64,12 @@ struct dabba_ifconf {
 	char name[IFNAMSIZ];
 };
 
+struct dabba_thread {
+	pthread_t id; /**< thread id */
+	int16_t sched_prio; /**< scheduling priority */
+	int16_t sched_policy; /**< schenduling policy */
+};
+
 /**
  * \brief Dabbad capture message buffer
  */
@@ -71,7 +77,7 @@ struct dabba_ifconf {
 struct dabba_capture {
 	char pcap_name[NAME_MAX]; /**< pcap file name */
 	char dev_name[IFNAMSIZ]; /**< interface name */
-	pthread_t thread_id; /**< thread id */
+	struct dabba_thread thread; /**< thread information */
 	uint64_t frame_nr; /**< number of frames to allocate */
 	uint32_t frame_size; /**< maximum frame size to support */
 };

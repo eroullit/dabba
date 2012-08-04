@@ -164,6 +164,10 @@ int dabbad_capture_start(struct dabba_ipc_msg *msg)
 	}
 
 	rc = dabbad_thread_start(&pkt_capture->thread, packet_rx, pkt_capture);
+	thread_sched_policy_set(&pkt_capture->thread,
+				capture_msg->thread.sched_policy);
+	thread_sched_prio_set(&pkt_capture->thread,
+			      capture_msg->thread.sched_prio);
 
 	if (!rc) {
 		thread_node->pkt_capture = pkt_capture;
@@ -205,7 +209,12 @@ int dabbad_capture_list(struct dabba_ipc_msg *msg)
 
 		layout = &node->pkt_capture->pkt_rx.layout;
 
-		capture[a].thread_id = node->pkt_capture->thread.id;
+		capture[a].thread.id = node->pkt_capture->thread.id;
+		thread_sched_policy_get(&node->pkt_capture->thread,
+					&capture[a].thread.sched_policy);
+		thread_sched_prio_get(&node->pkt_capture->thread,
+				      &capture[a].thread.sched_prio);
+		capture[a].thread.id = node->pkt_capture->thread.id;
 		capture[a].frame_size = layout->tp_frame_size;
 		capture[a].frame_nr = layout->tp_frame_nr;
 
@@ -237,7 +246,7 @@ int dabbad_capture_stop(struct dabba_ipc_msg *msg)
 	int rc = 0;
 
 	TAILQ_FOREACH(node, &thread_head, entry) {
-		if (capture_msg->thread_id == node->pkt_capture->thread.id)
+		if (capture_msg->thread.id == node->pkt_capture->thread.id)
 			break;
 	}
 
