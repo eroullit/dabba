@@ -151,7 +151,8 @@ int dabbad_capture_start(struct dabba_ipc_msg *msg)
 	}
 
 	/* TODO: Add pthread attribute support */
-	rc = pthread_create(&pkt_capture->thread, NULL, packet_rx, pkt_capture);
+	rc = pthread_create(&pkt_capture->thread.id, NULL, packet_rx,
+			    pkt_capture);
 
 	if (!rc) {
 		thread_node->pkt_capture = pkt_capture;
@@ -193,7 +194,7 @@ int dabbad_capture_list(struct dabba_ipc_msg *msg)
 
 		layout = &node->pkt_capture->pkt_rx.layout;
 
-		capture[a].thread_id = node->pkt_capture->thread;
+		capture[a].thread_id = node->pkt_capture->thread.id;
 		capture[a].frame_size = layout->tp_frame_size;
 		capture[a].frame_nr = layout->tp_frame_nr;
 
@@ -225,13 +226,13 @@ int dabbad_capture_stop(struct dabba_ipc_msg *msg)
 	int rc = 0;
 
 	TAILQ_FOREACH(node, &thread_head, entry) {
-		if (capture_msg->thread_id == node->pkt_capture->thread)
+		if (capture_msg->thread_id == node->pkt_capture->thread.id)
 			break;
 	}
 
 	if (node) {
 		TAILQ_REMOVE(&thread_head, node, entry);
-		rc = pthread_cancel(node->pkt_capture->thread);
+		rc = pthread_cancel(node->pkt_capture->thread.id);
 		close(node->pkt_capture->pcap_fd);
 		packet_mmap_destroy(&node->pkt_capture->pkt_rx);
 		free(node->pkt_capture);

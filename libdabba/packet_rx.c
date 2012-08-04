@@ -84,7 +84,10 @@ void *packet_rx(void *arg)
 						   (uint8_t *) mmap_hdr +
 						   mmap_hdr->tp_h.tp_mac,
 						   mmap_hdr->tp_h.tp_len,
-						   min(mmap_hdr->tp_h.tp_snaplen, pkt_rx->layout.tp_frame_size),
+						   min(mmap_hdr->tp_h.
+						       tp_snaplen,
+						       pkt_rx->layout.
+						       tp_frame_size),
 						   mmap_hdr->tp_h.tp_sec,
 						   mmap_hdr->tp_h.tp_usec);
 				}

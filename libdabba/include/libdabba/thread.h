@@ -1,13 +1,13 @@
 /**
- * \file packet_rx.h
- * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2011
- * \date 2011
+ * \file thread.h
+ * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2012
+ * \date 2012
  */
 
 /* __LICENSE_HEADER_BEGIN__ */
 
 /*
- * Copyright (C) 2011	Emmanuel Roullit <emmanuel.roullit@gmail.com>
+ * Copyright (C) 2012	Emmanuel Roullit <emmanuel.roullit@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,24 +27,28 @@
 
  /* __LICENSE_HEADER_END__ */
 
-#ifndef PACKET_RX_H
-#define	PACKET_RX_H
+#ifndef THREAD_H
+#define	THREAD_H
 
+#include <stdint.h>
 #include <pthread.h>
 
-#include <libdabba/packet_mmap.h>
-#include <libdabba/thread.h>
-
 /**
- * \brief Packet capture structure
+ * \brief Packet thread structure
  */
 
-struct packet_rx_thread {
-	struct packet_mmap pkt_rx; /**< capture packet mmap structure */
-	struct packet_thread thread; /**< thread information */
-	int pcap_fd; /**< pcap file descriptor */
+struct packet_thread {
+	pthread_t id;
+	pthread_attr_t attributes;
 };
 
-void *packet_rx(void *arg);
+int thread_sched_prio_set(struct packet_thread *pkt_thread,
+			  const int16_t sched_prio);
+int thread_sched_prio_get(struct packet_thread *pkt_thread,
+			  int16_t * sched_prio);
+int thread_sched_policy_set(struct packet_thread *pkt_thread,
+			    const int16_t sched_policy);
+int thread_sched_policy_get(struct packet_thread *pkt_thread,
+			    int16_t * sched_policy);
 
-#endif				/* PACKET_RX_H */
+#endif				/* THREAD_H */
