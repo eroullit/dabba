@@ -146,6 +146,8 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <getopt.h>
 #include <inttypes.h>
 #include <errno.h>
+#include <sched.h>
+#include <sys/resource.h>
 
 #include <libdabba/macros.h>
 #include <libdabba/strlcpy.h>
@@ -158,6 +160,8 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 enum capture_start_option {
 	OPT_CAPTURE_INTERFACE,
 	OPT_CAPTURE_PCAP,
+	OPT_CAPTURE_SCHED_PRIORITY,
+	OPT_CAPTURE_SCHED_POLICY,
 	OPT_CAPTURE_FRAME_NUMBER
 };
 
@@ -170,6 +174,10 @@ static struct option *capture_start_options_get(void)
 	static struct option capture_start_option[] = {
 		{"interface", required_argument, NULL, OPT_CAPTURE_INTERFACE},
 		{"pcap", required_argument, NULL, OPT_CAPTURE_PCAP},
+		{"sched-prio", required_argument, NULL,
+		 OPT_CAPTURE_SCHED_PRIORITY},
+		{"sched-policy", required_argument, NULL,
+		 OPT_CAPTURE_SCHED_POLICY},
 		{"frame-number", required_argument, NULL,
 		 OPT_CAPTURE_FRAME_NUMBER},
 		{NULL, 0, NULL, 0},
@@ -188,6 +196,11 @@ static int prepare_capture_start_query(int argc, char **argv,
 	assert(msg);
 	msg->mtype = 1;
 	msg->msg_body.type = DABBA_CAPTURE_START;
+
+	/* Assume conservative values for now */
+	capture_start_msg->frame_size = PACKET_MMAP_ETH_FRAME_LEN;
+	capture_start_msg->thread.sched_prio = PRIO_MAX - PRIO_MIN;
+	capture_start_msg->thread.sched_policy = SCHED_OTHER;
 
 	while ((ret =
 		getopt_long_only(argc, argv, "", capture_start_options_get(),
@@ -214,15 +227,29 @@ static int prepare_capture_start_query(int argc, char **argv,
 			capture_start_msg->frame_nr =
 			    strtoull(optarg, NULL, 10);
 			break;
+		case OPT_CAPTURE_SCHED_PRIORITY:
+			capture_start_msg->thread.sched_prio =
+			    strtoll(optarg, NULL, 10);
+			break;
+		case OPT_CAPTURE_SCHED_POLICY:
+			if (!strcmp(optarg, "fifo"))
+				capture_start_msg->thread.sched_policy =
+				    SCHED_FIFO;
+			else if (!strcmp(optarg, "rr"))
+				capture_start_msg->thread.sched_policy =
+				    SCHED_RR;
+			else if (!strcmp(optarg, "other"))
+				capture_start_msg->thread.sched_policy =
+				    SCHED_OTHER;
+
+			break;
+
 		default:
 			show_usage(capture_start_options_get());
 			rc = -1;
 			break;
 		}
 	}
-
-	/* Assume conservative values for now */
-	capture_start_msg->frame_size = PACKET_MMAP_ETH_FRAME_LEN;
 
 	return rc;
 }
@@ -249,7 +276,11 @@ static void display_capture_list(const struct dabba_ipc_msg *const msg)
 
 	for (a = 0; a < msg->msg_body.elem_nr; a++) {
 		printf("    - id: %" PRIu64 "\n",
-		       (uint64_t) msg->msg_body.msg.capture[a].thread_id);
+		       (uint64_t) msg->msg_body.msg.capture[a].thread.id);
+		printf("      scheduling policy: %i\n",
+		       msg->msg_body.msg.capture[a].thread.sched_policy);
+		printf("      scheduling priority: %i\n",
+		       msg->msg_body.msg.capture[a].thread.sched_prio);
 		printf("      packet mmap size: %" PRIu64 "\n",
 		       msg->msg_body.msg.capture[a].frame_nr *
 		       msg->msg_body.msg.capture[a].frame_size);
@@ -350,7 +381,7 @@ static int prepare_capture_stop_query(int argc, char **argv,
 				 NULL)) != EOF) {
 		switch (ret) {
 		case OPT_CAPTURE_ID:
-			capture_stop_msg->thread_id =
+			capture_stop_msg->thread.id =
 			    strtoull(optarg, NULL, 10);
 			break;
 		default:
