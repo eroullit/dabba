@@ -31,6 +31,7 @@
 #include <errno.h>
 #include <assert.h>
 
+#include <dabbad/dabbad.h>
 #include <dabbad/thread.h>
 #include <libdabba/macros.h>
 
@@ -126,4 +127,43 @@ int dabbad_thread_stop(struct packet_thread *pkt_thread)
 		TAILQ_REMOVE(&packet_thread_head, node, entry);
 
 	return rc;
+}
+
+/**
+ * \brief List currently running thread
+ * \param[in,out] msg Thread message
+ * \return 0 on success, else on failure.
+ */
+
+int dabbad_thread_list(struct dabba_ipc_msg *msg)
+{
+	struct dabba_thread *thread_msg;
+	struct packet_thread *pkt_thread;
+	size_t a = 0, off = 0, thread_list_size;
+
+	thread_msg = msg->msg_body.msg.thread;
+	thread_list_size = ARRAY_SIZE(msg->msg_body.msg.thread);
+
+	for (pkt_thread = dabbad_thread_first(); pkt_thread;
+	     pkt_thread = dabbad_thread_next(pkt_thread)) {
+		if (off < msg->msg_body.offset) {
+			off++;
+			continue;
+		}
+
+		if (a >= thread_list_size)
+			break;
+
+		thread_msg[a].id = pkt_thread->id;
+		thread_msg[a].type = pkt_thread->type;
+		thread_sched_policy_get(pkt_thread,
+					&thread_msg[a].sched_policy);
+		thread_sched_prio_get(pkt_thread, &thread_msg[a].sched_prio);
+
+		a++;
+	}
+
+	msg->msg_body.elem_nr = a;
+
+	return 0;
 }

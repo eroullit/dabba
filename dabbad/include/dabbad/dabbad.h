@@ -45,7 +45,8 @@ enum dabba_msg_type {
 	DABBA_IFCONF,
 	DABBA_CAPTURE_START,
 	DABBA_CAPTURE_LIST,
-	DABBA_CAPTURE_STOP
+	DABBA_CAPTURE_STOP,
+	DABBA_THREAD_LIST,
 };
 
 /**
@@ -64,8 +65,13 @@ struct dabba_ifconf {
 	char name[IFNAMSIZ];
 };
 
+/**
+ * \brief Dabbad thread message buffer
+ */
+
 struct dabba_thread {
 	pthread_t id; /**< thread id */
+	int16_t type; /**< thread type */
 	int16_t sched_prio; /**< scheduling priority */
 	int16_t sched_policy; /**< schenduling policy */
 };
@@ -84,6 +90,7 @@ struct dabba_capture {
 
 #define DABBA_IFCONF_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_ifconf))
 #define DABBA_CAPTURE_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_capture))
+#define DABBA_THREAD_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_thread))
 
 /**
  * \brief Dabbad IPC message structure
@@ -102,6 +109,7 @@ struct dabba_ipc_msg {
 			struct dabba_msg_buf buf;
 			struct dabba_ifconf ifconf[DABBA_IFCONF_MAX_SIZE];
 			struct dabba_capture capture[DABBA_CAPTURE_MAX_SIZE];
+			struct dabba_thread thread[DABBA_THREAD_MAX_SIZE];
 		} msg; /**< message data */
 	} msg_body;
 };

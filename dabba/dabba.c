@@ -96,6 +96,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabbad/dabbad.h>
 #include <dabba/dabba.h>
 #include <dabba/help.h>
+#include <dabba/thread.h>
 #include <dabba/interface.h>
 #include <dabba/capture.h>
 
@@ -142,6 +143,7 @@ static int handle_internal_command(int argc, const char **argv)
 	const char *cmd = argv[0];
 	static struct cmd_struct commands[] = {
 		{"interface", cmd_interface},
+		{"thread", cmd_thread},
 		{"capture", cmd_capture},
 		{"version", cmd_version},
 		{"help", cmd_help}

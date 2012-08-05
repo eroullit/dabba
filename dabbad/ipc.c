@@ -34,6 +34,7 @@
 #include <dabbad/ipc.h>
 #include <dabbad/list.h>
 #include <dabbad/capture.h>
+#include <dabbad/thread.h>
 
 /**
  * \internal
@@ -61,6 +62,9 @@ static int dabbad_handle_msg(struct dabba_ipc_msg *msg)
 		break;
 	case DABBA_CAPTURE_STOP:
 		rc = dabbad_capture_stop(msg);
+		break;
+	case DABBA_THREAD_LIST:
+		rc = dabbad_thread_list(msg);
 		break;
 	default:
 		rc = -1;

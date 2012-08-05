@@ -83,6 +83,7 @@ static void list_common_cmds_help(void)
 
 	static struct cmdname_help common_cmds[] = {
 		{"interface", "perform an interface related command"},
+		{"thread", "perform a thread related command"},
 		{"capture", "capture live traffic from an interface"}
 	};
 

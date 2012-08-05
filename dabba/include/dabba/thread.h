@@ -28,5 +28,6 @@ int sched_policy_value_get(const char *const policy_name);
 const char *sched_policy_key_get(const int policy_value);
 int sched_policy_default_get(void);
 int sched_prio_default_get(void);
+int cmd_thread(int argc, const char **argv);
 
 #endif				/* THREAD_H */
