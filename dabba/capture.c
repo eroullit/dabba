@@ -169,6 +169,16 @@ enum capture_stop_option {
 	OPT_CAPTURE_ID
 };
 
+struct sched_policy_name_mapping {
+	const char key[8];
+	int value;
+} sched_policy_mapping[] = {
+	{
+	.key = "rr",.value = SCHED_RR}, {
+	.key = "fifo",.value = SCHED_FIFO}, {
+	.key = "other",.value = SCHED_OTHER}
+};
+
 static struct option *capture_start_options_get(void)
 {
 	static struct option capture_start_option[] = {
@@ -184,6 +194,30 @@ static struct option *capture_start_options_get(void)
 	};
 
 	return capture_start_option;
+}
+
+static int sched_policy_value_get(const char *const policy_name)
+{
+	size_t a;
+
+	assert(policy_name);
+
+	for (a = 0; a < ARRAY_SIZE(sched_policy_mapping) - 1; a++)
+		if (!strcmp(policy_name, sched_policy_mapping[a].key))
+			break;
+
+	return sched_policy_mapping[a].value;
+}
+
+static const char *sched_policy_key_get(const int policy_value)
+{
+	size_t a;
+
+	for (a = 0; a < ARRAY_SIZE(sched_policy_mapping) - 1; a++)
+		if (policy_value == sched_policy_mapping[a].value)
+			break;
+
+	return sched_policy_mapping[a].key;
 }
 
 static int prepare_capture_start_query(int argc, char **argv,
@@ -232,16 +266,8 @@ static int prepare_capture_start_query(int argc, char **argv,
 			    strtoll(optarg, NULL, 10);
 			break;
 		case OPT_CAPTURE_SCHED_POLICY:
-			if (!strcmp(optarg, "fifo"))
-				capture_start_msg->thread.sched_policy =
-				    SCHED_FIFO;
-			else if (!strcmp(optarg, "rr"))
-				capture_start_msg->thread.sched_policy =
-				    SCHED_RR;
-			else if (!strcmp(optarg, "other"))
-				capture_start_msg->thread.sched_policy =
-				    SCHED_OTHER;
-
+			capture_start_msg->thread.sched_policy =
+			    sched_policy_value_get(optarg);
 			break;
 
 		default:
@@ -277,8 +303,9 @@ static void display_capture_list(const struct dabba_ipc_msg *const msg)
 	for (a = 0; a < msg->msg_body.elem_nr; a++) {
 		printf("    - id: %" PRIu64 "\n",
 		       (uint64_t) msg->msg_body.msg.capture[a].thread.id);
-		printf("      scheduling policy: %i\n",
-		       msg->msg_body.msg.capture[a].thread.sched_policy);
+		printf("      scheduling policy: %s\n",
+		       sched_policy_key_get(msg->msg_body.msg.capture[a].
+					    thread.sched_policy));
 		printf("      scheduling priority: %i\n",
 		       msg->msg_body.msg.capture[a].thread.sched_prio);
 		printf("      packet mmap size: %" PRIu64 "\n",
