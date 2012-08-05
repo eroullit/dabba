@@ -258,30 +258,28 @@ static void display_capture_list_msg_header(void)
 	printf("  captures:\n");
 }
 
-static void display_capture_list(const struct dabba_ipc_msg *const msg)
+static void display_capture_list(struct dabba_ipc_msg *const msg)
 {
+	struct dabba_capture *capture_msg;
 	size_t a;
 
 	assert(msg);
 	assert(msg->msg_body.elem_nr <= ARRAY_SIZE(msg->msg_body.msg.capture));
 
 	for (a = 0; a < msg->msg_body.elem_nr; a++) {
+		capture_msg = &msg->msg_body.msg.capture[a];
 		printf("    - id: %" PRIu64 "\n",
-		       (uint64_t) msg->msg_body.msg.capture[a].thread.id);
+		       (uint64_t) capture_msg->thread.id);
 		printf("      scheduling policy: %s\n",
-		       sched_policy_key_get(msg->msg_body.msg.capture[a].
-					    thread.sched_policy));
+		       sched_policy_key_get(capture_msg->thread.sched_policy));
 		printf("      scheduling priority: %i\n",
-		       msg->msg_body.msg.capture[a].thread.sched_prio);
+		       capture_msg->thread.sched_prio);
 		printf("      packet mmap size: %" PRIu64 "\n",
-		       msg->msg_body.msg.capture[a].frame_nr *
-		       msg->msg_body.msg.capture[a].frame_size);
+		       capture_msg->frame_nr * capture_msg->frame_size);
 		printf("      frame number: %" PRIu64 "\n",
-		       msg->msg_body.msg.capture[a].frame_nr);
-		printf("      pcap: %s\n",
-		       msg->msg_body.msg.capture[a].pcap_name);
-		printf("      interface: %s\n",
-		       msg->msg_body.msg.capture[a].dev_name);
+		       capture_msg->frame_nr);
+		printf("      pcap: %s\n", capture_msg->pcap_name);
+		printf("      interface: %s\n", capture_msg->dev_name);
 	}
 }
 

@@ -115,9 +115,8 @@ static void display_interface_list(const struct dabba_ipc_msg *const msg)
 	assert(msg);
 	assert(msg->msg_body.elem_nr <= ARRAY_SIZE(msg->msg_body.msg.ifconf));
 
-	for (a = 0; a < msg->msg_body.elem_nr; a++) {
+	for (a = 0; a < msg->msg_body.elem_nr; a++)
 		printf("    - %s\n", msg->msg_body.msg.ifconf[a].name);
-	}
 }
 
 static void prepare_interface_list_query(struct dabba_ipc_msg *msg)
@@ -127,7 +126,8 @@ static void prepare_interface_list_query(struct dabba_ipc_msg *msg)
 	msg->msg_body.type = DABBA_IFCONF;
 }
 
-static void display_interface_list_msg_header(const struct dabba_ipc_msg *const msg)
+static void display_interface_list_msg_header(const struct dabba_ipc_msg *const
+					      msg)
 {
 	assert(msg);
 
