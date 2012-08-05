@@ -146,8 +146,6 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <getopt.h>
 #include <inttypes.h>
 #include <errno.h>
-#include <sched.h>
-#include <sys/resource.h>
 
 #include <libdabba/macros.h>
 #include <libdabba/strlcpy.h>
@@ -155,6 +153,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabba/dabba.h>
 #include <dabba/help.h>
 #include <dabba/ipc.h>
+#include <dabba/thread.h>
 #include <dabbad/dabbad.h>
 
 enum capture_start_option {
@@ -167,16 +166,6 @@ enum capture_start_option {
 
 enum capture_stop_option {
 	OPT_CAPTURE_ID
-};
-
-struct sched_policy_name_mapping {
-	const char key[8];
-	int value;
-} sched_policy_mapping[] = {
-	{
-	.key = "rr",.value = SCHED_RR}, {
-	.key = "fifo",.value = SCHED_FIFO}, {
-	.key = "other",.value = SCHED_OTHER}
 };
 
 static struct option *capture_start_options_get(void)
@@ -196,30 +185,6 @@ static struct option *capture_start_options_get(void)
 	return capture_start_option;
 }
 
-static int sched_policy_value_get(const char *const policy_name)
-{
-	size_t a;
-
-	assert(policy_name);
-
-	for (a = 0; a < ARRAY_SIZE(sched_policy_mapping) - 1; a++)
-		if (!strcmp(policy_name, sched_policy_mapping[a].key))
-			break;
-
-	return sched_policy_mapping[a].value;
-}
-
-static const char *sched_policy_key_get(const int policy_value)
-{
-	size_t a;
-
-	for (a = 0; a < ARRAY_SIZE(sched_policy_mapping) - 1; a++)
-		if (policy_value == sched_policy_mapping[a].value)
-			break;
-
-	return sched_policy_mapping[a].key;
-}
-
 static int prepare_capture_start_query(int argc, char **argv,
 				       struct dabba_ipc_msg *msg)
 {
@@ -233,8 +198,8 @@ static int prepare_capture_start_query(int argc, char **argv,
 
 	/* Assume conservative values for now */
 	capture_start_msg->frame_size = PACKET_MMAP_ETH_FRAME_LEN;
-	capture_start_msg->thread.sched_prio = PRIO_MAX - PRIO_MIN;
-	capture_start_msg->thread.sched_policy = SCHED_OTHER;
+	capture_start_msg->thread.sched_prio = sched_prio_default_get();
+	capture_start_msg->thread.sched_policy = sched_policy_default_get();
 
 	while ((ret =
 		getopt_long_only(argc, argv, "", capture_start_options_get(),

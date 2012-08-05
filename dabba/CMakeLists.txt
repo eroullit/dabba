@@ -13,7 +13,7 @@ IF(DOXYGEN_FOUND)
 	ADD_DEPENDENCIES(doc ${PROJECT_NAME}-doc)
 ENDIF(DOXYGEN_FOUND)
 
-ADD_EXECUTABLE(${PROJECT_NAME} dabba.c help.c interface.c ipc.c capture.c)
+ADD_EXECUTABLE(${PROJECT_NAME} dabba.c help.c interface.c ipc.c capture.c thread.c)
 
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} libdabba)
 
