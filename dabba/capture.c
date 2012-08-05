@@ -270,10 +270,6 @@ static void display_capture_list(struct dabba_ipc_msg *const msg)
 		capture_msg = &msg->msg_body.msg.capture[a];
 		printf("    - id: %" PRIu64 "\n",
 		       (uint64_t) capture_msg->thread.id);
-		printf("      scheduling policy: %s\n",
-		       sched_policy_key_get(capture_msg->thread.sched_policy));
-		printf("      scheduling priority: %i\n",
-		       capture_msg->thread.sched_prio);
 		printf("      packet mmap size: %" PRIu64 "\n",
 		       capture_msg->frame_nr * capture_msg->frame_size);
 		printf("      frame number: %" PRIu64 "\n",
