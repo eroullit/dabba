@@ -162,12 +162,12 @@ int dabbad_capture_start(struct dabba_ipc_msg *msg)
 int dabbad_capture_list(struct dabba_ipc_msg *msg)
 {
 	struct packet_rx_thread *pkt_capture;
-	struct dabba_capture *capture;
+	struct dabba_capture *capture_msg;
 	struct packet_thread *pkt_thread;
 	struct tpacket_req *layout;
 	size_t a = 0, off = 0, thread_list_size;
 
-	capture = msg->msg_body.msg.capture;
+	capture_msg = msg->msg_body.msg.capture;
 	thread_list_size = ARRAY_SIZE(msg->msg_body.msg.capture);
 
 	for (pkt_thread = dabbad_thread_type_first(CAPTURE_THREAD); pkt_thread;
@@ -184,21 +184,21 @@ int dabbad_capture_list(struct dabba_ipc_msg *msg)
 
 		layout = &pkt_capture->pkt_rx.layout;
 
-		capture[a].thread.id = pkt_capture->thread.id;
+		capture_msg[a].thread.id = pkt_capture->thread.id;
 		thread_sched_policy_get(&pkt_capture->thread,
-					&capture[a].thread.sched_policy);
+					&capture_msg[a].thread.sched_policy);
 		thread_sched_prio_get(&pkt_capture->thread,
-				      &capture[a].thread.sched_prio);
-		capture[a].thread.id = pkt_capture->thread.id;
-		capture[a].frame_size = layout->tp_frame_size;
-		capture[a].frame_nr = layout->tp_frame_nr;
+				      &capture_msg[a].thread.sched_prio);
+		capture_msg[a].thread.id = pkt_capture->thread.id;
+		capture_msg[a].frame_size = layout->tp_frame_size;
+		capture_msg[a].frame_nr = layout->tp_frame_nr;
 
 		/* TODO error handling */
-		fd_to_path(pkt_capture->pcap_fd, capture[a].pcap_name,
-			   sizeof(capture[a].pcap_name));
+		fd_to_path(pkt_capture->pcap_fd, capture_msg[a].pcap_name,
+			   sizeof(capture_msg[a].pcap_name));
 		ifindex_to_devname(pkt_capture->pkt_rx.ifindex,
-				   capture[a].dev_name,
-				   sizeof(capture[a].dev_name));
+				   capture_msg[a].dev_name,
+				   sizeof(capture_msg[a].dev_name));
 
 		a++;
 	}
