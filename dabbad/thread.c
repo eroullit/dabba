@@ -42,14 +42,40 @@
 static TAILQ_HEAD(packet_thread_head, packet_thread) packet_thread_head =
 TAILQ_HEAD_INITIALIZER(packet_thread_head);
 
-struct packet_thread *dabbad_thread_first(void)
+static struct packet_thread *dabbad_thread_first(void)
 {
 	return TAILQ_FIRST(&packet_thread_head);
 }
 
-struct packet_thread *dabbad_thread_next(struct packet_thread *pkt_thread)
+static struct packet_thread *dabbad_thread_next(struct packet_thread
+						*pkt_thread)
 {
 	return pkt_thread ? TAILQ_NEXT(pkt_thread, entry) : NULL;
+}
+
+struct packet_thread *dabbad_thread_type_first(const enum packet_thread_type
+					       type)
+{
+	struct packet_thread *node;
+
+	for (node = dabbad_thread_first(); node;
+	     node = dabbad_thread_next(node))
+		if (node->type == type)
+			break;
+
+	return node;
+}
+
+struct packet_thread *dabbad_thread_type_next(struct packet_thread *pkt_thread,
+					      const enum packet_thread_type
+					      type)
+{
+	for (pkt_thread = dabbad_thread_next(pkt_thread); pkt_thread;
+	     pkt_thread = dabbad_thread_next(pkt_thread))
+		if (pkt_thread->type == type)
+			break;
+
+	return pkt_thread;
 }
 
 struct packet_thread *dabbad_thread_data_get(const pthread_t thread_id)

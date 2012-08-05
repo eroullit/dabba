@@ -26,8 +26,11 @@
 
 #include <libdabba/thread.h>
 
-struct packet_thread *dabbad_thread_first(void);
-struct packet_thread *dabbad_thread_next(struct packet_thread *pkt_thread);
+struct packet_thread *dabbad_thread_type_first(const enum packet_thread_type
+					       type);
+struct packet_thread *dabbad_thread_type_next(struct packet_thread *pkt_thread,
+					      const enum packet_thread_type
+					      type);
 struct packet_thread *dabbad_thread_data_get(const pthread_t thread_id);
 int dabbad_thread_start(struct packet_thread *pkt_thread,
 			void *(*func) (void *arg), void *arg);

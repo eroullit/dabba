@@ -170,8 +170,8 @@ int dabbad_capture_list(struct dabba_ipc_msg *msg)
 	capture = msg->msg_body.msg.capture;
 	thread_list_size = ARRAY_SIZE(msg->msg_body.msg.capture);
 
-	for (pkt_thread = dabbad_thread_first(); pkt_thread;
-	     pkt_thread = dabbad_thread_next(pkt_thread)) {
+	for (pkt_thread = dabbad_thread_type_first(CAPTURE_THREAD); pkt_thread;
+	     pkt_thread = dabbad_thread_type_next(pkt_thread, CAPTURE_THREAD)) {
 		if (off < msg->msg_body.offset) {
 			off++;
 			continue;

@@ -34,6 +34,10 @@
 #include <sys/queue.h>
 #include <pthread.h>
 
+enum packet_thread_type {
+	CAPTURE_THREAD
+};
+
 /**
  * \brief Packet thread structure
  */
@@ -41,6 +45,7 @@
 struct packet_thread {
 	pthread_t id;
 	pthread_attr_t attributes;
+	enum packet_thread_type type;
 	 TAILQ_ENTRY(packet_thread) entry;
 };
 
