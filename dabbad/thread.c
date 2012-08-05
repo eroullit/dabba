@@ -30,103 +30,74 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <assert.h>
-#include <sys/queue.h>
 
 #include <dabbad/thread.h>
 #include <libdabba/macros.h>
-
-/**
- * \brief Capture thread management element
- */
-
-struct packet_thread_node {
-	TAILQ_ENTRY(packet_thread_node) entry;	/**< tail queue list entry */
-	struct packet_thread *thread;  /**< Packet thread */
-};
 
 /**
  * \internal
  * \brief Packet thread management list
  */
 
-static TAILQ_HEAD(packet_thread_head, packet_thread_node) packet_thread_head =
+static TAILQ_HEAD(packet_thread_head, packet_thread) packet_thread_head =
 TAILQ_HEAD_INITIALIZER(packet_thread_head);
 
 struct packet_thread *dabbad_thread_first(void)
 {
-	struct packet_thread_node *node = TAILQ_FIRST(&packet_thread_head);
-	return node ? node->thread : NULL;
+	return TAILQ_FIRST(&packet_thread_head);
 }
 
 struct packet_thread *dabbad_thread_next(struct packet_thread *pkt_thread)
 {
-	struct packet_thread_node *node = NULL, *next = NULL;
-	node = container_of(&pkt_thread, struct packet_thread_node, thread);
-
-	if (node)
-		next = TAILQ_NEXT(node, entry);
-
-	return next ? next->thread : NULL;
+	return pkt_thread ? TAILQ_NEXT(pkt_thread, entry) : NULL;
 }
 
 struct packet_thread *dabbad_thread_data_get(const pthread_t thread_id)
 {
-	struct packet_thread_node *node;
+	struct packet_thread *node;
 
 	TAILQ_FOREACH(node, &packet_thread_head, entry)
-	    if (thread_id == node->thread->id)
+	    if (thread_id == node->id)
 		break;
 
-	return node ? node->thread : NULL;
+	return node;
 }
 
 int dabbad_thread_start(struct packet_thread *pkt_thread,
 			void *(*func) (void *arg), void *arg)
 {
-	struct packet_thread_node *node;
 	int rc;
 
 	assert(pkt_thread);
 	assert(func);
 
-	node = calloc(1, sizeof(*node));
-
-	if (!node)
-		return ENOMEM;
-
 	rc = pthread_create(&pkt_thread->id, &pkt_thread->attributes, func,
 			    arg);
 
-	if (rc) {
-		free(node);
-	} else {
-		node->thread = pkt_thread;
-		TAILQ_INSERT_TAIL(&packet_thread_head, node, entry);
-	}
+	if (!rc)
+		TAILQ_INSERT_TAIL(&packet_thread_head, pkt_thread, entry);
 
 	return rc;
 }
 
 int dabbad_thread_stop(struct packet_thread *pkt_thread)
 {
-	struct packet_thread_node *node;
+	struct packet_thread *node;
 	int rc;
 
 	assert(pkt_thread);
 
 	TAILQ_FOREACH(node, &packet_thread_head, entry)
-	    if (pkt_thread->id == node->thread->id)
+	    if (pkt_thread->id == node->id)
 		break;
 
 	if (!node)
 		return EINVAL;
 
-	rc = pthread_cancel(node->thread->id);
+	rc = pthread_cancel(node->id);
 
-	if (!rc) {
+	if (!rc)
 		TAILQ_REMOVE(&packet_thread_head, node, entry);
-		free(node);
-	}
 
 	return rc;
 }

@@ -31,6 +31,7 @@
 #define	THREAD_H
 
 #include <stdint.h>
+#include <sys/queue.h>
 #include <pthread.h>
 
 /**
@@ -40,6 +41,7 @@
 struct packet_thread {
 	pthread_t id;
 	pthread_attr_t attributes;
+	 TAILQ_ENTRY(packet_thread) entry;
 };
 
 int thread_sched_prio_set(struct packet_thread *pkt_thread,
