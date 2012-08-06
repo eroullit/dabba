@@ -159,6 +159,7 @@ int dabbad_thread_list(struct dabba_ipc_msg *msg)
 		thread_sched_policy_get(pkt_thread,
 					&thread_msg[a].sched_policy);
 		thread_sched_prio_get(pkt_thread, &thread_msg[a].sched_prio);
+                thread_sched_affinity_get(pkt_thread, &thread_msg[a].cpu);
 
 		a++;
 	}

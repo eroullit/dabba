@@ -36,6 +36,7 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
+#include <sched.h>
 
 /**
  * \brief Supported dabbad IPC message types
@@ -70,6 +71,7 @@ struct dabba_ifconf {
  */
 
 struct dabba_thread {
+        cpu_set_t cpu;
 	pthread_t id; /**< thread id */
 	int16_t type; /**< thread type */
 	int16_t sched_prio; /**< scheduling priority */
