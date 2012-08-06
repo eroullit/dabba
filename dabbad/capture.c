@@ -142,6 +142,7 @@ int dabbad_capture_start(struct dabba_ipc_msg *msg)
 	thread_sched_prio_set(&pkt_capture->thread,
 			      capture_msg->thread.sched_prio);
         thread_sched_affinity_set(&pkt_capture->thread, &capture_msg->thread.cpu);
+        thread_detached_state_set(&pkt_capture->thread);
 
         rc = dabbad_thread_start(&pkt_capture->thread, packet_rx, pkt_capture);
 

@@ -151,6 +151,13 @@ int thread_sched_affinity_get(struct packet_thread *pkt_thread, cpu_set_t *run_o
 	return pthread_attr_getaffinity_np(&pkt_thread->attributes, sizeof(*run_on), run_on);
 }
 
+int thread_detached_state_set(struct packet_thread *pkt_thread)
+{
+	assert(pkt_thread);
+
+	return pthread_attr_setdetachstate(&pkt_thread->attributes, PTHREAD_CREATE_DETACHED);
+}
+
 int dabbad_thread_start(struct packet_thread *pkt_thread,
 			void *(*func) (void *arg), void *arg)
 {
