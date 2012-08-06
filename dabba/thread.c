@@ -104,15 +104,15 @@ int sched_prio_default_get(void)
 	return 0;
 }
 
-void sched_cpu_affinty_default_get(cpu_set_t *mask)
+void sched_cpu_affinty_default_get(cpu_set_t * mask)
 {
-    size_t a;
-    
-    for(a = 0; a < CPU_SETSIZE; a++)
-        CPU_SET(a, mask);
+	size_t a;
+
+	for (a = 0; a < CPU_SETSIZE; a++)
+		CPU_SET(a, mask);
 }
 
-static char *nexttoken(char *q,  int sep)
+static char *nexttoken(char *q, int sep)
 {
 	if (q)
 		q = strchr(q, sep);
@@ -121,21 +121,21 @@ static char *nexttoken(char *q,  int sep)
 	return q;
 }
 
-int str_to_cpu_affinity(char *str, cpu_set_t *mask)
+int str_to_cpu_affinity(char *str, cpu_set_t * mask)
 {
 	char *p, *q;
 
-        assert(str);
-        assert(mask);
-        
+	assert(str);
+	assert(mask);
+
 	q = str;
 
 	CPU_ZERO(mask);
 
 	while (p = q, q = nexttoken(q, ','), p) {
-		unsigned int a;	 /* Beginning of range */
-		unsigned int b;	 /* End of range */
-		unsigned int s;	 /* Stride */
+		unsigned int a;	/* Beginning of range */
+		unsigned int b;	/* End of range */
+		unsigned int s;	/* Stride */
 		char *c1, *c2;
 
 		if (sscanf(p, "%u", &a) < 1)
@@ -166,17 +166,17 @@ int str_to_cpu_affinity(char *str, cpu_set_t *mask)
 			a += s;
 		}
 	}
-        
-        return 0;
+
+	return 0;
 }
 
 static void display_thread_cpu_affinity(const cpu_set_t * const cpu)
 {
-      
-    	size_t i, j, run = 0;
-        
-        assert(cpu);
-        
+
+	size_t i, j, run = 0;
+
+	assert(cpu);
+
 	for (i = 0; i < CPU_SETSIZE; i++)
 		if (CPU_ISSET(i, cpu)) {
 			for (j = i + 1; j < CPU_SETSIZE; j++) {
@@ -185,7 +185,7 @@ static void display_thread_cpu_affinity(const cpu_set_t * const cpu)
 				else
 					break;
 			}
-                        
+
 			if (!run)
 				printf("%zu,", i);
 			else if (run == 1) {
@@ -220,9 +220,9 @@ static void display_thread_list(struct dabba_ipc_msg *const msg)
 		       sched_policy_key_get(thread_msg->sched_policy));
 		printf("      scheduling priority: %i\n",
 		       thread_msg->sched_prio);
-                printf("      cpu affinity: ");
-                display_thread_cpu_affinity(&thread_msg->cpu);
-                printf("\n");
+		printf("      cpu affinity: ");
+		display_thread_cpu_affinity(&thread_msg->cpu);
+		printf("\n");
 	}
 }
 

@@ -93,5 +93,5 @@ void *packet_rx(void *arg)
 		}
 	}
 
-        return NULL;
+	return NULL;
 }

@@ -51,15 +51,17 @@ struct packet_thread *dabbad_thread_type_next(struct packet_thread *pkt_thread,
 					      type);
 struct packet_thread *dabbad_thread_data_get(const pthread_t thread_id);
 int dabbad_thread_sched_prio_set(struct packet_thread *pkt_thread,
-			  const int16_t sched_prio);
+				 const int16_t sched_prio);
 int dabbad_thread_sched_prio_get(struct packet_thread *pkt_thread,
-			  int16_t * sched_prio);
+				 int16_t * sched_prio);
 int dabbad_thread_sched_policy_set(struct packet_thread *pkt_thread,
-			    const int16_t sched_policy);
+				   const int16_t sched_policy);
 int dabbad_thread_sched_policy_get(struct packet_thread *pkt_thread,
-			    int16_t * sched_policy);
-int dabbad_thread_sched_affinity_set(struct packet_thread *pkt_thread, cpu_set_t *run_on);
-int dabbad_thread_sched_affinity_get(struct packet_thread *pkt_thread, cpu_set_t *run_on);
+				   int16_t * sched_policy);
+int dabbad_thread_sched_affinity_set(struct packet_thread *pkt_thread,
+				     cpu_set_t * run_on);
+int dabbad_thread_sched_affinity_get(struct packet_thread *pkt_thread,
+				     cpu_set_t * run_on);
 int dabbad_thread_detached_state_set(struct packet_thread *pkt_thread);
 int dabbad_thread_start(struct packet_thread *pkt_thread,
 			void *(*func) (void *arg), void *arg);

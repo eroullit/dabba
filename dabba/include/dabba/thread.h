@@ -28,8 +28,8 @@ int sched_policy_value_get(const char *const policy_name);
 const char *sched_policy_key_get(const int policy_value);
 int sched_policy_default_get(void);
 int sched_prio_default_get(void);
-void sched_cpu_affinty_default_get(cpu_set_t *mask);
-void str_to_cpu_affinity(char *str, cpu_set_t *mask);
+void sched_cpu_affinty_default_get(cpu_set_t * mask);
+void str_to_cpu_affinity(char *str, cpu_set_t * mask);
 int cmd_thread(int argc, const char **argv);
 
 #endif				/* THREAD_H */

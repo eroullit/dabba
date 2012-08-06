@@ -27,10 +27,9 @@
 #include <dabbad/thread.h>
 #include <libdabba/packet_rx.h>
 
-struct packet_capture_thread
-{
-    struct packet_rx rx;
-    struct packet_thread thread;
+struct packet_capture_thread {
+	struct packet_rx rx;
+	struct packet_thread thread;
 };
 
 struct packet_thread *dabbad_capture_thread_data_get(const pthread_t thread_id);

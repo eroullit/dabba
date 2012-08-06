@@ -90,7 +90,7 @@ static int capture_msg_is_valid(struct dabba_ipc_msg *msg)
 }
 
 static struct packet_capture_thread *dabbad_capture_thread_get(struct packet_thread
-							  *pkt_thread)
+							       *pkt_thread)
 {
 	return container_of(pkt_thread, struct packet_capture_thread, thread);
 }
@@ -127,9 +127,9 @@ int dabbad_capture_start(struct dabba_ipc_msg *msg)
 	pkt_capture->rx.pcap_fd =
 	    pcap_create(msg->msg_body.msg.capture->pcap_name, LINKTYPE_EN10MB);
 
-	rc = packet_mmap_create(&pkt_capture->rx.pkt_mmap, capture_msg->dev_name,
-				sock, PACKET_MMAP_RX, capture_msg->frame_size,
-				capture_msg->frame_nr);
+	rc = packet_mmap_create(&pkt_capture->rx.pkt_mmap,
+				capture_msg->dev_name, sock, PACKET_MMAP_RX,
+				capture_msg->frame_size, capture_msg->frame_nr);
 
 	if (rc) {
 		free(pkt_capture);
@@ -138,13 +138,14 @@ int dabbad_capture_start(struct dabba_ipc_msg *msg)
 	}
 
 	dabbad_thread_sched_policy_set(&pkt_capture->thread,
-				capture_msg->thread.sched_policy);
+				       capture_msg->thread.sched_policy);
 	dabbad_thread_sched_prio_set(&pkt_capture->thread,
-			      capture_msg->thread.sched_prio);
-        dabbad_thread_sched_affinity_set(&pkt_capture->thread, &capture_msg->thread.cpu);
-        dabbad_thread_detached_state_set(&pkt_capture->thread);
+				     capture_msg->thread.sched_prio);
+	dabbad_thread_sched_affinity_set(&pkt_capture->thread,
+					 &capture_msg->thread.cpu);
+	dabbad_thread_detached_state_set(&pkt_capture->thread);
 
-        rc = dabbad_thread_start(&pkt_capture->thread, packet_rx, pkt_capture);
+	rc = dabbad_thread_start(&pkt_capture->thread, packet_rx, pkt_capture);
 
 	if (rc) {
 		packet_mmap_destroy(&pkt_capture->rx.pkt_mmap);
@@ -188,9 +189,10 @@ int dabbad_capture_list(struct dabba_ipc_msg *msg)
 
 		capture_msg[a].thread.id = pkt_capture->thread.id;
 		dabbad_thread_sched_policy_get(&pkt_capture->thread,
-					&capture_msg[a].thread.sched_policy);
+					       &capture_msg[a].
+					       thread.sched_policy);
 		dabbad_thread_sched_prio_get(&pkt_capture->thread,
-				      &capture_msg[a].thread.sched_prio);
+					     &capture_msg[a].thread.sched_prio);
 		capture_msg[a].thread.id = pkt_capture->thread.id;
 		capture_msg[a].frame_size = layout->tp_frame_size;
 		capture_msg[a].frame_nr = layout->tp_frame_nr;
