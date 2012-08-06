@@ -90,7 +90,7 @@ struct packet_thread *dabbad_thread_data_get(const pthread_t thread_id)
 	return node;
 }
 
-int thread_sched_prio_set(struct packet_thread *pkt_thread,
+int dabbad_thread_sched_prio_set(struct packet_thread *pkt_thread,
 			  const int16_t sched_prio)
 {
 	struct sched_param sp = {.sched_priority = sched_prio };
@@ -100,7 +100,7 @@ int thread_sched_prio_set(struct packet_thread *pkt_thread,
 	return pthread_attr_setschedparam(&pkt_thread->attributes, &sp);
 }
 
-int thread_sched_prio_get(struct packet_thread *pkt_thread,
+int dabbad_thread_sched_prio_get(struct packet_thread *pkt_thread,
 			  int16_t * sched_prio)
 {
 	int rc;
@@ -116,7 +116,7 @@ int thread_sched_prio_get(struct packet_thread *pkt_thread,
 	return rc;
 }
 
-int thread_sched_policy_set(struct packet_thread *pkt_thread,
+int dabbad_thread_sched_policy_set(struct packet_thread *pkt_thread,
 			    const int16_t sched_policy)
 {
 	assert(pkt_thread);
@@ -125,7 +125,7 @@ int thread_sched_policy_set(struct packet_thread *pkt_thread,
 					   sched_policy);
 }
 
-int thread_sched_policy_get(struct packet_thread *pkt_thread,
+int dabbad_thread_sched_policy_get(struct packet_thread *pkt_thread,
 			    int16_t * sched_policy)
 {
 	assert(pkt_thread);
@@ -135,7 +135,7 @@ int thread_sched_policy_get(struct packet_thread *pkt_thread,
 					   (int *)sched_policy);
 }
 
-int thread_sched_affinity_set(struct packet_thread *pkt_thread, cpu_set_t *run_on)
+int dabbad_thread_sched_affinity_set(struct packet_thread *pkt_thread, cpu_set_t *run_on)
 {
 	assert(pkt_thread);
 	assert(run_on);
@@ -143,7 +143,7 @@ int thread_sched_affinity_set(struct packet_thread *pkt_thread, cpu_set_t *run_o
 	return pthread_attr_setaffinity_np(&pkt_thread->attributes, sizeof(*run_on), run_on);
 }
 
-int thread_sched_affinity_get(struct packet_thread *pkt_thread, cpu_set_t *run_on)
+int dabbad_thread_sched_affinity_get(struct packet_thread *pkt_thread, cpu_set_t *run_on)
 {
 	assert(pkt_thread);
 	assert(run_on);
@@ -151,7 +151,7 @@ int thread_sched_affinity_get(struct packet_thread *pkt_thread, cpu_set_t *run_o
 	return pthread_attr_getaffinity_np(&pkt_thread->attributes, sizeof(*run_on), run_on);
 }
 
-int thread_detached_state_set(struct packet_thread *pkt_thread)
+int dabbad_thread_detached_state_set(struct packet_thread *pkt_thread)
 {
 	assert(pkt_thread);
 
@@ -224,10 +224,10 @@ int dabbad_thread_list(struct dabba_ipc_msg *msg)
 
 		thread_msg[a].id = pkt_thread->id;
 		thread_msg[a].type = pkt_thread->type;
-		thread_sched_policy_get(pkt_thread,
+		dabbad_thread_sched_policy_get(pkt_thread,
 					&thread_msg[a].sched_policy);
-		thread_sched_prio_get(pkt_thread, &thread_msg[a].sched_prio);
-                thread_sched_affinity_get(pkt_thread, &thread_msg[a].cpu);
+		dabbad_thread_sched_prio_get(pkt_thread, &thread_msg[a].sched_prio);
+                dabbad_thread_sched_affinity_get(pkt_thread, &thread_msg[a].cpu);
 
 		a++;
 	}

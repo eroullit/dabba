@@ -50,17 +50,17 @@ struct packet_thread *dabbad_thread_type_next(struct packet_thread *pkt_thread,
 					      const enum packet_thread_type
 					      type);
 struct packet_thread *dabbad_thread_data_get(const pthread_t thread_id);
-int thread_sched_prio_set(struct packet_thread *pkt_thread,
+int dabbad_thread_sched_prio_set(struct packet_thread *pkt_thread,
 			  const int16_t sched_prio);
-int thread_sched_prio_get(struct packet_thread *pkt_thread,
+int dabbad_thread_sched_prio_get(struct packet_thread *pkt_thread,
 			  int16_t * sched_prio);
-int thread_sched_policy_set(struct packet_thread *pkt_thread,
+int dabbad_thread_sched_policy_set(struct packet_thread *pkt_thread,
 			    const int16_t sched_policy);
-int thread_sched_policy_get(struct packet_thread *pkt_thread,
+int dabbad_thread_sched_policy_get(struct packet_thread *pkt_thread,
 			    int16_t * sched_policy);
-int thread_sched_affinity_set(struct packet_thread *pkt_thread, cpu_set_t *run_on);
-int thread_sched_affinity_get(struct packet_thread *pkt_thread, cpu_set_t *run_on);
-int thread_detached_state_set(struct packet_thread *pkt_thread);
+int dabbad_thread_sched_affinity_set(struct packet_thread *pkt_thread, cpu_set_t *run_on);
+int dabbad_thread_sched_affinity_get(struct packet_thread *pkt_thread, cpu_set_t *run_on);
+int dabbad_thread_detached_state_set(struct packet_thread *pkt_thread);
 int dabbad_thread_start(struct packet_thread *pkt_thread,
 			void *(*func) (void *arg), void *arg);
 int dabbad_thread_stop(struct packet_thread *pkt_thread);

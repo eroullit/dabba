@@ -137,12 +137,12 @@ int dabbad_capture_start(struct dabba_ipc_msg *msg)
 		return rc;
 	}
 
-	thread_sched_policy_set(&pkt_capture->thread,
+	dabbad_thread_sched_policy_set(&pkt_capture->thread,
 				capture_msg->thread.sched_policy);
-	thread_sched_prio_set(&pkt_capture->thread,
+	dabbad_thread_sched_prio_set(&pkt_capture->thread,
 			      capture_msg->thread.sched_prio);
-        thread_sched_affinity_set(&pkt_capture->thread, &capture_msg->thread.cpu);
-        thread_detached_state_set(&pkt_capture->thread);
+        dabbad_thread_sched_affinity_set(&pkt_capture->thread, &capture_msg->thread.cpu);
+        dabbad_thread_detached_state_set(&pkt_capture->thread);
 
         rc = dabbad_thread_start(&pkt_capture->thread, packet_rx, pkt_capture);
 
@@ -187,9 +187,9 @@ int dabbad_capture_list(struct dabba_ipc_msg *msg)
 		layout = &pkt_capture->rx.pkt_mmap.layout;
 
 		capture_msg[a].thread.id = pkt_capture->thread.id;
-		thread_sched_policy_get(&pkt_capture->thread,
+		dabbad_thread_sched_policy_get(&pkt_capture->thread,
 					&capture_msg[a].thread.sched_policy);
-		thread_sched_prio_get(&pkt_capture->thread,
+		dabbad_thread_sched_prio_get(&pkt_capture->thread,
 				      &capture_msg[a].thread.sched_prio);
 		capture_msg[a].thread.id = pkt_capture->thread.id;
 		capture_msg[a].frame_size = layout->tp_frame_size;
