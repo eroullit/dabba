@@ -35,9 +35,9 @@
 #include <sched.h>
 #include <sys/resource.h>
 
-#include <libdabba/thread.h>
 #include <libdabba/macros.h>
 #include <dabbad/dabbad.h>
+#include <dabbad/thread.h>
 #include <dabba/dabba.h>
 #include <dabba/ipc.h>
 

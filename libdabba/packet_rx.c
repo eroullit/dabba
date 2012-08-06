@@ -49,25 +49,23 @@
 
 void *packet_rx(void *arg)
 {
-	struct packet_rx_thread *thread = arg;
-	struct packet_mmap *pkt_rx = &thread->pkt_rx;
+	struct packet_rx *pkt_rx = arg;
+	struct packet_mmap *pkt_mmap = &pkt_rx->pkt_mmap;
 	struct pollfd pfd;
 	size_t index = 0;
 
 	if (!arg)
-		goto out;
-
-	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+		return NULL;
 
 	memset(&pfd, 0, sizeof(pfd));
 
 	pfd.events = POLLIN | POLLRDNORM | POLLERR;
-	pfd.fd = pkt_rx->pf_sock;
+	pfd.fd = pkt_mmap->pf_sock;
 
 	for (;;) {
-		for (index = 0; index < pkt_rx->layout.tp_frame_nr; index++) {
+		for (index = 0; index < pkt_mmap->layout.tp_frame_nr; index++) {
 			struct packet_mmap_header *mmap_hdr =
-			    pkt_rx->vec[index].iov_base;
+			    pkt_mmap->vec[index].iov_base;
 
 			if ((mmap_hdr->tp_h.tp_status & TP_STATUS_KERNEL) ==
 			    TP_STATUS_KERNEL) {
@@ -77,14 +75,14 @@ void *packet_rx(void *arg)
 
 			if ((mmap_hdr->tp_h.tp_status & TP_STATUS_USER) ==
 			    TP_STATUS_USER) {
-				if (thread->pcap_fd > 0) {
-					pcap_write(thread->pcap_fd,
+				if (pkt_rx->pcap_fd > 0) {
+					pcap_write(pkt_rx->pcap_fd,
 						   (uint8_t *) mmap_hdr +
 						   mmap_hdr->tp_h.tp_mac,
 						   mmap_hdr->tp_h.tp_len,
 						   min(mmap_hdr->tp_h.
 						       tp_snaplen,
-						       pkt_rx->layout.
+						       pkt_mmap->layout.
 						       tp_frame_size),
 						   mmap_hdr->tp_h.tp_sec,
 						   mmap_hdr->tp_h.tp_usec);
@@ -95,6 +93,5 @@ void *packet_rx(void *arg)
 		}
 	}
 
- out:
-	pthread_exit(NULL);
+        return NULL;
 }

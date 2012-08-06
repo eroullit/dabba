@@ -42,7 +42,7 @@
 #include <libdabba/packet_rx.h>
 #include <libdabba/pcap.h>
 #include <dabbad/dabbad.h>
-#include <dabbad/thread.h>
+#include <dabbad/capture.h>
 #include <dabbad/misc.h>
 
 /**
@@ -89,10 +89,10 @@ static int capture_msg_is_valid(struct dabba_ipc_msg *msg)
 	return 1;
 }
 
-static struct packet_rx_thread *dabbad_capture_thread_get(struct packet_thread
+static struct packet_capture_thread *dabbad_capture_thread_get(struct packet_thread
 							  *pkt_thread)
 {
-	return container_of(pkt_thread, struct packet_rx_thread, thread);
+	return container_of(pkt_thread, struct packet_capture_thread, thread);
 }
 
 /**
@@ -104,7 +104,7 @@ static struct packet_rx_thread *dabbad_capture_thread_get(struct packet_thread
 
 int dabbad_capture_start(struct dabba_ipc_msg *msg)
 {
-	struct packet_rx_thread *pkt_capture;
+	struct packet_capture_thread *pkt_capture;
 	struct dabba_capture *capture_msg = msg->msg_body.msg.capture;
 	int rc, sock;
 
@@ -124,10 +124,10 @@ int dabbad_capture_start(struct dabba_ipc_msg *msg)
 		return ENOMEM;
 	}
 
-	pkt_capture->pcap_fd =
+	pkt_capture->rx.pcap_fd =
 	    pcap_create(msg->msg_body.msg.capture->pcap_name, LINKTYPE_EN10MB);
 
-	rc = packet_mmap_create(&pkt_capture->pkt_rx, capture_msg->dev_name,
+	rc = packet_mmap_create(&pkt_capture->rx.pkt_mmap, capture_msg->dev_name,
 				sock, PACKET_MMAP_RX, capture_msg->frame_size,
 				capture_msg->frame_nr);
 
@@ -146,7 +146,7 @@ int dabbad_capture_start(struct dabba_ipc_msg *msg)
         thread_sched_affinity_set(&pkt_capture->thread, &capture_msg->thread.cpu);
 
 	if (rc) {
-		packet_mmap_destroy(&pkt_capture->pkt_rx);
+		packet_mmap_destroy(&pkt_capture->rx.pkt_mmap);
 		free(pkt_capture);
 		close(sock);
 	}
@@ -162,7 +162,7 @@ int dabbad_capture_start(struct dabba_ipc_msg *msg)
 
 int dabbad_capture_list(struct dabba_ipc_msg *msg)
 {
-	struct packet_rx_thread *pkt_capture;
+	struct packet_capture_thread *pkt_capture;
 	struct dabba_capture *capture_msg;
 	struct packet_thread *pkt_thread;
 	struct tpacket_req *layout;
@@ -183,7 +183,7 @@ int dabbad_capture_list(struct dabba_ipc_msg *msg)
 
 		pkt_capture = dabbad_capture_thread_get(pkt_thread);
 
-		layout = &pkt_capture->pkt_rx.layout;
+		layout = &pkt_capture->rx.pkt_mmap.layout;
 
 		capture_msg[a].thread.id = pkt_capture->thread.id;
 		thread_sched_policy_get(&pkt_capture->thread,
@@ -195,9 +195,9 @@ int dabbad_capture_list(struct dabba_ipc_msg *msg)
 		capture_msg[a].frame_nr = layout->tp_frame_nr;
 
 		/* TODO error handling */
-		fd_to_path(pkt_capture->pcap_fd, capture_msg[a].pcap_name,
+		fd_to_path(pkt_capture->rx.pcap_fd, capture_msg[a].pcap_name,
 			   sizeof(capture_msg[a].pcap_name));
-		ifindex_to_devname(pkt_capture->pkt_rx.ifindex,
+		ifindex_to_devname(pkt_capture->rx.pkt_mmap.ifindex,
 				   capture_msg[a].dev_name,
 				   sizeof(capture_msg[a].dev_name));
 
@@ -217,7 +217,7 @@ int dabbad_capture_list(struct dabba_ipc_msg *msg)
 
 int dabbad_capture_stop(struct dabba_ipc_msg *msg)
 {
-	struct packet_rx_thread *pkt_capture;
+	struct packet_capture_thread *pkt_capture;
 	struct packet_thread *pkt_thread;
 	struct dabba_capture *capture_msg = msg->msg_body.msg.capture;
 	int rc = 0;
@@ -231,8 +231,8 @@ int dabbad_capture_stop(struct dabba_ipc_msg *msg)
 
 	if (!rc) {
 		pkt_capture = dabbad_capture_thread_get(pkt_thread);
-		close(pkt_capture->pcap_fd);
-		packet_mmap_destroy(&pkt_capture->pkt_rx);
+		close(pkt_capture->rx.pcap_fd);
+		packet_mmap_destroy(&pkt_capture->rx.pkt_mmap);
 		free(pkt_capture);
 	}
 

@@ -30,18 +30,14 @@
 #ifndef PACKET_RX_H
 #define	PACKET_RX_H
 
-#include <pthread.h>
-
 #include <libdabba/packet_mmap.h>
-#include <libdabba/thread.h>
 
 /**
  * \brief Packet capture structure
  */
 
-struct packet_rx_thread {
-	struct packet_mmap pkt_rx; /**< capture packet mmap structure */
-	struct packet_thread thread; /**< thread information */
+struct packet_rx {
+	struct packet_mmap pkt_mmap; /**< capture packet mmap structure */
 	int pcap_fd; /**< pcap file descriptor */
 };
 
