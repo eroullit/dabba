@@ -137,13 +137,13 @@ int dabbad_capture_start(struct dabba_ipc_msg *msg)
 		return rc;
 	}
 
-	rc = dabbad_thread_start(&pkt_capture->thread, packet_rx, pkt_capture);
-
 	thread_sched_policy_set(&pkt_capture->thread,
 				capture_msg->thread.sched_policy);
 	thread_sched_prio_set(&pkt_capture->thread,
 			      capture_msg->thread.sched_prio);
         thread_sched_affinity_set(&pkt_capture->thread, &capture_msg->thread.cpu);
+
+        rc = dabbad_thread_start(&pkt_capture->thread, packet_rx, pkt_capture);
 
 	if (rc) {
 		packet_mmap_destroy(&pkt_capture->rx.pkt_mmap);
