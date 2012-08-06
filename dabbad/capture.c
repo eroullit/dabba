@@ -143,6 +143,7 @@ int dabbad_capture_start(struct dabba_ipc_msg *msg)
 				capture_msg->thread.sched_policy);
 	thread_sched_prio_set(&pkt_capture->thread,
 			      capture_msg->thread.sched_prio);
+        thread_sched_affinity_set(&pkt_capture->thread, &capture_msg->thread.cpu);
 
 	if (rc) {
 		packet_mmap_destroy(&pkt_capture->pkt_rx);

@@ -161,6 +161,7 @@ enum capture_start_option {
 	OPT_CAPTURE_PCAP,
 	OPT_CAPTURE_SCHED_PRIORITY,
 	OPT_CAPTURE_SCHED_POLICY,
+	OPT_CAPTURE_SCHED_CPU_AFFINITY,
 	OPT_CAPTURE_FRAME_NUMBER
 };
 
@@ -177,6 +178,7 @@ static struct option *capture_start_options_get(void)
 		 OPT_CAPTURE_SCHED_PRIORITY},
 		{"sched-policy", required_argument, NULL,
 		 OPT_CAPTURE_SCHED_POLICY},
+                 {"cpu-affinity", required_argument, NULL, OPT_CAPTURE_SCHED_CPU_AFFINITY},
 		{"frame-number", required_argument, NULL,
 		 OPT_CAPTURE_FRAME_NUMBER},
 		{NULL, 0, NULL, 0},
@@ -229,6 +231,9 @@ static int prepare_capture_start_query(int argc, char **argv,
 		case OPT_CAPTURE_SCHED_PRIORITY:
 			capture_start_msg->thread.sched_prio =
 			    strtoll(optarg, NULL, 10);
+			break;
+                case OPT_CAPTURE_SCHED_CPU_AFFINITY:
+			str_to_cpu_affinity(optarg, &capture_start_msg->thread.cpu);
 			break;
 		case OPT_CAPTURE_SCHED_POLICY:
 			capture_start_msg->thread.sched_policy =

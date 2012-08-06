@@ -57,7 +57,7 @@ int thread_sched_policy_set(struct packet_thread *pkt_thread,
 			    const int16_t sched_policy);
 int thread_sched_policy_get(struct packet_thread *pkt_thread,
 			    int16_t * sched_policy);
-int thread_sched_affinity_set(struct packet_thread *pkt_thread, const cpu_set_t * const run_on);
-int thread_sched_affinity_get(struct packet_thread *pkt_thread, cpu_set_t * run_on);
+int thread_sched_affinity_set(struct packet_thread *pkt_thread, cpu_set_t *run_on);
+int thread_sched_affinity_get(struct packet_thread *pkt_thread, cpu_set_t *run_on);
 
 #endif				/* THREAD_H */

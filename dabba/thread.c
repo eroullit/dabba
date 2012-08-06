@@ -103,6 +103,63 @@ int sched_prio_default_get(void)
 {
 	return 0;
 }
+static char *nexttoken(char *q,  int sep)
+{
+	if (q)
+		q = strchr(q, sep);
+	if (q)
+		q++;
+	return q;
+}
+
+int str_to_cpu_affinity(char *str, cpu_set_t *mask)
+{
+	char *p, *q;
+
+        assert(str);
+        assert(mask);
+        
+	q = str;
+
+	CPU_ZERO(mask);
+
+	while (p = q, q = nexttoken(q, ','), p) {
+		unsigned int a;	 /* Beginning of range */
+		unsigned int b;	 /* End of range */
+		unsigned int s;	 /* Stride */
+		char *c1, *c2;
+
+		if (sscanf(p, "%u", &a) < 1)
+			return -EINVAL;
+
+		b = a;
+		s = 1;
+
+		c1 = nexttoken(p, '-');
+		c2 = nexttoken(p, ',');
+
+		if (c1 != NULL && (c2 == NULL || c1 < c2)) {
+			if (sscanf(c1, "%u", &b) < 1)
+				return -EINVAL;
+
+			c1 = nexttoken(c1, ':');
+
+			if (c1 != NULL && (c2 == NULL || c1 < c2))
+				if (sscanf(c1, "%u", &s) < 1)
+					return -EINVAL;
+		}
+
+		if (!(a <= b))
+			return -EINVAL;
+
+		while (a <= b) {
+			CPU_SET(a, mask);
+			a += s;
+		}
+	}
+        
+        return 0;
+}
 
 static void display_thread_cpu_affinity(const cpu_set_t * const cpu)
 {
