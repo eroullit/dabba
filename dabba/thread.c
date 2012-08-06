@@ -104,6 +104,34 @@ int sched_prio_default_get(void)
 	return 0;
 }
 
+static void display_thread_cpu_affinity(const cpu_set_t * const cpu)
+{
+      
+    	size_t i, j, run = 0;
+        
+        assert(cpu);
+        
+	for (i = 0; i < CPU_SETSIZE; i++)
+		if (CPU_ISSET(i, cpu)) {
+			for (j = i + 1; j < CPU_SETSIZE; j++) {
+				if (CPU_ISSET(j, cpu))
+					run++;
+				else
+					break;
+			}
+                        
+			if (!run)
+				printf("%zu,", i);
+			else if (run == 1) {
+				printf("%zu,%zu,", i, i + 1);
+				i++;
+			} else {
+				printf("%zu-%zu,", i, i + run);
+				i += run;
+			}
+		}
+}
+
 static void display_thread_list_header(void)
 {
 	printf("---\n");
@@ -126,6 +154,9 @@ static void display_thread_list(struct dabba_ipc_msg *const msg)
 		       sched_policy_key_get(thread_msg->sched_policy));
 		printf("      scheduling priority: %i\n",
 		       thread_msg->sched_prio);
+                printf("      cpu affinity: ");
+                display_thread_cpu_affinity(&thread_msg->cpu);
+                printf("\n");
 	}
 }
 
