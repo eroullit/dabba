@@ -202,6 +202,7 @@ static int prepare_capture_start_query(int argc, char **argv,
 	capture_start_msg->frame_size = PACKET_MMAP_ETH_FRAME_LEN;
 	capture_start_msg->thread.sched_prio = sched_prio_default_get();
 	capture_start_msg->thread.sched_policy = sched_policy_default_get();
+	sched_cpu_affinty_default_get(&capture_start_msg->thread.cpu);
 
 	while ((ret =
 		getopt_long_only(argc, argv, "", capture_start_options_get(),

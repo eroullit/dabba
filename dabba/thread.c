@@ -103,6 +103,15 @@ int sched_prio_default_get(void)
 {
 	return 0;
 }
+
+void sched_cpu_affinty_default_get(cpu_set_t *mask)
+{
+    size_t a;
+    
+    for(a = 0; a < CPU_SETSIZE; a++)
+        CPU_SET(a, mask);
+}
+
 static char *nexttoken(char *q,  int sep)
 {
 	if (q)
