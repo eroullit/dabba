@@ -84,7 +84,7 @@ struct packet_thread *dabbad_thread_data_get(const pthread_t thread_id)
 	struct packet_thread *node;
 
 	TAILQ_FOREACH(node, &packet_thread_head, entry)
-	    if (thread_id == node->id)
+	    if (pthread_equal(thread_id, node->id))
 		break;
 
 	return node;
@@ -176,7 +176,7 @@ int dabbad_thread_stop(struct packet_thread *pkt_thread)
 	assert(pkt_thread);
 
 	TAILQ_FOREACH(node, &packet_thread_head, entry)
-	    if (pkt_thread->id == node->id)
+	    if (pthread_equal(pkt_thread->id, node->id))
 		break;
 
 	if (!node)
