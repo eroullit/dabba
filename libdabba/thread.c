@@ -77,3 +77,19 @@ int thread_sched_policy_get(struct packet_thread *pkt_thread,
 	return pthread_attr_getschedpolicy(&pkt_thread->attributes,
 					   (int *)sched_policy);
 }
+
+int thread_sched_affinity_set(struct packet_thread *pkt_thread, const cpu_set_t * const run_on)
+{
+	assert(pkt_thread);
+	assert(run_on);
+
+	return pthread_attr_setaffinity_np(&pkt_thread->attributes, sizeof(*run_on), run_on);
+}
+
+int thread_sched_affinity_get(struct packet_thread *pkt_thread, cpu_set_t * run_on)
+{
+	assert(pkt_thread);
+	assert(run_on);
+        
+	return pthread_attr_getaffinity_np(&pkt_thread->attributes, sizeof(*run_on), run_on);
+}
