@@ -269,6 +269,10 @@ static int prepare_thread_modify_query(int argc, char **argv,
 	msg->mtype = 1;
 	msg->msg_body.type = DABBA_THREAD_MODIFY;
 
+	thread_msg->sched_prio = sched_prio_default_get();
+	thread_msg->sched_policy = sched_policy_default_get();
+	sched_cpu_affinty_default_get(&thread_msg->cpu);
+
 	while ((ret =
 		getopt_long_only(argc, argv, "", thread_modify_options_get(),
 				 NULL)) != EOF) {
