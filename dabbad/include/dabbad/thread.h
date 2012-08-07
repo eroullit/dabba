@@ -67,5 +67,6 @@ int dabbad_thread_start(struct packet_thread *pkt_thread,
 			void *(*func) (void *arg), void *arg);
 int dabbad_thread_stop(struct packet_thread *pkt_thread);
 int dabbad_thread_list(struct dabba_ipc_msg *msg);
+int dabbad_thread_modify(struct dabba_ipc_msg *msg);
 
 #endif				/* DABBAD_THREAD_H */

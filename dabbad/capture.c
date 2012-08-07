@@ -189,8 +189,8 @@ int dabbad_capture_list(struct dabba_ipc_msg *msg)
 
 		capture_msg[a].thread.id = pkt_capture->thread.id;
 		dabbad_thread_sched_policy_get(&pkt_capture->thread,
-					       &capture_msg[a].
-					       thread.sched_policy);
+					       &capture_msg[a].thread.
+					       sched_policy);
 		dabbad_thread_sched_prio_get(&pkt_capture->thread,
 					     &capture_msg[a].thread.sched_prio);
 		capture_msg[a].thread.id = pkt_capture->thread.id;

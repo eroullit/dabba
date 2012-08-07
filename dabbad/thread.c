@@ -243,3 +243,33 @@ int dabbad_thread_list(struct dabba_ipc_msg *msg)
 
 	return 0;
 }
+
+int dabbad_thread_modify(struct dabba_ipc_msg *msg)
+{
+	struct packet_thread *pkt_thread;
+	struct dabba_thread *thread_msg = msg->msg_body.msg.thread;
+	int rc = 0;
+
+	pkt_thread = dabbad_thread_data_get(thread_msg->id);
+
+	if (!pkt_thread)
+		return EINVAL;
+
+	rc = dabbad_thread_sched_policy_set(pkt_thread,
+					    thread_msg->sched_policy);
+
+	if (rc)
+		return rc;
+
+	rc = dabbad_thread_sched_prio_set(pkt_thread, thread_msg->sched_prio);
+
+	if (rc)
+		return rc;
+
+	rc = dabbad_thread_sched_affinity_set(pkt_thread, &thread_msg->cpu);
+
+	if (rc)
+		return rc;
+
+	return 0;
+}

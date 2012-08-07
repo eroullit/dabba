@@ -29,10 +29,12 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <errno.h>
 #include <inttypes.h>
 #include <assert.h>
 #include <sched.h>
+#include <getopt.h>
 #include <sys/resource.h>
 
 #include <libdabba/macros.h>
@@ -40,6 +42,14 @@
 #include <dabbad/thread.h>
 #include <dabba/dabba.h>
 #include <dabba/ipc.h>
+#include <dabba/help.h>
+
+enum thread_modify_option {
+	OPT_THREAD_ID,
+	OPT_THREAD_SCHED_PRIO,
+	OPT_THREAD_SCHED_POLICY,
+	OPT_THREAD_CPU_AFFINITY
+};
 
 static struct sched_policy_name_mapping {
 	const char key[8];
@@ -233,6 +243,59 @@ static void prepare_thread_list_query(struct dabba_ipc_msg *msg)
 	msg->msg_body.type = DABBA_THREAD_LIST;
 }
 
+static struct option *thread_modify_options_get(void)
+{
+	static struct option thread_modify_option[] = {
+		{"id", required_argument, NULL, OPT_THREAD_ID},
+		{"sched-prio", required_argument, NULL, OPT_THREAD_SCHED_PRIO},
+		{"sched-policy", required_argument, NULL,
+		 OPT_THREAD_SCHED_POLICY},
+		{"cpu-affinity", required_argument, NULL,
+		 OPT_THREAD_CPU_AFFINITY},
+		{NULL, 0, NULL, 0},
+	};
+
+	return thread_modify_option;
+}
+
+static int prepare_thread_modify_query(int argc, char **argv,
+				       struct dabba_ipc_msg *msg)
+{
+	struct dabba_thread *thread_msg = msg->msg_body.msg.thread;
+	int ret, rc = 0;
+
+	assert(msg);
+
+	msg->mtype = 1;
+	msg->msg_body.type = DABBA_THREAD_MODIFY;
+
+	while ((ret =
+		getopt_long_only(argc, argv, "", thread_modify_options_get(),
+				 NULL)) != EOF) {
+		switch (ret) {
+		case OPT_THREAD_ID:
+			thread_msg->id = strtoull(optarg, NULL, 10);
+			break;
+		case OPT_THREAD_SCHED_PRIO:
+			thread_msg->sched_prio = strtol(optarg, NULL, 10);
+			break;
+		case OPT_THREAD_SCHED_POLICY:
+			thread_msg->sched_policy =
+			    sched_policy_value_get(optarg);
+			break;
+		case OPT_THREAD_CPU_AFFINITY:
+			str_to_cpu_affinity(optarg, &thread_msg->cpu);
+			break;
+		default:
+			show_usage(thread_modify_options_get());
+			rc = -1;
+			break;
+		}
+	}
+
+	return rc;
+}
+
 static void display_thread_list_msg(struct dabba_ipc_msg *const msg)
 {
 	assert(msg);
@@ -284,6 +347,27 @@ int cmd_thread_list(int argc, const char **argv)
 	return rc;
 }
 
+int cmd_thread_modify(int argc, const char **argv)
+{
+	int rc;
+	struct dabba_ipc_msg msg;
+
+	assert(argc >= 0);
+	assert(argv);
+
+	memset(&msg, 0, sizeof(msg));
+
+	rc = prepare_thread_modify_query(argc, (char **)argv, &msg);
+
+	if (rc)
+		return rc;
+
+	/* For now, just one thread request at a time */
+	msg.msg_body.elem_nr = 1;
+
+	return dabba_ipc_msg(&msg);
+}
+
 /**
  * \brief Parse which thread sub-command.
  * \param[in]           argc	        Argument counter
@@ -300,6 +384,7 @@ int cmd_thread(int argc, const char **argv)
 	const char *cmd = argv[0];
 	size_t i;
 	static struct cmd_struct thread_commands[] = {
+		{"modify", cmd_thread_modify},
 		{"list", cmd_thread_list}
 	};
 
