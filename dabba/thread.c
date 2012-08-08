@@ -214,33 +214,25 @@ static void display_thread_list_header(void)
 	printf("  threads:\n");
 }
 
-static void display_thread_list(struct dabba_ipc_msg *const msg)
+static void display_thread_list(const struct dabba_thread *const ifconf_msg,
+				const size_t elem_nr)
 {
-	struct dabba_thread *thread_msg;
 	size_t a;
 
-	assert(msg);
-	assert(msg->msg_body.elem_nr <= ARRAY_SIZE(msg->msg_body.msg.thread));
+	assert(ifconf_msg);
+	assert(elem_nr <= DABBA_THREAD_MAX_SIZE);
 
-	for (a = 0; a < msg->msg_body.elem_nr; a++) {
-		thread_msg = &msg->msg_body.msg.thread[a];
-		printf("    - id: %" PRIu64 "\n", (uint64_t) thread_msg->id);
-		printf("      type: %s\n", thread_key_get(thread_msg->type));
+	for (a = 0; a < elem_nr; a++) {
+		printf("    - id: %" PRIu64 "\n", (uint64_t) ifconf_msg[a].id);
+		printf("      type: %s\n", thread_key_get(ifconf_msg[a].type));
 		printf("      scheduling policy: %s\n",
-		       sched_policy_key_get(thread_msg->sched_policy));
+		       sched_policy_key_get(ifconf_msg[a].sched_policy));
 		printf("      scheduling priority: %i\n",
-		       thread_msg->sched_prio);
+		       ifconf_msg[a].sched_prio);
 		printf("      cpu affinity: ");
-		display_thread_cpu_affinity(&thread_msg->cpu);
+		display_thread_cpu_affinity(&ifconf_msg[a].cpu);
 		printf("\n");
 	}
-}
-
-static void prepare_thread_list_query(struct dabba_ipc_msg *msg)
-{
-	assert(msg);
-	msg->mtype = 1;
-	msg->msg_body.type = DABBA_THREAD_LIST;
 }
 
 static struct option *thread_modify_options_get(void)
@@ -259,15 +251,11 @@ static struct option *thread_modify_options_get(void)
 }
 
 static int prepare_thread_modify_query(int argc, char **argv,
-				       struct dabba_ipc_msg *msg)
+				       struct dabba_thread *thread_msg)
 {
-	struct dabba_thread *thread_msg = msg->msg_body.msg.thread;
 	int ret, rc = 0;
 
-	assert(msg);
-
-	msg->mtype = 1;
-	msg->msg_body.type = DABBA_THREAD_MODIFY;
+	assert(thread_msg);
 
 	thread_msg->sched_prio = sched_prio_default_get();
 	thread_msg->sched_policy = sched_policy_default_get();
@@ -303,19 +291,6 @@ static int prepare_thread_modify_query(int argc, char **argv,
 	return rc;
 }
 
-static void display_thread_list_msg(struct dabba_ipc_msg *const msg)
-{
-	assert(msg);
-
-	switch (msg->msg_body.type) {
-	case DABBA_THREAD_LIST:
-		display_thread_list(msg);
-		break;
-	default:
-		break;
-	}
-}
-
 /**
  * \brief Request the current supported interface list
  * \param[in]           argc	        Argument counter
@@ -336,7 +311,10 @@ int cmd_thread_list(int argc, const char **argv)
 	assert(argv);
 
 	memset(&msg, 0, sizeof(msg));
-	prepare_thread_list_query(&msg);
+
+	msg.mtype = 1;
+	msg.msg_body.type = DABBA_THREAD_LIST;
+
 	display_thread_list_header();
 
 	do {
@@ -348,7 +326,8 @@ int cmd_thread_list(int argc, const char **argv)
 		if (rc)
 			break;
 
-		display_thread_list_msg(&msg);
+		display_thread_list(msg.msg_body.msg.thread,
+				    msg.msg_body.elem_nr);
 	} while (msg.msg_body.elem_nr);
 
 	return rc;
@@ -364,7 +343,11 @@ int cmd_thread_modify(int argc, const char **argv)
 
 	memset(&msg, 0, sizeof(msg));
 
-	rc = prepare_thread_modify_query(argc, (char **)argv, &msg);
+	msg.mtype = 1;
+	msg.msg_body.type = DABBA_THREAD_MODIFY;
+
+	rc = prepare_thread_modify_query(argc, (char **)argv,
+					 msg.msg_body.msg.thread);
 
 	if (rc)
 		return rc;

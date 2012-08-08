@@ -108,49 +108,16 @@ static void display_interface_list_header(void)
 	printf("  interfaces:\n");
 }
 
-static void display_interface_list(const struct dabba_ipc_msg *const msg)
+static void display_interface_list(const struct dabba_ifconf *const
+				   interface_msg, const size_t elem_nr)
 {
 	size_t a;
 
-	assert(msg);
-	assert(msg->msg_body.elem_nr <= ARRAY_SIZE(msg->msg_body.msg.ifconf));
+	assert(interface_msg);
+	assert(elem_nr <= DABBA_IFCONF_MAX_SIZE);
 
-	for (a = 0; a < msg->msg_body.elem_nr; a++)
-		printf("    - %s\n", msg->msg_body.msg.ifconf[a].name);
-}
-
-static void prepare_interface_list_query(struct dabba_ipc_msg *msg)
-{
-	assert(msg);
-	msg->mtype = 1;
-	msg->msg_body.type = DABBA_IFCONF;
-}
-
-static void display_interface_list_msg_header(const struct dabba_ipc_msg *const
-					      msg)
-{
-	assert(msg);
-
-	switch (msg->msg_body.type) {
-	case DABBA_IFCONF:
-		display_interface_list_header();
-		break;
-	default:
-		break;
-	}
-}
-
-static void display_interface_list_msg(const struct dabba_ipc_msg *const msg)
-{
-	assert(msg);
-
-	switch (msg->msg_body.type) {
-	case DABBA_IFCONF:
-		display_interface_list(msg);
-		break;
-	default:
-		break;
-	}
+	for (a = 0; a < elem_nr; a++)
+		printf("    - %s\n", interface_msg[a].name);
 }
 
 /**
@@ -173,8 +140,11 @@ int cmd_interface_list(int argc, const char **argv)
 	assert(argv);
 
 	memset(&msg, 0, sizeof(msg));
-	prepare_interface_list_query(&msg);
-	display_interface_list_msg_header(&msg);
+
+	msg.mtype = 1;
+	msg.msg_body.type = DABBA_IFCONF;
+
+	display_interface_list_header();
 
 	do {
 		msg.msg_body.offset += msg.msg_body.elem_nr;
@@ -185,7 +155,8 @@ int cmd_interface_list(int argc, const char **argv)
 		if (rc)
 			break;
 
-		display_interface_list_msg(&msg);
+		display_interface_list(msg.msg_body.msg.ifconf,
+				       msg.msg_body.elem_nr);
 	} while (msg.msg_body.elem_nr);
 
 	return rc;
