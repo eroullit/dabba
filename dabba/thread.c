@@ -282,13 +282,16 @@ static int prepare_thread_modify_query(int argc, char **argv,
 			break;
 		case OPT_THREAD_SCHED_PRIO:
 			thread_msg->sched_prio = strtol(optarg, NULL, 10);
+			thread_msg->usage_flags |= USE_SCHED_PRIO;
 			break;
 		case OPT_THREAD_SCHED_POLICY:
 			thread_msg->sched_policy =
 			    sched_policy_value_get(optarg);
+			thread_msg->usage_flags |= USE_SCHED_POLICY;
 			break;
 		case OPT_THREAD_CPU_AFFINITY:
 			str_to_cpu_affinity(optarg, &thread_msg->cpu);
+			thread_msg->usage_flags |= USE_CPU_MASK;
 			break;
 		default:
 			show_usage(thread_modify_options_get());

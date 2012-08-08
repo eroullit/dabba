@@ -67,11 +67,18 @@ struct dabba_ifconf {
 	char name[IFNAMSIZ];
 };
 
+enum dabba_thread_flags {
+	USE_CPU_MASK = 1 << 0,
+	USE_SCHED_PRIO = 1 << 1,
+	USE_SCHED_POLICY = 1 << 2
+};
+
 /**
  * \brief Dabbad thread message buffer
  */
 
 struct dabba_thread {
+	uint8_t usage_flags;
 	cpu_set_t cpu;
 	pthread_t id; /**< thread id */
 	int16_t type; /**< thread type */

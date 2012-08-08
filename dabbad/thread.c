@@ -255,21 +255,29 @@ int dabbad_thread_modify(struct dabba_ipc_msg *msg)
 	if (!pkt_thread)
 		return EINVAL;
 
-	rc = dabbad_thread_sched_policy_set(pkt_thread,
-					    thread_msg->sched_policy);
+	if ((thread_msg->usage_flags & USE_SCHED_POLICY) == USE_SCHED_POLICY) {
+		rc = dabbad_thread_sched_policy_set(pkt_thread,
+						    thread_msg->sched_policy);
 
-	if (rc)
-		return rc;
+		if (rc)
+			return rc;
+	}
 
-	rc = dabbad_thread_sched_prio_set(pkt_thread, thread_msg->sched_prio);
+	if ((thread_msg->usage_flags & USE_SCHED_PRIO) == USE_SCHED_PRIO) {
+		rc = dabbad_thread_sched_prio_set(pkt_thread,
+						  thread_msg->sched_prio);
 
-	if (rc)
-		return rc;
+		if (rc)
+			return rc;
+	}
 
-	rc = dabbad_thread_sched_affinity_set(pkt_thread, &thread_msg->cpu);
+	if ((thread_msg->usage_flags & USE_CPU_MASK) == USE_CPU_MASK) {
+		rc = dabbad_thread_sched_affinity_set(pkt_thread,
+						      &thread_msg->cpu);
 
-	if (rc)
-		return rc;
+		if (rc)
+			return rc;
+	}
 
 	return 0;
 }
