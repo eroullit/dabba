@@ -137,12 +137,6 @@ int dabbad_capture_start(struct dabba_ipc_msg *msg)
 		return rc;
 	}
 
-	dabbad_thread_sched_policy_set(&pkt_capture->thread,
-				       capture_msg->thread.sched_policy);
-	dabbad_thread_sched_prio_set(&pkt_capture->thread,
-				     capture_msg->thread.sched_prio);
-	dabbad_thread_sched_affinity_set(&pkt_capture->thread,
-					 &capture_msg->thread.cpu);
 	dabbad_thread_detached_state_set(&pkt_capture->thread);
 
 	rc = dabbad_thread_start(&pkt_capture->thread, packet_rx, pkt_capture);
@@ -189,8 +183,8 @@ int dabbad_capture_list(struct dabba_ipc_msg *msg)
 
 		capture_msg[a].thread.id = pkt_capture->thread.id;
 		dabbad_thread_sched_policy_get(&pkt_capture->thread,
-					       &capture_msg[a].thread.
-					       sched_policy);
+					       &capture_msg[a].
+					       thread.sched_policy);
 		dabbad_thread_sched_prio_get(&pkt_capture->thread,
 					     &capture_msg[a].thread.sched_prio);
 		capture_msg[a].thread.id = pkt_capture->thread.id;
