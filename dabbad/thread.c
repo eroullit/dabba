@@ -171,6 +171,11 @@ int dabbad_thread_start(struct packet_thread *pkt_thread,
 	assert(pkt_thread);
 	assert(func);
 
+	rc = pthread_attr_init(&pkt_thread->attributes);
+
+	if (rc)
+		return rc;
+
 	rc = pthread_create(&pkt_thread->id, &pkt_thread->attributes, func,
 			    arg);
 
@@ -196,8 +201,10 @@ int dabbad_thread_stop(struct packet_thread *pkt_thread)
 
 	rc = pthread_cancel(node->id);
 
-	if (!rc)
+	if (!rc) {
 		TAILQ_REMOVE(&packet_thread_head, node, entry);
+		pthread_attr_destroy(&node->attributes);
+	}
 
 	return rc;
 }
