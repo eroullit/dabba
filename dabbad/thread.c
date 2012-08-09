@@ -174,7 +174,12 @@ int dabbad_thread_start(struct packet_thread *pkt_thread,
 	rc = pthread_attr_init(&pkt_thread->attributes);
 
 	if (rc)
-		return rc;
+		goto out;
+
+	rc = dabbad_thread_detached_state_set(pkt_thread);
+
+	if (rc)
+		goto out;
 
 	rc = pthread_create(&pkt_thread->id, &pkt_thread->attributes, func,
 			    arg);
@@ -182,6 +187,7 @@ int dabbad_thread_start(struct packet_thread *pkt_thread,
 	if (!rc)
 		TAILQ_INSERT_TAIL(&packet_thread_head, pkt_thread, entry);
 
+ out:
 	return rc;
 }
 
