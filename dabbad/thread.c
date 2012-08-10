@@ -90,49 +90,34 @@ struct packet_thread *dabbad_thread_data_get(const pthread_t thread_id)
 	return node;
 }
 
-int dabbad_thread_sched_prio_set(struct packet_thread *pkt_thread,
-				 const int16_t sched_prio)
+int dabbad_thread_sched_param_set(struct packet_thread *pkt_thread,
+				  const int16_t sched_prio,
+				  const int16_t sched_policy)
 {
-	struct sched_param sp = {.sched_priority = sched_prio };
+	struct sched_param sp = { 0 };
 
 	assert(pkt_thread);
 
-	return pthread_attr_setschedparam(&pkt_thread->attributes, &sp);
+	sp.sched_priority = sched_prio;
+
+	return pthread_setschedparam(pkt_thread->id, sched_policy, &sp);
 }
 
-int dabbad_thread_sched_prio_get(struct packet_thread *pkt_thread,
-				 int16_t * sched_prio)
+int dabbad_thread_sched_param_get(struct packet_thread *pkt_thread,
+				  int16_t * sched_prio, int16_t * sched_policy)
 {
 	int rc;
 	struct sched_param sp = { 0 };
 
 	assert(pkt_thread);
 	assert(sched_prio);
+	assert(sched_policy);
 
-	rc = pthread_attr_getschedparam(&pkt_thread->attributes, &sp);
+	rc = pthread_getschedparam(pkt_thread->id, (int *)sched_policy, &sp);
 
 	*sched_prio = sp.sched_priority;
 
 	return rc;
-}
-
-int dabbad_thread_sched_policy_set(struct packet_thread *pkt_thread,
-				   const int16_t sched_policy)
-{
-	assert(pkt_thread);
-
-	return pthread_attr_setschedpolicy(&pkt_thread->attributes,
-					   sched_policy);
-}
-
-int dabbad_thread_sched_policy_get(struct packet_thread *pkt_thread,
-				   int16_t * sched_policy)
-{
-	assert(pkt_thread);
-	assert(sched_policy);
-
-	return pthread_attr_getschedpolicy(&pkt_thread->attributes,
-					   (int *)sched_policy);
 }
 
 int dabbad_thread_sched_affinity_set(struct packet_thread *pkt_thread,
@@ -141,8 +126,7 @@ int dabbad_thread_sched_affinity_set(struct packet_thread *pkt_thread,
 	assert(pkt_thread);
 	assert(run_on);
 
-	return pthread_attr_setaffinity_np(&pkt_thread->attributes,
-					   sizeof(*run_on), run_on);
+	return pthread_setaffinity_np(pkt_thread->id, sizeof(*run_on), run_on);
 }
 
 int dabbad_thread_sched_affinity_get(struct packet_thread *pkt_thread,
@@ -151,8 +135,7 @@ int dabbad_thread_sched_affinity_get(struct packet_thread *pkt_thread,
 	assert(pkt_thread);
 	assert(run_on);
 
-	return pthread_attr_getaffinity_np(&pkt_thread->attributes,
-					   sizeof(*run_on), run_on);
+	return pthread_getaffinity_np(pkt_thread->id, sizeof(*run_on), run_on);
 }
 
 int dabbad_thread_detached_state_set(struct packet_thread *pkt_thread)
@@ -242,10 +225,9 @@ int dabbad_thread_list(struct dabba_ipc_msg *msg)
 
 		thread_msg[a].id = pkt_thread->id;
 		thread_msg[a].type = pkt_thread->type;
-		dabbad_thread_sched_policy_get(pkt_thread,
-					       &thread_msg[a].sched_policy);
-		dabbad_thread_sched_prio_get(pkt_thread,
-					     &thread_msg[a].sched_prio);
+		dabbad_thread_sched_param_get(pkt_thread,
+					      &thread_msg[a].sched_prio,
+					      &thread_msg[a].sched_policy);
 		dabbad_thread_sched_affinity_get(pkt_thread,
 						 &thread_msg[a].cpu);
 
@@ -262,23 +244,30 @@ int dabbad_thread_modify(struct dabba_ipc_msg *msg)
 	struct packet_thread *pkt_thread;
 	struct dabba_thread *thread_msg = msg->msg_body.msg.thread;
 	int rc = 0;
+	int16_t cur_sched_prio, cur_sched_policy;
 
 	pkt_thread = dabbad_thread_data_get(thread_msg->id);
 
 	if (!pkt_thread)
 		return EINVAL;
 
-	if ((thread_msg->usage_flags & USE_SCHED_POLICY) == USE_SCHED_POLICY) {
-		rc = dabbad_thread_sched_policy_set(pkt_thread,
-						    thread_msg->sched_policy);
+	/* Get current scheduling parameters */
+	dabbad_thread_sched_param_get(pkt_thread, &cur_sched_prio,
+				      &cur_sched_policy);
 
-		if (rc)
-			return rc;
-	}
+	/* Update the new values the user gave use */
+	if ((thread_msg->usage_flags & USE_SCHED_PRIO) == USE_SCHED_PRIO)
+		cur_sched_prio = thread_msg->sched_prio;
 
-	if ((thread_msg->usage_flags & USE_SCHED_PRIO) == USE_SCHED_PRIO) {
-		rc = dabbad_thread_sched_prio_set(pkt_thread,
-						  thread_msg->sched_prio);
+	if ((thread_msg->usage_flags & USE_SCHED_POLICY) == USE_SCHED_POLICY)
+		cur_sched_policy = thread_msg->sched_policy;
+
+	/* Set the scheduling values if the user wanted to update one of them */
+	if ((thread_msg->usage_flags & USE_SCHED_PRIO) == USE_SCHED_PRIO
+	    || (thread_msg->usage_flags & USE_SCHED_POLICY) ==
+	    USE_SCHED_POLICY) {
+		rc = dabbad_thread_sched_param_set(pkt_thread, cur_sched_prio,
+						   cur_sched_policy);
 
 		if (rc)
 			return rc;
