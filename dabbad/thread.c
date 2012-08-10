@@ -138,14 +138,6 @@ int dabbad_thread_sched_affinity_get(struct packet_thread *pkt_thread,
 	return pthread_getaffinity_np(pkt_thread->id, sizeof(*run_on), run_on);
 }
 
-int dabbad_thread_detached_state_set(struct packet_thread *pkt_thread)
-{
-	assert(pkt_thread);
-
-	return pthread_attr_setdetachstate(&pkt_thread->attributes,
-					   PTHREAD_CREATE_DETACHED);
-}
-
 int dabbad_thread_start(struct packet_thread *pkt_thread,
 			void *(*func) (void *arg), void *arg)
 {
@@ -154,23 +146,14 @@ int dabbad_thread_start(struct packet_thread *pkt_thread,
 	assert(pkt_thread);
 	assert(func);
 
-	rc = pthread_attr_init(&pkt_thread->attributes);
+	rc = pthread_create(&pkt_thread->id, NULL, func, arg);
 
-	if (rc)
-		goto out;
-
-	rc = dabbad_thread_detached_state_set(pkt_thread);
-
-	if (rc)
-		goto out;
-
-	rc = pthread_create(&pkt_thread->id, &pkt_thread->attributes, func,
-			    arg);
+	if (!rc)
+		rc = pthread_detach(pkt_thread->id);
 
 	if (!rc)
 		TAILQ_INSERT_TAIL(&packet_thread_head, pkt_thread, entry);
 
- out:
 	return rc;
 }
 
@@ -192,7 +175,6 @@ int dabbad_thread_stop(struct packet_thread *pkt_thread)
 
 	if (!rc) {
 		TAILQ_REMOVE(&packet_thread_head, node, entry);
-		pthread_attr_destroy(&node->attributes);
 	}
 
 	return rc;

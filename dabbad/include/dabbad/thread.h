@@ -39,7 +39,6 @@ enum packet_thread_type {
 
 struct packet_thread {
 	pthread_t id;
-	pthread_attr_t attributes;
 	enum packet_thread_type type;
 	 TAILQ_ENTRY(packet_thread) entry;
 };
@@ -59,7 +58,6 @@ int dabbad_thread_sched_affinity_set(struct packet_thread *pkt_thread,
 				     cpu_set_t * run_on);
 int dabbad_thread_sched_affinity_get(struct packet_thread *pkt_thread,
 				     cpu_set_t * run_on);
-int dabbad_thread_detached_state_set(struct packet_thread *pkt_thread);
 int dabbad_thread_start(struct packet_thread *pkt_thread,
 			void *(*func) (void *arg), void *arg);
 int dabbad_thread_stop(struct packet_thread *pkt_thread);
