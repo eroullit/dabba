@@ -180,11 +180,6 @@ int dabbad_capture_list(struct dabba_ipc_msg *msg)
 		layout = &pkt_capture->rx.pkt_mmap.layout;
 
 		capture_msg[a].thread.id = pkt_capture->thread.id;
-		dabbad_thread_sched_param_get(&pkt_capture->thread,
-					      &capture_msg[a].thread.sched_prio,
-					      &capture_msg[a].thread.
-					      sched_policy);
-		capture_msg[a].thread.id = pkt_capture->thread.id;
 		capture_msg[a].frame_size = layout->tp_frame_size;
 		capture_msg[a].frame_nr = layout->tp_frame_nr;
 
