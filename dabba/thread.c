@@ -235,6 +235,27 @@ static void display_thread_list(const struct dabba_thread *const ifconf_msg,
 	}
 }
 
+static void display_thread_capabilities_header(void)
+{
+	printf("---\n");
+	printf("  thread capabilities:\n");
+}
+
+static void display_thread_capabilities(const struct dabba_thread_cap
+					*const thread_cap, const size_t elem_nr)
+{
+	size_t a;
+	assert(thread_cap);
+
+	for (a = 0; a < elem_nr; a++) {
+		printf("    - scheduling policy: %s\n",
+		       sched_policy_key_get(thread_cap[a].policy));
+		printf("      scheduling priority:\n");
+		printf("          minimum: %i\n", thread_cap[a].prio_min);
+		printf("          maximum: %i\n", thread_cap[a].prio_max);
+	}
+}
+
 static struct option *thread_modify_options_get(void)
 {
 	static struct option thread_modify_option[] = {
@@ -358,6 +379,37 @@ int cmd_thread_modify(int argc, const char **argv)
 	return dabba_ipc_msg(&msg);
 }
 
+int cmd_thread_capabilities(int argc, const char **argv)
+{
+	int rc;
+	struct dabba_ipc_msg msg;
+
+	assert(argc >= 0);
+	assert(argv);
+
+	memset(&msg, 0, sizeof(msg));
+
+	msg.mtype = 1;
+	msg.msg_body.type = DABBA_THREAD_CAP_LIST;
+
+	display_thread_capabilities_header();
+
+	do {
+		msg.msg_body.offset += msg.msg_body.elem_nr;
+		msg.msg_body.elem_nr = 0;
+
+		rc = dabba_ipc_msg(&msg);
+
+		if (rc)
+			break;
+
+		display_thread_capabilities(msg.msg_body.msg.thread_cap,
+					    msg.msg_body.elem_nr);
+	} while (msg.msg_body.elem_nr);
+
+	return rc;
+}
+
 /**
  * \brief Parse which thread sub-command.
  * \param[in]           argc	        Argument counter
@@ -375,7 +427,8 @@ int cmd_thread(int argc, const char **argv)
 	size_t i;
 	static struct cmd_struct thread_commands[] = {
 		{"modify", cmd_thread_modify},
-		{"list", cmd_thread_list}
+		{"list", cmd_thread_list},
+		{"capabilities", cmd_thread_capabilities},
 	};
 
 	if (argc == 0 || cmd == NULL || !strcmp(cmd, "--help"))

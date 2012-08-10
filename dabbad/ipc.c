@@ -69,6 +69,9 @@ static int dabbad_handle_msg(struct dabba_ipc_msg *msg)
 	case DABBA_THREAD_MODIFY:
 		rc = dabbad_thread_modify(msg);
 		break;
+	case DABBA_THREAD_CAP_LIST:
+		rc = dabbad_thread_cap_list(msg);
+		break;
 	default:
 		rc = -1;
 		errno = ENOSYS;

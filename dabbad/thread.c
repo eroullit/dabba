@@ -27,6 +27,7 @@
 
  /* __LICENSE_HEADER_END__ */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <assert.h>
@@ -261,6 +262,33 @@ int dabbad_thread_modify(struct dabba_ipc_msg *msg)
 
 		if (rc)
 			return rc;
+	}
+
+	return 0;
+}
+
+int dabbad_thread_cap_list(struct dabba_ipc_msg *msg)
+{
+	struct dabba_thread_cap *thread_cap_msg = msg->msg_body.msg.thread_cap;
+
+	if (msg->msg_body.offset < 3) {
+		thread_cap_msg[0].policy = SCHED_FIFO;
+		thread_cap_msg[0].prio_min = sched_get_priority_min(SCHED_FIFO);
+		thread_cap_msg[0].prio_max = sched_get_priority_max(SCHED_FIFO);
+
+		thread_cap_msg[1].policy = SCHED_RR;
+		thread_cap_msg[1].prio_min = sched_get_priority_min(SCHED_RR);
+		thread_cap_msg[1].prio_max = sched_get_priority_max(SCHED_RR);
+
+		thread_cap_msg[2].policy = SCHED_OTHER;
+		thread_cap_msg[2].prio_min =
+		    sched_get_priority_min(SCHED_OTHER);
+		thread_cap_msg[2].prio_max =
+		    sched_get_priority_max(SCHED_OTHER);
+
+		msg->msg_body.elem_nr = 3;
+	} else {
+		msg->msg_body.elem_nr = 0;
 	}
 
 	return 0;
