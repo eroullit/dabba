@@ -27,6 +27,7 @@ usage: dabba [--help] [--version] <command> [<args>]
 
 The most commonly used dabba commands are:
    interface   perform an interface related command
+   thread      perform a thread related command
    capture     capture live traffic from an interface
 
 See 'dabba help <command>' for more info on a specific command.
