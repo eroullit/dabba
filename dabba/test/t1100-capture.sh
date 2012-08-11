@@ -86,6 +86,7 @@ check_capture_thread_frame_nr()
     test "$expected_frame_nr" = "$result_frame_nr"
 }
 
+default_frame_nr="32"
 frame_nr="16"
 ring_size="$(($frame_nr * 2048))" # 2kB are allocated for one ethernet frame
 
@@ -118,12 +119,23 @@ test_expect_success "Start capture thread with a missing pcap path" "
     test_expect_code 22 '$DABBA_PATH'/dabba capture start --interface any --frame-number $frame_nr
 "
 
-test_expect_success "Start capture thread with a missing frame number" "
-    test_expect_code 22 '$DABBA_PATH'/dabba capture start --interface any --pcap test.pcap
-"
-
 test_expect_success "Invoke capture command w/o any parameters" "
     test_expect_code 38 '$DABBA_PATH'/dabba capture
+"
+
+test_expect_success "Start capture thread with a default frame number" "
+    '$DABBA_PATH'/dabba capture start --interface any --pcap test.pcap &&
+    '$DABBA_PATH'/dabba capture list > result
+"
+
+test_expect_success PYTHON_YAML "Check thread default capture frame number ($default_frame_nr)" "
+    check_capture_thread_frame_nr 0 $default_frame_nr result
+"
+
+test_expect_success PYTHON_YAML "Stop capture thread with a default frame number" "
+    '$DABBA_PATH'/dabba capture stop --id `get_capture_thread_id 0 result` &&
+    '$DABBA_PATH'/dabba capture list > after &&
+    test_must_fail grep -wq `get_capture_thread_id 0 result` after
 "
 
 for i in `seq 0 9`
