@@ -42,9 +42,6 @@
 
 <p>dabba is a set of network tools written for Linux.</p>
 
-<p>Its main use is to gather or scatter actions on a network such as
-traffic capture, replay, generation or monitoring on a network.</p>
-
 <p>This is inspired on the Dabba Walla system present in Mumbai where
 meals are regrouped and dispatched throughout the city with a
 high efficiency rate, every day of the year.</p>
@@ -58,70 +55,85 @@ high efficiency rate, every day of the year.</p>
 <code>dabbad</code> - multi-threaded task manager and IPC query processor</li>
 <li>
 <code>dabba</code> - CLI 'à la git' to communicate with dabbad and submit tasks</li>
-</ul><h1>What is libdabba's goal?</h1>
+</ul><p>Currently supported feature are listed in the <a href="https://github.com/eroullit/dabba/blob/master/CODING">CODING</a> file.</p>
 
-<p>libdabba's goal is to prepare a clear and simple API for future networking tools.
-It uses low-level zero-copy kernel features to bring traffic between the
-userspace and the kernelspace with very low overhead.</p>
-
-<p>Right now, it provides functions to perform:</p>
-
-<ul>
-<li>Multi-threaded traffic capture</li>
-<li>PCAP file support</li>
-</ul><h1>What is a zero-copy feature?</h1>
-
-<p>Zero-copy packet rings are memory-mapped buffers common to kernelspace and
-userspace where packets can be directly read or written.
-This direct way of data access drastically reduces the processing overhead 
-as packets are not hard-copied between spaces.
-When using a RX packet ring, received packets are quicker available
-to the userspace.
-When a TX packet ring is used, packets to transmit can be placed to
-medium within shorter time.</p>
-
-<h1>What is a PCAP file?</h1>
-
-<p>A PCAP file is a file where previously recorded packets are saved.
-It can be then read to perform protocol analysis, reverse engineering
-or network debugging.
-dabba will stay independent of libpcap, but nevertheless offer PCAP file support
-to capture, replay and perform off-line analysis on recorded traffic.</p>
-
-<h1>Development</h1>
-
-<p>There is a <a href="http://github.com/eroullit/dabba">public Git repository</a>
-where you can check out the latest code base.</p>
+<h1>Get the source!</h1>
 
 <pre><code>git clone git://github.com/eroullit/dabba.git
 </code></pre>
 
-<h1>Installation</h1>
+<p>Contributions are welcome, <a href="https://github.com/eroullit/dabba/blob/master/CODING">CODING</a> regroups all information about it.</p>
 
-<p>You need to fulfill these prerequisites in order to build dabba:</p>
+<h1>Prerequisites</h1>
+
+<p>dabba needs these to compile and run properly:</p>
 
 <ul>
 <li>Linux kernel &gt;= 2.6.31</li>
 <li><code>cmake</code></li>
+<li><code>pthread</code></li>
 <li>
-<code>setcap</code> (within libcap package)</li>
-</ul><p>The following are optional but recommended:</p>
+<code>setcap</code> (within <code>libcap</code> package)</li>
+</ul><p>Recommended optional packages:</p>
 
 <ul>
 <li><code>python-yaml</code></li>
 <li><code>doxygen</code></li>
-</ul><p>To build out-of-tree:</p>
+</ul><h1>Installation</h1>
 
-<pre><code>$ mkdir build
-$ cd build
-$ cmake ..
-$ make
-# make install/strip
-</code></pre>
+<p>To build out-of-tree:</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>mkdir build <span class="o">&amp;&amp;</span> <span class="nb">cd </span>build <span class="o">&amp;&amp;</span> cmake .. <span class="o">&amp;&amp;</span> make
+</pre></div>
+
+<p>To install it after being built:</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>sudo make install/strip
+</pre></div>
+
+<h1>Capabilities</h1>
+
+<p>To configure dabba to run with a regular user account:</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>sudo make setcap
+</pre></div>
+
+<h1>Getting started!</h1>
+
+<p>Start dabbad:</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>dabbad --daemonize
+</pre></div>
+
+<p>As long as dabbad is running, captures tasks can be submitted:</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>dabba capture start --interface eth0 --pcap /tmp/example.pcap
+</pre></div>
+
+<p>Running captures can be listed in YAML format:</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>dabba capture list
+---
+  captures:
+    - id: 3076324160
+      packet mmap size: 32768
+      frame number: 16
+      pcap: /tmp/example.pcap
+      interface: eth0
+</pre></div>
+
+<p>Stopping the capture:</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>dabba capture stop --id 3076324160
+</pre></div>
+
+<h1>More info</h1>
+
+<p>Further information can be found on the project's <a href="https://github.com/eroullit/dabba/wiki">wiki</a></p>
 
 <h1>Copyright</h1>
 
-<p>Copyright (C) 2012  Emmanuel Roullit <a href="mailto:emmanuel.roullit@gmail.com">emmanuel.roullit@gmail.com</a></p>
+<p>Copyright (C) 2011-2012 Emmanuel Roullit <a href="mailto:emmanuel.roullit@gmail.com">emmanuel.roullit@gmail.com</a></p>
 
 <p>This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -140,14 +152,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 <h1>Contact</h1>
 
 <p>For questions:
-    Send me a message <a href="https://github.com/eroullit">on GitHub</a></p>
+    Send me a message to <a href="https://github.com/eroullit" class="user-mention">@eroullit</a> on GitHub</p>
 
-<p>For bugs:
-    Open an issue on the <a href="https://github.com/eroullit/dabba/issues">bug tracker</a>.</p>
+<p>For suggestions or bug reports:
+    Feel free to open an issue on the <a href="https://github.com/eroullit/dabba/issues">ticket system</a>.</p>
       </section>
 
     </div>
-    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
     
   </body>
 </html>
