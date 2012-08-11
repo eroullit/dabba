@@ -11,110 +11,83 @@ What is dabba?
 
 dabba is a set of network tools written for Linux.
 
-Its main use is to gather or scatter actions on a network such as
-traffic capture, replay, generation or monitoring on a network.
-
-This is inspired on the Dabba Walla system present in Mumbai where
-meals are regrouped and dispatched throughout the city with a
-high efficiency rate, every day of the year.
-
 The project has 3 main components:
     - libdabba - low-level zero-copy network library
     - dabbad - multi-threaded task manager and IPC query processor
     - dabba - CLI 'à la git' to communicate with dabbad and submit tasks
 
-What is libdabba's goal?
-========================
+Currently supported feature are listed in the CODING file.
 
-libdabba's goal is to prepare a clear and simple API for future networking tools.
-It uses low-level zero-copy kernel features to bring traffic between the
-userspace and the kernelspace with very low overhead.
-
-Right now, it provides functions to perform:
-    - Multi-threaded traffic capture
-    - PCAP file support
-
-What is a zero-copy feature?
-============================
-
-Zero-copy packet rings are memory-mapped buffers common to kernelspace and
-userspace where packets can be directly read or written.
-This direct way of data access drastically reduces the processing overhead 
-as packets are not hard-copied between spaces.
-When using a RX packet ring, received packets are quicker available
-to the userspace.
-When a TX packet ring is used, packets to transmit can be placed to
-medium within shorter time.
-
-What is a PCAP file?
-====================
-
-A PCAP file is a file where previously recorded packets are saved.
-It can be then read to perform protocol analysis, reverse engineering
-or network debugging.
-dabba will stay independent of libpcap, but nevertheless offer PCAP file support
-to capture, replay and perform off-line analysis on recorded traffic.
-
-Development
-===========
+Get the source!
+===============
 
 There's a public Git repository at http://github.com/eroullit/dabba
 where you can check out the latest code base.
 
 git clone git://github.com/eroullit/dabba.git
 
-Coding conventions can be found in CODING.
+Contributions are welcome, CODING regroups all information about it.
+
+Prerequisites
+=============
+
+dabba needs these to compile and run properly:
+	- Linux kernel >= 2.6.31
+	- cmake
+	- pthread
+	- setcap (within libcap package)
+
+Recommended optional packages:
+	- python-yaml
+	- doxygen
 
 Installation
 ============
 
-You need to fulfill these prerequisites in order to build dabba:
-	- Linux kernel >= 2.6.31
-	- cmake
-	- setcap (within libcap package)
-
-The following are optional but recommended:
-	- python-yaml
-	- doxygen
-
 To build out-of-tree:
-	$ mkdir build
-	$ cd build
-	$ cmake ..
-	$ make
-	# make install/strip
+	$ mkdir build && cd build && cmake .. && make
 
-Some unit tests need the following extra capabilities:
-	- CAP_NET_ADMIN - To allow various network-related operations
-	- CAP_NET_RAW - To allow use of RAW and PACKET sockets.
-	- CAP_IPC_LOCK - To allow to lock than 64kB of mmap'ed memory
+To install it after being built:
+	$ sudo make install/strip
 
-To grant them run in your build directory:
-	# make setcap
+Capabilities
+============
 
-When the code is compiled and capabilities are granted, unit tests
-can be executed by this command:
-	$ ctest --output-on-failure
+To configure dabba to run with a regular user account:
+	$ sudo make setcap
 
-Packaging
+Getting started!
+================
+
+Start dabbad:
+	$ dabbad --daemonize
+
+As long as dabbad is running, captures tasks can be submitted:
+	$ dabba capture start --interface eth0 --pcap /tmp/example.pcap
+
+Running captures can be listed in YAML format:
+	$ dabba capture list
+	---
+	  captures:
+	    - id: 3076324160
+	      packet mmap size: 32768
+	      frame number: 16
+	      pcap: /tmp/example.pcap
+	      interface: eth0
+
+Stopping the capture:
+	$ dabba capture stop --id 3076324160
+
+More info
 =========
 
-RPM and DEB packages can be generated this way:
-	# make package
-
-It can be then installed with:
-	# dpkg -i dabba*.deb
-or
-	# rpm -i dabba*.rpm
-
-Source code can be packaged with this command:
-	$ make package_source
-
+Further information can be found on the project's wiki:
+https://github.com/eroullit/dabba/wiki
 
 Copyright
 =========
 
-Copyright (C) 2012	Emmanuel Roullit <emmanuel.roullit@gmail.com>
+Copyright (C) 2011-2012	Emmanuel Roullit <emmanuel.roullit@gmail.com>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -136,6 +109,5 @@ Contact
 For questions:
     Send me a message to @eroullit on GitHub
 
-For bugs:
-    https://github.com/eroullit/dabba and open an issue.
-
+For suggestions or bug reports:
+    https://github.com/eroullit/dabba and feel free to open an issue.
