@@ -4,9 +4,9 @@ What is dabba?
 dabba is a set of network tools written for Linux.
 
 The project has 3 main components:
-    * `libdabba` - low-level zero-copy network library
-    * `dabbad` - multi-threaded task manager and IPC query processor
-    * `dabba` - CLI 'à la git' to communicate with dabbad and submit tasks
+* `libdabba` - low-level zero-copy network library
+* `dabbad` - multi-threaded task manager and IPC query processor
+* `dabba` - CLI 'à la git' to communicate with dabbad and submit tasks
 
 Currently supported feature are listed in the [CODING] file.
 
@@ -23,14 +23,14 @@ Prerequisites
 =============
 
 dabba needs these to compile and run properly:
-	* Linux kernel >= 2.6.31
-	* `cmake`
-	* `pthread`
-	* `setcap` (within `libcap` package)
+* Linux kernel >= 2.6.31
+* `cmake`
+* `pthread`
+* `setcap` (within `libcap` package)
 
 Recommended optional packages:
-	* `python-yaml`
-	* `doxygen`
+* `python-yaml`
+* `doxygen`
 
 Installation
 ============
@@ -80,7 +80,7 @@ $ dabba capture list
 
 Stopping the capture:
 ```sh
-	$ dabba capture stop --id 3076324160
+$ dabba capture stop --id 3076324160
 ```
 
 More info
@@ -115,3 +115,5 @@ For questions:
 
 For suggestions or bug reports:
     Feel free to open an issue on the [ticket system](https://github.com/eroullit/dabba/issues).
+
+[CODING]: https://github.com/eroullit/dabba/blob/master/CODING
