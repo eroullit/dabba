@@ -48,7 +48,7 @@ and to list information about currently running captures.
 
 =item list
 
-Fetch and print information about currenty running captures.
+Fetch and print information about currently running captures.
 The output is formatted in YAML.
 
 =item start
@@ -78,7 +78,8 @@ Write all captured traffic in pcap file at <path>.
 =item --frame-number <number>
 
 Configure the packet mmap area to contain <number> of frames.
-This number must be a power of two.
+This number must be a power of two. The default value is 32 frames.
+The lowest frame number value is 8.
 
 =item --id <thread-id>
 
@@ -155,6 +156,8 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabba/ipc.h>
 #include <dabbad/dabbad.h>
 
+#define DEFAULT_CAPTURE_FRAME_NUMBER 32
+
 enum capture_start_option {
 	OPT_CAPTURE_INTERFACE,
 	OPT_CAPTURE_PCAP,
@@ -188,6 +191,8 @@ static int prepare_capture_start_query(int argc, char **argv,
 	assert(msg);
 	msg->mtype = 1;
 	msg->msg_body.type = DABBA_CAPTURE_START;
+
+	capture_start_msg->frame_nr = DEFAULT_CAPTURE_FRAME_NUMBER;
 
 	while ((ret =
 		getopt_long_only(argc, argv, "", capture_start_options_get(),
