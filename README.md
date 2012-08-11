@@ -1,7 +1,13 @@
 What is dabba?
 ==============
 
+[![Build Status](https://secure.travis-ci.org/eroullit/dabba.png?branch=master)](http://travis-ci.org/eroullit/dabba)
+
 dabba is a set of network tools written for Linux.
+
+This is inspired on the Dabba Walla system present in Mumbai where
+meals are regrouped and dispatched throughout the city with a high
+efficiency rate, every day of the year.
 
 The project has 3 main components:
 * `libdabba` - low-level zero-copy network library
