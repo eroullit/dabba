@@ -1,3 +1,11 @@
+dabba (0.1.1) unstable; urgency=low
+
+  * compile with -fPIE.
+  * made the option '--frame-number' parameter optional
+  * tidy up end user documentation
+
+ -- Emmanuel Roullit <emmanuel.roullit@gmail.com>  Sat, 11 Aug 2012 22:19:57 +0200
+
 dabba (0.1) unstable; urgency=low
 
   * Initial release for Debian
