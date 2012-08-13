@@ -29,6 +29,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 #include <errno.h>
 #include <assert.h>
 #include <dabbad/ipc.h>
@@ -156,6 +157,8 @@ int dabbad_ipc_msg_poll(void)
 		if (rcv != 0) {
 			perror("Error while handling IPC msg");
 		}
+
+		usleep(100);
 
 		snd = msgsnd(qid, &msg, sizeof(msg.msg_body), 0);
 
