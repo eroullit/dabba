@@ -236,8 +236,7 @@ static void display_capture_list(const struct dabba_capture *const capture_msg,
 	assert(elem_nr <= DABBA_CAPTURE_MAX_SIZE);
 
 	for (a = 0; a < elem_nr; a++) {
-		printf("    - id: %" PRIu64 "\n",
-		       (uint64_t) capture_msg[a].thread.id);
+		printf("    - id: %" PRIu64 "\n", (uint64_t) capture_msg[a].id);
 		printf("      packet mmap size: %" PRIu64 "\n",
 		       capture_msg[a].frame_nr * capture_msg[a].frame_size);
 		printf("      frame number: %" PRIu64 "\n",
@@ -339,7 +338,7 @@ static int prepare_capture_stop_query(int argc, char **argv,
 				 NULL)) != EOF) {
 		switch (ret) {
 		case OPT_CAPTURE_ID:
-			capture_msg->thread.id = strtoull(optarg, NULL, 10);
+			capture_msg->id = strtoull(optarg, NULL, 10);
 			break;
 		default:
 			show_usage(capture_stop_options_get());

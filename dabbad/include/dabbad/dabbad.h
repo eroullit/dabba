@@ -104,7 +104,7 @@ struct dabba_thread_cap {
 struct dabba_capture {
 	char pcap_name[NAME_MAX]; /**< pcap file name */
 	char dev_name[IFNAMSIZ]; /**< interface name */
-	struct dabba_thread thread; /**< thread information */
+	pthread_t id;
 	uint64_t frame_nr; /**< number of frames to allocate */
 	uint32_t frame_size; /**< maximum frame size to support */
 };

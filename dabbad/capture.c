@@ -179,7 +179,7 @@ int dabbad_capture_list(struct dabba_ipc_msg *msg)
 
 		layout = &pkt_capture->rx.pkt_mmap.layout;
 
-		capture_msg[a].thread.id = pkt_capture->thread.id;
+		capture_msg[a].id = pkt_capture->thread.id;
 		capture_msg[a].frame_size = layout->tp_frame_size;
 		capture_msg[a].frame_nr = layout->tp_frame_nr;
 
@@ -211,7 +211,7 @@ int dabbad_capture_stop(struct dabba_ipc_msg *msg)
 	struct dabba_capture *capture_msg = msg->msg_body.msg.capture;
 	int rc = 0;
 
-	pkt_thread = dabbad_thread_data_get(capture_msg->thread.id);
+	pkt_thread = dabbad_thread_data_get(capture_msg->id);
 
 	if (!pkt_thread)
 		return EINVAL;
