@@ -35,16 +35,24 @@
 #include <linux/if_packet.h>
 
 /** \brief pcap file magic value */
+#ifndef TCPDUMP_MAGIC
 #define TCPDUMP_MAGIC               0xa1b2c3d4
+#endif				/* TCPDUMP_MAGIC */
 
 /** \brief pcap version major */
+#ifndef PCAP_VERSION_MAJOR
 #define PCAP_VERSION_MAJOR          2
+#endif				/* PCAP_VERSION_MAJOR */
 
 /** \brief pcap version minor */
+#ifndef PCAP_VERSION_MINOR
 #define PCAP_VERSION_MINOR          4
+#endif				/* PCAP_VERSION_MINOR */
 
 /** \brief pcap default snapshot packet length */
+#ifndef PCAP_DEFAULT_SNAPSHOT_LEN
 #define PCAP_DEFAULT_SNAPSHOT_LEN   65535
+#endif				/* PCAP_DEFAULT_SNAPSHOT_LEN */
 
 /** \brief Enum regrouping all possible PCAP link types */
 enum pcap_linktype {

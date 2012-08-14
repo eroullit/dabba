@@ -109,10 +109,21 @@ struct dabba_capture {
 	uint32_t frame_size; /**< maximum frame size to support */
 };
 
+#ifndef DABBA_IFCONF_MAX_SIZE
 #define DABBA_IFCONF_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_ifconf))
+#endif				/* DABBA_IFCONF_MAX_SIZE */
+
+#ifndef DABBA_CAPTURE_MAX_SIZE
 #define DABBA_CAPTURE_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_capture))
+#endif				/* DABBA_CAPTURE_MAX_SIZE */
+
+#ifndef DABBA_THREAD_MAX_SIZE
 #define DABBA_THREAD_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_thread))
+#endif				/* DABBA_THREAD_MAX_SIZE */
+
+#ifndef DABBA_THREAD_CAP_MAX_SIZE
 #define DABBA_THREAD_CAP_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_thread_cap))
+#endif				/* DABBA_THREAD_CAP_MAX_SIZE */
 
 /**
  * \brief Dabbad IPC message structure
@@ -133,17 +144,16 @@ struct dabba_ipc_msg {
 			struct dabba_capture capture[DABBA_CAPTURE_MAX_SIZE];
 			struct dabba_thread thread[DABBA_THREAD_MAX_SIZE];
 			struct dabba_thread_cap
-			    thread_cap[DABBA_THREAD_CAP_MAX_SIZE];
+			 thread_cap[DABBA_THREAD_CAP_MAX_SIZE];
 		} msg; /**< message data */
 	} msg_body;
 };
-
-#ifndef DABBAD_PID_FILE
 
 /**
  * \brief Dabbad pid file path
  */
 
+#ifndef DABBAD_PID_FILE
 #define DABBAD_PID_FILE "/tmp/dabba.pid"
 #endif				/* DABBAD_PID_FILE */
 

@@ -34,7 +34,9 @@
  * \brief Pseudo-interface name to indicate that all interfaces must be used
  */
 
+#ifndef ANY_INTERFACE
 #define ANY_INTERFACE "any"
+#endif				/* ANY_INTERFACE */
 
 int devname_to_ifindex(const char *const dev, int *index);
 int ifindex_to_devname(const int index, char *dev, size_t dev_len);

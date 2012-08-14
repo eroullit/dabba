@@ -42,7 +42,9 @@
  * \brief Path to current process open file descriptor information
  */
 
+#ifndef PROC_FD_PATH
 #define PROC_FD_PATH "/proc/self/fd/"
+#endif				/* PROC_FD_PATH */
 
 /**
  * \brief Get file path from an open file descriptor

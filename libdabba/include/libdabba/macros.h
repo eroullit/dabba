@@ -32,7 +32,9 @@
 
 #include <stdint.h>
 
+#ifndef offsetof
 #define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
+#endif				/* offsetof */
 
 /**
  * container_of - cast a member of a structure out to the containing structure
@@ -41,12 +43,14 @@
  * \param[in] member	the name of the member within the struct.
  */
 
+#ifndef container_of
 #define container_of(ptr, type, member)                         \
 __extension__                                                   \
 ({                                                              \
         const typeof(((type *)0)->member) * __mptr = (ptr);	\
         (type *)((char *)__mptr - offsetof(type, member));      \
 })
+#endif				/* container_of */
 
 /**
  * \brief Abort build when expression is equal zero
@@ -58,7 +62,9 @@ __extension__                                                   \
  * aren't permitted).
  */
 
+#ifndef BUILD_BUG_ON_ZERO
 #define BUILD_BUG_ON_ZERO(e) (sizeof(char[1 - 2 * !!(e)]) - 1)
+#endif				/* BUILD_BUG_ON_ZERO */
 
 /**
  * \brief Check if the variable is an array
@@ -67,8 +73,10 @@ __extension__                                                   \
  * Force a compilation error if the variable is not an array
  */
 
+#ifndef __must_be_array
 #define __must_be_array(a) \
         BUILD_BUG_ON_ZERO(__builtin_types_compatible_p(typeof(a), typeof(&a[0])))
+#endif				/* __must_be_array */
 
 /**
  * \brief Returns the amount of element the array holds
@@ -77,7 +85,9 @@ __extension__                                                   \
  * Force a compilation error if the variable is not an array
  */
 
+#ifndef ARRAY_SIZE
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]) + __must_be_array(arr))
+#endif				/* ARRAY_SIZE */
 
 /**
  * \brief Tell if a integer is a power of 2
@@ -98,6 +108,7 @@ static inline int is_power_of_2(const uint64_t n)
  * \note Force a compilation error if the variable types don't match
  */
 
+#ifndef min
 #define min(x, y)                               \
         __extension__                           \
         ({                                      \
@@ -105,6 +116,7 @@ static inline int is_power_of_2(const uint64_t n)
 	typeof(y) _min2 = (y);			\
 	(void) (&_min1 == &_min2);		\
 	_min1 < _min2 ? _min1 : _min2; })
+#endif				/* min */
 
 /**
  * \brief Returns the maximum value between two variables
@@ -114,6 +126,7 @@ static inline int is_power_of_2(const uint64_t n)
  * \note Force a compilation error if the variable types don't match
  */
 
+#ifndef max
 #define max(x, y)                               \
         __extension__                           \
         ({                                      \
@@ -121,5 +134,6 @@ static inline int is_power_of_2(const uint64_t n)
 	typeof(y) _max2 = (y);			\
 	(void) (&_max1 == &_max2);		\
 	_max1 > _max2 ? _max1 : _max2; })
+#endif				/* max */
 
 #endif				/* MACROS_H */
