@@ -182,7 +182,7 @@ int str_to_cpu_affinity(char *str, cpu_set_t * mask)
 
 static void display_thread_cpu_affinity(const cpu_set_t * const cpu)
 {
-
+	int trail_sep = 0;
 	size_t i, j, run = 0;
 
 	assert(cpu);
@@ -196,13 +196,23 @@ static void display_thread_cpu_affinity(const cpu_set_t * const cpu)
 					break;
 			}
 
+			/*
+			 * Add a trailing comma at new entries but the first
+			 * to get an cpu list like: 0,1-4,5,7
+			 */
+
+			if (trail_sep) {
+				printf(",");
+				trail_sep = 1;
+			}
+
 			if (!run)
-				printf("%zu,", i);
+				printf("%zu", i);
 			else if (run == 1) {
-				printf("%zu,%zu,", i, i + 1);
+				printf("%zu,%zu", i, i + 1);
 				i++;
 			} else {
-				printf("%zu-%zu,", i, i + run);
+				printf("%zu-%zu", i, i + run);
 				i += run;
 			}
 		}
