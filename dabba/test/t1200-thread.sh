@@ -21,6 +21,11 @@ test_description='Test dabba thread command'
 
 . ./dabba-test-lib.sh
 
+get_default_cpu_affinity()
+{
+    taskset -pc 1 | awk '{ print $NF }'
+}
+
 get_thread_nr()
 {
     local result_file=$1
@@ -127,9 +132,8 @@ test_expect_success PYTHON_YAML "Check thread default scheduling priority" "
     check_thread_sched_prio 0 0 result
 "
 
-# TODO Find a way to generate the expected CPU affinity string out of cpuinfo
-test_expect_success PYTHON_YAML "Check thread default CPU affinity" "
-    true
+test_expect_success TASKSET,PYTHON_YAML "Check thread default CPU affinity" "
+    check_thread_sched_cpu_affinity 0 '$(get_default_cpu_affinity)' result
 "
 
 test_expect_success PYTHON_YAML "Stop capture thread using thread output" "
