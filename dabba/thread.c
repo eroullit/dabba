@@ -258,11 +258,10 @@ static void display_thread_capabilities(const struct dabba_thread_cap
 	assert(thread_cap);
 
 	for (a = 0; a < elem_nr; a++) {
-		printf("    - scheduling policy: %s\n",
-		       sched_policy_key_get(thread_cap[a].policy));
-		printf("      scheduling priority:\n");
-		printf("          minimum: %i\n", thread_cap[a].prio_min);
-		printf("          maximum: %i\n", thread_cap[a].prio_max);
+		printf("    %s:\n", sched_policy_key_get(thread_cap[a].policy));
+		printf("        scheduling priority:\n");
+		printf("            minimum: %i\n", thread_cap[a].prio_min);
+		printf("            maximum: %i\n", thread_cap[a].prio_max);
 	}
 }
 
