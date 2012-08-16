@@ -26,6 +26,18 @@ get_default_cpu_affinity()
     taskset -pc 1 | awk '{ print $NF }'
 }
 
+get_default_sched_prio_min()
+{
+    local policy="$1"
+    chrt -m | grep -i "$policy" |  awk '{ print $NF }' | cut -d/ -f1
+}
+
+get_default_sched_prio_max()
+{
+    local policy="$1"
+    chrt -m | grep -i "$policy" |  awk '{ print $NF }' | cut -d/ -f2
+}
+
 get_thread_nr()
 {
     local result_file=$1
@@ -136,11 +148,45 @@ test_expect_success TASKSET,PYTHON_YAML "Check thread default CPU affinity" "
     check_thread_sched_cpu_affinity 0 '$(get_default_cpu_affinity)' result
 "
 
+thread_id=$(get_thread_id 0 result)
+
+for policy in fifo rr other
+do
+        min_prio=$(get_default_sched_prio_min $policy)
+        max_prio=$(get_default_sched_prio_max $policy)
+
+        for priority in $min_prio $max_prio
+        do
+                test_expect_success "Modify capture thread scheduling policy ($policy:$priority)" "
+                    '$DABBA_PATH'/dabba thread modify --sched-policy '$policy' --sched-prio '$priority' --id '$thread_id'
+                "
+
+                test_expect_success PYTHON_YAML "Check new capture thread scheduling policy" "
+                    '$DABBA_PATH'/dabba thread list > result &&
+                    check_thread_sched_policy 0 '$policy' result &&
+                    check_thread_sched_prio 0 '$priority' result
+                "
+        done
+
+        for priority in $(($min_prio-1)) $(($max_prio+1))
+        do
+                test_expect_success "Do not modify capture thread out-of-range scheduling policy ($policy:$priority)" "
+                    test_must_fail '$DABBA_PATH'/dabba thread modify --sched-policy '$policy' --sched-prio '$priority' --id '$thread_id'
+                "
+
+                test_expect_success "Check that the capture thread scheduling policy did not change" "
+                    '$DABBA_PATH'/dabba thread list > result &&
+                    check_thread_sched_policy 0 '$policy' result &&
+                    check_thread_sched_prio 0 '$max_prio' result
+                "
+        done
+done
+
 test_expect_success PYTHON_YAML "Stop capture thread using thread output" "
     '$DABBA_PATH'/dabba thread list > result &&
-    '$DABBA_PATH'/dabba capture stop --id `get_thread_id 0 result` &&
+    '$DABBA_PATH'/dabba capture stop --id '$thread_id' &&
     '$DABBA_PATH'/dabba thread list > after &&
-    test_must_fail grep -wq `get_thread_id 0 result` after
+    test_must_fail grep -wq '$thread_id' after
 "
 
 test_expect_success "Cleanup: Stop dabbad" "
