@@ -183,7 +183,6 @@ do
 done
 
 test_expect_success PYTHON_YAML "Stop capture thread using thread output" "
-    '$DABBA_PATH'/dabba thread list > result &&
     '$DABBA_PATH'/dabba capture stop --id '$thread_id' &&
     '$DABBA_PATH'/dabba thread list > after &&
     test_must_fail grep -wq '$thread_id' after
