@@ -185,10 +185,8 @@ int cmd_interface(int argc, const char **argv)
 		cmd = "help";
 
 	for (i = 0; i < ARRAY_SIZE(interface_commands); i++) {
-		struct cmd_struct *p = interface_commands + i;
-		if (strcmp(p->cmd, cmd))
-			continue;
-		return (run_builtin(p, argc, argv));
+		if (!strcmp(interface_commands[i].cmd, cmd))
+			return run_builtin(&interface_commands[i], argc, argv);
 	}
 
 	return ENOSYS;

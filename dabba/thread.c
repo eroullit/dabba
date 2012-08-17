@@ -444,10 +444,8 @@ int cmd_thread(int argc, const char **argv)
 		cmd = "help";
 
 	for (i = 0; i < ARRAY_SIZE(thread_commands); i++) {
-		struct cmd_struct *p = thread_commands + i;
-		if (strcmp(p->cmd, cmd))
-			continue;
-		return (run_builtin(p, argc, argv));
+		if (!strcmp(thread_commands[i].cmd, cmd))
+			return run_builtin(&thread_commands[i], argc, argv);
 	}
 
 	return ENOSYS;

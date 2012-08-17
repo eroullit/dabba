@@ -407,10 +407,8 @@ int cmd_capture(int argc, const char **argv)
 		cmd = "help";
 
 	for (i = 0; i < ARRAY_SIZE(capture_commands); i++) {
-		struct cmd_struct *p = capture_commands + i;
-		if (strcmp(p->cmd, cmd))
-			continue;
-		return (run_builtin(p, argc, argv));
+		if (!strcmp(capture_commands[i].cmd, cmd))
+			return run_builtin(&capture_commands[i], argc, argv);
 	}
 
 	return ENOSYS;
