@@ -214,6 +214,12 @@ static struct thread_name_mapping {
 	.key = "capture",.value = CAPTURE_THREAD}
 };
 
+/**
+ * \brief Get the policy value out of the policy name.
+ * \param[in]           policy_name	Policy name string
+ * \return Related policy value
+ */
+
 int sched_policy_value_get(const char *const policy_name)
 {
 	size_t a;
@@ -227,6 +233,12 @@ int sched_policy_value_get(const char *const policy_name)
 	return sched_policy_mapping[a].value;
 }
 
+/**
+ * \brief Get the policy name out of the policy value.
+ * \param[in]           policy_name	Policy value
+ * \return Related policy name
+ */
+
 const char *sched_policy_key_get(const int policy_value)
 {
 	size_t a;
@@ -237,6 +249,12 @@ const char *sched_policy_key_get(const int policy_value)
 
 	return sched_policy_mapping[a].key;
 }
+
+/**
+ * \brief Get the thread name out of the thread type value
+ * \param[in]           type	Thread type value
+ * \return Thread name string
+ */
 
 const char *thread_key_get(const int type)
 {
@@ -249,15 +267,31 @@ const char *thread_key_get(const int type)
 	return a < max ? thread_name_mapping[a].key : "unknown";
 }
 
+/**
+ * \brief Get the default used thread scheduling policy
+ * \return \c SCHED_OTHER
+ */
+
 int sched_policy_default_get(void)
 {
 	return SCHED_OTHER;
 }
 
+/**
+ * \brief Get the default used thread scheduling priority
+ * \return scheduling priority 0. Default value for \c SCHED_OTHER
+ */
+
 int sched_prio_default_get(void)
 {
 	return 0;
 }
+
+/**
+ * \brief Get the default used CPU affinity
+ * \param[in]           mask		Output CPU set pointer
+ * \return All set CPU set
+ */
 
 void sched_cpu_affinty_default_get(cpu_set_t * mask)
 {
@@ -276,7 +310,14 @@ static char *nexttoken(char *q, int sep)
 	return q;
 }
 
-int str_to_cpu_affinity(char *str, cpu_set_t * mask)
+/**
+ * \brief Parse a CPU number list to a CPU set.
+ * \param[in]           str	        Input CPU list
+ * \param[in]           mask		Output CPU set pointer
+ * \return 0 on success, -EINVAL on failure.
+ */
+
+static int str_to_cpu_affinity(char *str, cpu_set_t * mask)
 {
 	char *p, *q;
 
@@ -324,6 +365,11 @@ int str_to_cpu_affinity(char *str, cpu_set_t * mask)
 
 	return 0;
 }
+
+/**
+ * \brief Print a CPU number list from a CPU set.
+ * \param[in]           cpu	        Pointer to a CPU set
+ */
 
 static void display_thread_cpu_affinity(const cpu_set_t * const cpu)
 {
@@ -467,14 +513,10 @@ static int prepare_thread_modify_query(int argc, char **argv,
 }
 
 /**
- * \brief Request the current supported interface list
+ * \brief Request the current list of running threads.
  * \param[in]           argc	        Argument counter
  * \param[in]           argv		Argument vector
  * \return 0 on success, else on failure.
- *
- * This function prepares an IPC message to query the supported network
- * interfaces present on the system. Once the message is sent, it waits for the
- * dabba daemon to reply.
  */
 
 int cmd_thread_list(int argc, const char **argv)
@@ -508,6 +550,13 @@ int cmd_thread_list(int argc, const char **argv)
 	return rc;
 }
 
+/**
+ * \brief Prepare a command to modify scheduling paramters of a specific thread.
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv		Argument vector
+ * \return 0 on success, else on failure.
+ */
+
 int cmd_thread_modify(int argc, const char **argv)
 {
 	int rc;
@@ -532,6 +581,13 @@ int cmd_thread_modify(int argc, const char **argv)
 
 	return dabba_ipc_msg(&msg);
 }
+
+/**
+ * \brief Prepare a command to list scheduling capabilities.
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv		Argument vector
+ * \return 0 on success, else on failure.
+ */
 
 int cmd_thread_capabilities(int argc, const char **argv)
 {
