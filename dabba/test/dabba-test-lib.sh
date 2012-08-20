@@ -27,13 +27,13 @@ python -c "import yaml" 2>&1 > /dev/null && test_set_prereq PYTHON_YAML
 
 flush_test_interface()
 {
-        sudo rmmod dummy
+        sudo rmmod dummy <&6
 }
 
 create_test_interface()
 {
         #local interface_nr=${$1:-1}
-        sudo modprobe dummy numdummies="$interface_nr"
+        sudo modprobe dummy numdummies="$interface_nr" <&6
         sleep 1
 }
 
