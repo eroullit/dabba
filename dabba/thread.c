@@ -27,6 +27,151 @@
 
 /* __LICENSE_HEADER_END__ */
 
+/*
+
+=head1 NAME
+
+dabba-thread - Manage thread specific parameters
+
+=head1 SYNOPSIS
+
+dabba thread <command> [<arguments>...] [--help]
+
+=head1 DESCRIPTION
+
+Give the user the possibility to manage threads scheduling policy,
+scheduling priority and CPU affinity running on the system.
+It also lists information about currently running threads.
+
+=head1 COMMANDS
+
+=over
+
+=item list
+
+Fetch and print information about currently running threads.
+The output is formatted in YAML.
+
+=item modify
+
+Modify scheduling parameter of a running thread.
+
+=item capabilities
+
+Fetch currently supported minimum and maximum scheduling priorities
+for each scheduling policy.
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item --sched-prio <priority>
+
+Configure which scheduling priority level to set on specific thread.
+This value is an signed integer. Possible scheduling priority range
+can be printed with using "dabba thread capabilities".
+
+=item --sched-policy <policy>
+
+Configure which scheduling policy to set on specific thread.
+The supported scheduling policies are:
+
+=over
+
+=item - fifo
+
+First In First Out (also known as First Come, First Served)
+
+=item - rr
+
+Round Robin
+
+=item - other
+
+Other (default)
+
+=back
+
+=item --cpu-affinity <cpu-list>
+
+Configure a numerical list of processors on which a specific thread 
+is allowed to be scheduled on.
+CPU numbers can be separated by commas and may include ranges.
+For instance: 0,5,7,9-11.
+
+=item --id <thread-id>
+
+Reference a thread by its unique thread id.
+The thread id can be fetched using "dabba thread list".
+
+=back
+
+=head1 EXAMPLES
+
+=over
+
+=item dabba thread list
+
+Output information about all running threads
+
+=item dabba thread capabilities
+
+Output information about currently support scheduling capabilities.
+
+=item dabba thread modify --cpu-list 0-2,4 --sched-policy rr --sched-prio 10 --id 123456789
+
+Change scheduling parameters of thread id "123456789" to:
+
+=over
+
+=over
+
+=item - Round Robin scheduling policy
+
+=item - Scheduling priority 10
+
+=item - Allowed to be scheduled on CPU 0,1,2,4
+
+=back
+
+=back
+
+=back
+
+=head1 AUTHOR
+
+Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
+
+=head1 BUGS
+
+=over
+
+=item Please report bugs to <https://github.com/eroullit/dabba/issues>
+
+=item dabba project project page: <https://github.com/eroullit/dabba>
+
+=back
+
+=head1 COPYRIGHT
+
+=over
+
+=item Copyright © 2012 Emmanuel Roullit.
+
+=item License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.
+
+=item This is free software: you are free to change and redistribute it.
+
+=item There is NO WARRANTY, to the extent permitted by law.
+
+=back
+
+=cut
+
+*/
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
