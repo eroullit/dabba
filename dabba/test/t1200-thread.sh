@@ -103,6 +103,8 @@ check_thread_sched_cpu_affinity()
     test "$expected_cpu_affinity" = "$result_cpu_affinity"
 }
 
+default_cpu_affinity=$(get_default_cpu_affinity)
+
 test_expect_success "Setup: Start dabbad" "
     '$DABBAD_PATH'/dabbad --daemonize
 "
@@ -145,7 +147,7 @@ test_expect_success PYTHON_YAML "Check thread default scheduling priority" "
 "
 
 test_expect_success TASKSET,PYTHON_YAML "Check thread default CPU affinity" "
-    check_thread_sched_cpu_affinity 0 '$(get_default_cpu_affinity)' result
+    check_thread_sched_cpu_affinity 0 '$default_cpu_affinity' result
 "
 
 thread_id=$(get_thread_id 0 result)
@@ -180,6 +182,18 @@ do
                     check_thread_sched_prio 0 '$max_prio' result
                 "
         done
+done
+
+for cpu_affinity in 0 $default_cpu_affinity
+do
+        test_expect_success "Modify capture thread CPU affinity (run on CPU $cpu_affinity)" "
+            '$DABBA_PATH'/dabba thread modify --cpu-affinity '$cpu_affinity' --id '$thread_id'
+        "
+
+        test_expect_success TASKSET,PYTHON_YAML "Check thread modified CPU affinity" "
+            '$DABBA_PATH'/dabba thread list > result &&
+            check_thread_sched_cpu_affinity 0 '$cpu_affinity' result
+        "
 done
 
 test_expect_success PYTHON_YAML "Stop capture thread using thread output" "
