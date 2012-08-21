@@ -191,8 +191,7 @@ static int prepare_capture_start_query(int argc, char **argv,
 
 	/* Assume conservative values for now */
 	capture_msg->frame_size = PACKET_MMAP_ETH_FRAME_LEN;
-
-	capture_start_msg->frame_nr = DEFAULT_CAPTURE_FRAME_NUMBER;
+	capture_msg->frame_nr = DEFAULT_CAPTURE_FRAME_NUMBER;
 
 	while ((ret =
 		getopt_long_only(argc, argv, "", capture_start_options_get(),
