@@ -27,6 +27,10 @@
 
  /* __LICENSE_HEADER_END__ */
 
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif				/* _GNU_SOURCE */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
