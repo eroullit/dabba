@@ -15,7 +15,7 @@ IF(DOXYGEN_FOUND)
 	ADD_DEPENDENCIES(doc ${PROJECT_NAME}-doc)
 ENDIF(DOXYGEN_FOUND)
 
-ADD_EXECUTABLE(${PROJECT_NAME} dabbad.c list.c ipc.c help.c capture.c misc.c)
+ADD_EXECUTABLE(${PROJECT_NAME} dabbad.c list.c ipc.c help.c capture.c misc.c thread.c)
 
 TARGET_LINK_LIBRARIES (${PROJECT_NAME} libdabba ${CMAKE_THREAD_LIBS_INIT})
 
@@ -25,5 +25,5 @@ INSTALL(FILES ${DABBAD_HDRS} DESTINATION include/dabbad COMPONENT headers)
 INSTALL(TARGETS ${PROJECT_NAME} DESTINATION sbin COMPONENT applications)
 INSTALL(CODE "EXECUTE_PROCESS(COMMAND ${SETCAP_EXECUTABLE} cap_net_raw,cap_ipc_lock,cap_net_admin=eip ${CMAKE_INSTALL_PREFIX}/sbin/${PROJECT_NAME})")
 
-ADD_CUSTOM_TARGET(${PROJECT_NAME}-setcap COMMAND ${SETCAP_EXECUTABLE} cap_net_raw,cap_ipc_lock,cap_net_admin=eip ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME})
+ADD_CUSTOM_TARGET(${PROJECT_NAME}-setcap COMMAND ${SETCAP_EXECUTABLE} cap_sys_nice,cap_net_raw,cap_ipc_lock,cap_net_admin=eip ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME})
 ADD_DEPENDENCIES(setcap ${PROJECT_NAME}-setcap)

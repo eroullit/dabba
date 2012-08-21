@@ -21,21 +21,15 @@
 
 /* __LICENSE_HEADER_END__ */
 
-#ifndef CAPTURE_H
-#define	CAPTURE_H
+#ifndef THREAD_H
+#define	THREAD_H
 
-#include <dabbad/thread.h>
-#include <libdabba/packet_rx.h>
+int sched_policy_value_get(const char *const policy_name);
+const char *sched_policy_key_get(const int policy_value);
+int sched_policy_default_get(void);
+int sched_prio_default_get(void);
+void sched_cpu_affinty_default_get(cpu_set_t * mask);
+void str_to_cpu_affinity(char *str, cpu_set_t * mask);
+int cmd_thread(int argc, const char **argv);
 
-struct packet_capture_thread {
-	struct packet_rx rx;
-	struct packet_thread thread;
-};
-
-struct packet_thread *dabbad_capture_thread_data_get(const pthread_t thread_id);
-
-int dabbad_capture_start(struct dabba_ipc_msg *msg);
-int dabbad_capture_list(struct dabba_ipc_msg *msg);
-int dabbad_capture_stop(struct dabba_ipc_msg *msg);
-
-#endif				/* CAPTURE_H */
+#endif				/* THREAD_H */

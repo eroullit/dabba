@@ -58,7 +58,7 @@ void swapped_pcap_file_header_init(struct pcap_file_header *pcap_hdr)
 {
 	assert(pcap_hdr);
 
-        memset(pcap_hdr, 0, sizeof(*pcap_hdr));
+	memset(pcap_hdr, 0, sizeof(*pcap_hdr));
 
 	pcap_hdr->magic = bswap_32(TCPDUMP_MAGIC);
 	pcap_hdr->version_major = bswap_16(PCAP_VERSION_MAJOR);
@@ -70,7 +70,7 @@ void swapped_pcap_file_header_init(struct pcap_file_header *pcap_hdr)
 }
 
 int test_pcap_write(const int fd, const uint8_t * const payload,
-			    const ssize_t len)
+		    const ssize_t len)
 {
 	struct timeval tv;
 
@@ -85,10 +85,10 @@ int test_pcap_write(const int fd, const uint8_t * const payload,
 
 int main(void)
 {
-        struct pcap_file_header pcap_hdr;
+	struct pcap_file_header pcap_hdr;
 	int fd;
 
-        swapped_pcap_file_header_init(&pcap_hdr);
+	swapped_pcap_file_header_init(&pcap_hdr);
 
 	assert((fd = pcap_create(test_path, LINKTYPE_EN10MB)) > 0);
 	assert(test_pcap_write(fd, icmp_dns, sizeof(icmp_dns)) == 0);
@@ -104,16 +104,16 @@ int main(void)
 	assert((fd = pcap_open(test_path, O_RDONLY)) > 0);
 	assert(pcap_close(fd) == 0);
 
-        /* Test swapped PCAP file header support */
-        assert((fd = open(test_path, O_WRONLY)) > 0);
-        assert(write(fd, &pcap_hdr, sizeof(pcap_hdr)) == sizeof(pcap_hdr));
-        assert(test_pcap_write(fd, icmp_dns, sizeof(icmp_dns)) == 0);
-        assert(close(fd) == 0);
-        
-        assert((fd = pcap_open(test_path, O_RDONLY)) > 0);
+	/* Test swapped PCAP file header support */
+	assert((fd = open(test_path, O_WRONLY)) > 0);
+	assert(write(fd, &pcap_hdr, sizeof(pcap_hdr)) == sizeof(pcap_hdr));
+	assert(test_pcap_write(fd, icmp_dns, sizeof(icmp_dns)) == 0);
+	assert(close(fd) == 0);
+
+	assert((fd = pcap_open(test_path, O_RDONLY)) > 0);
 	assert(pcap_close(fd) == 0);
 
 	pcap_destroy(fd, test_path);
 
-        return (EXIT_SUCCESS);
+	return (EXIT_SUCCESS);
 }

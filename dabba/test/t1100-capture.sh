@@ -170,13 +170,12 @@ do
         "
 done
 
-for i in `seq 10`
+for i in `seq 0 9`
 do
-        test_expect_success PYTHON_YAML "Stop capture thread #$i on loopback" "
-            '$DABBA_PATH'/dabba capture list > result &&
-            '$DABBA_PATH'/dabba capture stop --id `get_capture_thread_id 0 result` &&
+        test_expect_success PYTHON_YAML "Stop capture thread #$(($i+1)) on loopback" "
+            '$DABBA_PATH'/dabba capture stop --id `get_capture_thread_id $i result` &&
             '$DABBA_PATH'/dabba capture list > after &&
-            test_must_fail grep -wq `get_capture_thread_id 0 result` after
+            test_must_fail grep -wq `get_capture_thread_id $i result` after
         "
 done
 

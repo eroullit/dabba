@@ -29,11 +29,13 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 #include <errno.h>
 #include <assert.h>
 #include <dabbad/ipc.h>
 #include <dabbad/list.h>
 #include <dabbad/capture.h>
+#include <dabbad/thread.h>
 
 /**
  * \internal
@@ -61,6 +63,15 @@ static int dabbad_handle_msg(struct dabba_ipc_msg *msg)
 		break;
 	case DABBA_CAPTURE_STOP:
 		rc = dabbad_capture_stop(msg);
+		break;
+	case DABBA_THREAD_LIST:
+		rc = dabbad_thread_list(msg);
+		break;
+	case DABBA_THREAD_MODIFY:
+		rc = dabbad_thread_modify(msg);
+		break;
+	case DABBA_THREAD_CAP_LIST:
+		rc = dabbad_thread_cap_list(msg);
 		break;
 	default:
 		rc = -1;
@@ -146,6 +157,8 @@ int dabbad_ipc_msg_poll(void)
 		if (rcv != 0) {
 			perror("Error while handling IPC msg");
 		}
+
+		usleep(100);
 
 		snd = msgsnd(qid, &msg, sizeof(msg.msg_body), 0);
 

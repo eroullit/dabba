@@ -154,6 +154,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabba/dabba.h>
 #include <dabba/help.h>
 #include <dabba/ipc.h>
+#include <dabba/thread.h>
 #include <dabbad/dabbad.h>
 
 #define DEFAULT_CAPTURE_FRAME_NUMBER 32
@@ -182,15 +183,14 @@ static struct option *capture_start_options_get(void)
 }
 
 static int prepare_capture_start_query(int argc, char **argv,
-				       struct dabba_ipc_msg *msg)
+				       struct dabba_capture *capture_msg)
 {
-	struct dabba_capture *capture_start_msg = msg->msg_body.msg.capture;
-	int ret = 0;
-	int rc = 0;
+	int ret, rc = 0;
 
-	assert(msg);
-	msg->mtype = 1;
-	msg->msg_body.type = DABBA_CAPTURE_START;
+	assert(capture_msg);
+
+	/* Assume conservative values for now */
+	capture_msg->frame_size = PACKET_MMAP_ETH_FRAME_LEN;
 
 	capture_start_msg->frame_nr = DEFAULT_CAPTURE_FRAME_NUMBER;
 
@@ -199,25 +199,22 @@ static int prepare_capture_start_query(int argc, char **argv,
 				 NULL)) != EOF) {
 		switch (ret) {
 		case OPT_CAPTURE_INTERFACE:
-			if (strlen(optarg) >=
-			    sizeof(capture_start_msg->dev_name))
+			if (strlen(optarg) >= sizeof(capture_msg->dev_name))
 				rc = EINVAL;
 
-			strlcpy(capture_start_msg->dev_name, optarg,
-				sizeof(capture_start_msg->dev_name));
+			strlcpy(capture_msg->dev_name, optarg,
+				sizeof(capture_msg->dev_name));
 			break;
 
 		case OPT_CAPTURE_PCAP:
-			if (strlen(optarg) >=
-			    sizeof(capture_start_msg->pcap_name))
+			if (strlen(optarg) >= sizeof(capture_msg->pcap_name))
 				rc = EINVAL;
 
-			strlcpy(capture_start_msg->pcap_name, optarg,
-				sizeof(capture_start_msg->pcap_name));
+			strlcpy(capture_msg->pcap_name, optarg,
+				sizeof(capture_msg->pcap_name));
 			break;
 		case OPT_CAPTURE_FRAME_NUMBER:
-			capture_start_msg->frame_nr =
-			    strtoull(optarg, NULL, 10);
+			capture_msg->frame_nr = strtoull(optarg, NULL, 10);
 			break;
 		default:
 			show_usage(capture_start_options_get());
@@ -226,17 +223,7 @@ static int prepare_capture_start_query(int argc, char **argv,
 		}
 	}
 
-	/* Assume conservative values for now */
-	capture_start_msg->frame_size = PACKET_MMAP_ETH_FRAME_LEN;
-
 	return rc;
-}
-
-static void prepare_capture_list_query(struct dabba_ipc_msg *msg)
-{
-	assert(msg);
-	msg->mtype = 1;
-	msg->msg_body.type = DABBA_CAPTURE_LIST;
 }
 
 static void display_capture_list_msg_header(void)
@@ -245,25 +232,22 @@ static void display_capture_list_msg_header(void)
 	printf("  captures:\n");
 }
 
-static void display_capture_list(const struct dabba_ipc_msg *const msg)
+static void display_capture_list(const struct dabba_capture *const capture_msg,
+				 const size_t elem_nr)
 {
 	size_t a;
 
-	assert(msg);
-	assert(msg->msg_body.elem_nr <= ARRAY_SIZE(msg->msg_body.msg.capture));
+	assert(capture_msg);
+	assert(elem_nr <= DABBA_CAPTURE_MAX_SIZE);
 
-	for (a = 0; a < msg->msg_body.elem_nr; a++) {
-		printf("    - id: %" PRIu64 "\n",
-		       (uint64_t) msg->msg_body.msg.capture[a].thread_id);
+	for (a = 0; a < elem_nr; a++) {
+		printf("    - id: %" PRIu64 "\n", (uint64_t) capture_msg[a].id);
 		printf("      packet mmap size: %" PRIu64 "\n",
-		       msg->msg_body.msg.capture[a].frame_nr *
-		       msg->msg_body.msg.capture[a].frame_size);
+		       capture_msg[a].frame_nr * capture_msg[a].frame_size);
 		printf("      frame number: %" PRIu64 "\n",
-		       msg->msg_body.msg.capture[a].frame_nr);
-		printf("      pcap: %s\n",
-		       msg->msg_body.msg.capture[a].pcap_name);
-		printf("      interface: %s\n",
-		       msg->msg_body.msg.capture[a].dev_name);
+		       capture_msg[a].frame_nr);
+		printf("      pcap: %s\n", capture_msg[a].pcap_name);
+		printf("      interface: %s\n", capture_msg[a].dev_name);
 	}
 }
 
@@ -284,7 +268,11 @@ int cmd_capture_start(int argc, const char **argv)
 
 	memset(&msg, 0, sizeof(msg));
 
-	rc = prepare_capture_start_query(argc, (char **)argv, &msg);
+	msg.mtype = 1;
+	msg.msg_body.type = DABBA_CAPTURE_START;
+
+	rc = prepare_capture_start_query(argc, (char **)argv,
+					 msg.msg_body.msg.capture);
 
 	if (rc)
 		return rc;
@@ -311,7 +299,10 @@ int cmd_capture_list(int argc, const char **argv)
 	assert(argv);
 
 	memset(&msg, 0, sizeof(msg));
-	prepare_capture_list_query(&msg);
+
+	msg.mtype = 1;
+	msg.msg_body.type = DABBA_CAPTURE_LIST;
+
 	display_capture_list_msg_header();
 
 	do {
@@ -323,7 +314,8 @@ int cmd_capture_list(int argc, const char **argv)
 		if (rc)
 			break;
 
-		display_capture_list(&msg);
+		display_capture_list(msg.msg_body.msg.capture,
+				     msg.msg_body.elem_nr);
 	} while (msg.msg_body.elem_nr);
 
 	return rc;
@@ -340,23 +332,18 @@ static struct option *capture_stop_options_get(void)
 }
 
 static int prepare_capture_stop_query(int argc, char **argv,
-				      struct dabba_ipc_msg *msg)
+				      struct dabba_capture *capture_msg)
 {
-	struct dabba_capture *capture_stop_msg = msg->msg_body.msg.capture;
 	int ret, rc = 0;
 
-	assert(msg);
-
-	msg->mtype = 1;
-	msg->msg_body.type = DABBA_CAPTURE_STOP;
+	assert(capture_msg);
 
 	while ((ret =
 		getopt_long_only(argc, argv, "", capture_stop_options_get(),
 				 NULL)) != EOF) {
 		switch (ret) {
 		case OPT_CAPTURE_ID:
-			capture_stop_msg->thread_id =
-			    strtoull(optarg, NULL, 10);
+			capture_msg->id = strtoull(optarg, NULL, 10);
 			break;
 		default:
 			show_usage(capture_stop_options_get());
@@ -385,7 +372,11 @@ int cmd_capture_stop(int argc, const char **argv)
 
 	memset(&msg, 0, sizeof(msg));
 
-	rc = prepare_capture_stop_query(argc, (char **)argv, &msg);
+	msg.mtype = 1;
+	msg.msg_body.type = DABBA_CAPTURE_STOP;
+
+	rc = prepare_capture_stop_query(argc, (char **)argv,
+					msg.msg_body.msg.capture);
 
 	if (rc)
 		return rc;
@@ -421,10 +412,8 @@ int cmd_capture(int argc, const char **argv)
 		cmd = "help";
 
 	for (i = 0; i < ARRAY_SIZE(capture_commands); i++) {
-		struct cmd_struct *p = capture_commands + i;
-		if (strcmp(p->cmd, cmd))
-			continue;
-		return (run_builtin(p, argc, argv));
+		if (!strcmp(capture_commands[i].cmd, cmd))
+			return run_builtin(&capture_commands[i], argc, argv);
 	}
 
 	return ENOSYS;

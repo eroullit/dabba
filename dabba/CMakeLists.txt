@@ -13,13 +13,14 @@ IF(DOXYGEN_FOUND)
 	ADD_DEPENDENCIES(doc ${PROJECT_NAME}-doc)
 ENDIF(DOXYGEN_FOUND)
 
-ADD_EXECUTABLE(${PROJECT_NAME} dabba.c help.c interface.c ipc.c capture.c)
+ADD_EXECUTABLE(${PROJECT_NAME} dabba.c help.c interface.c ipc.c capture.c thread.c)
 
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} libdabba)
 
 POD2MAN(${CMAKE_CURRENT_SOURCE_DIR}/dabba.c dabba 1)
 POD2MAN(${CMAKE_CURRENT_SOURCE_DIR}/interface.c dabba-interface 1)
 POD2MAN(${CMAKE_CURRENT_SOURCE_DIR}/capture.c dabba-capture 1)
+POD2MAN(${CMAKE_CURRENT_SOURCE_DIR}/thread.c dabba-thread 1)
 
 INSTALL(TARGETS dabba DESTINATION sbin COMPONENT applications)
 

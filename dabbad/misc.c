@@ -42,7 +42,9 @@
  * \brief Path to current process open file descriptor information
  */
 
+#ifndef PROC_FD_PATH
 #define PROC_FD_PATH "/proc/self/fd/"
+#endif				/* PROC_FD_PATH */
 
 /**
  * \brief Get file path from an open file descriptor
@@ -70,7 +72,7 @@ int fd_to_path(const int fd, char *path, const size_t path_len)
 	assert(path_len);
 
 	memset(proc_path, 0, sizeof(proc_path));
-        memset(fdstr, 0, sizeof(fdstr));
+	memset(fdstr, 0, sizeof(fdstr));
 	memset(&fd_stat, 0, sizeof(fd_stat));
 	memset(&resolved_path, 0, sizeof(resolved_path));
 	memset(&path_stat, 0, sizeof(path_stat));
@@ -95,7 +97,8 @@ int fd_to_path(const int fd, char *path, const size_t path_len)
 	}
 
 	if (snprintf
-	    (proc_path, sizeof(proc_path), "%s%s", PROC_FD_PATH, dir_entry->d_name) <= 0) {
+	    (proc_path, sizeof(proc_path), "%s%s", PROC_FD_PATH,
+	     dir_entry->d_name) <= 0) {
 		rc = errno;
 		goto out;
 	}
