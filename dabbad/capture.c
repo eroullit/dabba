@@ -89,6 +89,13 @@ static int capture_msg_is_valid(struct dabba_ipc_msg *msg)
 	return 1;
 }
 
+/**
+ * \internal
+ * \brief Get capture thread data from thread dabba
+ * \param[in] pkt_thread pointer to thread data structure
+ * \return Pointer to the corresponding capture thread information.
+ */
+
 static struct packet_capture_thread *dabbad_capture_thread_get(struct packet_thread
 							       *pkt_thread)
 {
