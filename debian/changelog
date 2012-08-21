@@ -1,3 +1,20 @@
+dabba (0.2) unstable; urgency=low
+
+  * setcap: Grant CAP_SYS_NICE on 'make setcap'.
+  * dabba: command parsing simplifications.
+  * ipc: usleep a while on both messaging ends.
+  * ipc: Refactored IPC message query/reply functions.
+  * thread: add 'dabba thread capabilities' subcommand
+  * thread: added 'dabba thread modify' subcommand.
+  * thread: added 'dabba thread list' subcommand.
+  * thread: made libdabba pthread independent.
+  * test: remove useless command.
+  * test: add 'dabba thread' unit tests.
+  * test: simplified capture thread stop unit tests.
+  * header: added missing defines guards.
+
+ -- Emmanuel Roullit <emmanuel.roullit@gmail.com>  Tue, 21 Aug 2012 22:11:03 +0200
+
 dabba (0.1.1) unstable; urgency=low
 
   * compile with -fPIE.
