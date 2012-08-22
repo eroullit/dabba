@@ -107,25 +107,6 @@ int dabbad_ipc_msg_create(void)
 }
 
 /**
- * \brief Flush dabbad Inter Process Communication message queue
- * \param[in]       qid	        Dabba daemon message queue
- *
- * This function removes all previously created IPC message queue.
- */
-
-void dabbad_ipc_msg_flush(const int qid)
-{
-	struct dabba_ipc_msg msg;
-	ssize_t rcv;
-
-	do {
-		rcv =
-		    msgrcv(qid, &msg, sizeof(msg.msg_body), 0,
-			   IPC_NOWAIT | MSG_NOERROR);
-	} while (rcv > 0);
-}
-
-/**
  * \brief Wait for IPC messages for dabbad.
  * \return 0 on success, else otherwise.
  *
@@ -147,8 +128,6 @@ int dabbad_ipc_msg_poll(const int qid)
 		perror("Cannot get IPC id");
 		return errno;
 	}
-
-	dabbad_ipc_msg_flush(qid);
 
 	for (;;) {
 		memset(&msg, 0, sizeof(msg));
