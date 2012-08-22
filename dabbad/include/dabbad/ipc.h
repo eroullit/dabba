@@ -26,7 +26,8 @@
 
 #include <dabbad/dabbad.h>
 
-int dabbad_ipc_msg_init(void);
-int dabbad_ipc_msg_poll(void);
+int dabbad_ipc_msg_create(void);
+int dabbad_ipc_msg_destroy(void);
+int dabbad_ipc_msg_poll(const int qid);
 
 #endif				/* IPC_H */

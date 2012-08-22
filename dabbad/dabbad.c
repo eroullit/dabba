@@ -172,7 +172,7 @@ static inline int dabbad_pidfile_create(void)
 
 int main(int argc, char **argv)
 {
-	int opt, opt_idx;
+	int opt, opt_idx, qid;
 	int daemonize = 0;
 
 	assert(argc);
@@ -198,6 +198,10 @@ int main(int argc, char **argv)
 		}
 	}
 
+	assert(dabbad_pidfile_create());
+	dabbad_ipc_msg_destroy();
+	qid = dabbad_ipc_msg_create();
+
 	if (daemonize) {
 		if (daemon(-1, 0)) {
 			perror("Could not daemonize process");
@@ -205,8 +209,5 @@ int main(int argc, char **argv)
 		}
 	}
 
-	assert(dabbad_pidfile_create());
-	dabbad_ipc_msg_init();
-
-	return dabbad_ipc_msg_poll();
+	return dabbad_ipc_msg_poll(qid);
 }
