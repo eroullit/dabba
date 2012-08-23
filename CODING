@@ -1,13 +1,12 @@
 Roadmap
 =======
 
-1. Thread scheduling tuning
-2. Zero-copy TX ring
-3. Traffic generation
-4. BPF support
-5. PCAP read
-6. PCAP file rolling
-7. Scatter-Gather I/O
+1. Zero-copy TX ring
+2. Traffic generation
+3. BPF support
+4. PCAP read
+5. PCAP file rolling
+6. Scatter-Gather I/O
 
 Present features
 ================
@@ -15,6 +14,7 @@ Present features
  - Zero-copy RX ring
  - Multithreading
  - Thread Management
+ - Thread scheduling tuning
  - PCAP write/validation support
 
 Feature implementation
