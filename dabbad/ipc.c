@@ -89,28 +89,21 @@ static int dabbad_handle_msg(struct dabba_ipc_msg *msg)
  * This function removes all previously created IPC message queue.
  */
 
-int dabbad_ipc_msg_init(void)
+int dabbad_ipc_msg_destroy(void)
 {
 	return msgctl(dabba_get_ipc_queue_id(0), IPC_RMID, NULL);
 }
 
 /**
- * \brief Flush dabbad Inter Process Communication message queue
- * \param[in]       qid	        Dabba daemon message queue
+ * \brief Create dabbad Inter Process Communication message queue
+ * \return 0 on success, msgget(2) return code on failure.
  *
  * This function removes all previously created IPC message queue.
  */
 
-void dabbad_ipc_msg_flush(const int qid)
+int dabbad_ipc_msg_create(void)
 {
-	struct dabba_ipc_msg msg;
-	ssize_t rcv;
-
-	do {
-		rcv =
-		    msgrcv(qid, &msg, sizeof(msg.msg_body), 0,
-			   IPC_NOWAIT | MSG_NOERROR);
-	} while (rcv > 0);
+	return dabba_get_ipc_queue_id(IPC_CREAT | IPC_EXCL | 0660);
 }
 
 /**
@@ -125,21 +118,16 @@ void dabbad_ipc_msg_flush(const int qid)
  * error code, etc.
  */
 
-int dabbad_ipc_msg_poll(void)
+int dabbad_ipc_msg_poll(const int qid)
 {
-	int qid;
 	ssize_t rcv;
 	int snd;
 	struct dabba_ipc_msg msg;
-
-	qid = dabba_get_ipc_queue_id(IPC_CREAT | IPC_EXCL | 0660);
 
 	if (qid < 0) {
 		perror("Cannot get IPC id");
 		return errno;
 	}
-
-	dabbad_ipc_msg_flush(qid);
 
 	for (;;) {
 		memset(&msg, 0, sizeof(msg));
