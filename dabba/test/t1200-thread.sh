@@ -159,7 +159,7 @@ do
 
         for priority in $min_prio $max_prio
         do
-                test_expect_success "Modify capture thread scheduling policy ($policy:$priority)" "
+                test_expect_success PYTHON_YAML "Modify capture thread scheduling policy ($policy:$priority)" "
                     '$DABBA_PATH'/dabba thread modify --sched-policy '$policy' --sched-prio '$priority' --id '$thread_id'
                 "
 
@@ -172,11 +172,11 @@ do
 
         for priority in $(($min_prio-1)) $(($max_prio+1))
         do
-                test_expect_success "Do not modify capture thread out-of-range scheduling policy ($policy:$priority)" "
+                test_expect_success PYTHON_YAML "Do not modify capture thread out-of-range scheduling policy ($policy:$priority)" "
                     test_must_fail '$DABBA_PATH'/dabba thread modify --sched-policy '$policy' --sched-prio '$priority' --id '$thread_id'
                 "
 
-                test_expect_success "Check that the capture thread scheduling policy did not change" "
+                test_expect_success PYTHON_YAML "Check that the capture thread scheduling policy did not change" "
                     '$DABBA_PATH'/dabba thread list > result &&
                     check_thread_sched_policy 0 '$policy' result &&
                     check_thread_sched_prio 0 '$max_prio' result
@@ -186,7 +186,7 @@ done
 
 for cpu_affinity in 0 $default_cpu_affinity
 do
-        test_expect_success "Modify capture thread CPU affinity (run on CPU $cpu_affinity)" "
+        test_expect_success PYTHON_YAML "Modify capture thread CPU affinity (run on CPU $cpu_affinity)" "
             '$DABBA_PATH'/dabba thread modify --cpu-affinity '$cpu_affinity' --id '$thread_id'
         "
 
