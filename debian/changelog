@@ -1,5 +1,7 @@
 dabba (0.2) unstable; urgency=low
 
+  * ipc: do not flush IPC message queue anymore.
+  * ipc: fix ipc race/daemon race condition.
   * setcap: Grant CAP_SYS_NICE on 'make setcap'.
   * dabba: command parsing simplifications.
   * ipc: usleep a while on both messaging ends.
@@ -13,7 +15,7 @@ dabba (0.2) unstable; urgency=low
   * test: simplified capture thread stop unit tests.
   * header: added missing defines guards.
 
- -- Emmanuel Roullit <emmanuel.roullit@gmail.com>  Tue, 21 Aug 2012 22:11:03 +0200
+ -- Emmanuel Roullit <emmanuel.roullit@gmail.com>  Thu, 23 Aug 2012 21:06:09 +0200
 
 dabba (0.1.1) unstable; urgency=low
 
