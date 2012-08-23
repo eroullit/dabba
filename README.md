@@ -89,11 +89,6 @@ Stopping the capture:
 $ dabba capture stop --id 3076324160
 ```
 
-More info
-=========
-
-Further information can be found on the project's [wiki](https://github.com/eroullit/dabba/wiki)
-
 Copyright
 =========
 
