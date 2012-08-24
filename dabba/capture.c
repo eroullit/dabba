@@ -201,7 +201,7 @@ static int prepare_capture_start_query(int argc, char **argv,
 			if (strlen(optarg) >= sizeof(capture_msg->dev_name))
 				rc = EINVAL;
 
-			strlcpy(capture_msg->dev_name, optarg,
+			strncpy(capture_msg->dev_name, optarg,
 				sizeof(capture_msg->dev_name));
 			break;
 
@@ -209,7 +209,7 @@ static int prepare_capture_start_query(int argc, char **argv,
 			if (strlen(optarg) >= sizeof(capture_msg->pcap_name))
 				rc = EINVAL;
 
-			strlcpy(capture_msg->pcap_name, optarg,
+			strncpy(capture_msg->pcap_name, optarg,
 				sizeof(capture_msg->pcap_name));
 			break;
 		case OPT_CAPTURE_FRAME_NUMBER:
