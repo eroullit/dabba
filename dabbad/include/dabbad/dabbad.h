@@ -66,6 +66,7 @@ struct dabba_msg_buf {
 
 struct dabba_ifconf {
 	char name[IFNAMSIZ];
+	uint32_t flags;
 };
 
 enum dabba_thread_flags {

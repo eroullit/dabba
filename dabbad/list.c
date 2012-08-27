@@ -66,6 +66,7 @@ int dabbad_ifconf_get(struct dabba_ipc_msg *msg)
 
 		strlcpy(msg->msg_body.msg.ifconf[a].name, ifa->ifa_name,
 			IFNAMSIZ);
+		msg->msg_body.msg.ifconf[a].flags = ifa->ifa_flags;
 		a++;
 	}
 

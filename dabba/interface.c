@@ -116,8 +116,21 @@ static void display_interface_list(const struct dabba_ifconf *const
 	assert(interface_msg);
 	assert(elem_nr <= DABBA_IFCONF_MAX_SIZE);
 
-	for (a = 0; a < elem_nr; a++)
-		printf("    - %s\n", interface_msg[a].name);
+	for (a = 0; a < elem_nr; a++) {
+		printf("    - name: %s\n", interface_msg[a].name);
+		printf("      up: \"%s\"\n",
+		       (interface_msg[a].flags & IFF_UP) ==
+		       IFF_UP ? "yes" : "no");
+		printf("      running: \"%s\"\n",
+		       (interface_msg[a].flags & IFF_RUNNING) ==
+		       IFF_RUNNING ? "yes" : "no");
+		printf("      promiscuous: \"%s\"\n",
+		       (interface_msg[a].flags & IFF_PROMISC) ==
+		       IFF_PROMISC ? "yes" : "no");
+		printf("      loopback: \"%s\"\n",
+		       (interface_msg[a].flags & IFF_LOOPBACK) ==
+		       IFF_LOOPBACK ? "yes" : "no");
+	}
 }
 
 /**
