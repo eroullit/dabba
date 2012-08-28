@@ -176,6 +176,30 @@ int cmd_interface_list(int argc, const char **argv)
 }
 
 /**
+ * \brief Modify parametets of a supported interface
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv		Argument vector
+ * \return 0 on success, else on failure.
+ */
+
+int cmd_interface_modify(int argc, const char **argv)
+{
+	int rc;
+	struct dabba_ipc_msg msg;
+
+	assert(argc >= 0);
+	assert(argv);
+
+	memset(&msg, 0, sizeof(msg));
+
+	msg.mtype = 1;
+	msg.msg_body.type = DABBA_IF_MODIFY;
+	msg.msg_body.elem_nr = 1;
+
+	return dabba_ipc_msg(&msg);
+}
+
+/**
  * \brief Parse which interface sub-command.
  * \param[in]           argc	        Argument counter
  * \param[in]           argv		Argument vector
@@ -191,7 +215,8 @@ int cmd_interface(int argc, const char **argv)
 	const char *cmd = argv[0];
 	size_t i;
 	static struct cmd_struct interface_commands[] = {
-		{"list", cmd_interface_list}
+		{"list", cmd_interface_list},
+		{"modify", cmd_interface_modify}
 	};
 
 	if (argc == 0 || cmd == NULL || !strcmp(cmd, "--help"))

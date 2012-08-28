@@ -33,6 +33,7 @@
 #include <ifaddrs.h>
 #include <libdabba/macros.h>
 #include <libdabba/strlcpy.h>
+#include <libdabba/nic.h>
 #include <dabbad/list.h>
 
 /**
@@ -73,4 +74,13 @@ int dabbad_ifconf_get(struct dabba_ipc_msg *msg)
 	msg->msg_body.elem_nr = a;
 	freeifaddrs(ifaddr);
 	return 0;
+}
+
+int dabbad_interface_modify(struct dabba_ipc_msg *msg)
+{
+	int ifindex;
+
+	rc = devname_to_ifindex(msg->msg_body.msg.ifconf[0].name, &ifindex);
+
+	return rc;
 }
