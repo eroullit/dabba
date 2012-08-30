@@ -35,6 +35,7 @@
 #include <libdabba/strlcpy.h>
 #include <libdabba/nic.h>
 #include <dabbad/list.h>
+#include <netpacket/packet.h>
 
 /**
  * \brief Get the list of usable interfaces by dabbad and give it to the user
@@ -78,9 +79,6 @@ int dabbad_ifconf_get(struct dabba_ipc_msg *msg)
 
 int dabbad_interface_modify(struct dabba_ipc_msg *msg)
 {
-	int ifindex;
-
-	rc = devname_to_ifindex(msg->msg_body.msg.ifconf[0].name, &ifindex);
-
-	return rc;
+	return dev_flags_set(msg->msg_body.msg.ifconf[0].name,
+			     msg->msg_body.msg.ifconf[0].flags);
 }

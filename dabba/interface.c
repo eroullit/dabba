@@ -98,9 +98,28 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <string.h>
 #include <assert.h>
 #include <errno.h>
+#include <getopt.h>
 #include <libdabba/macros.h>
+#include <libdabba/strlcpy.h>
 #include <dabba/dabba.h>
 #include <dabba/ipc.h>
+#include <dabba/help.h>
+
+enum interface_modify_option {
+	OPT_INTERFACE_PROMISC,
+	OPT_INTERFACE_ID,
+};
+
+static struct option *interface_modify_options_get(void)
+{
+	static struct option interface_modify_option[] = {
+		{"promisc", no_argument, NULL, OPT_INTERFACE_PROMISC},
+		{"id", required_argument, NULL, OPT_INTERFACE_ID},
+		{NULL, 0, NULL, 0},
+	};
+
+	return interface_modify_option;
+}
 
 static void display_interface_list_header(void)
 {
@@ -175,6 +194,34 @@ int cmd_interface_list(int argc, const char **argv)
 	return rc;
 }
 
+static int prepare_interface_modify_query(int argc, char **argv,
+					  struct dabba_ifconf *ifconf_msg)
+{
+	int ret, rc = 0;
+
+	assert(ifconf_msg);
+
+	while ((ret =
+		getopt_long_only(argc, argv, "", interface_modify_options_get(),
+				 NULL)) != EOF) {
+		switch (ret) {
+		case OPT_INTERFACE_PROMISC:
+			ifconf_msg->flags |= IFF_PROMISC;
+			break;
+		case OPT_INTERFACE_ID:
+			strlcpy(ifconf_msg->name, optarg,
+				sizeof(ifconf_msg->name));
+			break;
+		default:
+			show_usage(interface_modify_options_get());
+			rc = -1;
+			break;
+		}
+	}
+
+	return rc;
+}
+
 /**
  * \brief Modify parametets of a supported interface
  * \param[in]           argc	        Argument counter
@@ -195,6 +242,12 @@ int cmd_interface_modify(int argc, const char **argv)
 	msg.mtype = 1;
 	msg.msg_body.type = DABBA_IF_MODIFY;
 	msg.msg_body.elem_nr = 1;
+
+	rc = prepare_interface_modify_query(argc, (char **)argv,
+					    msg.msg_body.msg.ifconf);
+
+	if (rc)
+		return rc;
 
 	return dabba_ipc_msg(&msg);
 }

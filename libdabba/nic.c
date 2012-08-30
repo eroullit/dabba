@@ -35,9 +35,30 @@
 #include <sys/socket.h>
 #include <sys/ioctl.h>
 #include <net/if.h>
+#include <netinet/in.h>
+#include <netpacket/packet.h>
+#include <linux/if_ether.h>
 
 #include <libdabba/nic.h>
 #include <libdabba/strlcpy.h>
+
+static int dev_kernel_request(struct ifreq *ifr, const int request)
+{
+	int rc, sock;
+
+	assert(ifr);
+
+	sock = socket(AF_INET, SOCK_DGRAM, 0);
+
+	if (sock < 0)
+		return errno;
+
+	rc = ioctl(sock, request, ifr);
+
+	close(sock);
+
+	return rc;
+}
 
 /**
  * \brief Get the interface index of a specific interface
@@ -52,36 +73,26 @@
 
 int devname_to_ifindex(const char *const dev, int *index)
 {
-	int ret;
-	int sock;
-	struct ifreq ethreq;
+	int rc;
+	struct ifreq ifr;
 
 	assert(dev);
 	assert(index);
 
 	if (strcmp(dev, ANY_INTERFACE) == 0) {
 		*index = 0;
-		return (0);
+		return 0;
 	}
 
-	sock = socket(AF_INET, SOCK_DGRAM, 0);
+	memset(&ifr, 0, sizeof(ifr));
+	strlcpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name));
 
-	if (sock < 0)
-		return (errno);
+	rc = dev_kernel_request(&ifr, SIOCGIFINDEX);
 
-	memset(&ethreq, 0, sizeof(ethreq));
-	strlcpy(ethreq.ifr_name, dev, sizeof(ethreq.ifr_name));
+	if (!rc)
+		*index = ifr.ifr_ifindex;
 
-	ret = ioctl(sock, SIOCGIFINDEX, &ethreq);
-
-	close(sock);
-
-	if (ret < 0)
-		return (errno);
-
-	*index = ethreq.ifr_ifindex;
-
-	return (0);
+	return rc;
 }
 
 /**
@@ -99,8 +110,8 @@ int devname_to_ifindex(const char *const dev, int *index)
 int ifindex_to_devname(const int index, char *dev, size_t dev_len)
 {
 	const char alldev[] = ANY_INTERFACE;
-	struct ifreq ethreq;
-	int ret, sock;
+	struct ifreq ifr;
+	int rc;
 
 	assert(index >= 0);
 	assert(dev);
@@ -111,22 +122,45 @@ int ifindex_to_devname(const int index, char *dev, size_t dev_len)
 		return (0);
 	}
 
-	sock = socket(AF_INET, SOCK_DGRAM, 0);
+	memset(&ifr, 0, sizeof(ifr));
+	ifr.ifr_ifindex = index;
 
-	if (sock < 0)
-		return (errno);
+	rc = dev_kernel_request(&ifr, SIOCGIFNAME);
 
-	memset(&ethreq, 0, sizeof(ethreq));
-	ethreq.ifr_ifindex = index;
+	if (!rc)
+		strlcpy(dev, ifr.ifr_name, dev_len);
 
-	ret = ioctl(sock, SIOCGIFNAME, &ethreq);
+	return rc;
+}
 
-	close(sock);
+int dev_flags_get(const char *const dev, short *flags)
+{
+	int rc;
+	struct ifreq ifr;
 
-	if (ret < 0)
-		return (errno);
+	assert(dev);
+	assert(flags);
 
-	strlcpy(dev, ethreq.ifr_name, dev_len);
+	memset(&ifr, 0, sizeof(ifr));
+	strlcpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name));
 
-	return (0);
+	rc = dev_kernel_request(&ifr, SIOCGIFFLAGS);
+
+	if (!rc)
+		*flags = ifr.ifr_flags;
+
+	return rc;
+}
+
+int dev_flags_set(const char *const dev, const short flags)
+{
+	struct ifreq ifr;
+
+	assert(dev);
+
+	memset(&ifr, 0, sizeof(ifr));
+	strlcpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name));
+	ifr.ifr_flags = flags;
+
+	return dev_kernel_request(&ifr, SIOCSIFFLAGS);
 }
