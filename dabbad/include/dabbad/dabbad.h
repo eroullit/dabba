@@ -31,6 +31,7 @@
 #define	DABBAD_H
 
 #include <stdint.h>
+#include <string.h>
 #include <limits.h>
 #include <net/if.h>
 #include <sys/types.h>
@@ -41,6 +42,12 @@
 /**
  * \brief Supported dabbad IPC message types
  */
+
+enum dabba_tristate {
+	FALSE,
+	TRUE,
+	UNSET
+};
 
 enum dabba_msg_type {
 	DABBA_IFCONF,
@@ -67,7 +74,7 @@ struct dabba_msg_buf {
 
 struct dabba_ifconf {
 	char name[IFNAMSIZ];
-	uint32_t flags;
+	enum dabba_tristate up, running, promisc, loopback;
 };
 
 enum dabba_thread_flags {
@@ -174,4 +181,15 @@ static inline int dabba_get_ipc_queue_id(const int flags)
 
 	return msgget(key, flags);
 }
+
+static inline enum dabba_tristate dabba_tristate_parse(const char *const str)
+{
+	if (strcasecmp(str, "false") == 0)
+		return FALSE;
+	else if (strcasecmp(str, "true") == 0)
+		return TRUE;
+	else
+		return UNSET;
+}
+
 #endif				/* DABBAD_H */

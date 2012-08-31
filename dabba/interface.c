@@ -106,6 +106,8 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabba/help.h>
 
 enum interface_modify_option {
+	OPT_INTERFACE_UP,
+	OPT_INTERFACE_RUNNING,
 	OPT_INTERFACE_PROMISC,
 	OPT_INTERFACE_ID,
 };
@@ -113,7 +115,9 @@ enum interface_modify_option {
 static struct option *interface_modify_options_get(void)
 {
 	static struct option interface_modify_option[] = {
-		{"promisc", no_argument, NULL, OPT_INTERFACE_PROMISC},
+		{"up", required_argument, NULL, OPT_INTERFACE_UP},
+		{"running", required_argument, NULL, OPT_INTERFACE_RUNNING},
+		{"promisc", required_argument, NULL, OPT_INTERFACE_PROMISC},
 		{"id", required_argument, NULL, OPT_INTERFACE_ID},
 		{NULL, 0, NULL, 0},
 	};
@@ -138,17 +142,13 @@ static void display_interface_list(const struct dabba_ifconf *const
 	for (a = 0; a < elem_nr; a++) {
 		printf("    - name: %s\n", interface_msg[a].name);
 		printf("      up: %s\n",
-		       (interface_msg[a].flags & IFF_UP) ==
-		       IFF_UP ? "true" : "false");
+		       interface_msg[a].up == TRUE ? "true" : "false");
 		printf("      running: %s\n",
-		       (interface_msg[a].flags & IFF_RUNNING) ==
-		       IFF_RUNNING ? "true" : "false");
+		       interface_msg[a].running == TRUE ? "true" : "false");
 		printf("      promiscuous: %s\n",
-		       (interface_msg[a].flags & IFF_PROMISC) ==
-		       IFF_PROMISC ? "true" : "false");
+		       interface_msg[a].promisc == TRUE ? "true" : "false");
 		printf("      loopback: %s\n",
-		       (interface_msg[a].flags & IFF_LOOPBACK) ==
-		       IFF_LOOPBACK ? "true" : "false");
+		       interface_msg[a].loopback == TRUE ? "true" : "false");
 	}
 }
 
@@ -201,12 +201,23 @@ static int prepare_interface_modify_query(int argc, char **argv,
 
 	assert(ifconf_msg);
 
+	ifconf_msg->up = UNSET;
+	ifconf_msg->running = UNSET;
+	ifconf_msg->promisc = UNSET;
+	ifconf_msg->loopback = UNSET;
+
 	while ((ret =
 		getopt_long_only(argc, argv, "", interface_modify_options_get(),
 				 NULL)) != EOF) {
 		switch (ret) {
+		case OPT_INTERFACE_UP:
+			ifconf_msg->up = dabba_tristate_parse(optarg);
+			break;
+		case OPT_INTERFACE_RUNNING:
+			ifconf_msg->running = dabba_tristate_parse(optarg);
+			break;
 		case OPT_INTERFACE_PROMISC:
-			ifconf_msg->flags |= IFF_PROMISC;
+			ifconf_msg->promisc = dabba_tristate_parse(optarg);
 			break;
 		case OPT_INTERFACE_ID:
 			strlcpy(ifconf_msg->name, optarg,

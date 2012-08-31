@@ -49,6 +49,7 @@ int dabbad_ifconf_get(struct dabba_ipc_msg *msg)
 {
 	size_t a, off, ifconf_size;
 	struct ifaddrs *ifaddr, *ifa;
+	struct dabba_ifconf *ifconf;
 
 	if (getifaddrs(&ifaddr) != 0)
 		return -1;
@@ -66,9 +67,20 @@ int dabbad_ifconf_get(struct dabba_ipc_msg *msg)
 		if (!ifa->ifa_addr || ifa->ifa_addr->sa_family != AF_PACKET)
 			continue;
 
-		strlcpy(msg->msg_body.msg.ifconf[a].name, ifa->ifa_name,
-			IFNAMSIZ);
-		msg->msg_body.msg.ifconf[a].flags = ifa->ifa_flags;
+		ifconf = &msg->msg_body.msg.ifconf[a];
+		strlcpy(ifconf->name, ifa->ifa_name, IFNAMSIZ);
+
+		ifconf->up = (ifa->ifa_flags & IFF_UP) == IFF_UP ? TRUE : FALSE;
+		ifconf->running =
+		    (ifa->ifa_flags & IFF_RUNNING) ==
+		    IFF_RUNNING ? TRUE : FALSE;
+		ifconf->promisc =
+		    (ifa->ifa_flags & IFF_PROMISC) ==
+		    IFF_PROMISC ? TRUE : FALSE;
+		ifconf->loopback =
+		    (ifa->ifa_flags & IFF_LOOPBACK) ==
+		    IFF_LOOPBACK ? TRUE : FALSE;
+
 		a++;
 	}
 
@@ -79,6 +91,28 @@ int dabbad_ifconf_get(struct dabba_ipc_msg *msg)
 
 int dabbad_interface_modify(struct dabba_ipc_msg *msg)
 {
-	return dev_flags_set(msg->msg_body.msg.ifconf[0].name,
-			     msg->msg_body.msg.ifconf[0].flags);
+	int rc;
+	short flags;
+
+	rc = dev_flags_get(msg->msg_body.msg.ifconf[0].name, &flags);
+
+	if (rc)
+		return rc;
+
+	if (msg->msg_body.msg.ifconf[0].up == TRUE)
+		flags |= IFF_UP;
+	else if (msg->msg_body.msg.ifconf[0].up == FALSE)
+		flags &= IFF_UP;
+
+	if (msg->msg_body.msg.ifconf[0].running == TRUE)
+		flags |= IFF_RUNNING;
+	else if (msg->msg_body.msg.ifconf[0].running == FALSE)
+		flags &= IFF_RUNNING;
+
+	if (msg->msg_body.msg.ifconf[0].promisc == TRUE)
+		flags |= IFF_PROMISC;
+	else if (msg->msg_body.msg.ifconf[0].promisc == FALSE)
+		flags &= IFF_PROMISC;
+
+	return dev_flags_set(msg->msg_body.msg.ifconf[0].name, flags);
 }
