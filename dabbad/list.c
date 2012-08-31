@@ -102,17 +102,17 @@ int dabbad_interface_modify(struct dabba_ipc_msg *msg)
 	if (msg->msg_body.msg.ifconf[0].up == TRUE)
 		flags |= IFF_UP;
 	else if (msg->msg_body.msg.ifconf[0].up == FALSE)
-		flags &= IFF_UP;
+		flags &= ~IFF_UP;
 
 	if (msg->msg_body.msg.ifconf[0].running == TRUE)
 		flags |= IFF_RUNNING;
 	else if (msg->msg_body.msg.ifconf[0].running == FALSE)
-		flags &= IFF_RUNNING;
+		flags &= ~IFF_RUNNING;
 
 	if (msg->msg_body.msg.ifconf[0].promisc == TRUE)
 		flags |= IFF_PROMISC;
 	else if (msg->msg_body.msg.ifconf[0].promisc == FALSE)
-		flags &= IFF_PROMISC;
+		flags &= ~IFF_PROMISC;
 
 	return dev_flags_set(msg->msg_body.msg.ifconf[0].name, flags);
 }
