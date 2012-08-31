@@ -57,7 +57,7 @@ static int dev_kernel_request(struct ifreq *ifr, const int request)
 
 	close(sock);
 
-	return rc;
+	return rc ? errno : rc;
 }
 
 /**
