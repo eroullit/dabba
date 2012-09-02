@@ -50,11 +50,26 @@ static void ifconf_stats_copy(struct dabba_ifconf *ifconf,
 	ifconf->rx.packet = stats->rx_packets;
 	ifconf->rx.error = stats->rx_errors;
 	ifconf->rx.dropped = stats->rx_dropped;
+	ifconf->rx.compressed = stats->rx_compressed;
+
+	ifconf->rx_error.fifo = stats->rx_fifo_errors;
+	ifconf->rx_error.frame = stats->rx_frame_errors;
+	ifconf->rx_error.crc = stats->rx_crc_errors;
+	ifconf->rx_error.length = stats->rx_length_errors;
+	ifconf->rx_error.missed = stats->rx_missed_errors;
+	ifconf->rx_error.over = stats->rx_over_errors;
 
 	ifconf->tx.byte = stats->tx_bytes;
 	ifconf->tx.packet = stats->tx_packets;
 	ifconf->tx.error = stats->tx_errors;
 	ifconf->tx.dropped = stats->tx_dropped;
+	ifconf->tx.compressed = stats->tx_compressed;
+
+	ifconf->tx_error.fifo = stats->tx_fifo_errors;
+	ifconf->tx_error.carrier = stats->tx_carrier_errors;
+	ifconf->tx_error.heartbeat = stats->tx_heartbeat_errors;
+	ifconf->tx_error.window = stats->tx_window_errors;
+	ifconf->tx_error.aborted = stats->tx_aborted_errors;
 }
 
 /**

@@ -69,7 +69,15 @@ struct dabba_msg_buf {
 };
 
 struct if_counter {
-	uint32_t packet, byte, error, dropped;
+	uint32_t packet, byte, error, dropped, compressed;
+};
+
+struct if_rx_error_counter {
+	uint32_t fifo, frame, crc, length, missed, over;
+};
+
+struct if_tx_error_counter {
+	uint32_t fifo, carrier, heartbeat, window, aborted;
 };
 
 /**
@@ -79,6 +87,8 @@ struct if_counter {
 struct dabba_ifconf {
 	char name[IFNAMSIZ];
 	struct if_counter rx, tx;
+	struct if_rx_error_counter rx_error;
+	struct if_tx_error_counter tx_error;
 	enum dabba_tristate up, running, promisc, loopback;
 };
 

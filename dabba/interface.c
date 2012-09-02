@@ -149,13 +149,30 @@ static void display_interface_list(const struct dabba_ifconf *const
 		     interface_msg[a].loopback == TRUE ? "true" : "false");
 		printf("      statistics:\n");
 		printf
-		    ("          rx: {byte: %u, packet: %u, error: %u, dropped: %u}\n",
+		    ("          rx: {byte: %u, packet: %u, error: %u, dropped: %u, compressed: %u}\n",
 		     interface_msg[a].rx.byte, interface_msg[a].rx.packet,
-		     interface_msg[a].rx.error, interface_msg[a].rx.dropped);
+		     interface_msg[a].rx.error, interface_msg[a].rx.dropped,
+		     interface_msg[a].rx.compressed);
 		printf
-		    ("          tx: {byte: %u, packet: %u, error: %u, dropped: %u}\n",
+		    ("          tx: {byte: %u, packet: %u, error: %u, dropped: %u, compressed: %u}\n",
 		     interface_msg[a].tx.byte, interface_msg[a].tx.packet,
-		     interface_msg[a].tx.error, interface_msg[a].tx.dropped);
+		     interface_msg[a].tx.error, interface_msg[a].tx.dropped,
+		     interface_msg[a].tx.compressed);
+		printf
+		    ("          rx error: {fifo: %u, frame: %u, crc: %u, length: %u, missed: %u, overflow: %u}\n",
+		     interface_msg[a].rx_error.fifo,
+		     interface_msg[a].rx_error.frame,
+		     interface_msg[a].rx_error.crc,
+		     interface_msg[a].rx_error.length,
+		     interface_msg[a].rx_error.missed,
+		     interface_msg[a].rx_error.over);
+		printf
+		    ("          tx error: {fifo: %u, carrier: %u, heartbeat: %u, window: %u, aborted: %u}\n",
+		     interface_msg[a].tx_error.fifo,
+		     interface_msg[a].tx_error.carrier,
+		     interface_msg[a].tx_error.heartbeat,
+		     interface_msg[a].tx_error.window,
+		     interface_msg[a].tx_error.aborted);
 	}
 }
 
