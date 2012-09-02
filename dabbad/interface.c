@@ -37,7 +37,7 @@
 #include <libdabba/macros.h>
 #include <libdabba/strlcpy.h>
 #include <libdabba/nic.h>
-#include <dabbad/list.h>
+#include <dabbad/interface.h>
 #include <netpacket/packet.h>
 
 static void ifconf_stats_copy(struct dabba_ifconf *ifconf,

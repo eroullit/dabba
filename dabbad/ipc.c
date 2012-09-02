@@ -33,7 +33,7 @@
 #include <errno.h>
 #include <assert.h>
 #include <dabbad/ipc.h>
-#include <dabbad/list.h>
+#include <dabbad/interface.h>
 #include <dabbad/capture.h>
 #include <dabbad/thread.h>
 
