@@ -141,14 +141,30 @@ static void display_interface_list(const struct dabba_ifconf *const
 
 	for (a = 0; a < elem_nr; a++) {
 		printf("    - name: %s\n", interface_msg[a].name);
-		printf("      up: %s\n",
+		printf("      status:\n");
+		printf("          up: %s\n",
 		       interface_msg[a].up == TRUE ? "true" : "false");
-		printf("      running: %s\n",
+		printf("          running: %s\n",
 		       interface_msg[a].running == TRUE ? "true" : "false");
-		printf("      promiscuous: %s\n",
+		printf("          promiscuous: %s\n",
 		       interface_msg[a].promisc == TRUE ? "true" : "false");
-		printf("      loopback: %s\n",
+		printf("          loopback: %s\n",
 		       interface_msg[a].loopback == TRUE ? "true" : "false");
+		printf("      statistics:\n");
+		printf("          rx:\n");
+		printf("              byte: %u\n", interface_msg[a].rx.byte);
+		printf("              packet: %u\n",
+		       interface_msg[a].rx.packet);
+		printf("              error: %u\n", interface_msg[a].rx.error);
+		printf("              dropped: %u\n",
+		       interface_msg[a].rx.dropped);
+		printf("          tx:\n");
+		printf("              byte: %u\n", interface_msg[a].tx.byte);
+		printf("              packet: %u\n",
+		       interface_msg[a].tx.packet);
+		printf("              error: %u\n", interface_msg[a].tx.error);
+		printf("              dropped: %u\n",
+		       interface_msg[a].tx.dropped);
 	}
 }
 

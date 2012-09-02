@@ -68,12 +68,17 @@ struct dabba_msg_buf {
 	uint8_t buf[1024];
 };
 
+struct if_counter {
+	uint32_t packet, byte, error, dropped;
+};
+
 /**
  * \brief Dabbad interface name buffer
  */
 
 struct dabba_ifconf {
 	char name[IFNAMSIZ];
+	struct if_counter rx, tx;
 	enum dabba_tristate up, running, promisc, loopback;
 };
 

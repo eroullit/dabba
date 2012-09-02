@@ -27,15 +27,35 @@
 
 /* __LICENSE_HEADER_END__ */
 
+#include <assert.h>
 #include <stdio.h>
 #include <net/if.h>
 #include <sys/types.h>
 #include <ifaddrs.h>
+#include <linux/if_link.h>
+
 #include <libdabba/macros.h>
 #include <libdabba/strlcpy.h>
 #include <libdabba/nic.h>
 #include <dabbad/list.h>
 #include <netpacket/packet.h>
+
+static void ifconf_stats_copy(struct dabba_ifconf *ifconf,
+			      struct rtnl_link_stats *stats)
+{
+	assert(ifconf);
+	assert(stats);
+
+	ifconf->rx.byte = stats->rx_bytes;
+	ifconf->rx.packet = stats->rx_packets;
+	ifconf->rx.error = stats->rx_errors;
+	ifconf->rx.dropped = stats->rx_dropped;
+
+	ifconf->tx.byte = stats->tx_bytes;
+	ifconf->tx.packet = stats->tx_packets;
+	ifconf->tx.error = stats->tx_errors;
+	ifconf->tx.dropped = stats->tx_dropped;
+}
 
 /**
  * \brief Get the list of usable interfaces by dabbad and give it to the user
@@ -50,6 +70,7 @@ int dabbad_ifconf_get(struct dabba_ipc_msg *msg)
 	size_t a, off, ifconf_size;
 	struct ifaddrs *ifaddr, *ifa;
 	struct dabba_ifconf *ifconf;
+	struct rtnl_link_stats *stats;
 
 	if (getifaddrs(&ifaddr) != 0)
 		return -1;
@@ -80,6 +101,12 @@ int dabbad_ifconf_get(struct dabba_ipc_msg *msg)
 		ifconf->loopback =
 		    (ifa->ifa_flags & IFF_LOOPBACK) ==
 		    IFF_LOOPBACK ? TRUE : FALSE;
+
+		stats = ifa->ifa_data;
+
+		/* FIXME 32-bit counters only... */
+		if (stats)
+			ifconf_stats_copy(ifconf, stats);
 
 		a++;
 	}
