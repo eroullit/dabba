@@ -29,4 +29,4 @@
 int dabbad_ifconf_get(struct dabba_ipc_msg *msg);
 int dabbad_interface_modify(struct dabba_ipc_msg *msg);
 
-#endif				/* LIST_H */
+#endif				/* INTERFACE_H */
