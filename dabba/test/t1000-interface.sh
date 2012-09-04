@@ -27,7 +27,7 @@ generate_list(){
         rm dev_list
         for dev in `sed '1,2d' /proc/net/dev | awk -F ':' '{ print $1 }' | tr -d ' '`
         do
-            echo "    - $dev" >> dev_list
+            echo "    - name: $dev" >> dev_list
         done
 }
 
@@ -36,8 +36,6 @@ generate_yaml_list()
 generate_list
 
 cat <<EOF
----
-  interfaces:
 `cat dev_list`
 EOF
 }
@@ -62,7 +60,7 @@ test_expect_success "Check 'dabba interface' help output" "
 test_expect_success "invoke dabba interface list with dabbad" "
     '$DABBAD_PATH'/dabbad --daemonize &&
     sleep 0.1 &&
-    '$DABBA_PATH'/dabba interface list > result &&
+    '$DABBA_PATH'/dabba interface list | grep 'name: ' > result &&
     killall dabbad &&
     generate_yaml_list > expected &&
     sort -o expected_sorted expected &&
@@ -77,7 +75,7 @@ test_expect_success DUMMY_DEV "Setup: Create $interface_nr dummy interfaces" "
 test_expect_success DUMMY_DEV "invoke dabba interface list with dabbad with $interface_nr extra interfaces" "
     '$DABBAD_PATH'/dabbad --daemonize &&
     sleep 0.1 &&
-    '$DABBA_PATH'/dabba interface list > result &&
+    '$DABBA_PATH'/dabba interface list | grep 'name: ' > result &&
     killall dabbad &&
     generate_yaml_list > expected &&
     sort -o expected_sorted expected &&
