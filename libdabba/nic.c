@@ -133,6 +133,13 @@ int ifindex_to_devname(const int index, char *dev, size_t dev_len)
 	return rc;
 }
 
+/**
+ * \brief Get the interface status flags
+ * \param[in]       dev	        interface name
+ * \param[out]      flags	current interface status flags
+ * \return 0 on success, -1 if the interface status flags could not be fetched.
+ */
+
 int dev_flags_get(const char *const dev, short *flags)
 {
 	int rc;
@@ -151,6 +158,13 @@ int dev_flags_get(const char *const dev, short *flags)
 
 	return rc;
 }
+
+/**
+ * \brief Set the interface status flags
+ * \param[in]       dev	        interface name
+ * \param[un]       flags	new interface status flags
+ * \return 0 on success, else if the interface status flags could not be changed.
+ */
 
 int dev_flags_set(const char *const dev, const short flags)
 {

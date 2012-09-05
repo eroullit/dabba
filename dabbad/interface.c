@@ -131,6 +131,12 @@ int dabbad_ifconf_get(struct dabba_ipc_msg *msg)
 	return 0;
 }
 
+/**
+ * \brief Modify a supported interface status
+ * \param[in,out]       msg	        Dabba daemon IPC message
+ * \return 0 on success, else if the interface status could not be modified.
+ */
+
 int dabbad_interface_modify(struct dabba_ipc_msg *msg)
 {
 	int rc;

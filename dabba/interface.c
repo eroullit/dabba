@@ -131,6 +131,12 @@ static void display_interface_list_header(void)
 	printf("  interfaces:\n");
 }
 
+/**
+ * \brief Print fetch interface information in a YAML format
+ * \param[in]           interface_msg	interface information IPC message
+ * \param[in]           elem_nr		number of interfaces to report
+ */
+
 static void display_interface_list(const struct dabba_ifconf *const
 				   interface_msg, const size_t elem_nr)
 {
