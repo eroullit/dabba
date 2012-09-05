@@ -366,6 +366,68 @@ test_expect_success() {
 	echo >&3 ""
 }
 
+# debugging-friendly alternatives to "test [-f|-d|-e]"
+# The commands test the existence or non-existence of $1. $2 can be
+# given to provide a more precise diagnosis.
+test_path_is_file () {
+	if ! [ -f "$1" ]
+	then
+		echo "File $1 doesn't exist. $*"
+		false
+	fi
+}
+
+test_path_is_dir () {
+	if ! [ -d "$1" ]
+	then
+		echo "Directory $1 doesn't exist. $*"
+		false
+	fi
+}
+
+test_path_is_missing () {
+	if [ -e "$1" ]
+	then
+		echo "Path exists:"
+		ls -ld "$1"
+		if [ $# -ge 1 ]; then
+			echo "$*"
+		fi
+		false
+	fi
+}
+
+# test_line_count checks that a file has the number of lines it
+# ought to. For example:
+#
+#	test_expect_success 'produce exactly one line of output' '
+#		do something >output &&
+#		test_line_count = 1 output
+#	'
+#
+# is like "test $(wc -l <output) = 1" except that it passes the
+# output through when the number of lines is wrong.
+
+test_line_count () {
+	if test $# != 3
+	then
+		error "bug in the test script: not 3 parameters to test_line_count"
+	elif ! test $(wc -l <"$3") "$1" "$2"
+	then
+		echo "test_line_count: line count for $3 !$1 $2"
+		cat "$3"
+		return 1
+	fi
+}
+
+write_script () {
+	{
+		echo "#!${2-"$SHELL_PATH"}" &&
+		cat
+	} >"$1" &&
+	chmod +x "$1"
+}
+
 # Public: Run test commands and expect them to fail. Used to demonstrate a known
 # breakage.
 #
