@@ -22,8 +22,10 @@
 DABBAD_PATH="$SHARNESS_TEST_DIRECTORY/../../dabbad"
 DABBA_PATH="$SHARNESS_TEST_DIRECTORY/../../dabba"
 
+PYTHON_PATH="$(which python)"
+
 modinfo dummy 2>&1 > /dev/null && test_set_prereq DUMMY_DEV
-python -c "import yaml" 2>&1 > /dev/null && test_set_prereq PYTHON_YAML
+"$PYTHON_PATH" -c "import yaml" 2>&1 > /dev/null && test_set_prereq PYTHON_YAML
 taskset -h 2>&1 > /dev/null && test_set_prereq TASKSET
 
 flush_test_interface()
@@ -36,6 +38,30 @@ create_test_interface()
         #local interface_nr=${$1:-1}
         sudo modprobe dummy numdummies="$interface_nr" <&6
         sleep 1
+}
+
+yaml2dict()
+{
+    local yaml_file=$1
+    "$PYTHON_PATH" -c "import yaml; y = yaml.load(open('$yaml_file')); print y;"
+}
+
+generate_python_dictonary_reader()
+{
+    output_path="$1"
+    dict_file="$2"
+    write_script "$output_path" "$PYTHON_PATH" << EOF
+import sys
+
+y=$(cat $dict_file)
+
+for i in range(1, len(sys.argv)):
+	if sys.argv[i].isdigit():
+		sys.argv[i] = int(sys.argv[i])
+	y = y[sys.argv[i]]
+
+print y
+EOF
 }
 
 # vim: ft=sh:tabstop=4:et
