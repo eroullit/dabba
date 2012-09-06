@@ -48,6 +48,10 @@ test_expect_success DUMMY_DEV "Setup: Remove all dummy interfaces" "
     test_might_fail flush_test_interface
 "
 
+test_expect_success "Setup: Start dabbad" "
+    '$DABBAD_PATH'/dabbad --daemonize
+"
+
 test_expect_success "Check 'dabba interface' help output" "
     '$DABBA_PATH/dabba' help interface | cat <<EOF
     q
@@ -58,13 +62,11 @@ test_expect_success "Check 'dabba interface' help output" "
 "
 
 test_expect_success "invoke dabba interface list with dabbad" "
-    '$DABBAD_PATH'/dabbad --daemonize &&
-    sleep 0.1 &&
-    '$DABBA_PATH'/dabba interface list | grep 'name: ' > result &&
-    killall dabbad &&
+    '$DABBA_PATH'/dabba interface list > result &&
+    grep 'name: ' result > name_result &&
     generate_yaml_list > expected &&
     sort -o expected_sorted expected &&
-    sort -o result_sorted result &&
+    sort -o result_sorted name_result &&
     test_cmp expected_sorted result_sorted
 "
 
@@ -72,19 +74,21 @@ test_expect_success DUMMY_DEV "Setup: Create $interface_nr dummy interfaces" "
     create_test_interface $interface_nr
 "
 
-test_expect_success DUMMY_DEV "invoke dabba interface list with dabbad with $interface_nr extra interfaces" "
-    '$DABBAD_PATH'/dabbad --daemonize &&
-    sleep 0.1 &&
-    '$DABBA_PATH'/dabba interface list | grep 'name: ' > result &&
-    killall dabbad &&
+test_expect_success DUMMY_DEV "Check interface list with $interface_nr extra interfaces" "
+    '$DABBA_PATH'/dabba interface list > result &&
+    grep 'name: ' result > name_result &&
     generate_yaml_list > expected &&
     sort -o expected_sorted expected &&
-    sort -o result_sorted result &&
+    sort -o result_sorted name_result &&
     test_cmp expected_sorted result_sorted
 "
 
 test_expect_success DUMMY_DEV "Cleanup: Remove all dummy interfaces" "
     flush_test_interface
+"
+
+test_expect_success "Cleanup: Stop dabbad" "
+    killall dabbad
 "
 
 test_done
