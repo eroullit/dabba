@@ -23,6 +23,10 @@ test_description='Test dabba interface list command'
 
 interface_nr=100
 
+number_of_interface_get(){
+    sed '1,2d' /proc/net/dev | wc -l | cut -f 1 -d ' '
+}
+
 generate_list(){
         rm dev_list
         for dev in `sed '1,2d' /proc/net/dev | awk -F ':' '{ print $1 }' | tr -d ' '`
@@ -69,6 +73,26 @@ test_expect_success "invoke dabba interface list with dabbad" "
     sort -o result_sorted name_result &&
     test_cmp expected_sorted result_sorted
 "
+
+test_expect_success PYTHON_YAML "Parse interface list YAML output" "
+    yaml2dict result > parsed &&
+    generate_python_dictonary_reader iface_status_read.py parsed
+"
+
+for i in `seq 0 $(($(number_of_interface_get)-1))`
+do
+    test_expect_success PYTHON_YAML "Check interface name" "
+        test -n \"$(./iface_status_read.py interfaces $i name)\"
+    "
+
+    test_expect_success PYTHON_YAML "Check interface status" "
+        test -n \"$(./iface_status_read.py interfaces $i status)\"
+    "
+
+    test_expect_success PYTHON_YAML "Check interface statistics" "
+        test -n \"$(./iface_status_read.py interfaces $i statistics)\"
+    "
+done
 
 test_expect_success DUMMY_DEV "Setup: Create $interface_nr dummy interfaces" "
     create_test_interface $interface_nr
