@@ -21,8 +21,6 @@ test_description='Test dabba interface list command'
 
 . ./dabba-test-lib.sh
 
-interface_nr=100
-
 number_of_interface_get(){
     sed '1,2d' /proc/net/dev | wc -l | cut -f 1 -d ' '
 }
@@ -80,35 +78,29 @@ test_expect_success PYTHON_YAML "Parse interface list YAML output" "
 
 for i in `seq 0 $(($(number_of_interface_get)-1))`
 do
-    test_expect_success PYTHON_YAML "Check interface name" "
-        test -n \"$(dictkeys2values interfaces $i name < parsed)\"
-    "
-
-    test_expect_success PYTHON_YAML "Check interface status" "
-        test -n \"$(dictkeys2values interfaces $i status < parsed)\"
-    "
-
-    test_expect_success PYTHON_YAML "Check interface statistics" "
+    test_expect_success PYTHON_YAML "Check interface #$(($i+1)) output" "
+        grep -wq \"$(dictkeys2values interfaces $i name < parsed)\" /proc/net/dev &&
+        test -n \"$(dictkeys2values interfaces $i status < parsed)\" &&
         test -n \"$(dictkeys2values interfaces $i statistics < parsed)\"
     "
 done
 
-test_expect_success DUMMY_DEV "Setup: Create $interface_nr dummy interfaces" "
-    create_test_interface $interface_nr
-"
+for promisc_status in True False
+do
+    test_expect_success "Set promiscuous mode to $promisc_status on loopback device" "
+        '$DABBA_PATH'/dabba interface modify --id 'lo' --promisc '$promisc_status'
+    "
 
-test_expect_success DUMMY_DEV "Check interface list with $interface_nr extra interfaces" "
-    '$DABBA_PATH'/dabba interface list > result &&
-    grep 'name: ' result > name_result &&
-    generate_yaml_list > expected &&
-    sort -o expected_sorted expected &&
-    sort -o result_sorted name_result &&
-    test_cmp expected_sorted result_sorted
-"
+    test_expect_success PYTHON_YAML "Parse interface YAML output" "
+        '$DABBA_PATH'/dabba interface list > result &&
+        yaml2dict result > parsed
+    "
 
-test_expect_success DUMMY_DEV "Cleanup: Remove all dummy interfaces" "
-    flush_test_interface
-"
+    # the loopback device gets always printed first
+    test_expect_success PYTHON_YAML "Check new promiscuous status" "
+        test \"$(dictkeys2values interfaces 0 status promiscuous < parsed)\" = '$promisc_status'
+    "
+done
 
 test_expect_success "Cleanup: Stop dabbad" "
     killall dabbad
