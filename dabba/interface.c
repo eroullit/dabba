@@ -50,6 +50,33 @@ Give the user the possibility to manage the available network interfaces.
 Fetch and print information about currenty supported interfaces.
 The output is formatted in YAML.
 
+=item modify
+
+Modify status of available network interfaces
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item --id <name>
+
+interface name to work on.
+
+=item --up (true|false)
+
+Activate or shutdown a specific interface.
+
+=item --running (true|false)
+
+Mark the interface as operational.
+
+=item --promiscuous (true|false)
+
+Enable or disable the 'promiscuous' mode of an interface.
+If selected, all packets on the network will be received by the interface.
+
 =back
 
 =head1 EXAMPLES
@@ -59,6 +86,11 @@ The output is formatted in YAML.
 =item dabba interface list
 
 Output the list of network interface which can be used by dabba.
+
+=item dabba interface modify --id eth0 --up true --running true --promiscuous true
+
+Modify the status of the interface 'eth0' to be up and running and alse
+listen to all incoming packets.
 
 =back
 
