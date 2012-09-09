@@ -28,14 +28,14 @@ modinfo dummy 2>&1 > /dev/null && test_set_prereq DUMMY_DEV
 "$PYTHON_PATH" -c "import yaml" 2>&1 > /dev/null && test_set_prereq PYTHON_YAML
 taskset -h 2>&1 > /dev/null && test_set_prereq TASKSET
 
-flush_test_interface()
+flush_dummy_interface()
 {
         sudo rmmod dummy <&6
 }
 
-create_test_interface()
+create_dummy_interface()
 {
-        #local interface_nr=${$1:-1}
+        interface_nr=$1
         sudo modprobe dummy numdummies="$interface_nr" <&6
         sleep 1
 }

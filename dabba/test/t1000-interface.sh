@@ -47,7 +47,7 @@ EOF
 #"
 
 test_expect_success DUMMY_DEV "Setup: Remove all dummy interfaces" "
-    test_might_fail flush_test_interface
+    test_might_fail flush_dummy_interface
 "
 
 test_expect_success "Setup: Start dabbad" "
@@ -85,23 +85,33 @@ do
     "
 done
 
-for promisc_status in True False
+test_expect_success "Activate dummy interface" "
+    create_dummy_interface 1
+"
+
+for status in True False
 do
-    test_expect_success "Set promiscuous mode to $promisc_status on loopback device" "
-        '$DABBA_PATH'/dabba interface modify --id 'lo' --promisc '$promisc_status'
-    "
+    for feature in promiscuous up running
+    do
+        test_expect_success DUMMY_DEV "Set '$feature' to $status on dummy device" "
+            '$DABBA_PATH'/dabba interface modify --id 'dummy0' --$feature '$status'
+        "
 
-    test_expect_success PYTHON_YAML "Parse interface YAML output" "
-        '$DABBA_PATH'/dabba interface list > result &&
-        yaml2dict result > parsed
-    "
+        test_expect_success DUMMY_DEV,PYTHON_YAML "Parse interface YAML output" "
+            '$DABBA_PATH'/dabba interface list > result &&
+            yaml2dict result > parsed
+        "
 
-    # the loopback device gets always printed first
-    test_expect_success PYTHON_YAML "Check new promiscuous status" "
-        test \"$(dictkeys2values interfaces 0 status promiscuous < parsed)\" = '$promisc_status'
-    "
+        # Freshly added interface will be at the end of the list
+        test_expect_success DUMMY_DEV,PYTHON_YAML "Check updated $feature status" "
+            test \"$(dictkeys2values interfaces $(($(number_of_interface_get)-1)) status $feature < parsed)\" = '$status'
+        "
+    done
 done
 
+test_expect_success DUMMY_DEV "Cleanup: Remove all dummy interfaces" "
+    flush_dummy_interface
+"
 test_expect_success "Cleanup: Stop dabbad" "
     killall dabbad
 "
