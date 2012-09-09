@@ -42,26 +42,12 @@ create_test_interface()
 
 yaml2dict()
 {
-    local yaml_file=$1
-    "$PYTHON_PATH" -c "import yaml; y = yaml.load(open('$yaml_file')); print y;"
+    "$PYTHON_PATH" "$SHARNESS_TEST_DIRECTORY"/yaml2dict.py $@
 }
 
-generate_python_dictonary_reader()
+dictkeys2values()
 {
-    output_path="$1"
-    dict_file="$2"
-    write_script "$output_path" "$PYTHON_PATH" << EOF
-import sys
-
-y=$(cat $dict_file)
-
-for i in range(1, len(sys.argv)):
-	if sys.argv[i].isdigit():
-		sys.argv[i] = int(sys.argv[i])
-	y = y[sys.argv[i]]
-
-print y
-EOF
+    "$PYTHON_PATH" "$SHARNESS_TEST_DIRECTORY"/dictkeys2values.py $@
 }
 
 # vim: ft=sh:tabstop=4:et

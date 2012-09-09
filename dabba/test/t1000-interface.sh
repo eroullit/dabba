@@ -75,22 +75,21 @@ test_expect_success "invoke dabba interface list with dabbad" "
 "
 
 test_expect_success PYTHON_YAML "Parse interface list YAML output" "
-    yaml2dict result > parsed &&
-    generate_python_dictonary_reader iface_status_read.py parsed
+    yaml2dict result > parsed
 "
 
 for i in `seq 0 $(($(number_of_interface_get)-1))`
 do
     test_expect_success PYTHON_YAML "Check interface name" "
-        test -n \"$(./iface_status_read.py interfaces $i name)\"
+        test -n \"$(dictkeys2values interfaces $i name < parsed)\"
     "
 
     test_expect_success PYTHON_YAML "Check interface status" "
-        test -n \"$(./iface_status_read.py interfaces $i status)\"
+        test -n \"$(dictkeys2values interfaces $i status < parsed)\"
     "
 
     test_expect_success PYTHON_YAML "Check interface statistics" "
-        test -n \"$(./iface_status_read.py interfaces $i statistics)\"
+        test -n \"$(dictkeys2values interfaces $i statistics < parsed)\"
     "
 done
 
