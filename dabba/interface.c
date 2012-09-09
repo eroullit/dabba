@@ -117,7 +117,7 @@ static struct option *interface_modify_options_get(void)
 	static struct option interface_modify_option[] = {
 		{"up", required_argument, NULL, OPT_INTERFACE_UP},
 		{"running", required_argument, NULL, OPT_INTERFACE_RUNNING},
-		{"promisc", required_argument, NULL, OPT_INTERFACE_PROMISC},
+		{"promiscuous", required_argument, NULL, OPT_INTERFACE_PROMISC},
 		{"id", required_argument, NULL, OPT_INTERFACE_ID},
 		{NULL, 0, NULL, 0},
 	};
