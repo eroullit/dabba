@@ -22,7 +22,7 @@
 DABBAD_PATH="$SHARNESS_TEST_DIRECTORY/../../dabbad"
 DABBA_PATH="$SHARNESS_TEST_DIRECTORY/../../dabba"
 
-PYTHON_PATH="$(which python)"
+PYTHON_PATH="$(command -v python)"
 
 modinfo dummy 2>&1 > /dev/null && test_set_prereq DUMMY_DEV
 "$PYTHON_PATH" -c "import yaml" 2>&1 > /dev/null && test_set_prereq PYTHON_YAML
