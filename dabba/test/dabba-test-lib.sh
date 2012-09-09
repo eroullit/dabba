@@ -42,12 +42,12 @@ create_dummy_interface()
 
 yaml2dict()
 {
-    "$PYTHON_PATH" "$SHARNESS_TEST_DIRECTORY"/yaml2dict.py $@
+    "$PYTHON_PATH" "$SHARNESS_TEST_DIRECTORY"/yaml2dict.py "$@"
 }
 
 dictkeys2values()
 {
-    "$PYTHON_PATH" "$SHARNESS_TEST_DIRECTORY"/dictkeys2values.py $@
+    "$PYTHON_PATH" "$SHARNESS_TEST_DIRECTORY"/dictkeys2values.py "$@"
 }
 
 # vim: ft=sh:tabstop=4:et
