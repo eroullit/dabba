@@ -211,6 +211,10 @@ static void display_interface_list(const struct dabba_ifconf *const
 		     interface_msg[a].tx_error.heartbeat,
 		     interface_msg[a].tx_error.window,
 		     interface_msg[a].tx_error.aborted);
+		printf("      settings: {speed: %u, duplex: %s, autoneg: %s}\n",
+		       ethtool_cmd_speed(&interface_msg[a].settings),
+		       interface_msg[a].settings.duplex ? "true" : "false",
+		       interface_msg[a].settings.autoneg ? "true" : "false");
 		printf
 		    ("      driver: {name: %s, version: %s, firmware version: %s}\n",
 		     interface_msg[a].driver_info.driver,

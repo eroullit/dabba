@@ -92,6 +92,7 @@ struct dabba_ifconf {
 	struct if_tx_error_counter tx_error;
 	enum dabba_tristate up, running, promisc, loopback;
 	struct ethtool_drvinfo driver_info;
+	struct ethtool_cmd settings;
 };
 
 enum dabba_thread_flags {

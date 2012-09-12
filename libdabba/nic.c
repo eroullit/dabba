@@ -197,3 +197,19 @@ int dev_driver_get(const char *const dev, struct ethtool_drvinfo *driver_info)
 
 	return dev_kernel_request(&ifr, SIOCETHTOOL);
 }
+
+int dev_settings_get(const char *const dev, struct ethtool_cmd *settings)
+{
+	struct ifreq ifr;
+
+	assert(dev);
+	assert(settings);
+
+	memset(&ifr, 0, sizeof(ifr));
+	memset(settings, 0, sizeof(*settings));
+	strlcpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name));
+	settings->cmd = ETHTOOL_GSET;
+	ifr.ifr_data = (caddr_t) settings;
+
+	return dev_kernel_request(&ifr, SIOCETHTOOL);
+}
