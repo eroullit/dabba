@@ -173,53 +173,65 @@ static void display_interface_list(const struct dabba_ifconf *const
 				   interface_msg, const size_t elem_nr)
 {
 	size_t a;
+	const struct dabba_ifconf *iface;
 
 	assert(interface_msg);
 	assert(elem_nr <= DABBA_IFCONF_MAX_SIZE);
 
 	for (a = 0; a < elem_nr; a++) {
-		printf("    - name: %s\n", interface_msg[a].name);
-		printf
-		    ("      status: {up: %s, running: %s, promiscuous: %s, loopback: %s}\n",
-		     interface_msg[a].up == TRUE ? "true" : "false",
-		     interface_msg[a].running == TRUE ? "true" : "false",
-		     interface_msg[a].promisc == TRUE ? "true" : "false",
-		     interface_msg[a].loopback == TRUE ? "true" : "false");
+		iface = &interface_msg[a];
+		printf("    - name: %s\n", iface->name);
+		printf("      status: {");
+		printf("up: %s, ", iface->up == TRUE ? "true" : "false");
+		printf("running: %s, ",
+		       iface->running == TRUE ? "true" : "false");
+		printf("promiscuous: %s, ",
+		       iface->promisc == TRUE ? "true" : "false");
+		printf("loopback: %s",
+		       iface->loopback == TRUE ? "true" : "false");
+		printf("}\n");
 		printf("      statistics:\n");
-		printf
-		    ("          rx: {byte: %u, packet: %u, error: %u, dropped: %u, compressed: %u}\n",
-		     interface_msg[a].rx.byte, interface_msg[a].rx.packet,
-		     interface_msg[a].rx.error, interface_msg[a].rx.dropped,
-		     interface_msg[a].rx.compressed);
-		printf
-		    ("          tx: {byte: %u, packet: %u, error: %u, dropped: %u, compressed: %u}\n",
-		     interface_msg[a].tx.byte, interface_msg[a].tx.packet,
-		     interface_msg[a].tx.error, interface_msg[a].tx.dropped,
-		     interface_msg[a].tx.compressed);
-		printf
-		    ("          rx error: {fifo: %u, frame: %u, crc: %u, length: %u, missed: %u, overflow: %u}\n",
-		     interface_msg[a].rx_error.fifo,
-		     interface_msg[a].rx_error.frame,
-		     interface_msg[a].rx_error.crc,
-		     interface_msg[a].rx_error.length,
-		     interface_msg[a].rx_error.missed,
-		     interface_msg[a].rx_error.over);
-		printf
-		    ("          tx error: {fifo: %u, carrier: %u, heartbeat: %u, window: %u, aborted: %u}\n",
-		     interface_msg[a].tx_error.fifo,
-		     interface_msg[a].tx_error.carrier,
-		     interface_msg[a].tx_error.heartbeat,
-		     interface_msg[a].tx_error.window,
-		     interface_msg[a].tx_error.aborted);
-		printf("      settings: {speed: %u, duplex: %s, autoneg: %s}\n",
-		       ethtool_cmd_speed(&interface_msg[a].settings),
-		       interface_msg[a].settings.duplex ? "true" : "false",
-		       interface_msg[a].settings.autoneg ? "true" : "false");
-		printf
-		    ("      driver: {name: %s, version: %s, firmware version: %s}\n",
-		     interface_msg[a].driver_info.driver,
-		     interface_msg[a].driver_info.version,
-		     interface_msg[a].driver_info.fw_version);
+		printf("          rx: {");
+		printf("byte: %u, ", iface->rx.byte);
+		printf("packet: %u, ", iface->rx.packet);
+		printf("error: %u, ", iface->rx.error);
+		printf("dropped: %u, ", iface->rx.dropped);
+		printf("compressed: %u", iface->rx.compressed);
+		printf("}\n");
+		printf("          tx: {");
+		printf("byte: %u, ", iface->tx.byte);
+		printf("packet: %u, ", iface->tx.packet);
+		printf("error: %u, ", iface->tx.error);
+		printf("dropped: %u, ", iface->tx.dropped);
+		printf("compressed: %u", iface->tx.compressed);
+		printf("}\n");
+		printf("          rx error: {");
+		printf("fifo: %u, ", iface->rx_error.fifo);
+		printf("frame: %u, ", iface->rx_error.frame);
+		printf("crc: %u, ", iface->rx_error.crc);
+		printf("length: %u, ", iface->rx_error.length);
+		printf("missed: %u, ", iface->rx_error.missed);
+		printf("overflow: %u", iface->rx_error.over);
+		printf("}\n");
+		printf("          tx error: {");
+		printf("fifo: %u, ", iface->tx_error.fifo);
+		printf("carrier: %u, ", iface->tx_error.carrier);
+		printf("heartbeat: %u, ", iface->tx_error.heartbeat);
+		printf("window: %u, ", iface->tx_error.window);
+		printf("aborted: %u", iface->tx_error.aborted);
+		printf("}\n");
+		printf("      settings: {");
+		printf("speed: %u, ", ethtool_cmd_speed(&iface->settings));
+		printf("duplex: %s, ",
+		       iface->settings.duplex ? "true" : "false");
+		printf("autoneg: %s",
+		       iface->settings.autoneg ? "true" : "false");
+		printf("}\n");
+		printf("      driver: {");
+		printf("name: %s, ", iface->driver_info.driver);
+		printf("version: %s, ", iface->driver_info.version);
+		printf("firmware version: %s", iface->driver_info.fw_version);
+		printf("}\n");
 	}
 }
 
