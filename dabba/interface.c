@@ -137,6 +137,10 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabba/ipc.h>
 #include <dabba/help.h>
 
+#ifndef print_tf
+#define print_tf(expr) (expr) ? "true" : "false"
+#endif
+
 enum interface_modify_option {
 	OPT_INTERFACE_UP,
 	OPT_INTERFACE_RUNNING,
@@ -182,13 +186,10 @@ static void display_interface_list(const struct dabba_ifconf *const
 		iface = &interface_msg[a];
 		printf("    - name: %s\n", iface->name);
 		printf("      status: {");
-		printf("up: %s, ", iface->up == TRUE ? "true" : "false");
-		printf("running: %s, ",
-		       iface->running == TRUE ? "true" : "false");
-		printf("promiscuous: %s, ",
-		       iface->promisc == TRUE ? "true" : "false");
-		printf("loopback: %s",
-		       iface->loopback == TRUE ? "true" : "false");
+		printf("up: %s, ", print_tf(iface->up == TRUE));
+		printf("running: %s, ", print_tf(iface->running == TRUE));
+		printf("promiscuous: %s, ", print_tf(iface->promisc == TRUE));
+		printf("loopback: %s", print_tf(iface->loopback == TRUE));
 		printf("}\n");
 		printf("      statistics:\n");
 		printf("          rx: {");
@@ -222,10 +223,12 @@ static void display_interface_list(const struct dabba_ifconf *const
 		printf("}\n");
 		printf("      settings: {");
 		printf("speed: %u, ", ethtool_cmd_speed(&iface->settings));
-		printf("duplex: %s, ",
-		       iface->settings.duplex ? "true" : "false");
-		printf("autoneg: %s",
-		       iface->settings.autoneg ? "true" : "false");
+		printf("duplex: %s, ", print_tf(iface->settings.duplex));
+		printf("autoneg: %s, ", print_tf(iface->settings.autoneg));
+		printf("port: %u, ", iface->settings.port);
+		printf("address: %u, ", iface->settings.phy_address);
+		printf("max rx packet: %u, ", iface->settings.maxrxpkt);
+		printf("max tx packet: %u", iface->settings.maxtxpkt);
 		printf("}\n");
 		printf("      driver: {");
 		printf("name: %s, ", iface->driver_info.driver);
