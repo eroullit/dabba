@@ -35,9 +35,32 @@
 #include <sys/socket.h>
 #include <sys/ioctl.h>
 #include <net/if.h>
+#include <netinet/in.h>
+#include <netpacket/packet.h>
+#include <linux/if_ether.h>
+#include <linux/ethtool.h>
+#include <linux/sockios.h>
 
 #include <libdabba/nic.h>
 #include <libdabba/strlcpy.h>
+
+static int dev_kernel_request(struct ifreq *ifr, const int request)
+{
+	int rc, sock;
+
+	assert(ifr);
+
+	sock = socket(AF_INET, SOCK_DGRAM, 0);
+
+	if (sock < 0)
+		return errno;
+
+	rc = ioctl(sock, request, ifr);
+
+	close(sock);
+
+	return rc ? errno : rc;
+}
 
 /**
  * \brief Get the interface index of a specific interface
@@ -52,36 +75,26 @@
 
 int devname_to_ifindex(const char *const dev, int *index)
 {
-	int ret;
-	int sock;
-	struct ifreq ethreq;
+	int rc;
+	struct ifreq ifr;
 
 	assert(dev);
 	assert(index);
 
 	if (strcmp(dev, ANY_INTERFACE) == 0) {
 		*index = 0;
-		return (0);
+		return 0;
 	}
 
-	sock = socket(AF_INET, SOCK_DGRAM, 0);
+	memset(&ifr, 0, sizeof(ifr));
+	strlcpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name));
 
-	if (sock < 0)
-		return (errno);
+	rc = dev_kernel_request(&ifr, SIOCGIFINDEX);
 
-	memset(&ethreq, 0, sizeof(ethreq));
-	strlcpy(ethreq.ifr_name, dev, sizeof(ethreq.ifr_name));
+	if (!rc)
+		*index = ifr.ifr_ifindex;
 
-	ret = ioctl(sock, SIOCGIFINDEX, &ethreq);
-
-	close(sock);
-
-	if (ret < 0)
-		return (errno);
-
-	*index = ethreq.ifr_ifindex;
-
-	return (0);
+	return rc;
 }
 
 /**
@@ -99,8 +112,8 @@ int devname_to_ifindex(const char *const dev, int *index)
 int ifindex_to_devname(const int index, char *dev, size_t dev_len)
 {
 	const char alldev[] = ANY_INTERFACE;
-	struct ifreq ethreq;
-	int ret, sock;
+	struct ifreq ifr;
+	int rc;
 
 	assert(index >= 0);
 	assert(dev);
@@ -111,22 +124,105 @@ int ifindex_to_devname(const int index, char *dev, size_t dev_len)
 		return (0);
 	}
 
-	sock = socket(AF_INET, SOCK_DGRAM, 0);
+	memset(&ifr, 0, sizeof(ifr));
+	ifr.ifr_ifindex = index;
 
-	if (sock < 0)
-		return (errno);
+	rc = dev_kernel_request(&ifr, SIOCGIFNAME);
 
-	memset(&ethreq, 0, sizeof(ethreq));
-	ethreq.ifr_ifindex = index;
+	if (!rc)
+		strlcpy(dev, ifr.ifr_name, dev_len);
 
-	ret = ioctl(sock, SIOCGIFNAME, &ethreq);
+	return rc;
+}
 
-	close(sock);
+/**
+ * \brief Get the interface status flags
+ * \param[in]       dev	        interface name
+ * \param[out]      flags	current interface status flags
+ * \return 0 on success, -1 if the interface status flags could not be fetched.
+ */
 
-	if (ret < 0)
-		return (errno);
+int dev_flags_get(const char *const dev, short *flags)
+{
+	int rc;
+	struct ifreq ifr;
 
-	strlcpy(dev, ethreq.ifr_name, dev_len);
+	assert(dev);
+	assert(flags);
 
-	return (0);
+	memset(&ifr, 0, sizeof(ifr));
+	strlcpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name));
+
+	rc = dev_kernel_request(&ifr, SIOCGIFFLAGS);
+
+	if (!rc)
+		*flags = ifr.ifr_flags;
+
+	return rc;
+}
+
+/**
+ * \brief Set the interface status flags
+ * \param[in]       dev	        interface name
+ * \param[un]       flags	new interface status flags
+ * \return 0 on success, else if the interface status flags could not be changed.
+ */
+
+int dev_flags_set(const char *const dev, const short flags)
+{
+	struct ifreq ifr;
+
+	assert(dev);
+
+	memset(&ifr, 0, sizeof(ifr));
+	strlcpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name));
+	ifr.ifr_flags = flags;
+
+	return dev_kernel_request(&ifr, SIOCSIFFLAGS);
+}
+
+/**
+ * \brief Get the interface driver information
+ * \param[in]       dev	        interface name
+ * \param[out]      driver	pointer to the driver info
+ * \return 0 on success, -1 if the interface driver information could not be fetched.
+ */
+
+int dev_driver_get(const char *const dev, struct ethtool_drvinfo *driver_info)
+{
+	struct ifreq ifr;
+
+	assert(dev);
+	assert(driver_info);
+
+	memset(&ifr, 0, sizeof(ifr));
+	memset(driver_info, 0, sizeof(*driver_info));
+	strlcpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name));
+	driver_info->cmd = ETHTOOL_GDRVINFO;
+	ifr.ifr_data = (caddr_t) driver_info;
+
+	return dev_kernel_request(&ifr, SIOCETHTOOL);
+}
+
+/**
+ * \brief Get the interface hardware settings
+ * \param[in]       dev	        interface name
+ * \param[out]      driver	pointer to the interface hardware settings
+ * \return 0 on success, -1 if the interface hardware settings could not be fetched.
+ */
+
+int dev_settings_get(const char *const dev, struct ethtool_cmd *settings)
+{
+	struct ifreq ifr;
+
+	assert(dev);
+	assert(settings);
+
+	memset(&ifr, 0, sizeof(ifr));
+	memset(settings, 0, sizeof(*settings));
+	strlcpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name));
+	settings->cmd = ETHTOOL_GSET;
+	ifr.ifr_data = (caddr_t) settings;
+
+	return dev_kernel_request(&ifr, SIOCETHTOOL);
 }

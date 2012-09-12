@@ -22,20 +22,32 @@
 DABBAD_PATH="$SHARNESS_TEST_DIRECTORY/../../dabbad"
 DABBA_PATH="$SHARNESS_TEST_DIRECTORY/../../dabba"
 
+PYTHON_PATH="$(command -v python)"
+
 modinfo dummy 2>&1 > /dev/null && test_set_prereq DUMMY_DEV
-python -c "import yaml" 2>&1 > /dev/null && test_set_prereq PYTHON_YAML
+"$PYTHON_PATH" -c "import yaml" 2>&1 > /dev/null && test_set_prereq PYTHON_YAML
 taskset -h 2>&1 > /dev/null && test_set_prereq TASKSET
 
-flush_test_interface()
+flush_dummy_interface()
 {
         sudo rmmod dummy <&6
 }
 
-create_test_interface()
+create_dummy_interface()
 {
-        #local interface_nr=${$1:-1}
+        interface_nr=$1
         sudo modprobe dummy numdummies="$interface_nr" <&6
         sleep 1
+}
+
+yaml2dict()
+{
+    "$PYTHON_PATH" "$SHARNESS_TEST_DIRECTORY"/yaml2dict.py "$@"
+}
+
+dictkeys2values()
+{
+    "$PYTHON_PATH" "$SHARNESS_TEST_DIRECTORY"/dictkeys2values.py "$@"
 }
 
 # vim: ft=sh:tabstop=4:et

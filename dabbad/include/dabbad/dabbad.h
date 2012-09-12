@@ -31,19 +31,28 @@
 #define	DABBAD_H
 
 #include <stdint.h>
+#include <string.h>
 #include <limits.h>
 #include <net/if.h>
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <sched.h>
+#include <linux/ethtool.h>
 
 /**
  * \brief Supported dabbad IPC message types
  */
 
+enum dabba_tristate {
+	FALSE,
+	TRUE,
+	UNSET
+};
+
 enum dabba_msg_type {
 	DABBA_IFCONF,
+	DABBA_IF_MODIFY,
 	DABBA_CAPTURE_START,
 	DABBA_CAPTURE_LIST,
 	DABBA_CAPTURE_STOP,
@@ -60,12 +69,30 @@ struct dabba_msg_buf {
 	uint8_t buf[1024];
 };
 
+struct if_counter {
+	uint32_t packet, byte, error, dropped, compressed;
+};
+
+struct if_rx_error_counter {
+	uint32_t fifo, frame, crc, length, missed, over;
+};
+
+struct if_tx_error_counter {
+	uint32_t fifo, carrier, heartbeat, window, aborted;
+};
+
 /**
  * \brief Dabbad interface name buffer
  */
 
 struct dabba_ifconf {
 	char name[IFNAMSIZ];
+	struct if_counter rx, tx;
+	struct if_rx_error_counter rx_error;
+	struct if_tx_error_counter tx_error;
+	enum dabba_tristate up, running, promisc, loopback;
+	struct ethtool_drvinfo driver_info;
+	struct ethtool_cmd settings;
 };
 
 enum dabba_thread_flags {
@@ -172,4 +199,15 @@ static inline int dabba_get_ipc_queue_id(const int flags)
 
 	return msgget(key, flags);
 }
+
+static inline enum dabba_tristate dabba_tristate_parse(const char *const str)
+{
+	if (strcasecmp(str, "false") == 0)
+		return FALSE;
+	else if (strcasecmp(str, "true") == 0)
+		return TRUE;
+	else
+		return UNSET;
+}
+
 #endif				/* DABBAD_H */

@@ -21,13 +21,15 @@ test_description='Test dabba interface list command'
 
 . ./dabba-test-lib.sh
 
-interface_nr=100
+number_of_interface_get(){
+    sed '1,2d' /proc/net/dev | wc -l | cut -f 1 -d ' '
+}
 
 generate_list(){
         rm dev_list
         for dev in `sed '1,2d' /proc/net/dev | awk -F ':' '{ print $1 }' | tr -d ' '`
         do
-            echo "    - $dev" >> dev_list
+            echo "    - name: $dev" >> dev_list
         done
 }
 
@@ -36,8 +38,6 @@ generate_yaml_list()
 generate_list
 
 cat <<EOF
----
-  interfaces:
 `cat dev_list`
 EOF
 }
@@ -47,7 +47,11 @@ EOF
 #"
 
 test_expect_success DUMMY_DEV "Setup: Remove all dummy interfaces" "
-    test_might_fail flush_test_interface
+    test_might_fail flush_dummy_interface
+"
+
+test_expect_success "Setup: Start dabbad" "
+    '$DABBAD_PATH'/dabbad --daemonize
 "
 
 test_expect_success "Check 'dabba interface' help output" "
@@ -60,33 +64,56 @@ test_expect_success "Check 'dabba interface' help output" "
 "
 
 test_expect_success "invoke dabba interface list with dabbad" "
-    '$DABBAD_PATH'/dabbad --daemonize &&
-    sleep 0.1 &&
     '$DABBA_PATH'/dabba interface list > result &&
-    killall dabbad &&
+    grep '\- name: ' result > name_result &&
     generate_yaml_list > expected &&
     sort -o expected_sorted expected &&
-    sort -o result_sorted result &&
+    sort -o result_sorted name_result &&
     test_cmp expected_sorted result_sorted
 "
 
-test_expect_success DUMMY_DEV "Setup: Create $interface_nr dummy interfaces" "
-    create_test_interface $interface_nr
+test_expect_success PYTHON_YAML "Parse interface list YAML output" "
+    yaml2dict result > parsed
 "
 
-test_expect_success DUMMY_DEV "invoke dabba interface list with dabbad with $interface_nr extra interfaces" "
-    '$DABBAD_PATH'/dabbad --daemonize &&
-    sleep 0.1 &&
-    '$DABBA_PATH'/dabba interface list > result &&
-    killall dabbad &&
-    generate_yaml_list > expected &&
-    sort -o expected_sorted expected &&
-    sort -o result_sorted result &&
-    test_cmp expected_sorted result_sorted
+for i in `seq 0 $(($(number_of_interface_get)-1))`
+do
+    test_expect_success PYTHON_YAML "Check interface #$(($i+1)) output" "
+        grep -wq \"$(dictkeys2values interfaces $i name < parsed)\" /proc/net/dev &&
+        test -n \"$(dictkeys2values interfaces $i status < parsed)\" &&
+        test -n \"$(dictkeys2values interfaces $i statistics < parsed)\"
+    "
+done
+
+test_expect_success "Activate dummy interface" "
+    create_dummy_interface 1
 "
+
+for status in True False
+do
+    for feature in promiscuous up running
+    do
+        test_expect_success DUMMY_DEV "Set '$feature' to $status on dummy device" "
+            '$DABBA_PATH'/dabba interface modify --id 'dummy0' --$feature '$status'
+        "
+
+        test_expect_success DUMMY_DEV,PYTHON_YAML "Parse interface YAML output" "
+            '$DABBA_PATH'/dabba interface list > result &&
+            yaml2dict result > parsed
+        "
+
+        # Freshly added interface will be at the end of the list
+        test_expect_success DUMMY_DEV,PYTHON_YAML "Check updated $feature status" "
+            test \"$(dictkeys2values interfaces $(($(number_of_interface_get)-1)) status $feature < parsed)\" = '$status'
+        "
+    done
+done
 
 test_expect_success DUMMY_DEV "Cleanup: Remove all dummy interfaces" "
-    flush_test_interface
+    flush_dummy_interface
+"
+test_expect_success "Cleanup: Stop dabbad" "
+    killall dabbad
 "
 
 test_done
