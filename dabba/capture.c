@@ -149,7 +149,6 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <errno.h>
 
 #include <libdabba/macros.h>
-#include <libdabba/strlcpy.h>
 #include <libdabba/packet_mmap.h>
 #include <dabba/dabba.h>
 #include <dabba/help.h>

@@ -132,7 +132,6 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <errno.h>
 #include <getopt.h>
 #include <libdabba/macros.h>
-#include <libdabba/strlcpy.h>
 #include <dabba/dabba.h>
 #include <dabba/ipc.h>
 #include <dabba/help.h>
@@ -306,7 +305,7 @@ static int prepare_interface_modify_query(int argc, char **argv,
 			ifconf_msg->promisc = dabba_tristate_parse(optarg);
 			break;
 		case OPT_INTERFACE_ID:
-			strlcpy(ifconf_msg->name, optarg,
+			strncpy(ifconf_msg->name, optarg,
 				sizeof(ifconf_msg->name));
 			break;
 		default:
