@@ -38,6 +38,7 @@
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <sched.h>
+#include <linux/ethtool.h>
 
 /**
  * \brief Supported dabbad IPC message types
@@ -90,6 +91,7 @@ struct dabba_ifconf {
 	struct if_rx_error_counter rx_error;
 	struct if_tx_error_counter tx_error;
 	enum dabba_tristate up, running, promisc, loopback;
+	struct ethtool_drvinfo driver_info;
 };
 
 enum dabba_thread_flags {

@@ -211,6 +211,11 @@ static void display_interface_list(const struct dabba_ifconf *const
 		     interface_msg[a].tx_error.heartbeat,
 		     interface_msg[a].tx_error.window,
 		     interface_msg[a].tx_error.aborted);
+		printf
+		    ("      driver: {name: %s, version: %s, firmware version: %s}\n",
+		     interface_msg[a].driver_info.driver,
+		     interface_msg[a].driver_info.version,
+		     interface_msg[a].driver_info.fw_version);
 	}
 }
 

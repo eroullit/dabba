@@ -31,6 +31,7 @@
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdio.h>
 
 #include <sys/socket.h>
 #include <sys/ioctl.h>
@@ -38,6 +39,8 @@
 #include <netinet/in.h>
 #include <netpacket/packet.h>
 #include <linux/if_ether.h>
+#include <linux/ethtool.h>
+#include <linux/sockios.h>
 
 #include <libdabba/nic.h>
 #include <libdabba/strlcpy.h>
@@ -177,4 +180,20 @@ int dev_flags_set(const char *const dev, const short flags)
 	ifr.ifr_flags = flags;
 
 	return dev_kernel_request(&ifr, SIOCSIFFLAGS);
+}
+
+int dev_driver_get(const char *const dev, struct ethtool_drvinfo *driver_info)
+{
+	struct ifreq ifr;
+
+	assert(dev);
+	assert(driver_info);
+
+	memset(&ifr, 0, sizeof(ifr));
+	memset(driver_info, 0, sizeof(*driver_info));
+	strlcpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name));
+	driver_info->cmd = ETHTOOL_GDRVINFO;
+	ifr.ifr_data = (caddr_t) driver_info;
+
+	return dev_kernel_request(&ifr, SIOCETHTOOL);
 }
