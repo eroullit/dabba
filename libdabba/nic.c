@@ -181,6 +181,13 @@ int dev_flags_set(const char *const dev, const short flags)
 	return dev_kernel_request(&ifr, SIOCSIFFLAGS);
 }
 
+/**
+ * \brief Get the interface driver information
+ * \param[in]       dev	        interface name
+ * \param[out]      driver	pointer to the driver info
+ * \return 0 on success, -1 if the interface driver information could not be fetched.
+ */
+
 int dev_driver_get(const char *const dev, struct ethtool_drvinfo *driver_info)
 {
 	struct ifreq ifr;
@@ -196,6 +203,13 @@ int dev_driver_get(const char *const dev, struct ethtool_drvinfo *driver_info)
 
 	return dev_kernel_request(&ifr, SIOCETHTOOL);
 }
+
+/**
+ * \brief Get the interface hardware settings
+ * \param[in]       dev	        interface name
+ * \param[out]      driver	pointer to the interface hardware settings
+ * \return 0 on success, -1 if the interface hardware settings could not be fetched.
+ */
 
 int dev_settings_get(const char *const dev, struct ethtool_cmd *settings)
 {
