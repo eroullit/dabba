@@ -24,9 +24,9 @@ DABBA_PATH="$SHARNESS_TEST_DIRECTORY/../../dabba"
 
 PYTHON_PATH="$(command -v python)"
 
-modinfo dummy 2>&1 > /dev/null && test_set_prereq DUMMY_DEV
-"$PYTHON_PATH" -c "import yaml" 2>&1 > /dev/null && test_set_prereq PYTHON_YAML
-taskset -h 2>&1 > /dev/null && test_set_prereq TASKSET
+modinfo dummy > /dev/null 2>&1 && test_set_prereq DUMMY_DEV
+"$PYTHON_PATH" -c "import yaml" > /dev/null 2>&1 && test_set_prereq PYTHON_YAML
+taskset -h > /dev/null 2>&1 && test_set_prereq TASKSET
 
 flush_dummy_interface()
 {
