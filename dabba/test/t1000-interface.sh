@@ -26,12 +26,14 @@ number_of_interface_get(){
 }
 
 generate_list(){
-        rm dev_list
+        rm -f dev_list
         for dev in `sed '1,2d' /proc/net/dev | awk -F ':' '{ print $1 }' | tr -d ' '`
         do
             echo "    - name: $dev" >> dev_list
         done
 }
+
+
 
 generate_yaml_list()
 {
@@ -78,10 +80,16 @@ test_expect_success PYTHON_YAML "Parse interface list YAML output" "
 
 for i in `seq 0 $(($(number_of_interface_get)-1))`
 do
+    test_expect_success PYTHON_YAML "Query interface list output" "
+        dictkeys2values interfaces $i name < parsed > interface_name &&
+        dictkeys2values interfaces $i status < parsed > interface_status &&
+        dictkeys2values interfaces $i statistics < parsed > interface_statistics
+    "
+
     test_expect_success PYTHON_YAML "Check interface #$(($i+1)) output" "
-        grep -wq \"$(dictkeys2values interfaces $i name < parsed)\" /proc/net/dev &&
-        test -n \"$(dictkeys2values interfaces $i status < parsed)\" &&
-        test -n \"$(dictkeys2values interfaces $i statistics < parsed)\"
+        grep -wq -f interface_name /proc/net/dev &&
+        test -n interface_status &&
+        test -n interface_statistics
     "
 done
 
@@ -102,9 +110,14 @@ do
             yaml2dict result > parsed
         "
 
+        test_expect_success DUMMY_DEV,PYTHON_YAML "Query interface status output" "
+            echo "$status" > expect_status &&
+            dictkeys2values interfaces $(($(number_of_interface_get)-1)) status $feature < parsed > result_status
+        "
+
         # Freshly added interface will be at the end of the list
         test_expect_success DUMMY_DEV,PYTHON_YAML "Check updated $feature status" "
-            test \"$(dictkeys2values interfaces $(($(number_of_interface_get)-1)) status $feature < parsed)\" = '$status'
+            test_cmp expect_status result_status
         "
     done
 done
