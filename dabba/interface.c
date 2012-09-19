@@ -221,15 +221,6 @@ static void display_interface_list(const struct dabba_ifconf *const
 		printf("window: %u, ", iface->tx_error.window);
 		printf("aborted: %u", iface->tx_error.aborted);
 		printf("}\n");
-		printf("      settings: {");
-		printf("speed: %u, ", ethtool_cmd_speed(&iface->settings));
-		printf("duplex: %s, ", print_tf(iface->settings.duplex));
-		printf("autoneg: %s, ", print_tf(iface->settings.autoneg));
-		printf("port: %u, ", iface->settings.port);
-		printf("address: %u, ", iface->settings.phy_address);
-		printf("max rx packet: %u, ", iface->settings.maxrxpkt);
-		printf("max tx packet: %u", iface->settings.maxtxpkt);
-		printf("}\n");
 	}
 }
 
@@ -248,6 +239,30 @@ static void display_interface_driver(const struct dabba_interface_driver *const
 		printf("name: %s, ", iface->driver_info.driver);
 		printf("version: %s, ", iface->driver_info.version);
 		printf("firmware version: %s", iface->driver_info.fw_version);
+		printf("}\n");
+	}
+}
+
+static void display_interface_settings(const struct dabba_interface_settings
+				       *const interface_settings,
+				       const size_t elem_nr)
+{
+	size_t a;
+	const struct dabba_interface_settings *iface;
+
+	assert(interface_settings);
+	assert(elem_nr <= DABBA_INTERFACE_SETTINGS_MAX_SIZE);
+
+	for (a = 0; a < elem_nr; a++) {
+		iface = &interface_settings[a];
+		printf("      settings: {");
+		printf("speed: %u, ", ethtool_cmd_speed(&iface->settings));
+		printf("duplex: %s, ", print_tf(iface->settings.duplex));
+		printf("autoneg: %s, ", print_tf(iface->settings.autoneg));
+		printf("port: %u, ", iface->settings.port);
+		printf("address: %u, ", iface->settings.phy_address);
+		printf("max rx packet: %u, ", iface->settings.maxrxpkt);
+		printf("max tx packet: %u", iface->settings.maxtxpkt);
 		printf("}\n");
 	}
 }
@@ -320,6 +335,37 @@ int cmd_interface_driver(int argc, const char **argv)
 
 		display_interface_driver(msg.msg_body.msg.interface_driver,
 					 msg.msg_body.elem_nr);
+	} while (msg.msg_body.elem_nr);
+
+	return rc;
+}
+
+int cmd_interface_settings(int argc, const char **argv)
+{
+	int rc;
+	struct dabba_ipc_msg msg;
+
+	assert(argc >= 0);
+	assert(argv);
+
+	memset(&msg, 0, sizeof(msg));
+
+	msg.mtype = 1;
+	msg.msg_body.type = DABBA_INTERFACE_SETTINGS;
+
+	display_interface_list_header();
+
+	do {
+		msg.msg_body.offset += msg.msg_body.elem_nr;
+		msg.msg_body.elem_nr = 0;
+
+		rc = dabba_ipc_msg(&msg);
+
+		if (rc)
+			break;
+
+		display_interface_settings(msg.msg_body.msg.interface_settings,
+					   msg.msg_body.elem_nr);
 	} while (msg.msg_body.elem_nr);
 
 	return rc;
@@ -412,6 +458,7 @@ int cmd_interface(int argc, const char **argv)
 	static struct cmd_struct interface_commands[] = {
 		{"list", cmd_interface_list},
 		{"driver", cmd_interface_driver},
+		{"settings", cmd_interface_settings},
 		{"modify", cmd_interface_modify}
 	};
 

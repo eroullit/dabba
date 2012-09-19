@@ -117,8 +117,6 @@ int dabbad_ifconf_get(struct dabba_ipc_msg *msg)
 		    (ifa->ifa_flags & IFF_LOOPBACK) ==
 		    IFF_LOOPBACK ? TRUE : FALSE;
 
-		dev_settings_get(ifa->ifa_name, &ifconf->settings);
-
 		stats = ifa->ifa_data;
 
 		/* FIXME 32-bit counters only... */
