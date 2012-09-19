@@ -256,6 +256,7 @@ static void display_interface_settings(const struct dabba_interface_settings
 
 	for (a = 0; a < elem_nr; a++) {
 		iface = &interface_settings[a];
+		printf("    - name: %s\n", iface->name);
 		printf("      settings: {");
 		printf("speed: %u, ", ethtool_cmd_speed(&iface->settings));
 		printf("duplex: %s, ", print_tf(iface->settings.duplex));
