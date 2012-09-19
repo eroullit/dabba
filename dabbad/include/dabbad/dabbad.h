@@ -52,6 +52,7 @@ enum dabba_tristate {
 
 enum dabba_msg_type {
 	DABBA_IFCONF,
+	DABBA_INTERFACE_DRIVER,
 	DABBA_IF_MODIFY,
 	DABBA_CAPTURE_START,
 	DABBA_CAPTURE_LIST,
@@ -91,8 +92,12 @@ struct dabba_ifconf {
 	struct if_rx_error_counter rx_error;
 	struct if_tx_error_counter tx_error;
 	enum dabba_tristate up, running, promisc, loopback;
-	struct ethtool_drvinfo driver_info;
 	struct ethtool_cmd settings;
+};
+
+struct dabba_interface_driver {
+	char name[IFNAMSIZ];
+	struct ethtool_drvinfo driver_info;
 };
 
 enum dabba_thread_flags {
@@ -140,6 +145,10 @@ struct dabba_capture {
 #define DABBA_IFCONF_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_ifconf))
 #endif				/* DABBA_IFCONF_MAX_SIZE */
 
+#ifndef DABBA_INTERFACE_DRIVER_MAX_SIZE
+#define DABBA_INTERFACE_DRIVER_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_interface_driver))
+#endif				/* DABBA_INTERFACE_DRIVER_MAX_SIZE */
+
 #ifndef DABBA_CAPTURE_MAX_SIZE
 #define DABBA_CAPTURE_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_capture))
 #endif				/* DABBA_CAPTURE_MAX_SIZE */
@@ -168,6 +177,8 @@ struct dabba_ipc_msg {
 		union dabba_info {
 			struct dabba_msg_buf buf;
 			struct dabba_ifconf ifconf[DABBA_IFCONF_MAX_SIZE];
+			struct dabba_interface_driver
+			 interface_driver[DABBA_INTERFACE_DRIVER_MAX_SIZE];
 			struct dabba_capture capture[DABBA_CAPTURE_MAX_SIZE];
 			struct dabba_thread thread[DABBA_THREAD_MAX_SIZE];
 			struct dabba_thread_cap

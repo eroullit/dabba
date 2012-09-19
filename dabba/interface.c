@@ -230,6 +230,20 @@ static void display_interface_list(const struct dabba_ifconf *const
 		printf("max rx packet: %u, ", iface->settings.maxrxpkt);
 		printf("max tx packet: %u", iface->settings.maxtxpkt);
 		printf("}\n");
+	}
+}
+
+static void display_interface_driver(const struct dabba_interface_driver *const
+				     interface_driver, const size_t elem_nr)
+{
+	size_t a;
+	const struct dabba_interface_driver *iface;
+
+	assert(interface_driver);
+	assert(elem_nr <= DABBA_INTERFACE_DRIVER_MAX_SIZE);
+
+	for (a = 0; a < elem_nr; a++) {
+		iface = &interface_driver[a];
 		printf("      driver: {");
 		printf("name: %s, ", iface->driver_info.driver);
 		printf("version: %s, ", iface->driver_info.version);
@@ -275,6 +289,37 @@ int cmd_interface_list(int argc, const char **argv)
 
 		display_interface_list(msg.msg_body.msg.ifconf,
 				       msg.msg_body.elem_nr);
+	} while (msg.msg_body.elem_nr);
+
+	return rc;
+}
+
+int cmd_interface_driver(int argc, const char **argv)
+{
+	int rc;
+	struct dabba_ipc_msg msg;
+
+	assert(argc >= 0);
+	assert(argv);
+
+	memset(&msg, 0, sizeof(msg));
+
+	msg.mtype = 1;
+	msg.msg_body.type = DABBA_INTERFACE_DRIVER;
+
+	display_interface_list_header();
+
+	do {
+		msg.msg_body.offset += msg.msg_body.elem_nr;
+		msg.msg_body.elem_nr = 0;
+
+		rc = dabba_ipc_msg(&msg);
+
+		if (rc)
+			break;
+
+		display_interface_driver(msg.msg_body.msg.interface_driver,
+					 msg.msg_body.elem_nr);
 	} while (msg.msg_body.elem_nr);
 
 	return rc;
@@ -366,6 +411,7 @@ int cmd_interface(int argc, const char **argv)
 	size_t i;
 	static struct cmd_struct interface_commands[] = {
 		{"list", cmd_interface_list},
+		{"driver", cmd_interface_driver},
 		{"modify", cmd_interface_modify}
 	};
 
