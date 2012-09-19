@@ -148,11 +148,11 @@ struct dabba_capture {
 };
 
 #ifndef DABBA_INTERFACE_LIST_MAX_SIZE
-#define DABBA_INTERFACE_LIST_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_interface_list))
+#define DABBA_INTERFACE_LIST_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_interface_settings))
 #endif				/* DABBA_IFCONF_MAX_SIZE */
 
 #ifndef DABBA_INTERFACE_DRIVER_MAX_SIZE
-#define DABBA_INTERFACE_DRIVER_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_interface_driver))
+#define DABBA_INTERFACE_DRIVER_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_interface_settings))
 #endif				/* DABBA_INTERFACE_DRIVER_MAX_SIZE */
 
 #ifndef DABBA_INTERFACE_SETTINGS_MAX_SIZE
@@ -187,7 +187,7 @@ struct dabba_ipc_msg {
 		union dabba_info {
 			struct dabba_msg_buf buf;
 			struct dabba_interface_list
-			    interface_list[DABBA_INTERFACE_LIST_MAX_SIZE];
+			 interface_list[DABBA_INTERFACE_LIST_MAX_SIZE];
 			struct dabba_interface_driver
 			 interface_driver[DABBA_INTERFACE_DRIVER_MAX_SIZE];
 			struct dabba_interface_settings

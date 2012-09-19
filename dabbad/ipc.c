@@ -53,7 +53,13 @@ static int dabbad_handle_msg(struct dabba_ipc_msg *msg)
 
 	switch (msg->msg_body.type) {
 	case DABBA_INTERFACE_LIST:
-		rc = dabbad_ifconf_get(msg);
+		rc = dabbad_interface_list_get(msg);
+		break;
+	case DABBA_INTERFACE_DRIVER:
+		rc = dabbad_interface_driver_get(msg);
+		break;
+	case DABBA_INTERFACE_SETTINGS:
+		rc = dabbad_interface_settings_get(msg);
 		break;
 	case DABBA_INTERFACE_MODIFY:
 		rc = dabbad_interface_modify(msg);

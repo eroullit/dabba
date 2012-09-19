@@ -40,36 +40,36 @@
 #include <dabbad/interface.h>
 #include <netpacket/packet.h>
 
-static void interface_stats_copy(struct dabba_interface_list *ifconf,
+static void interface_stats_copy(struct dabba_interface_list *iflist,
 				 struct rtnl_link_stats *stats)
 {
-	assert(ifconf);
+	assert(iflist);
 	assert(stats);
 
-	ifconf->rx.byte = stats->rx_bytes;
-	ifconf->rx.packet = stats->rx_packets;
-	ifconf->rx.error = stats->rx_errors;
-	ifconf->rx.dropped = stats->rx_dropped;
-	ifconf->rx.compressed = stats->rx_compressed;
+	iflist->rx.byte = stats->rx_bytes;
+	iflist->rx.packet = stats->rx_packets;
+	iflist->rx.error = stats->rx_errors;
+	iflist->rx.dropped = stats->rx_dropped;
+	iflist->rx.compressed = stats->rx_compressed;
 
-	ifconf->rx_error.fifo = stats->rx_fifo_errors;
-	ifconf->rx_error.frame = stats->rx_frame_errors;
-	ifconf->rx_error.crc = stats->rx_crc_errors;
-	ifconf->rx_error.length = stats->rx_length_errors;
-	ifconf->rx_error.missed = stats->rx_missed_errors;
-	ifconf->rx_error.over = stats->rx_over_errors;
+	iflist->rx_error.fifo = stats->rx_fifo_errors;
+	iflist->rx_error.frame = stats->rx_frame_errors;
+	iflist->rx_error.crc = stats->rx_crc_errors;
+	iflist->rx_error.length = stats->rx_length_errors;
+	iflist->rx_error.missed = stats->rx_missed_errors;
+	iflist->rx_error.over = stats->rx_over_errors;
 
-	ifconf->tx.byte = stats->tx_bytes;
-	ifconf->tx.packet = stats->tx_packets;
-	ifconf->tx.error = stats->tx_errors;
-	ifconf->tx.dropped = stats->tx_dropped;
-	ifconf->tx.compressed = stats->tx_compressed;
+	iflist->tx.byte = stats->tx_bytes;
+	iflist->tx.packet = stats->tx_packets;
+	iflist->tx.error = stats->tx_errors;
+	iflist->tx.dropped = stats->tx_dropped;
+	iflist->tx.compressed = stats->tx_compressed;
 
-	ifconf->tx_error.fifo = stats->tx_fifo_errors;
-	ifconf->tx_error.carrier = stats->tx_carrier_errors;
-	ifconf->tx_error.heartbeat = stats->tx_heartbeat_errors;
-	ifconf->tx_error.window = stats->tx_window_errors;
-	ifconf->tx_error.aborted = stats->tx_aborted_errors;
+	iflist->tx_error.fifo = stats->tx_fifo_errors;
+	iflist->tx_error.carrier = stats->tx_carrier_errors;
+	iflist->tx_error.heartbeat = stats->tx_heartbeat_errors;
+	iflist->tx_error.window = stats->tx_window_errors;
+	iflist->tx_error.aborted = stats->tx_aborted_errors;
 }
 
 /**
@@ -80,7 +80,7 @@ static void interface_stats_copy(struct dabba_interface_list *ifconf,
  * This function only retrieves interfaces which belong to the packet family.
  */
 
-int dabbad_ifconf_get(struct dabba_ipc_msg *msg)
+int dabbad_interface_list_get(struct dabba_ipc_msg *msg)
 {
 	size_t a, off, ifconf_size;
 	struct ifaddrs *ifaddr, *ifa;
@@ -122,6 +122,74 @@ int dabbad_ifconf_get(struct dabba_ipc_msg *msg)
 		/* FIXME 32-bit counters only... */
 		if (stats)
 			interface_stats_copy(ifconf, stats);
+
+		a++;
+	}
+
+	msg->msg_body.elem_nr = a;
+	freeifaddrs(ifaddr);
+	return 0;
+}
+
+int dabbad_interface_driver_get(struct dabba_ipc_msg *msg)
+{
+	size_t a, off, ifdrv_size;
+	struct ifaddrs *ifaddr, *ifa;
+	struct dabba_interface_driver *ifdrv;
+
+	if (getifaddrs(&ifaddr) != 0)
+		return -1;
+
+	ifdrv_size = ARRAY_SIZE(msg->msg_body.msg.interface_settings);
+	ifa = ifaddr;
+
+	for (off = 0; ifa && off < msg->msg_body.offset; ifa = ifa->ifa_next) {
+		if (!ifa->ifa_addr || ifa->ifa_addr->sa_family != AF_PACKET)
+			continue;
+		off++;
+	}
+
+	for (a = 0; ifa && a < ifdrv_size; ifa = ifa->ifa_next) {
+		if (!ifa->ifa_addr || ifa->ifa_addr->sa_family != AF_PACKET)
+			continue;
+
+		ifdrv = &msg->msg_body.msg.interface_driver[a];
+		strlcpy(ifdrv->name, ifa->ifa_name, IFNAMSIZ);
+		dev_driver_get(ifdrv->name, &ifdrv->driver_info);
+
+		a++;
+	}
+
+	msg->msg_body.elem_nr = a;
+	freeifaddrs(ifaddr);
+	return 0;
+}
+
+int dabbad_interface_settings_get(struct dabba_ipc_msg *msg)
+{
+	size_t a, off, ifsettings_size;
+	struct ifaddrs *ifaddr, *ifa;
+	struct dabba_interface_settings *ifsettings;
+
+	if (getifaddrs(&ifaddr) != 0)
+		return -1;
+
+	ifsettings_size = ARRAY_SIZE(msg->msg_body.msg.interface_settings);
+	ifa = ifaddr;
+
+	for (off = 0; ifa && off < msg->msg_body.offset; ifa = ifa->ifa_next) {
+		if (!ifa->ifa_addr || ifa->ifa_addr->sa_family != AF_PACKET)
+			continue;
+		off++;
+	}
+
+	for (a = 0; ifa && a < ifsettings_size; ifa = ifa->ifa_next) {
+		if (!ifa->ifa_addr || ifa->ifa_addr->sa_family != AF_PACKET)
+			continue;
+
+		ifsettings = &msg->msg_body.msg.interface_settings[a];
+		strlcpy(ifsettings->name, ifa->ifa_name, IFNAMSIZ);
+		dev_settings_get(ifsettings->name, &ifsettings->settings);
 
 		a++;
 	}

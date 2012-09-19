@@ -26,7 +26,9 @@
 
 #include <dabbad/dabbad.h>
 
-int dabbad_ifconf_get(struct dabba_ipc_msg *msg);
+int dabbad_interface_list_get(struct dabba_ipc_msg *msg);
+int dabbad_interface_driver_get(struct dabba_ipc_msg *msg);
+int dabbad_interface_settings_get(struct dabba_ipc_msg *msg);
 int dabbad_interface_modify(struct dabba_ipc_msg *msg);
 
 #endif				/* INTERFACE_H */
