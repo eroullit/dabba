@@ -235,6 +235,7 @@ static void display_interface_driver(const struct dabba_interface_driver *const
 
 	for (a = 0; a < elem_nr; a++) {
 		iface = &interface_driver[a];
+		printf("    - name: %s\n", iface->name);
 		printf("      driver: {");
 		printf("name: %s, ", iface->driver_info.driver);
 		printf("version: %s, ", iface->driver_info.version);
@@ -371,8 +372,7 @@ int cmd_interface_settings(int argc, const char **argv)
 	return rc;
 }
 
-static int prepare_interface_modify_query(int argc, char **argv,
-					  struct dabba_interface_list
+static int prepare_interface_modify_query(int argc, char **argv, struct dabba_interface_list
 					  *ifconf_msg)
 {
 	int ret, rc = 0;
