@@ -173,14 +173,14 @@ static void display_interface_list_header(void)
  * \param[in]           elem_nr		number of interfaces to report
  */
 
-static void display_interface_list(const struct dabba_ifconf *const
+static void display_interface_list(const struct dabba_interface_list *const
 				   interface_msg, const size_t elem_nr)
 {
 	size_t a;
-	const struct dabba_ifconf *iface;
+	const struct dabba_interface_list *iface;
 
 	assert(interface_msg);
-	assert(elem_nr <= DABBA_IFCONF_MAX_SIZE);
+	assert(elem_nr <= DABBA_INTERFACE_LIST_MAX_SIZE);
 
 	for (a = 0; a < elem_nr; a++) {
 		iface = &interface_msg[a];
@@ -302,7 +302,7 @@ int cmd_interface_list(int argc, const char **argv)
 		if (rc)
 			break;
 
-		display_interface_list(msg.msg_body.msg.ifconf,
+		display_interface_list(msg.msg_body.msg.interface_list,
 				       msg.msg_body.elem_nr);
 	} while (msg.msg_body.elem_nr);
 
@@ -372,7 +372,8 @@ int cmd_interface_settings(int argc, const char **argv)
 }
 
 static int prepare_interface_modify_query(int argc, char **argv,
-					  struct dabba_ifconf *ifconf_msg)
+					  struct dabba_interface_list
+					  *ifconf_msg)
 {
 	int ret, rc = 0;
 
@@ -432,7 +433,7 @@ int cmd_interface_modify(int argc, const char **argv)
 	msg.msg_body.elem_nr = 1;
 
 	rc = prepare_interface_modify_query(argc, (char **)argv,
-					    msg.msg_body.msg.ifconf);
+					    msg.msg_body.msg.interface_list);
 
 	if (rc)
 		return rc;

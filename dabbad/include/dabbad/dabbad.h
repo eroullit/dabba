@@ -87,7 +87,7 @@ struct if_tx_error_counter {
  * \brief Dabbad interface name buffer
  */
 
-struct dabba_ifconf {
+struct dabba_interface_list {
 	char name[IFNAMSIZ];
 	struct if_counter rx, tx;
 	struct if_rx_error_counter rx_error;
@@ -147,8 +147,8 @@ struct dabba_capture {
 	uint32_t frame_size; /**< maximum frame size to support */
 };
 
-#ifndef DABBA_IFCONF_MAX_SIZE
-#define DABBA_IFCONF_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_ifconf))
+#ifndef DABBA_INTERFACE_LIST_MAX_SIZE
+#define DABBA_INTERFACE_LIST_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_interface_list))
 #endif				/* DABBA_IFCONF_MAX_SIZE */
 
 #ifndef DABBA_INTERFACE_DRIVER_MAX_SIZE
@@ -186,7 +186,8 @@ struct dabba_ipc_msg {
 
 		union dabba_info {
 			struct dabba_msg_buf buf;
-			struct dabba_ifconf ifconf[DABBA_IFCONF_MAX_SIZE];
+			struct dabba_interface_list
+			    interface_list[DABBA_INTERFACE_LIST_MAX_SIZE];
 			struct dabba_interface_driver
 			 interface_driver[DABBA_INTERFACE_DRIVER_MAX_SIZE];
 			struct dabba_interface_settings
