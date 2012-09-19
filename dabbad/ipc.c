@@ -52,10 +52,10 @@ static int dabbad_handle_msg(struct dabba_ipc_msg *msg)
 	assert(msg);
 
 	switch (msg->msg_body.type) {
-	case DABBA_IFCONF:
+	case DABBA_INTERFACE_LIST:
 		rc = dabbad_ifconf_get(msg);
 		break;
-	case DABBA_IF_MODIFY:
+	case DABBA_INTERFACE_MODIFY:
 		rc = dabbad_interface_modify(msg);
 		break;
 	case DABBA_CAPTURE_START:

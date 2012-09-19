@@ -289,7 +289,7 @@ int cmd_interface_list(int argc, const char **argv)
 	memset(&msg, 0, sizeof(msg));
 
 	msg.mtype = 1;
-	msg.msg_body.type = DABBA_IFCONF;
+	msg.msg_body.type = DABBA_INTERFACE_LIST;
 
 	display_interface_list_header();
 
@@ -428,7 +428,7 @@ int cmd_interface_modify(int argc, const char **argv)
 	memset(&msg, 0, sizeof(msg));
 
 	msg.mtype = 1;
-	msg.msg_body.type = DABBA_IF_MODIFY;
+	msg.msg_body.type = DABBA_INTERFACE_MODIFY;
 	msg.msg_body.elem_nr = 1;
 
 	rc = prepare_interface_modify_query(argc, (char **)argv,
