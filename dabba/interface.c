@@ -236,11 +236,12 @@ static void display_interface_driver(const struct dabba_ipc_msg *const msg)
 	for (a = 0; a < msg->msg_body.elem_nr; a++) {
 		iface = &msg->msg_body.msg.interface_driver[a];
 		printf("    - name: %s\n", iface->name);
-		printf("      driver: {");
-		printf("name: %s, ", iface->driver_info.driver);
-		printf("version: %s, ", iface->driver_info.version);
-		printf("firmware version: %s", iface->driver_info.fw_version);
-		printf("}\n");
+		printf("        driver name: %s\n", iface->driver_info.driver);
+		printf("        driver version: %s\n",
+		       iface->driver_info.version);
+		printf("        firmware version: %s\n",
+		       iface->driver_info.fw_version);
+		printf("        bus info: %s\n", iface->driver_info.bus_info);
 	}
 }
 
