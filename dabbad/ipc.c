@@ -61,6 +61,9 @@ static int dabbad_handle_msg(struct dabba_ipc_msg *msg)
 	case DABBA_INTERFACE_SETTINGS:
 		rc = dabbad_interface_settings_get(msg);
 		break;
+	case DABBA_INTERFACE_PAUSE:
+		rc = dabbad_interface_pause_get(msg);
+		break;
 	case DABBA_INTERFACE_MODIFY:
 		rc = dabbad_interface_modify(msg);
 		break;

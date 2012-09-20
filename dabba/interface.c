@@ -309,6 +309,25 @@ static void display_interface_capabilities(const struct dabba_ipc_msg *const
 	}
 }
 
+static void display_interface_pause(const struct dabba_ipc_msg *const msg)
+{
+	size_t a;
+	const struct dabba_interface_pause *iface;
+
+	assert(msg);
+	assert(msg->msg_body.elem_nr <= DABBA_INTERFACE_PAUSE_MAX_SIZE);
+	assert(msg->msg_body.type == DABBA_INTERFACE_PAUSE);
+
+	for (a = 0; a < msg->msg_body.elem_nr; a++) {
+		iface = &msg->msg_body.msg.interface_pause[a];
+		printf("    - name: %s\n", iface->name);
+		printf("      pause:\n");
+		printf("        autoneg: %s\n", print_tf(iface->pause.autoneg));
+		printf("        rx: %s\n", print_tf(iface->pause.rx_pause));
+		printf("        tx: %s\n", print_tf(iface->pause.tx_pause));
+	}
+}
+
 /**
  * \brief Request the current supported interface list
  * \param[in]           argc	        Argument counter
@@ -382,6 +401,22 @@ int cmd_interface_capabilities(int argc, const char **argv)
 	display_interface_list_header();
 
 	return dabba_ipc_fetch_all(&msg, display_interface_capabilities);
+}
+
+int cmd_interface_pause(int argc, const char **argv)
+{
+	struct dabba_ipc_msg msg;
+
+	assert(argc >= 0);
+	assert(argv);
+
+	memset(&msg, 0, sizeof(msg));
+
+	msg.msg_body.type = DABBA_INTERFACE_PAUSE;
+
+	display_interface_list_header();
+
+	return dabba_ipc_fetch_all(&msg, display_interface_pause);
 }
 
 static int prepare_interface_modify_query(int argc, char **argv, struct dabba_interface_list
@@ -473,6 +508,7 @@ int cmd_interface(int argc, const char **argv)
 		{"driver", cmd_interface_driver},
 		{"settings", cmd_interface_settings},
 		{"capabilities", cmd_interface_capabilities},
+		{"pause", cmd_interface_pause},
 		{"modify", cmd_interface_modify}
 	};
 
