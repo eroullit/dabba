@@ -148,6 +148,20 @@ enum interface_modify_option {
 	OPT_INTERFACE_ID,
 };
 
+static const char *ethtool_port_str_get(const uint8_t port)
+{
+	static const char *const port_str[] = {
+		[PORT_TP] = "tp",
+		[PORT_AUI] = "aui",
+		[PORT_MII] = "mii",
+		[PORT_FIBRE] = "fibre",
+		[PORT_BNC] = "bnc",
+		[PORT_DA] = "da"
+	};
+
+	return port < sizeof(port_str) ? port_str[port] : "unknown";
+}
+
 static struct option *interface_modify_options_get(void)
 {
 	static struct option interface_modify_option[] = {
@@ -269,6 +283,32 @@ static void display_interface_settings(const struct dabba_ipc_msg *const msg)
 	}
 }
 
+static void display_interface_capabilities(const struct dabba_ipc_msg *const
+					   msg)
+{
+	size_t a;
+	const struct dabba_interface_settings *iface;
+
+	assert(msg);
+	assert(msg->msg_body.elem_nr <= DABBA_INTERFACE_SETTINGS_MAX_SIZE);
+	assert(msg->msg_body.type == DABBA_INTERFACE_SETTINGS);
+
+	for (a = 0; a < msg->msg_body.elem_nr; a++) {
+		iface = &msg->msg_body.msg.interface_settings[a];
+		printf("    - name: %s\n", iface->name);
+		printf("      capabilities:\n");
+		printf("        port: %s\n",
+		       ethtool_port_str_get(iface->settings.port));
+		printf("        mdi-x: %s\n",
+		       print_tf(iface->settings.port == PORT_TP
+				&& iface->settings.eth_tp_mdix));
+		printf("        autoneg: %s\n",
+		       print_tf(iface->settings.mdio_support));
+		printf("        link-partner advertising: %s\n",
+		       print_tf(iface->settings.lp_advertising));
+	}
+}
+
 /**
  * \brief Request the current supported interface list
  * \param[in]           argc	        Argument counter
@@ -326,6 +366,22 @@ int cmd_interface_settings(int argc, const char **argv)
 	display_interface_list_header();
 
 	return dabba_ipc_fetch_all(&msg, display_interface_settings);
+}
+
+int cmd_interface_capabilities(int argc, const char **argv)
+{
+	struct dabba_ipc_msg msg;
+
+	assert(argc >= 0);
+	assert(argv);
+
+	memset(&msg, 0, sizeof(msg));
+
+	msg.msg_body.type = DABBA_INTERFACE_SETTINGS;
+
+	display_interface_list_header();
+
+	return dabba_ipc_fetch_all(&msg, display_interface_capabilities);
 }
 
 static int prepare_interface_modify_query(int argc, char **argv, struct dabba_interface_list
@@ -416,6 +472,7 @@ int cmd_interface(int argc, const char **argv)
 		{"list", cmd_interface_list},
 		{"driver", cmd_interface_driver},
 		{"settings", cmd_interface_settings},
+		{"capabilities", cmd_interface_capabilities},
 		{"modify", cmd_interface_modify}
 	};
 
