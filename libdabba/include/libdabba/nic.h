@@ -40,6 +40,7 @@
 
 struct ethtool_drvinfo;
 struct ethtool_cmd;
+struct ethtool_pauseparam;
 
 int devname_to_ifindex(const char *const dev, int *index);
 int ifindex_to_devname(const int index, char *dev, size_t dev_len);
