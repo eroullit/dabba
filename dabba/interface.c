@@ -173,17 +173,17 @@ static void display_interface_list_header(void)
  * \param[in]           elem_nr		number of interfaces to report
  */
 
-static void display_interface_list(const struct dabba_interface_list *const
-				   interface_msg, const size_t elem_nr)
+static void display_interface_list(const struct dabba_ipc_msg *const msg)
 {
 	size_t a;
 	const struct dabba_interface_list *iface;
 
-	assert(interface_msg);
-	assert(elem_nr <= DABBA_INTERFACE_LIST_MAX_SIZE);
+	assert(msg);
+	assert(msg->msg_body.elem_nr <= DABBA_INTERFACE_LIST_MAX_SIZE);
+	assert(msg->msg_body.type == DABBA_INTERFACE_LIST);
 
-	for (a = 0; a < elem_nr; a++) {
-		iface = &interface_msg[a];
+	for (a = 0; a < msg->msg_body.elem_nr; a++) {
+		iface = &msg->msg_body.msg.interface_list[a];
 		printf("    - name: %s\n", iface->name);
 		printf("      status: {");
 		printf("up: %s, ", print_tf(iface->up == TRUE));
@@ -224,17 +224,17 @@ static void display_interface_list(const struct dabba_interface_list *const
 	}
 }
 
-static void display_interface_driver(const struct dabba_interface_driver *const
-				     interface_driver, const size_t elem_nr)
+static void display_interface_driver(const struct dabba_ipc_msg *const msg)
 {
 	size_t a;
 	const struct dabba_interface_driver *iface;
 
-	assert(interface_driver);
-	assert(elem_nr <= DABBA_INTERFACE_DRIVER_MAX_SIZE);
+	assert(msg);
+	assert(msg->msg_body.elem_nr <= DABBA_INTERFACE_DRIVER_MAX_SIZE);
+	assert(msg->msg_body.type == DABBA_INTERFACE_DRIVER);
 
-	for (a = 0; a < elem_nr; a++) {
-		iface = &interface_driver[a];
+	for (a = 0; a < msg->msg_body.elem_nr; a++) {
+		iface = &msg->msg_body.msg.interface_driver[a];
 		printf("    - name: %s\n", iface->name);
 		printf("      driver: {");
 		printf("name: %s, ", iface->driver_info.driver);
@@ -244,18 +244,17 @@ static void display_interface_driver(const struct dabba_interface_driver *const
 	}
 }
 
-static void display_interface_settings(const struct dabba_interface_settings
-				       *const interface_settings,
-				       const size_t elem_nr)
+static void display_interface_settings(const struct dabba_ipc_msg *const msg)
 {
 	size_t a;
 	const struct dabba_interface_settings *iface;
 
-	assert(interface_settings);
-	assert(elem_nr <= DABBA_INTERFACE_SETTINGS_MAX_SIZE);
+	assert(msg);
+	assert(msg->msg_body.elem_nr <= DABBA_INTERFACE_SETTINGS_MAX_SIZE);
+	assert(msg->msg_body.type == DABBA_INTERFACE_SETTINGS);
 
-	for (a = 0; a < elem_nr; a++) {
-		iface = &interface_settings[a];
+	for (a = 0; a < msg->msg_body.elem_nr; a++) {
+		iface = &msg->msg_body.msg.interface_settings[a];
 		printf("    - name: %s\n", iface->name);
 		printf("      settings: {");
 		printf("speed: %u, ", ethtool_cmd_speed(&iface->settings));
@@ -282,7 +281,6 @@ static void display_interface_settings(const struct dabba_interface_settings
 
 int cmd_interface_list(int argc, const char **argv)
 {
-	int rc;
 	struct dabba_ipc_msg msg;
 
 	assert(argc >= 0);
@@ -290,30 +288,15 @@ int cmd_interface_list(int argc, const char **argv)
 
 	memset(&msg, 0, sizeof(msg));
 
-	msg.mtype = 1;
 	msg.msg_body.type = DABBA_INTERFACE_LIST;
 
 	display_interface_list_header();
 
-	do {
-		msg.msg_body.offset += msg.msg_body.elem_nr;
-		msg.msg_body.elem_nr = 0;
-
-		rc = dabba_ipc_msg(&msg);
-
-		if (rc)
-			break;
-
-		display_interface_list(msg.msg_body.msg.interface_list,
-				       msg.msg_body.elem_nr);
-	} while (msg.msg_body.elem_nr);
-
-	return rc;
+	return dabba_ipc_fetch_all(&msg, display_interface_list);
 }
 
 int cmd_interface_driver(int argc, const char **argv)
 {
-	int rc;
 	struct dabba_ipc_msg msg;
 
 	assert(argc >= 0);
@@ -321,30 +304,15 @@ int cmd_interface_driver(int argc, const char **argv)
 
 	memset(&msg, 0, sizeof(msg));
 
-	msg.mtype = 1;
 	msg.msg_body.type = DABBA_INTERFACE_DRIVER;
 
 	display_interface_list_header();
 
-	do {
-		msg.msg_body.offset += msg.msg_body.elem_nr;
-		msg.msg_body.elem_nr = 0;
-
-		rc = dabba_ipc_msg(&msg);
-
-		if (rc)
-			break;
-
-		display_interface_driver(msg.msg_body.msg.interface_driver,
-					 msg.msg_body.elem_nr);
-	} while (msg.msg_body.elem_nr);
-
-	return rc;
+	return dabba_ipc_fetch_all(&msg, display_interface_driver);
 }
 
 int cmd_interface_settings(int argc, const char **argv)
 {
-	int rc;
 	struct dabba_ipc_msg msg;
 
 	assert(argc >= 0);
@@ -352,25 +320,11 @@ int cmd_interface_settings(int argc, const char **argv)
 
 	memset(&msg, 0, sizeof(msg));
 
-	msg.mtype = 1;
 	msg.msg_body.type = DABBA_INTERFACE_SETTINGS;
 
 	display_interface_list_header();
 
-	do {
-		msg.msg_body.offset += msg.msg_body.elem_nr;
-		msg.msg_body.elem_nr = 0;
-
-		rc = dabba_ipc_msg(&msg);
-
-		if (rc)
-			break;
-
-		display_interface_settings(msg.msg_body.msg.interface_settings,
-					   msg.msg_body.elem_nr);
-	} while (msg.msg_body.elem_nr);
-
-	return rc;
+	return dabba_ipc_fetch_all(&msg, display_interface_settings);
 }
 
 static int prepare_interface_modify_query(int argc, char **argv, struct dabba_interface_list
