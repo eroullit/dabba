@@ -257,15 +257,15 @@ static void display_interface_settings(const struct dabba_ipc_msg *const msg)
 	for (a = 0; a < msg->msg_body.elem_nr; a++) {
 		iface = &msg->msg_body.msg.interface_settings[a];
 		printf("    - name: %s\n", iface->name);
-		printf("      settings: {");
-		printf("speed: %u, ", ethtool_cmd_speed(&iface->settings));
-		printf("duplex: %s, ", print_tf(iface->settings.duplex));
-		printf("autoneg: %s, ", print_tf(iface->settings.autoneg));
-		printf("port: %u, ", iface->settings.port);
-		printf("address: %u, ", iface->settings.phy_address);
-		printf("max rx packet: %u, ", iface->settings.maxrxpkt);
-		printf("max tx packet: %u", iface->settings.maxtxpkt);
-		printf("}\n");
+		printf("      settings:\n");
+		printf("        speed: %u\n",
+		       ethtool_cmd_speed(&iface->settings));
+		printf("        duplex: %s\n",
+		       iface->settings.duplex ? "full" : "half");
+		printf("        autoneg: %s\n",
+		       print_tf(iface->settings.autoneg));
+		printf("        max rx packet: %u\n", iface->settings.maxrxpkt);
+		printf("        max tx packet: %u\n", iface->settings.maxtxpkt);
 	}
 }
 
