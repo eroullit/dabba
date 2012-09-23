@@ -55,6 +55,7 @@ enum dabba_msg_type {
 	DABBA_INTERFACE_DRIVER,
 	DABBA_INTERFACE_SETTINGS,
 	DABBA_INTERFACE_PAUSE,
+	DABBA_INTERFACE_COALESCE,
 	DABBA_INTERFACE_MODIFY,
 	DABBA_CAPTURE_START,
 	DABBA_CAPTURE_LIST,
@@ -110,6 +111,11 @@ struct dabba_interface_settings {
 struct dabba_interface_pause {
 	char name[IFNAMSIZ];
 	struct ethtool_pauseparam pause;
+};
+
+struct dabba_interface_coalesce {
+	char name[IFNAMSIZ];
+	struct ethtool_coalesce coalesce;
 };
 
 enum dabba_thread_flags {
@@ -169,6 +175,10 @@ struct dabba_capture {
 #define DABBA_INTERFACE_PAUSE_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_interface_pause))
 #endif				/* DABBA_INTERFACE_PAUSE_MAX_SIZE */
 
+#ifndef DABBA_INTERFACE_COALESCE_MAX_SIZE
+#define DABBA_INTERFACE_COALESCE_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_interface_coalesce))
+#endif				/* DABBA_INTERFACE_COALESCE_MAX_SIZE */
+
 #ifndef DABBA_CAPTURE_MAX_SIZE
 #define DABBA_CAPTURE_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_capture))
 #endif				/* DABBA_CAPTURE_MAX_SIZE */
@@ -204,6 +214,8 @@ struct dabba_ipc_msg {
 			 interface_settings[DABBA_INTERFACE_SETTINGS_MAX_SIZE];
 			struct dabba_interface_pause
 			 interface_pause[DABBA_INTERFACE_PAUSE_MAX_SIZE];
+			struct dabba_interface_coalesce
+			 interface_coalesce[DABBA_INTERFACE_COALESCE_MAX_SIZE];
 			struct dabba_capture capture[DABBA_CAPTURE_MAX_SIZE];
 			struct dabba_thread thread[DABBA_THREAD_MAX_SIZE];
 			struct dabba_thread_cap

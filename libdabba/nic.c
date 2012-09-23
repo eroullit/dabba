@@ -249,3 +249,26 @@ int dev_pause_get(const char *const dev, struct ethtool_pauseparam *pause)
 
 	return dev_kernel_request(&ifr, SIOCETHTOOL);
 }
+
+/**
+ * \brief Get the interface coalesce settings
+ * \param[in]       dev	        interface name
+ * \param[out]      coalesce	pointer to the interface coalesce settings
+ * \return 0 on success, -1 if the interface pause settings could not be fetched.
+ */
+
+int dev_coalesce_get(const char *const dev, struct ethtool_coalesce *coalesce)
+{
+	struct ifreq ifr;
+
+	assert(dev);
+	assert(coalesce);
+
+	memset(&ifr, 0, sizeof(ifr));
+	memset(coalesce, 0, sizeof(*coalesce));
+	strlcpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name));
+	coalesce->cmd = ETHTOOL_GCOALESCE;
+	ifr.ifr_data = (caddr_t) coalesce;
+
+	return dev_kernel_request(&ifr, SIOCETHTOOL);
+}

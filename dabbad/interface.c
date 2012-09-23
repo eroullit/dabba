@@ -233,6 +233,40 @@ int dabbad_interface_pause_get(struct dabba_ipc_msg *msg)
 	return 0;
 }
 
+int dabbad_interface_coalesce_get(struct dabba_ipc_msg *msg)
+{
+	size_t a, off, ifcoalesce_size;
+	struct ifaddrs *ifaddr, *ifa;
+	struct dabba_interface_coalesce *ifcoalesce;
+
+	if (getifaddrs(&ifaddr) != 0)
+		return -1;
+
+	ifcoalesce_size = ARRAY_SIZE(msg->msg_body.msg.interface_coalesce);
+	ifa = ifaddr;
+
+	for (off = 0; ifa && off < msg->msg_body.offset; ifa = ifa->ifa_next) {
+		if (!ifa->ifa_addr || ifa->ifa_addr->sa_family != AF_PACKET)
+			continue;
+		off++;
+	}
+
+	for (a = 0; ifa && a < ifcoalesce_size; ifa = ifa->ifa_next) {
+		if (!ifa->ifa_addr || ifa->ifa_addr->sa_family != AF_PACKET)
+			continue;
+
+		ifcoalesce = &msg->msg_body.msg.interface_coalesce[a];
+		strlcpy(ifcoalesce->name, ifa->ifa_name, IFNAMSIZ);
+		dev_coalesce_get(ifcoalesce->name, &ifcoalesce->coalesce);
+
+		a++;
+	}
+
+	msg->msg_body.elem_nr = a;
+	freeifaddrs(ifaddr);
+	return 0;
+}
+
 /**
  * \brief Modify a supported interface status
  * \param[in,out]       msg	        Dabba daemon IPC message

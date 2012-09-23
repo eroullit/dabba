@@ -41,6 +41,7 @@
 struct ethtool_drvinfo;
 struct ethtool_cmd;
 struct ethtool_pauseparam;
+struct ethtool_coalesce;
 
 int devname_to_ifindex(const char *const dev, int *index);
 int ifindex_to_devname(const int index, char *dev, size_t dev_len);
@@ -49,5 +50,6 @@ int dev_flags_set(const char *const dev, const short flags);
 int dev_driver_get(const char *const dev, struct ethtool_drvinfo *driver_info);
 int dev_settings_get(const char *const dev, struct ethtool_cmd *settings);
 int dev_pause_get(const char *const dev, struct ethtool_pauseparam *pause);
+int dev_coalesce_get(const char *const dev, struct ethtool_coalesce *coalesce);
 
 #endif				/* NIC_H */
