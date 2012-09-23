@@ -181,6 +181,31 @@ int dev_flags_set(const char *const dev, const short flags)
 	return dev_kernel_request(&ifr, SIOCSIFFLAGS);
 }
 
+static int dev_ethtool_value_get(const char *const dev, const int cmd,
+				 uint32_t * value)
+{
+	int rc;
+	struct ethtool_value e;
+	struct ifreq ifr;
+
+	assert(dev);
+	assert(value);
+
+	memset(&e, 0, sizeof(e));
+	memset(&ifr, 0, sizeof(ifr));
+
+	strlcpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name));
+	e.cmd = cmd;
+	ifr.ifr_data = (caddr_t) & e;
+
+	rc = dev_kernel_request(&ifr, SIOCETHTOOL);
+
+	if (!rc)
+		*value = e.data;
+
+	return rc;
+}
+
 /**
  * \brief Get the interface driver information
  * \param[in]       dev	        interface name
@@ -271,4 +296,38 @@ int dev_coalesce_get(const char *const dev, struct ethtool_coalesce *coalesce)
 	ifr.ifr_data = (caddr_t) coalesce;
 
 	return dev_kernel_request(&ifr, SIOCETHTOOL);
+}
+
+/**
+ * \brief Get the interface coalesce settings
+ * \param[in]       dev	        interface name
+ * \param[out]      offload	pointer to the interface offload settings
+ * \return 0 on success, -1 if the interface offload settings could not be fetched.
+ */
+
+int dev_offload_get(const char *const dev,
+		    struct libdabba_interface_offload *offload)
+{
+	uint32_t flags = 0;
+
+	assert(offload);
+
+	memset(offload, 0, sizeof(*offload));
+
+	dev_ethtool_value_get(dev, ETHTOOL_GRXCSUM,
+			      (uint32_t *) & offload->rx_csum);
+	dev_ethtool_value_get(dev, ETHTOOL_GTXCSUM,
+			      (uint32_t *) & offload->tx_csum);
+	dev_ethtool_value_get(dev, ETHTOOL_GSG, (uint32_t *) & offload->sg);
+	dev_ethtool_value_get(dev, ETHTOOL_GTSO, (uint32_t *) & offload->tso);
+	dev_ethtool_value_get(dev, ETHTOOL_GUFO, (uint32_t *) & offload->ufo);
+	dev_ethtool_value_get(dev, ETHTOOL_GGSO, (uint32_t *) & offload->gso);
+	dev_ethtool_value_get(dev, ETHTOOL_GGRO, (uint32_t *) & offload->gro);
+	dev_ethtool_value_get(dev, ETHTOOL_GFLAGS, &flags);
+
+	offload->lro = flags & ETH_FLAG_LRO;
+	offload->ntuple = flags & ETH_FLAG_NTUPLE;
+	offload->rxhash = flags & ETH_FLAG_RXHASH;
+
+	return 0;
 }

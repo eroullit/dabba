@@ -30,6 +30,8 @@
 #ifndef NIC_H
 #define	NIC_H
 
+#include <stdint.h>
+
 /**
  * \brief Pseudo-interface name to indicate that all interfaces must be used
  */
@@ -37,6 +39,10 @@
 #ifndef ANY_INTERFACE
 #define ANY_INTERFACE "any"
 #endif				/* ANY_INTERFACE */
+
+struct libdabba_interface_offload {
+	uint8_t rx_csum, tx_csum, sg, tso, ufo, gso, gro, lro, ntuple, rxhash;
+};
 
 struct ethtool_drvinfo;
 struct ethtool_cmd;
@@ -51,5 +57,7 @@ int dev_driver_get(const char *const dev, struct ethtool_drvinfo *driver_info);
 int dev_settings_get(const char *const dev, struct ethtool_cmd *settings);
 int dev_pause_get(const char *const dev, struct ethtool_pauseparam *pause);
 int dev_coalesce_get(const char *const dev, struct ethtool_coalesce *coalesce);
+int dev_offload_get(const char *const dev,
+		    struct libdabba_interface_offload *offload);
 
 #endif				/* NIC_H */

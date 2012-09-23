@@ -386,6 +386,39 @@ static void display_interface_coalesce(const struct dabba_ipc_msg *const msg)
 	}
 }
 
+static void display_interface_offload(const struct dabba_ipc_msg *const msg)
+{
+	size_t a;
+	const struct dabba_interface_offload *iface;
+
+	assert(msg);
+	assert(msg->msg_body.elem_nr <= DABBA_INTERFACE_OFFLOAD_MAX_SIZE);
+	assert(msg->msg_body.type == DABBA_INTERFACE_OFFLOAD);
+
+	for (a = 0; a < msg->msg_body.elem_nr; a++) {
+		iface = &msg->msg_body.msg.interface_offload[a];
+		printf("    - name: %s\n", iface->name);
+		printf("      offload:\n");
+		printf("        rx checksum: %s\n",
+		       print_tf(iface->offload.rx_csum));
+		printf("        tx checksum: %s\n",
+		       print_tf(iface->offload.tx_csum));
+		printf("        scatter gather: %s\n",
+		       print_tf(iface->offload.sg));
+		printf("        tcp segment: %s\n",
+		       print_tf(iface->offload.tso));
+		printf("        udp fragment: %s\n",
+		       print_tf(iface->offload.ufo));
+		printf("        generic segmentation: %s\n",
+		       print_tf(iface->offload.gso));
+		printf("        generic receive: %s\n",
+		       print_tf(iface->offload.gro));
+		printf("        ntuple: %s\n", print_tf(iface->offload.ntuple));
+		printf("        receive hashing: %s\n",
+		       print_tf(iface->offload.rxhash));
+	}
+}
+
 /**
  * \brief Request the current supported interface list
  * \param[in]           argc	        Argument counter
@@ -493,6 +526,22 @@ int cmd_interface_coalesce(int argc, const char **argv)
 	return dabba_ipc_fetch_all(&msg, display_interface_coalesce);
 }
 
+int cmd_interface_offload(int argc, const char **argv)
+{
+	struct dabba_ipc_msg msg;
+
+	assert(argc >= 0);
+	assert(argv);
+
+	memset(&msg, 0, sizeof(msg));
+
+	msg.msg_body.type = DABBA_INTERFACE_OFFLOAD;
+
+	display_interface_list_header();
+
+	return dabba_ipc_fetch_all(&msg, display_interface_offload);
+}
+
 static int prepare_interface_modify_query(int argc, char **argv, struct dabba_interface_list
 					  *ifconf_msg)
 {
@@ -584,6 +633,7 @@ int cmd_interface(int argc, const char **argv)
 		{"capabilities", cmd_interface_capabilities},
 		{"pause", cmd_interface_pause},
 		{"coalesce", cmd_interface_coalesce},
+		{"offload", cmd_interface_offload},
 		{"modify", cmd_interface_modify}
 	};
 
