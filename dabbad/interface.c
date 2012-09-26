@@ -36,7 +36,7 @@
 
 #include <libdabba/macros.h>
 #include <libdabba/strlcpy.h>
-#include <libdabba/nic.h>
+#include <libdabba/interface.h>
 #include <dabbad/interface.h>
 #include <netpacket/packet.h>
 

@@ -33,7 +33,7 @@
 #include <linux/if_ether.h>
 
 #include <libdabba/macros.h>
-#include <libdabba/nic.h>
+#include <libdabba/interface.h>
 #include <libdabba/packet_mmap.h>
 
 #define MIN_FRAME_NR 1<<3

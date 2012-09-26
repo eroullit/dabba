@@ -39,7 +39,7 @@
 #include <sys/msg.h>
 #include <sched.h>
 #include <linux/ethtool.h>
-#include <libdabba/nic.h>
+#include <libdabba/interface.h>
 
 /**
  * \brief Supported dabbad IPC message types

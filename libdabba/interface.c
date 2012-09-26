@@ -41,7 +41,7 @@
 #include <linux/ethtool.h>
 #include <linux/sockios.h>
 
-#include <libdabba/nic.h>
+#include <libdabba/interface.h>
 #include <libdabba/strlcpy.h>
 
 static int dev_kernel_request(struct ifreq *ifr, const int request)

@@ -41,7 +41,7 @@
 
 #include <libdabba/macros.h>
 #include <libdabba/packet_mmap.h>
-#include <libdabba/nic.h>
+#include <libdabba/interface.h>
 
 /**
  * \internal
