@@ -298,38 +298,61 @@ int dev_coalesce_get(const char *const dev, struct ethtool_coalesce *coalesce)
 	return dev_kernel_request(&ifr, SIOCETHTOOL);
 }
 
-/**
- * \brief Get the interface coalesce settings
- * \param[in]       dev	        interface name
- * \param[out]      offload	pointer to the interface offload settings
- * \return 0 on success, -1 if the interface offload settings could not be fetched.
- */
-
-int dev_offload_get(const char *const dev,
-		    struct libdabba_interface_offload *offload)
+int dev_rx_csum_offload_get(const char *const dev, uint32_t * rx_csum)
 {
+	return dev_ethtool_value_get(dev, ETHTOOL_GRXCSUM, rx_csum);
+}
+
+int dev_tx_csum_offload_get(const char *const dev, uint32_t * tx_csum)
+{
+	return dev_ethtool_value_get(dev, ETHTOOL_GTXCSUM, tx_csum);
+}
+
+int dev_scatter_gather_get(const char *const dev, uint32_t * sg)
+{
+	return dev_ethtool_value_get(dev, ETHTOOL_GSG, sg);
+}
+
+int dev_tcp_seg_offload_get(const char *const dev, uint32_t * tso)
+{
+	return dev_ethtool_value_get(dev, ETHTOOL_GTSO, tso);
+}
+
+int dev_udp_frag_offload_get(const char *const dev, uint32_t * ufo)
+{
+	return dev_ethtool_value_get(dev, ETHTOOL_GUFO, ufo);
+}
+
+int dev_generic_seg_offload_get(const char *const dev, uint32_t * gso)
+{
+	return dev_ethtool_value_get(dev, ETHTOOL_GGSO, gso);
+}
+
+int dev_generic_rcv_offload_get(const char *const dev, uint32_t * gro)
+{
+	return dev_ethtool_value_get(dev, ETHTOOL_GGRO, gro);
+}
+
+int dev_large_rcv_offload_get(const char *const dev, uint32_t * lro)
+{
+	int rc;
 	uint32_t flags = 0;
 
-	assert(offload);
+	rc = dev_ethtool_value_get(dev, ETHTOOL_GGRO, &flags);
+	*lro = flags & ETH_FLAG_LRO;
 
-	memset(offload, 0, sizeof(*offload));
+	return rc;
+}
 
-	dev_ethtool_value_get(dev, ETHTOOL_GRXCSUM,
-			      (uint32_t *) & offload->rx_csum);
-	dev_ethtool_value_get(dev, ETHTOOL_GTXCSUM,
-			      (uint32_t *) & offload->tx_csum);
-	dev_ethtool_value_get(dev, ETHTOOL_GSG, (uint32_t *) & offload->sg);
-	dev_ethtool_value_get(dev, ETHTOOL_GTSO, (uint32_t *) & offload->tso);
-	dev_ethtool_value_get(dev, ETHTOOL_GUFO, (uint32_t *) & offload->ufo);
-	dev_ethtool_value_get(dev, ETHTOOL_GGSO, (uint32_t *) & offload->gso);
-	dev_ethtool_value_get(dev, ETHTOOL_GGRO, (uint32_t *) & offload->gro);
-	dev_ethtool_value_get(dev, ETHTOOL_GFLAGS, &flags);
+int dev_rx_hash_offload_get(const char *const dev, uint32_t * rxhash)
+{
+	int rc;
+	uint32_t flags = 0;
 
-	offload->lro = flags & ETH_FLAG_LRO;
-	offload->ntuple = flags & ETH_FLAG_NTUPLE;
-	offload->rxhash = flags & ETH_FLAG_RXHASH;
+	rc = dev_ethtool_value_get(dev, ETHTOOL_GFLAGS, &flags);
+	*rxhash = flags & ETH_FLAG_RXHASH;
 
-	return 0;
+	return rc;
 }
 
 /**
