@@ -106,6 +106,8 @@ int dabbad_interface_list_get(struct dabba_ipc_msg *msg)
 		ifconf = &msg->msg_body.msg.interface_list[a];
 		strlcpy(ifconf->name, ifa->ifa_name, IFNAMSIZ);
 
+		dev_link_get(ifconf->name, (uint32_t *) & ifconf->link);
+
 		ifconf->up = (ifa->ifa_flags & IFF_UP) == IFF_UP ? TRUE : FALSE;
 		ifconf->running =
 		    (ifa->ifa_flags & IFF_RUNNING) ==

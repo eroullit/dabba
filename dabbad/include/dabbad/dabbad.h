@@ -98,6 +98,7 @@ struct dabba_interface_list {
 	struct if_tx_error_counter tx_error;
 	enum dabba_tristate up, running, promisc, loopback;
 	struct ethtool_cmd settings;
+	uint8_t link;
 };
 
 struct dabba_interface_driver {

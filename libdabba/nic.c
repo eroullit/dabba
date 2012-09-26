@@ -331,3 +331,15 @@ int dev_offload_get(const char *const dev,
 
 	return 0;
 }
+
+/**
+ * \brief Get the interface link status
+ * \param[in]       dev	        interface name
+ * \param[out]      link	pointer to the interface link status
+ * \return 0 on success, -1 if the interface link status could not be fetched.
+ */
+
+int dev_link_get(const char *const dev, uint32_t * link)
+{
+	return dev_ethtool_value_get(dev, ETHTOOL_GLINK, link);
+}

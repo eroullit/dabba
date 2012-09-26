@@ -59,5 +59,6 @@ int dev_pause_get(const char *const dev, struct ethtool_pauseparam *pause);
 int dev_coalesce_get(const char *const dev, struct ethtool_coalesce *coalesce);
 int dev_offload_get(const char *const dev,
 		    struct libdabba_interface_offload *offload);
+int dev_link_get(const char *const dev, uint32_t * link);
 
 #endif				/* NIC_H */
