@@ -74,7 +74,7 @@ static void interface_stats_copy(struct dabba_interface_list *iflist,
 
 /**
  * \brief Get the list of usable interfaces by dabbad and give it to the user
- * \param[in,out]       msg	        Dabba daemon IPC message
+ * \param[in,out]       msg	        IPC message
  * \return 0 on success, -1 if the interface list could not be fetched.
  *
  * This function only retrieves interfaces which belong to the packet family.
@@ -133,6 +133,16 @@ int dabbad_interface_list_get(struct dabba_ipc_msg *msg)
 	return 0;
 }
 
+/**
+ * \brief Get the list of interface driver and give it to the user
+ * \param[in,out]       msg	        IPC message
+ * \return 0 on success, -1 if the interface driver list could not be fetched.
+ *
+ * This function only retrieves interfaces which belong to the packet family.
+ * The kernel might return empty strings when the interface has no driver
+ * (e.g: loopback interface)
+ */
+
 int dabbad_interface_driver_get(struct dabba_ipc_msg *msg)
 {
 	size_t a, off, ifdrv_size;
@@ -166,6 +176,14 @@ int dabbad_interface_driver_get(struct dabba_ipc_msg *msg)
 	freeifaddrs(ifaddr);
 	return 0;
 }
+
+/**
+ * \brief Get the list of interface hardware settings and give it to the user
+ * \param[in,out]       msg	        IPC message
+ * \return 0 on success, -1 if the interface hardware settings list could not be fetched.
+ *
+ * This function only retrieves interfaces which belong to the packet family.
+ */
 
 int dabbad_interface_settings_get(struct dabba_ipc_msg *msg)
 {
@@ -201,6 +219,14 @@ int dabbad_interface_settings_get(struct dabba_ipc_msg *msg)
 	return 0;
 }
 
+/**
+ * \brief Get the list of interface pause settings and give it to the user
+ * \param[in,out]       msg	        IPC message
+ * \return 0 on success, -1 if the interface pause settings list could not be fetched.
+ *
+ * This function only retrieves interfaces which belong to the packet family.
+ */
+
 int dabbad_interface_pause_get(struct dabba_ipc_msg *msg)
 {
 	size_t a, off, ifpause_size;
@@ -235,6 +261,14 @@ int dabbad_interface_pause_get(struct dabba_ipc_msg *msg)
 	return 0;
 }
 
+/**
+ * \brief Get the list of interface coalesce settings and give it to the user
+ * \param[in,out]       msg	        IPC message
+ * \return 0 on success, -1 if the interface coalesce settings list could not be fetched.
+ *
+ * This function only retrieves interfaces which belong to the packet family.
+ */
+
 int dabbad_interface_coalesce_get(struct dabba_ipc_msg *msg)
 {
 	size_t a, off, ifcoalesce_size;
@@ -268,6 +302,14 @@ int dabbad_interface_coalesce_get(struct dabba_ipc_msg *msg)
 	freeifaddrs(ifaddr);
 	return 0;
 }
+
+/**
+ * \brief Get the list of interface offload settings and give it to the user
+ * \param[in,out]       msg	        IPC message
+ * \return 0 on success, -1 if the interface offload settings list could not be fetched.
+ *
+ * This function only retrieves interfaces which belong to the packet family.
+ */
 
 int dabbad_interface_offload_get(struct dabba_ipc_msg *msg)
 {
@@ -314,7 +356,7 @@ int dabbad_interface_offload_get(struct dabba_ipc_msg *msg)
 
 /**
  * \brief Modify a supported interface status
- * \param[in,out]       msg	        Dabba daemon IPC message
+ * \param[in,out]       msg	        IPC message
  * \return 0 on success, else if the interface status could not be modified.
  */
 
