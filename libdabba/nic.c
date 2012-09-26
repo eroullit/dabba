@@ -338,7 +338,7 @@ int dev_large_rcv_offload_get(const char *const dev, uint32_t * lro)
 	int rc;
 	uint32_t flags = 0;
 
-	rc = dev_ethtool_value_get(dev, ETHTOOL_GGRO, &flags);
+	rc = dev_ethtool_value_get(dev, ETHTOOL_GFLAGS, &flags);
 	*lro = flags & ETH_FLAG_LRO;
 
 	return rc;

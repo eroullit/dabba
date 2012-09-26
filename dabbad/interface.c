@@ -293,7 +293,16 @@ int dabbad_interface_offload_get(struct dabba_ipc_msg *msg)
 
 		ifoffload = &msg->msg_body.msg.interface_offload[a];
 		strlcpy(ifoffload->name, ifa->ifa_name, IFNAMSIZ);
-		dev_offload_get(ifoffload->name, &ifoffload->offload);
+
+		dev_rx_csum_offload_get(ifoffload->name, &ifoffload->rx_csum);
+		dev_tx_csum_offload_get(ifoffload->name, &ifoffload->tx_csum);
+		dev_scatter_gather_get(ifoffload->name, &ifoffload->sg);
+		dev_tcp_seg_offload_get(ifoffload->name, &ifoffload->tso);
+		dev_udp_frag_offload_get(ifoffload->name, &ifoffload->ufo);
+		dev_generic_seg_offload_get(ifoffload->name, &ifoffload->gso);
+		dev_generic_rcv_offload_get(ifoffload->name, &ifoffload->gro);
+		dev_large_rcv_offload_get(ifoffload->name, &ifoffload->lro);
+		dev_rx_hash_offload_get(ifoffload->name, &ifoffload->rxhash);
 
 		a++;
 	}

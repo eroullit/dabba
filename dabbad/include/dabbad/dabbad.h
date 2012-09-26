@@ -122,7 +122,7 @@ struct dabba_interface_coalesce {
 
 struct dabba_interface_offload {
 	char name[IFNAMSIZ];
-	struct libdabba_interface_offload offload;
+	uint32_t rx_csum, tx_csum, sg, tso, ufo, gso, gro, lro, rxhash;
 };
 
 enum dabba_thread_flags {

@@ -322,84 +322,71 @@ static void display_interface_capabilities(const struct dabba_ipc_msg *const
 		       "            100:   {half: %s, full: %s}\n"
 		       "            1000:  {half: %s, full: %s}\n"
 		       "            10000: {half: false, full: %s}\n",
-		       print_tf(iface->
-				settings.supported & SUPPORTED_10baseT_Half),
-		       print_tf(iface->
-				settings.supported & SUPPORTED_10baseT_Full),
-		       print_tf(iface->
-				settings.supported & SUPPORTED_100baseT_Half),
-		       print_tf(iface->
-				settings.supported & SUPPORTED_100baseT_Full),
-		       print_tf(iface->
-				settings.supported & SUPPORTED_1000baseT_Half),
-		       print_tf(iface->
-				settings.supported & SUPPORTED_1000baseT_Full),
-		       print_tf(iface->
-				settings.supported &
-				SUPPORTED_10000baseT_Full));
+		       print_tf(iface->settings.
+				supported & SUPPORTED_10baseT_Half),
+		       print_tf(iface->settings.
+				supported & SUPPORTED_10baseT_Full),
+		       print_tf(iface->settings.
+				supported & SUPPORTED_100baseT_Half),
+		       print_tf(iface->settings.
+				supported & SUPPORTED_100baseT_Full),
+		       print_tf(iface->settings.
+				supported & SUPPORTED_1000baseT_Half),
+		       print_tf(iface->settings.
+				supported & SUPPORTED_1000baseT_Full),
+		       print_tf(iface->settings.
+				supported & SUPPORTED_10000baseT_Full));
 		printf("        advertised:\n");
 		printf("          autoneg: %s\n",
-		       print_tf(iface->
-				settings.advertising & ADVERTISED_Autoneg));
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_Autoneg));
 		printf("          pause: %s\n",
-		       print_tf(iface->
-				settings.advertising & ADVERTISED_Pause));
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_Pause));
 		printf("          speed:\n");
 		printf("            10:    {half: %s, full: %s}\n"
 		       "            100:   {half: %s, full: %s}\n"
 		       "            1000:  {half: %s, full: %s}\n"
 		       "            10000: {half: false, full: %s}\n",
-		       print_tf(iface->
-				settings.advertising & ADVERTISED_10baseT_Half),
-		       print_tf(iface->
-				settings.advertising & ADVERTISED_10baseT_Full),
-		       print_tf(iface->
-				settings.advertising &
-				ADVERTISED_100baseT_Half),
-		       print_tf(iface->
-				settings.advertising &
-				ADVERTISED_100baseT_Full),
-		       print_tf(iface->
-				settings.advertising &
-				ADVERTISED_1000baseT_Half),
-		       print_tf(iface->
-				settings.advertising &
-				ADVERTISED_1000baseT_Full),
-		       print_tf(iface->
-				settings.advertising &
-				ADVERTISED_10000baseT_Full));
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_10baseT_Half),
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_10baseT_Full),
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_100baseT_Half),
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_100baseT_Full),
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_1000baseT_Half),
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_1000baseT_Full),
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_10000baseT_Full));
 		printf("        link-partner advertised:\n");
 		printf("          autoneg: %s\n",
-		       print_tf(iface->
-				settings.lp_advertising & ADVERTISED_Autoneg));
+		       print_tf(iface->settings.
+				lp_advertising & ADVERTISED_Autoneg));
 		printf("          pause: %s\n",
-		       print_tf(iface->
-				settings.lp_advertising & ADVERTISED_Pause));
+		       print_tf(iface->settings.
+				lp_advertising & ADVERTISED_Pause));
 		printf("          speed:\n");
 		printf("            10:    {half: %s, full: %s}\n"
 		       "            100:   {half: %s, full: %s}\n"
 		       "            1000:  {half: %s, full: %s}\n"
 		       "            10000: {half: false, full: %s}\n",
-		       print_tf(iface->
-				settings.lp_advertising &
+		       print_tf(iface->settings.lp_advertising &
 				ADVERTISED_10baseT_Half),
-		       print_tf(iface->
-				settings.lp_advertising &
+		       print_tf(iface->settings.lp_advertising &
 				ADVERTISED_10baseT_Full),
-		       print_tf(iface->
-				settings.lp_advertising &
+		       print_tf(iface->settings.lp_advertising &
 				ADVERTISED_100baseT_Half),
-		       print_tf(iface->
-				settings.lp_advertising &
+		       print_tf(iface->settings.lp_advertising &
 				ADVERTISED_100baseT_Full),
-		       print_tf(iface->
-				settings.lp_advertising &
+		       print_tf(iface->settings.lp_advertising &
 				ADVERTISED_1000baseT_Half),
-		       print_tf(iface->
-				settings.lp_advertising &
+		       print_tf(iface->settings.lp_advertising &
 				ADVERTISED_1000baseT_Full),
-		       print_tf(iface->
-				settings.lp_advertising &
+		       print_tf(iface->settings.lp_advertising &
 				ADVERTISED_10000baseT_Full));
 	}
 }
@@ -494,23 +481,15 @@ static void display_interface_offload(const struct dabba_ipc_msg *const msg)
 		iface = &msg->msg_body.msg.interface_offload[a];
 		printf("    - name: %s\n", iface->name);
 		printf("      offload:\n");
-		printf("        rx checksum: %s\n",
-		       print_tf(iface->offload.rx_csum));
-		printf("        tx checksum: %s\n",
-		       print_tf(iface->offload.tx_csum));
-		printf("        scatter gather: %s\n",
-		       print_tf(iface->offload.sg));
-		printf("        tcp segment: %s\n",
-		       print_tf(iface->offload.tso));
-		printf("        udp fragment: %s\n",
-		       print_tf(iface->offload.ufo));
+		printf("        rx checksum: %s\n", print_tf(iface->rx_csum));
+		printf("        tx checksum: %s\n", print_tf(iface->tx_csum));
+		printf("        scatter gather: %s\n", print_tf(iface->sg));
+		printf("        tcp segment: %s\n", print_tf(iface->tso));
+		printf("        udp fragment: %s\n", print_tf(iface->ufo));
 		printf("        generic segmentation: %s\n",
-		       print_tf(iface->offload.gso));
-		printf("        generic receive: %s\n",
-		       print_tf(iface->offload.gro));
-		printf("        ntuple: %s\n", print_tf(iface->offload.ntuple));
-		printf("        receive hashing: %s\n",
-		       print_tf(iface->offload.rxhash));
+		       print_tf(iface->gso));
+		printf("        generic receive: %s\n", print_tf(iface->gro));
+		printf("        rx hashing: %s\n", print_tf(iface->rxhash));
 	}
 }
 
