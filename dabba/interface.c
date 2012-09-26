@@ -278,6 +278,8 @@ static void display_interface_settings(const struct dabba_ipc_msg *const msg)
 		       iface->settings.duplex ? "full" : "half");
 		printf("        autoneg: %s\n",
 		       print_tf(iface->settings.autoneg));
+		printf("        port: %s\n",
+		       ethtool_port_str_get(iface->settings.port));
 		printf("        max rx packet: %u\n", iface->settings.maxrxpkt);
 		printf("        max tx packet: %u\n", iface->settings.maxtxpkt);
 	}
@@ -297,15 +299,95 @@ static void display_interface_capabilities(const struct dabba_ipc_msg *const
 		iface = &msg->msg_body.msg.interface_settings[a];
 		printf("    - name: %s\n", iface->name);
 		printf("      capabilities:\n");
-		printf("        port: %s\n",
-		       ethtool_port_str_get(iface->settings.port));
-		printf("        mdi-x: %s\n",
-		       print_tf(iface->settings.port == PORT_TP
-				&& iface->settings.eth_tp_mdix));
-		printf("        autoneg: %s\n",
-		       print_tf(iface->settings.mdio_support));
-		printf("        link-partner advertising: %s\n",
-		       print_tf(iface->settings.lp_advertising));
+		printf("        port: {");
+		printf("%s: %s, ", ethtool_port_str_get(PORT_TP),
+		       print_tf(iface->settings.supported & SUPPORTED_TP));
+		printf("%s: %s, ", ethtool_port_str_get(PORT_AUI),
+		       print_tf(iface->settings.supported & SUPPORTED_AUI));
+		printf("%s: %s, ", ethtool_port_str_get(PORT_MII),
+		       print_tf(iface->settings.supported & SUPPORTED_MII));
+		printf("%s: %s, ", ethtool_port_str_get(PORT_FIBRE),
+		       print_tf(iface->settings.supported & SUPPORTED_FIBRE));
+		printf("%s: %s", ethtool_port_str_get(PORT_BNC),
+		       print_tf(iface->settings.supported & SUPPORTED_BNC));
+		printf("}\n");
+		printf("        supported:\n");
+		printf("          autoneg: %s\n",
+		       print_tf(iface->settings.supported & SUPPORTED_Autoneg));
+		printf("          pause: %s\n",
+		       print_tf(iface->settings.supported & SUPPORTED_Pause));
+		printf("          speed:\n");
+		printf("            10:    {half: %s, full: %s}\n",
+		       print_tf(iface->settings.
+				supported & SUPPORTED_10baseT_Half),
+		       print_tf(iface->settings.
+				supported & SUPPORTED_10baseT_Full));
+		printf("            100:   {half: %s, full: %s}\n",
+		       print_tf(iface->settings.
+				supported & SUPPORTED_100baseT_Half),
+		       print_tf(iface->settings.
+				supported & SUPPORTED_100baseT_Full));
+		printf("            1000:  {half: %s, full: %s}\n",
+		       print_tf(iface->settings.
+				supported & SUPPORTED_1000baseT_Half),
+		       print_tf(iface->settings.
+				supported & SUPPORTED_1000baseT_Full));
+		printf("            10000: {half: %s, full: %s}\n", "false",
+		       print_tf(iface->
+				settings.supported &
+				SUPPORTED_10000baseT_Full));
+		printf("        advertised:\n");
+		printf("          autoneg: %s\n",
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_Autoneg));
+		printf("          pause: %s\n",
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_Pause));
+		printf("          speed:\n");
+		printf("            10:    {half: %s, full: %s}\n",
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_10baseT_Half),
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_10baseT_Full));
+		printf("            100:   {half: %s, full: %s}\n",
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_100baseT_Half),
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_100baseT_Full));
+		printf("            1000:  {half: %s, full: %s}\n",
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_1000baseT_Half),
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_1000baseT_Full));
+		printf("            10000: {half: %s, full: %s}\n", "false",
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_10000baseT_Full));
+		printf("        link-partner advertised:\n");
+		printf("          autoneg: %s\n",
+		       print_tf(iface->settings.
+				lp_advertising & ADVERTISED_Autoneg));
+		printf("          pause: %s\n",
+		       print_tf(iface->settings.
+				lp_advertising & ADVERTISED_Pause));
+		printf("          speed:\n");
+		printf("            10:    {half: %s, full: %s}\n",
+		       print_tf(iface->settings.lp_advertising &
+				ADVERTISED_10baseT_Half),
+		       print_tf(iface->settings.lp_advertising &
+				ADVERTISED_10baseT_Full));
+		printf("            100:   {half: %s, full: %s}\n",
+		       print_tf(iface->settings.lp_advertising &
+				ADVERTISED_100baseT_Half),
+		       print_tf(iface->settings.lp_advertising &
+				ADVERTISED_100baseT_Full));
+		printf("            1000:  {half: %s, full: %s}\n",
+		       print_tf(iface->settings.lp_advertising &
+				ADVERTISED_1000baseT_Half),
+		       print_tf(iface->settings.lp_advertising &
+				ADVERTISED_1000baseT_Full));
+		printf("            10000: {half: %s, full: %s}\n", "false",
+		       print_tf(iface->settings.lp_advertising &
+				ADVERTISED_10000baseT_Full));
 	}
 }
 
