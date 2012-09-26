@@ -322,53 +322,59 @@ static void display_interface_capabilities(const struct dabba_ipc_msg *const
 		       "            100:   {half: %s, full: %s}\n"
 		       "            1000:  {half: %s, full: %s}\n"
 		       "            10000: {half: false, full: %s}\n",
-		       print_tf(iface->settings.
-				supported & SUPPORTED_10baseT_Half),
-		       print_tf(iface->settings.
-				supported & SUPPORTED_10baseT_Full),
-		       print_tf(iface->settings.
-				supported & SUPPORTED_100baseT_Half),
-		       print_tf(iface->settings.
-				supported & SUPPORTED_100baseT_Full),
-		       print_tf(iface->settings.
-				supported & SUPPORTED_1000baseT_Half),
-		       print_tf(iface->settings.
-				supported & SUPPORTED_1000baseT_Full),
-		       print_tf(iface->settings.
-				supported & SUPPORTED_10000baseT_Full));
+		       print_tf(iface->
+				settings.supported & SUPPORTED_10baseT_Half),
+		       print_tf(iface->
+				settings.supported & SUPPORTED_10baseT_Full),
+		       print_tf(iface->
+				settings.supported & SUPPORTED_100baseT_Half),
+		       print_tf(iface->
+				settings.supported & SUPPORTED_100baseT_Full),
+		       print_tf(iface->
+				settings.supported & SUPPORTED_1000baseT_Half),
+		       print_tf(iface->
+				settings.supported & SUPPORTED_1000baseT_Full),
+		       print_tf(iface->
+				settings.supported &
+				SUPPORTED_10000baseT_Full));
 		printf("        advertised:\n");
 		printf("          autoneg: %s\n",
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_Autoneg));
+		       print_tf(iface->
+				settings.advertising & ADVERTISED_Autoneg));
 		printf("          pause: %s\n",
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_Pause));
+		       print_tf(iface->
+				settings.advertising & ADVERTISED_Pause));
 		printf("          speed:\n");
 		printf("            10:    {half: %s, full: %s}\n"
 		       "            100:   {half: %s, full: %s}\n"
 		       "            1000:  {half: %s, full: %s}\n"
 		       "            10000: {half: false, full: %s}\n",
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_10baseT_Half),
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_10baseT_Full),
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_100baseT_Half),
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_100baseT_Full),
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_1000baseT_Half),
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_1000baseT_Full),
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_10000baseT_Full));
+		       print_tf(iface->
+				settings.advertising & ADVERTISED_10baseT_Half),
+		       print_tf(iface->
+				settings.advertising & ADVERTISED_10baseT_Full),
+		       print_tf(iface->
+				settings.advertising &
+				ADVERTISED_100baseT_Half),
+		       print_tf(iface->
+				settings.advertising &
+				ADVERTISED_100baseT_Full),
+		       print_tf(iface->
+				settings.advertising &
+				ADVERTISED_1000baseT_Half),
+		       print_tf(iface->
+				settings.advertising &
+				ADVERTISED_1000baseT_Full),
+		       print_tf(iface->
+				settings.advertising &
+				ADVERTISED_10000baseT_Full));
 		printf("        link-partner advertised:\n");
 		printf("          autoneg: %s\n",
-		       print_tf(iface->settings.
-				lp_advertising & ADVERTISED_Autoneg));
+		       print_tf(iface->
+				settings.lp_advertising & ADVERTISED_Autoneg));
 		printf("          pause: %s\n",
-		       print_tf(iface->settings.
-				lp_advertising & ADVERTISED_Pause));
+		       print_tf(iface->
+				settings.lp_advertising & ADVERTISED_Pause));
 		printf("          speed:\n");
 		printf("            10:    {half: %s, full: %s}\n"
 		       "            100:   {half: %s, full: %s}\n"
@@ -494,7 +500,7 @@ static void display_interface_offload(const struct dabba_ipc_msg *const msg)
 }
 
 /**
- * \brief Request the current supported interface list
+ * \brief Get current interface list information and output them on \c stdout
  * \param[in]           argc	        Argument counter
  * \param[in]           argv		Argument vector
  * \return 0 on success, else on failure.
@@ -520,6 +526,13 @@ int cmd_interface_list(int argc, const char **argv)
 	return dabba_ipc_fetch_all(&msg, display_interface_list);
 }
 
+/**
+ * \brief Get interface driver information and output them on \c stdout
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv		Argument vector
+ * \return 0 on success, else on failure.
+ */
+
 int cmd_interface_driver(int argc, const char **argv)
 {
 	struct dabba_ipc_msg msg;
@@ -535,6 +548,13 @@ int cmd_interface_driver(int argc, const char **argv)
 
 	return dabba_ipc_fetch_all(&msg, display_interface_driver);
 }
+
+/**
+ * \brief Get interface hardware settings and output them on \c stdout
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv		Argument vector
+ * \return 0 on success, else on failure.
+ */
 
 int cmd_interface_settings(int argc, const char **argv)
 {
@@ -552,6 +572,13 @@ int cmd_interface_settings(int argc, const char **argv)
 	return dabba_ipc_fetch_all(&msg, display_interface_settings);
 }
 
+/**
+ * \brief Get interface hardware capabilities and output them on \c stdout
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv		Argument vector
+ * \return 0 on success, else on failure.
+ */
+
 int cmd_interface_capabilities(int argc, const char **argv)
 {
 	struct dabba_ipc_msg msg;
@@ -567,6 +594,13 @@ int cmd_interface_capabilities(int argc, const char **argv)
 
 	return dabba_ipc_fetch_all(&msg, display_interface_capabilities);
 }
+
+/**
+ * \brief Get interface pause parameters and output them on \c stdout
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv		Argument vector
+ * \return 0 on success, else on failure.
+ */
 
 int cmd_interface_pause(int argc, const char **argv)
 {
@@ -584,6 +618,13 @@ int cmd_interface_pause(int argc, const char **argv)
 	return dabba_ipc_fetch_all(&msg, display_interface_pause);
 }
 
+/**
+ * \brief Get interface coalesce parameters and output them on \c stdout
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv		Argument vector
+ * \return 0 on success, else on failure.
+ */
+
 int cmd_interface_coalesce(int argc, const char **argv)
 {
 	struct dabba_ipc_msg msg;
@@ -599,6 +640,13 @@ int cmd_interface_coalesce(int argc, const char **argv)
 
 	return dabba_ipc_fetch_all(&msg, display_interface_coalesce);
 }
+
+/**
+ * \brief Get interface offload parameters and output them on \c stdout
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv		Argument vector
+ * \return 0 on success, else on failure.
+ */
 
 int cmd_interface_offload(int argc, const char **argv)
 {
@@ -656,7 +704,7 @@ static int prepare_interface_modify_query(int argc, char **argv, struct dabba_in
 }
 
 /**
- * \brief Modify parametets of a supported interface
+ * \brief Modify parameters of a supported interface
  * \param[in]           argc	        Argument counter
  * \param[in]           argv		Argument vector
  * \return 0 on success, else on failure.
