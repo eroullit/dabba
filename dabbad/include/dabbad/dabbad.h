@@ -108,6 +108,7 @@ struct dabba_interface_driver {
 struct dabba_interface_settings {
 	char name[IFNAMSIZ];
 	struct ethtool_cmd settings;
+	uint32_t mtu;
 };
 
 struct dabba_interface_pause {

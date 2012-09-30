@@ -43,6 +43,7 @@
 
 #include <libdabba/interface.h>
 #include <libdabba/strlcpy.h>
+#include <bits/ioctls.h>
 
 static int dev_kernel_request(struct ifreq *ifr, const int request)
 {
@@ -131,6 +132,32 @@ int ifindex_to_devname(const int index, char *dev, size_t dev_len)
 
 	if (!rc)
 		strlcpy(dev, ifr.ifr_name, dev_len);
+
+	return rc;
+}
+
+/**
+ * \brief Get the interface maximum transmission unit value
+ * \param[in]       dev	        interface name
+ * \param[out]      link	pointer to the maximum transmission unit value
+ * \return 0 on success, -1 if the maximum transmission unit value could not be fetched.
+ */
+
+int dev_mtu_get(const char *const dev, uint32_t * mtu)
+{
+	int rc;
+	struct ifreq ifr;
+
+	assert(dev);
+	assert(mtu);
+
+	memset(&ifr, 0, sizeof(ifr));
+	strlcpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name));
+
+	rc = dev_kernel_request(&ifr, SIOCGIFMTU);
+
+	if (!rc)
+		*mtu = ifr.ifr_mtu;
 
 	return rc;
 }

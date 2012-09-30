@@ -210,6 +210,7 @@ int dabbad_interface_settings_get(struct dabba_ipc_msg *msg)
 		ifsettings = &msg->msg_body.msg.interface_settings[a];
 		strlcpy(ifsettings->name, ifa->ifa_name, IFNAMSIZ);
 		dev_settings_get(ifsettings->name, &ifsettings->settings);
+		dev_mtu_get(ifsettings->name, &ifsettings->mtu);
 
 		a++;
 	}
