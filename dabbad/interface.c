@@ -211,6 +211,7 @@ int dabbad_interface_settings_get(struct dabba_ipc_msg *msg)
 		strlcpy(ifsettings->name, ifa->ifa_name, IFNAMSIZ);
 		dev_settings_get(ifsettings->name, &ifsettings->settings);
 		dev_mtu_get(ifsettings->name, &ifsettings->mtu);
+		dev_tx_queue_len_get(ifsettings->name, &ifsettings->tx_qlen);
 
 		a++;
 	}
