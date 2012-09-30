@@ -251,12 +251,12 @@ static void display_interface_driver(const struct dabba_ipc_msg *const msg)
 	for (a = 0; a < msg->msg_body.elem_nr; a++) {
 		iface = &msg->msg_body.msg.interface_driver[a];
 		printf("    - name: %s\n", iface->name);
-		printf("        driver name: %s\n", iface->driver_info.driver);
-		printf("        driver version: %s\n",
+		printf("      driver name: %s\n", iface->driver_info.driver);
+		printf("      driver version: %s\n",
 		       iface->driver_info.version);
-		printf("        firmware version: %s\n",
+		printf("      firmware version: %s\n",
 		       iface->driver_info.fw_version);
-		printf("        bus info: %s\n", iface->driver_info.bus_info);
+		printf("      bus info: %s\n", iface->driver_info.bus_info);
 	}
 }
 
@@ -324,59 +324,53 @@ static void display_interface_capabilities(const struct dabba_ipc_msg *const
 		       "            100:   {half: %s, full: %s}\n"
 		       "            1000:  {half: %s, full: %s}\n"
 		       "            10000: {half: false, full: %s}\n",
-		       print_tf(iface->
-				settings.supported & SUPPORTED_10baseT_Half),
-		       print_tf(iface->
-				settings.supported & SUPPORTED_10baseT_Full),
-		       print_tf(iface->
-				settings.supported & SUPPORTED_100baseT_Half),
-		       print_tf(iface->
-				settings.supported & SUPPORTED_100baseT_Full),
-		       print_tf(iface->
-				settings.supported & SUPPORTED_1000baseT_Half),
-		       print_tf(iface->
-				settings.supported & SUPPORTED_1000baseT_Full),
-		       print_tf(iface->
-				settings.supported &
-				SUPPORTED_10000baseT_Full));
+		       print_tf(iface->settings.
+				supported & SUPPORTED_10baseT_Half),
+		       print_tf(iface->settings.
+				supported & SUPPORTED_10baseT_Full),
+		       print_tf(iface->settings.
+				supported & SUPPORTED_100baseT_Half),
+		       print_tf(iface->settings.
+				supported & SUPPORTED_100baseT_Full),
+		       print_tf(iface->settings.
+				supported & SUPPORTED_1000baseT_Half),
+		       print_tf(iface->settings.
+				supported & SUPPORTED_1000baseT_Full),
+		       print_tf(iface->settings.
+				supported & SUPPORTED_10000baseT_Full));
 		printf("        advertised:\n");
 		printf("          autoneg: %s\n",
-		       print_tf(iface->
-				settings.advertising & ADVERTISED_Autoneg));
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_Autoneg));
 		printf("          pause: %s\n",
-		       print_tf(iface->
-				settings.advertising & ADVERTISED_Pause));
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_Pause));
 		printf("          speed:\n");
 		printf("            10:    {half: %s, full: %s}\n"
 		       "            100:   {half: %s, full: %s}\n"
 		       "            1000:  {half: %s, full: %s}\n"
 		       "            10000: {half: false, full: %s}\n",
-		       print_tf(iface->
-				settings.advertising & ADVERTISED_10baseT_Half),
-		       print_tf(iface->
-				settings.advertising & ADVERTISED_10baseT_Full),
-		       print_tf(iface->
-				settings.advertising &
-				ADVERTISED_100baseT_Half),
-		       print_tf(iface->
-				settings.advertising &
-				ADVERTISED_100baseT_Full),
-		       print_tf(iface->
-				settings.advertising &
-				ADVERTISED_1000baseT_Half),
-		       print_tf(iface->
-				settings.advertising &
-				ADVERTISED_1000baseT_Full),
-		       print_tf(iface->
-				settings.advertising &
-				ADVERTISED_10000baseT_Full));
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_10baseT_Half),
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_10baseT_Full),
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_100baseT_Half),
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_100baseT_Full),
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_1000baseT_Half),
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_1000baseT_Full),
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_10000baseT_Full));
 		printf("        link-partner advertised:\n");
 		printf("          autoneg: %s\n",
-		       print_tf(iface->
-				settings.lp_advertising & ADVERTISED_Autoneg));
+		       print_tf(iface->settings.
+				lp_advertising & ADVERTISED_Autoneg));
 		printf("          pause: %s\n",
-		       print_tf(iface->
-				settings.lp_advertising & ADVERTISED_Pause));
+		       print_tf(iface->settings.
+				lp_advertising & ADVERTISED_Pause));
 		printf("          speed:\n");
 		printf("            10:    {half: %s, full: %s}\n"
 		       "            100:   {half: %s, full: %s}\n"
