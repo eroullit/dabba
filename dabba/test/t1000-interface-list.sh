@@ -52,6 +52,10 @@ test_expect_success DUMMY_DEV "Setup: Remove all dummy interfaces" "
     test_might_fail flush_dummy_interface
 "
 
+test_expect_success "Activate dummy interface" "
+    create_dummy_interface 10
+"
+
 test_expect_success "Setup: Start dabbad" "
     '$DABBAD_PATH'/dabbad --daemonize
 "
@@ -96,31 +100,6 @@ done
 test_expect_success "Activate dummy interface" "
     create_dummy_interface 1
 "
-
-for status in True False
-do
-    for feature in promiscuous up running
-    do
-        test_expect_success DUMMY_DEV "Set '$feature' to $status on dummy device" "
-            '$DABBA_PATH'/dabba interface modify --id 'dummy0' --$feature '$status'
-        "
-
-        test_expect_success DUMMY_DEV,PYTHON_YAML "Parse interface YAML output" "
-            '$DABBA_PATH'/dabba interface list > result &&
-            yaml2dict result > parsed
-        "
-
-        test_expect_success DUMMY_DEV,PYTHON_YAML "Query interface status output" "
-            echo "$status" > expect_status &&
-            dictkeys2values interfaces $(($(number_of_interface_get)-1)) status $feature < parsed > result_status
-        "
-
-        # Freshly added interface will be at the end of the list
-        test_expect_success DUMMY_DEV,PYTHON_YAML "Check updated $feature status" "
-            test_cmp expect_status result_status
-        "
-    done
-done
 
 test_expect_success DUMMY_DEV "Cleanup: Remove all dummy interfaces" "
     flush_dummy_interface
