@@ -21,10 +21,6 @@ test_description='Test dabba interface list command'
 
 . ./dabba-test-lib.sh
 
-number_of_interface_get(){
-    sed '1,2d' /proc/net/dev | wc -l | cut -f 1 -d ' '
-}
-
 generate_list(){
         rm -f dev_list
         for dev in `sed '1,2d' /proc/net/dev | awk -F ':' '{ print $1 }' | tr -d ' '`
@@ -32,8 +28,6 @@ generate_list(){
             echo "    - name: $dev" >> dev_list
         done
 }
-
-
 
 generate_yaml_list()
 {
