@@ -38,7 +38,6 @@
 #include <libdabba/strlcpy.h>
 #include <libdabba/interface.h>
 #include <dabbad/interface.h>
-#include <netpacket/packet.h>
 
 static void interface_stats_copy(struct dabba_interface_list *iflist,
 				 struct rtnl_link_stats *stats)
