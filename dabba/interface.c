@@ -47,12 +47,37 @@ Give the user the possibility to manage the available network interfaces.
 
 =item list
 
-Fetch and print information about currenty supported interfaces.
+Fetch and print status information and statistics about currently
+supported interfaces.
 The output is formatted in YAML.
+
+=item driver
+
+Output driver information which are used by the network interfaces.
+
+=item settings
+
+Retrieve current interface settings.
+
+=item capabilities
+
+Report which features are supported by the interfaces.
+
+=item pause
+
+Output current interface pause settings.
+
+=item coalesce
+
+Query interface coalescing information.
+
+=item offload
+
+Report which interface offloading features are enabled.
 
 =item modify
 
-Modify status of available network interfaces
+Modify status of available network interfaces.
 
 =back
 
@@ -324,53 +349,59 @@ static void display_interface_capabilities(const struct dabba_ipc_msg *const
 		       "            100:   {half: %s, full: %s}\n"
 		       "            1000:  {half: %s, full: %s}\n"
 		       "            10000: {half: false, full: %s}\n",
-		       print_tf(iface->settings.
-				supported & SUPPORTED_10baseT_Half),
-		       print_tf(iface->settings.
-				supported & SUPPORTED_10baseT_Full),
-		       print_tf(iface->settings.
-				supported & SUPPORTED_100baseT_Half),
-		       print_tf(iface->settings.
-				supported & SUPPORTED_100baseT_Full),
-		       print_tf(iface->settings.
-				supported & SUPPORTED_1000baseT_Half),
-		       print_tf(iface->settings.
-				supported & SUPPORTED_1000baseT_Full),
-		       print_tf(iface->settings.
-				supported & SUPPORTED_10000baseT_Full));
+		       print_tf(iface->
+				settings.supported & SUPPORTED_10baseT_Half),
+		       print_tf(iface->
+				settings.supported & SUPPORTED_10baseT_Full),
+		       print_tf(iface->
+				settings.supported & SUPPORTED_100baseT_Half),
+		       print_tf(iface->
+				settings.supported & SUPPORTED_100baseT_Full),
+		       print_tf(iface->
+				settings.supported & SUPPORTED_1000baseT_Half),
+		       print_tf(iface->
+				settings.supported & SUPPORTED_1000baseT_Full),
+		       print_tf(iface->
+				settings.supported &
+				SUPPORTED_10000baseT_Full));
 		printf("        advertised:\n");
 		printf("          autoneg: %s\n",
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_Autoneg));
+		       print_tf(iface->
+				settings.advertising & ADVERTISED_Autoneg));
 		printf("          pause: %s\n",
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_Pause));
+		       print_tf(iface->
+				settings.advertising & ADVERTISED_Pause));
 		printf("          speed:\n");
 		printf("            10:    {half: %s, full: %s}\n"
 		       "            100:   {half: %s, full: %s}\n"
 		       "            1000:  {half: %s, full: %s}\n"
 		       "            10000: {half: false, full: %s}\n",
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_10baseT_Half),
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_10baseT_Full),
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_100baseT_Half),
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_100baseT_Full),
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_1000baseT_Half),
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_1000baseT_Full),
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_10000baseT_Full));
+		       print_tf(iface->
+				settings.advertising & ADVERTISED_10baseT_Half),
+		       print_tf(iface->
+				settings.advertising & ADVERTISED_10baseT_Full),
+		       print_tf(iface->
+				settings.advertising &
+				ADVERTISED_100baseT_Half),
+		       print_tf(iface->
+				settings.advertising &
+				ADVERTISED_100baseT_Full),
+		       print_tf(iface->
+				settings.advertising &
+				ADVERTISED_1000baseT_Half),
+		       print_tf(iface->
+				settings.advertising &
+				ADVERTISED_1000baseT_Full),
+		       print_tf(iface->
+				settings.advertising &
+				ADVERTISED_10000baseT_Full));
 		printf("        link-partner advertised:\n");
 		printf("          autoneg: %s\n",
-		       print_tf(iface->settings.
-				lp_advertising & ADVERTISED_Autoneg));
+		       print_tf(iface->
+				settings.lp_advertising & ADVERTISED_Autoneg));
 		printf("          pause: %s\n",
-		       print_tf(iface->settings.
-				lp_advertising & ADVERTISED_Pause));
+		       print_tf(iface->
+				settings.lp_advertising & ADVERTISED_Pause));
 		printf("          speed:\n");
 		printf("            10:    {half: %s, full: %s}\n"
 		       "            100:   {half: %s, full: %s}\n"
