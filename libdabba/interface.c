@@ -137,58 +137,6 @@ int ifindex_to_devname(const int index, char *dev, size_t dev_len)
 }
 
 /**
- * \brief Get the interface maximum transmission unit value
- * \param[in]       dev	        interface name
- * \param[out]      link	pointer to the maximum transmission unit value
- * \return 0 on success, -1 if the maximum transmission unit value could not be fetched.
- */
-
-int dev_mtu_get(const char *const dev, uint32_t * mtu)
-{
-	int rc;
-	struct ifreq ifr;
-
-	assert(dev);
-	assert(mtu);
-
-	memset(&ifr, 0, sizeof(ifr));
-	strlcpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name));
-
-	rc = dev_kernel_request(&ifr, SIOCGIFMTU);
-
-	if (!rc)
-		*mtu = ifr.ifr_mtu;
-
-	return rc;
-}
-
-/**
- * \brief Get the interface transmit queue length
- * \param[in]       dev	        interface name
- * \param[out]      link	pointer to the transmit queue length
- * \return 0 on success, -1 if the transmit queue length could not be fetched.
- */
-
-int dev_tx_queue_len_get(const char *const dev, uint32_t * txqlen)
-{
-	int rc;
-	struct ifreq ifr;
-
-	assert(dev);
-	assert(txqlen);
-
-	memset(&ifr, 0, sizeof(ifr));
-	strlcpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name));
-
-	rc = dev_kernel_request(&ifr, SIOCGIFTXQLEN);
-
-	if (!rc)
-		*txqlen = ifr.ifr_qlen;
-
-	return rc;
-}
-
-/**
  * \brief Get the interface status flags
  * \param[in]       dev	        interface name
  * \param[out]      flags	current interface status flags

@@ -153,6 +153,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 
 #include <stdio.h>
 #include <string.h>
+#include <inttypes.h>
 #include <assert.h>
 #include <errno.h>
 #include <getopt.h>
@@ -232,33 +233,33 @@ static void display_interface_list(const struct dabba_ipc_msg *const msg)
 		printf("}\n");
 		printf("      statistics:\n");
 		printf("          rx: {");
-		printf("byte: %u, ", iface->rx.byte);
-		printf("packet: %u, ", iface->rx.packet);
-		printf("error: %u, ", iface->rx.error);
-		printf("dropped: %u, ", iface->rx.dropped);
-		printf("compressed: %u", iface->rx.compressed);
+		printf("byte: %" PRIu64 ", ", iface->rx.byte);
+		printf("packet: %" PRIu64 ", ", iface->rx.packet);
+		printf("error: %" PRIu64 ", ", iface->rx.error);
+		printf("dropped: %" PRIu64 ", ", iface->rx.dropped);
+		printf("compressed: %" PRIu64 "", iface->rx.compressed);
 		printf("}\n");
 		printf("          tx: {");
-		printf("byte: %u, ", iface->tx.byte);
-		printf("packet: %u, ", iface->tx.packet);
-		printf("error: %u, ", iface->tx.error);
-		printf("dropped: %u, ", iface->tx.dropped);
-		printf("compressed: %u", iface->tx.compressed);
+		printf("byte: %" PRIu64 ", ", iface->tx.byte);
+		printf("packet: %" PRIu64 ", ", iface->tx.packet);
+		printf("error: %" PRIu64 ", ", iface->tx.error);
+		printf("dropped: %" PRIu64 ", ", iface->tx.dropped);
+		printf("compressed: %" PRIu64 "", iface->tx.compressed);
 		printf("}\n");
 		printf("          rx error: {");
-		printf("fifo: %u, ", iface->rx_error.fifo);
-		printf("frame: %u, ", iface->rx_error.frame);
-		printf("crc: %u, ", iface->rx_error.crc);
-		printf("length: %u, ", iface->rx_error.length);
-		printf("missed: %u, ", iface->rx_error.missed);
-		printf("overflow: %u", iface->rx_error.over);
+		printf("fifo: %" PRIu64 ", ", iface->rx_error.fifo);
+		printf("frame: %" PRIu64 ", ", iface->rx_error.frame);
+		printf("crc: %" PRIu64 ", ", iface->rx_error.crc);
+		printf("length: %" PRIu64 ", ", iface->rx_error.length);
+		printf("missed: %" PRIu64 ", ", iface->rx_error.missed);
+		printf("overflow: %" PRIu64 "", iface->rx_error.over);
 		printf("}\n");
 		printf("          tx error: {");
-		printf("fifo: %u, ", iface->tx_error.fifo);
-		printf("carrier: %u, ", iface->tx_error.carrier);
-		printf("heartbeat: %u, ", iface->tx_error.heartbeat);
-		printf("window: %u, ", iface->tx_error.window);
-		printf("aborted: %u", iface->tx_error.aborted);
+		printf("fifo: %" PRIu64 ", ", iface->tx_error.fifo);
+		printf("carrier: %" PRIu64 ", ", iface->tx_error.carrier);
+		printf("heartbeat: %" PRIu64 ", ", iface->tx_error.heartbeat);
+		printf("window: %" PRIu64 ", ", iface->tx_error.window);
+		printf("aborted: %" PRIu64 "", iface->tx_error.aborted);
 		printf("}\n");
 	}
 }
@@ -348,59 +349,53 @@ static void display_interface_capabilities(const struct dabba_ipc_msg *const
 		       "            100:   {half: %s, full: %s}\n"
 		       "            1000:  {half: %s, full: %s}\n"
 		       "            10000: {half: false, full: %s}\n",
-		       print_tf(iface->
-				settings.supported & SUPPORTED_10baseT_Half),
-		       print_tf(iface->
-				settings.supported & SUPPORTED_10baseT_Full),
-		       print_tf(iface->
-				settings.supported & SUPPORTED_100baseT_Half),
-		       print_tf(iface->
-				settings.supported & SUPPORTED_100baseT_Full),
-		       print_tf(iface->
-				settings.supported & SUPPORTED_1000baseT_Half),
-		       print_tf(iface->
-				settings.supported & SUPPORTED_1000baseT_Full),
-		       print_tf(iface->
-				settings.supported &
-				SUPPORTED_10000baseT_Full));
+		       print_tf(iface->settings.
+				supported & SUPPORTED_10baseT_Half),
+		       print_tf(iface->settings.
+				supported & SUPPORTED_10baseT_Full),
+		       print_tf(iface->settings.
+				supported & SUPPORTED_100baseT_Half),
+		       print_tf(iface->settings.
+				supported & SUPPORTED_100baseT_Full),
+		       print_tf(iface->settings.
+				supported & SUPPORTED_1000baseT_Half),
+		       print_tf(iface->settings.
+				supported & SUPPORTED_1000baseT_Full),
+		       print_tf(iface->settings.
+				supported & SUPPORTED_10000baseT_Full));
 		printf("        advertised:\n");
 		printf("          autoneg: %s\n",
-		       print_tf(iface->
-				settings.advertising & ADVERTISED_Autoneg));
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_Autoneg));
 		printf("          pause: %s\n",
-		       print_tf(iface->
-				settings.advertising & ADVERTISED_Pause));
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_Pause));
 		printf("          speed:\n");
 		printf("            10:    {half: %s, full: %s}\n"
 		       "            100:   {half: %s, full: %s}\n"
 		       "            1000:  {half: %s, full: %s}\n"
 		       "            10000: {half: false, full: %s}\n",
-		       print_tf(iface->
-				settings.advertising & ADVERTISED_10baseT_Half),
-		       print_tf(iface->
-				settings.advertising & ADVERTISED_10baseT_Full),
-		       print_tf(iface->
-				settings.advertising &
-				ADVERTISED_100baseT_Half),
-		       print_tf(iface->
-				settings.advertising &
-				ADVERTISED_100baseT_Full),
-		       print_tf(iface->
-				settings.advertising &
-				ADVERTISED_1000baseT_Half),
-		       print_tf(iface->
-				settings.advertising &
-				ADVERTISED_1000baseT_Full),
-		       print_tf(iface->
-				settings.advertising &
-				ADVERTISED_10000baseT_Full));
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_10baseT_Half),
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_10baseT_Full),
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_100baseT_Half),
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_100baseT_Full),
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_1000baseT_Half),
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_1000baseT_Full),
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_10000baseT_Full));
 		printf("        link-partner advertised:\n");
 		printf("          autoneg: %s\n",
-		       print_tf(iface->
-				settings.lp_advertising & ADVERTISED_Autoneg));
+		       print_tf(iface->settings.
+				lp_advertising & ADVERTISED_Autoneg));
 		printf("          pause: %s\n",
-		       print_tf(iface->
-				settings.lp_advertising & ADVERTISED_Pause));
+		       print_tf(iface->settings.
+				lp_advertising & ADVERTISED_Pause));
 		printf("          speed:\n");
 		printf("            10:    {half: %s, full: %s}\n"
 		       "            100:   {half: %s, full: %s}\n"

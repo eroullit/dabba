@@ -47,7 +47,6 @@ struct ethtool_coalesce;
 
 int devname_to_ifindex(const char *const dev, int *index);
 int ifindex_to_devname(const int index, char *dev, size_t dev_len);
-int dev_mtu_get(const char *const dev, uint32_t * mtu);
 int dev_tx_queue_len_get(const char *const dev, uint32_t * txqlen);
 int dev_flags_get(const char *const dev, short *flags);
 int dev_flags_set(const char *const dev, const short flags);

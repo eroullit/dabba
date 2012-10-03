@@ -76,15 +76,15 @@ struct dabba_msg_buf {
 };
 
 struct if_counter {
-	uint32_t packet, byte, error, dropped, compressed;
+	uint64_t packet, byte, error, dropped, compressed;
 };
 
 struct if_rx_error_counter {
-	uint32_t fifo, frame, crc, length, missed, over;
+	uint64_t fifo, frame, crc, length, missed, over;
 };
 
 struct if_tx_error_counter {
-	uint32_t fifo, carrier, heartbeat, window, aborted;
+	uint64_t fifo, carrier, heartbeat, window, aborted;
 };
 
 /**

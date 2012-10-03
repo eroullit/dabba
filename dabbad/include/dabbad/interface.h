@@ -26,12 +26,18 @@
 
 #include <dabbad/dabbad.h>
 
-int dabbad_interface_list_get(struct dabba_ipc_msg *msg);
-int dabbad_interface_driver_get(struct dabba_ipc_msg *msg);
-int dabbad_interface_settings_get(struct dabba_ipc_msg *msg);
-int dabbad_interface_pause_get(struct dabba_ipc_msg *msg);
-int dabbad_interface_coalesce_get(struct dabba_ipc_msg *msg);
-int dabbad_interface_offload_get(struct dabba_ipc_msg *msg);
+struct nl_object;
+
+void interface_list(struct nl_object *obj, void *arg);
+void interface_driver(struct nl_object *obj, void *arg);
+void interface_settings(struct nl_object *obj, void *arg);
+void interface_pause(struct nl_object *obj, void *arg);
+void interface_coalesce(struct nl_object *obj, void *arg);
+void interface_offload(struct nl_object *obj, void *arg);
+
+int dabbad_interface_get_all(struct dabba_ipc_msg *msg,
+			     void (*msg_cb) (struct nl_object * obj,
+					     void *arg));
 int dabbad_interface_modify(struct dabba_ipc_msg *msg);
 
 #endif				/* INTERFACE_H */
