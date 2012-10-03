@@ -43,7 +43,7 @@ test_expect_success "Activate dummy interface" "
 
 for status in True False
 do
-    for feature in promiscuous up running
+    for feature in promiscuous up
     do
         test_expect_success DUMMY_DEV "Set '$feature' to $status on dummy device" "
             '$DABBA_PATH'/dabba interface modify --id 'dummy0' --$feature '$status'
