@@ -60,6 +60,8 @@ int dabba_ipc_msg(struct dabba_ipc_msg *msg)
 		return errno;
 	}
 
+	msg->mtype = DABBA_CLIENT_MSG;
+
 	snd = msgsnd(qid, msg, sizeof(msg->msg_body), 0);
 
 	if (snd < 0) {
@@ -69,12 +71,14 @@ int dabba_ipc_msg(struct dabba_ipc_msg *msg)
 
 	usleep(100);
 
-	rcv = msgrcv(qid, msg, sizeof(msg->msg_body), 0, 0);
+	rcv = msgrcv(qid, msg, sizeof(msg->msg_body), DABBA_DAEMON_MSG, 0);
 
 	if (rcv <= 0) {
 		perror("Error while receiving IPC msg");
 		return errno;
 	}
+
+	assert(msg->mtype == DABBA_DAEMON_MSG);
 
 	if (msg->msg_body.error != 0) {
 		printf("The daemon reported: %s\n",
@@ -92,8 +96,6 @@ int dabba_ipc_fetch_all(struct dabba_ipc_msg *msg,
 
 	assert(msg);
 	assert(msg_cb);
-
-	msg->mtype = 1;
 
 	do {
 		msg->msg_body.offset += msg->msg_body.elem_nr;

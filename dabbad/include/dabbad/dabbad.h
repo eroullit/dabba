@@ -67,6 +67,11 @@ enum dabba_msg_type {
 	DABBA_THREAD_CAP_LIST
 };
 
+enum dabba_msg_entity {
+	DABBA_CLIENT_MSG = 1,
+	DABBA_DAEMON_MSG,
+};
+
 /**
  * \brief Dabbad raw message buffer
  */

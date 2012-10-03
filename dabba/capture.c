@@ -266,7 +266,6 @@ int cmd_capture_start(int argc, const char **argv)
 
 	memset(&msg, 0, sizeof(msg));
 
-	msg.mtype = 1;
 	msg.msg_body.type = DABBA_CAPTURE_START;
 
 	rc = prepare_capture_start_query(argc, (char **)argv,
@@ -298,7 +297,6 @@ int cmd_capture_list(int argc, const char **argv)
 
 	memset(&msg, 0, sizeof(msg));
 
-	msg.mtype = 1;
 	msg.msg_body.type = DABBA_CAPTURE_LIST;
 
 	display_capture_list_msg_header();
@@ -370,7 +368,6 @@ int cmd_capture_stop(int argc, const char **argv)
 
 	memset(&msg, 0, sizeof(msg));
 
-	msg.mtype = 1;
 	msg.msg_body.type = DABBA_CAPTURE_STOP;
 
 	rc = prepare_capture_stop_query(argc, (char **)argv,

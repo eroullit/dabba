@@ -533,7 +533,6 @@ int cmd_thread_list(int argc, const char **argv)
 
 	memset(&msg, 0, sizeof(msg));
 
-	msg.mtype = 1;
 	msg.msg_body.type = DABBA_THREAD_LIST;
 
 	display_thread_list_header();
@@ -571,7 +570,6 @@ int cmd_thread_modify(int argc, const char **argv)
 
 	memset(&msg, 0, sizeof(msg));
 
-	msg.mtype = 1;
 	msg.msg_body.type = DABBA_THREAD_MODIFY;
 
 	rc = prepare_thread_modify_query(argc, (char **)argv,
@@ -603,7 +601,6 @@ int cmd_thread_capabilities(int argc, const char **argv)
 
 	memset(&msg, 0, sizeof(msg));
 
-	msg.mtype = 1;
 	msg.msg_body.type = DABBA_THREAD_CAP_LIST;
 
 	display_thread_capabilities_header();

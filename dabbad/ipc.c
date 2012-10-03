@@ -149,15 +149,20 @@ int dabbad_ipc_msg_poll(const int qid)
 
 	for (;;) {
 		memset(&msg, 0, sizeof(msg));
-		rcv = msgrcv(qid, &msg, sizeof(msg.msg_body), 0, 0);
+		rcv =
+		    msgrcv(qid, &msg, sizeof(msg.msg_body), DABBA_CLIENT_MSG,
+			   0);
 
 		if (rcv <= 0) {
 			perror("Error while receiving IPC msg");
 			return errno;
 		}
 
+		assert(msg.mtype == DABBA_CLIENT_MSG);
+
 		rcv = dabbad_handle_msg(&msg);
 
+		msg.mtype = DABBA_DAEMON_MSG;
 		msg.msg_body.error = rcv;
 
 		if (rcv != 0) {
