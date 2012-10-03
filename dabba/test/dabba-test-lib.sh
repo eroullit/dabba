@@ -50,4 +50,9 @@ dictkeys2values()
     "$PYTHON_PATH" "$SHARNESS_TEST_DIRECTORY"/dictkeys2values.py "$@"
 }
 
+number_of_interface_get()
+{
+    sed '1,2d' /proc/net/dev | wc -l | cut -f 1 -d ' '
+}
+
 # vim: ft=sh:tabstop=4:et

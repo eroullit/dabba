@@ -39,6 +39,7 @@
 #include <sys/msg.h>
 #include <sched.h>
 #include <linux/ethtool.h>
+#include <libdabba/interface.h>
 
 /**
  * \brief Supported dabbad IPC message types
@@ -51,8 +52,13 @@ enum dabba_tristate {
 };
 
 enum dabba_msg_type {
-	DABBA_IFCONF,
-	DABBA_IF_MODIFY,
+	DABBA_INTERFACE_LIST,
+	DABBA_INTERFACE_DRIVER,
+	DABBA_INTERFACE_SETTINGS,
+	DABBA_INTERFACE_PAUSE,
+	DABBA_INTERFACE_COALESCE,
+	DABBA_INTERFACE_OFFLOAD,
+	DABBA_INTERFACE_MODIFY,
 	DABBA_CAPTURE_START,
 	DABBA_CAPTURE_LIST,
 	DABBA_CAPTURE_STOP,
@@ -85,14 +91,39 @@ struct if_tx_error_counter {
  * \brief Dabbad interface name buffer
  */
 
-struct dabba_ifconf {
+struct dabba_interface_list {
 	char name[IFNAMSIZ];
 	struct if_counter rx, tx;
 	struct if_rx_error_counter rx_error;
 	struct if_tx_error_counter tx_error;
 	enum dabba_tristate up, running, promisc, loopback;
+	uint8_t link;
+};
+
+struct dabba_interface_driver {
+	char name[IFNAMSIZ];
 	struct ethtool_drvinfo driver_info;
+};
+
+struct dabba_interface_settings {
+	char name[IFNAMSIZ];
 	struct ethtool_cmd settings;
+	uint32_t mtu, tx_qlen;
+};
+
+struct dabba_interface_pause {
+	char name[IFNAMSIZ];
+	struct ethtool_pauseparam pause;
+};
+
+struct dabba_interface_coalesce {
+	char name[IFNAMSIZ];
+	struct ethtool_coalesce coalesce;
+};
+
+struct dabba_interface_offload {
+	char name[IFNAMSIZ];
+	uint32_t rx_csum, tx_csum, sg, tso, ufo, gso, gro, lro, rxhash;
 };
 
 enum dabba_thread_flags {
@@ -136,9 +167,29 @@ struct dabba_capture {
 	uint32_t frame_size; /**< maximum frame size to support */
 };
 
-#ifndef DABBA_IFCONF_MAX_SIZE
-#define DABBA_IFCONF_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_ifconf))
+#ifndef DABBA_INTERFACE_LIST_MAX_SIZE
+#define DABBA_INTERFACE_LIST_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_interface_settings))
 #endif				/* DABBA_IFCONF_MAX_SIZE */
+
+#ifndef DABBA_INTERFACE_DRIVER_MAX_SIZE
+#define DABBA_INTERFACE_DRIVER_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_interface_settings))
+#endif				/* DABBA_INTERFACE_DRIVER_MAX_SIZE */
+
+#ifndef DABBA_INTERFACE_SETTINGS_MAX_SIZE
+#define DABBA_INTERFACE_SETTINGS_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_interface_settings))
+#endif				/* DABBA_INTERFACE_SETTINGS_MAX_SIZE */
+
+#ifndef DABBA_INTERFACE_PAUSE_MAX_SIZE
+#define DABBA_INTERFACE_PAUSE_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_interface_pause))
+#endif				/* DABBA_INTERFACE_PAUSE_MAX_SIZE */
+
+#ifndef DABBA_INTERFACE_COALESCE_MAX_SIZE
+#define DABBA_INTERFACE_COALESCE_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_interface_coalesce))
+#endif				/* DABBA_INTERFACE_COALESCE_MAX_SIZE */
+
+#ifndef DABBA_INTERFACE_OFFLOAD_MAX_SIZE
+#define DABBA_INTERFACE_OFFLOAD_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_interface_offload))
+#endif				/* DABBA_INTERFACE_OFFLOAD_MAX_SIZE */
 
 #ifndef DABBA_CAPTURE_MAX_SIZE
 #define DABBA_CAPTURE_MAX_SIZE (sizeof(struct dabba_msg_buf)/sizeof(struct dabba_capture))
@@ -167,7 +218,18 @@ struct dabba_ipc_msg {
 
 		union dabba_info {
 			struct dabba_msg_buf buf;
-			struct dabba_ifconf ifconf[DABBA_IFCONF_MAX_SIZE];
+			struct dabba_interface_list
+			 interface_list[DABBA_INTERFACE_LIST_MAX_SIZE];
+			struct dabba_interface_driver
+			 interface_driver[DABBA_INTERFACE_DRIVER_MAX_SIZE];
+			struct dabba_interface_settings
+			 interface_settings[DABBA_INTERFACE_SETTINGS_MAX_SIZE];
+			struct dabba_interface_pause
+			 interface_pause[DABBA_INTERFACE_PAUSE_MAX_SIZE];
+			struct dabba_interface_coalesce
+			 interface_coalesce[DABBA_INTERFACE_COALESCE_MAX_SIZE];
+			struct dabba_interface_offload
+			 interface_offload[DABBA_INTERFACE_OFFLOAD_MAX_SIZE];
 			struct dabba_capture capture[DABBA_CAPTURE_MAX_SIZE];
 			struct dabba_thread thread[DABBA_THREAD_MAX_SIZE];
 			struct dabba_thread_cap

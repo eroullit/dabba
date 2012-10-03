@@ -1,5 +1,5 @@
 /**
- * \file nic.h
+ * \file interface.h
  * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2011
  * \date 2011
  */
@@ -30,6 +30,8 @@
 #ifndef NIC_H
 #define	NIC_H
 
+#include <stdint.h>
+
 /**
  * \brief Pseudo-interface name to indicate that all interfaces must be used
  */
@@ -40,12 +42,29 @@
 
 struct ethtool_drvinfo;
 struct ethtool_cmd;
+struct ethtool_pauseparam;
+struct ethtool_coalesce;
 
 int devname_to_ifindex(const char *const dev, int *index);
 int ifindex_to_devname(const int index, char *dev, size_t dev_len);
+int dev_mtu_get(const char *const dev, uint32_t * mtu);
+int dev_tx_queue_len_get(const char *const dev, uint32_t * txqlen);
 int dev_flags_get(const char *const dev, short *flags);
 int dev_flags_set(const char *const dev, const short flags);
-int dev_driver_get(const char *const dev, struct ethtool_drvinfo *driver_info);
+int dev_driver_get(const char *const dev, struct ethtool_drvinfo *driver);
 int dev_settings_get(const char *const dev, struct ethtool_cmd *settings);
+int dev_pause_get(const char *const dev, struct ethtool_pauseparam *pause);
+int dev_coalesce_get(const char *const dev, struct ethtool_coalesce *coalesce);
+int dev_rx_csum_offload_get(const char *const dev, uint32_t * rx_csum);
+int dev_tx_csum_offload_get(const char *const dev, uint32_t * tx_csum);
+int dev_scatter_gather_get(const char *const dev, uint32_t * sg);
+int dev_tcp_seg_offload_get(const char *const dev, uint32_t * tso);
+int dev_udp_frag_offload_get(const char *const dev, uint32_t * ufo);
+int dev_generic_seg_offload_get(const char *const dev, uint32_t * gso);
+int dev_generic_rcv_offload_get(const char *const dev, uint32_t * gro);
+int dev_large_rcv_offload_get(const char *const dev, uint32_t * lro);
+int dev_rx_hash_offload_get(const char *const dev, uint32_t * rxhash);
+
+int dev_link_get(const char *const dev, uint32_t * link);
 
 #endif				/* NIC_H */

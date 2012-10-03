@@ -17,7 +17,7 @@
 # 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 #
 
-test_description='Test dabba interface list command'
+test_description='Test dabba interface modify command'
 
 . ./dabba-test-lib.sh
 
@@ -25,27 +25,8 @@ number_of_interface_get(){
     sed '1,2d' /proc/net/dev | wc -l | cut -f 1 -d ' '
 }
 
-generate_list(){
-        rm -f dev_list
-        for dev in `sed '1,2d' /proc/net/dev | awk -F ':' '{ print $1 }' | tr -d ' '`
-        do
-            echo "    - name: $dev" >> dev_list
-        done
-}
-
-
-
-generate_yaml_list()
-{
-generate_list
-
-cat <<EOF
-`cat dev_list`
-EOF
-}
-
-#test_expect_success 'invoke dabba interface list w/o dabbad' "
-#    test_must_fail $DABBA_PATH/dabba interface list
+#test_expect_success 'invoke dabba interface modify w/o dabbad' "
+#    test_must_fail $DABBA_PATH/dabba interface modify
 #"
 
 test_expect_success DUMMY_DEV "Setup: Remove all dummy interfaces" "
@@ -55,43 +36,6 @@ test_expect_success DUMMY_DEV "Setup: Remove all dummy interfaces" "
 test_expect_success "Setup: Start dabbad" "
     '$DABBAD_PATH'/dabbad --daemonize
 "
-
-test_expect_success "Check 'dabba interface' help output" "
-    '$DABBA_PATH/dabba' help interface | cat <<EOF
-    q
-    EOF &&
-    '$DABBA_PATH/dabba' interface --help | cat <<EOF
-    q
-    EOF
-"
-
-test_expect_success "invoke dabba interface list with dabbad" "
-    '$DABBA_PATH'/dabba interface list > result &&
-    grep '\- name: ' result > name_result &&
-    generate_yaml_list > expected &&
-    sort -o expected_sorted expected &&
-    sort -o result_sorted name_result &&
-    test_cmp expected_sorted result_sorted
-"
-
-test_expect_success PYTHON_YAML "Parse interface list YAML output" "
-    yaml2dict result > parsed
-"
-
-for i in `seq 0 $(($(number_of_interface_get)-1))`
-do
-    test_expect_success PYTHON_YAML "Query interface list output" "
-        dictkeys2values interfaces $i name < parsed > interface_name &&
-        dictkeys2values interfaces $i status < parsed > interface_status &&
-        dictkeys2values interfaces $i statistics < parsed > interface_statistics
-    "
-
-    test_expect_success PYTHON_YAML "Check interface #$(($i+1)) output" "
-        grep -wq -f interface_name /proc/net/dev &&
-        test -n interface_status &&
-        test -n interface_statistics
-    "
-done
 
 test_expect_success "Activate dummy interface" "
     create_dummy_interface 1

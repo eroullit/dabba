@@ -38,7 +38,7 @@
 #include <linux/if_ether.h>
 
 #include <libdabba/macros.h>
-#include <libdabba/nic.h>
+#include <libdabba/interface.h>
 #include <libdabba/packet_rx.h>
 #include <libdabba/pcap.h>
 #include <dabbad/dabbad.h>
