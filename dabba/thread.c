@@ -419,23 +419,24 @@ static void display_thread_list_header(void)
 	printf("  threads:\n");
 }
 
-static void display_thread_list(const struct dabba_thread *const ifconf_msg,
-				const size_t elem_nr)
+static void display_thread_list(const struct dabba_ipc_msg *const msg)
 {
+	const struct dabba_thread *thread_msg;
 	size_t a;
 
-	assert(ifconf_msg);
-	assert(elem_nr <= DABBA_THREAD_MAX_SIZE);
+	assert(msg);
+	assert(msg->msg_body.elem_nr <= DABBA_THREAD_MAX_SIZE);
 
-	for (a = 0; a < elem_nr; a++) {
-		printf("    - id: %" PRIu64 "\n", (uint64_t) ifconf_msg[a].id);
-		printf("      type: %s\n", thread_key_get(ifconf_msg[a].type));
+	for (a = 0; a < msg->msg_body.elem_nr; a++) {
+		thread_msg = &msg->msg_body.msg.thread[a];
+		printf("    - id: %" PRIu64 "\n", (uint64_t) thread_msg->id);
+		printf("      type: %s\n", thread_key_get(thread_msg->type));
 		printf("      scheduling policy: %s\n",
-		       sched_policy_key_get(ifconf_msg[a].sched_policy));
+		       sched_policy_key_get(thread_msg->sched_policy));
 		printf("      scheduling priority: %i\n",
-		       ifconf_msg[a].sched_prio);
+		       thread_msg->sched_prio);
 		printf("      cpu affinity: ");
-		display_thread_cpu_affinity(&ifconf_msg[a].cpu);
+		display_thread_cpu_affinity(&thread_msg->cpu);
 		printf("\n");
 	}
 }
@@ -446,17 +447,20 @@ static void display_thread_capabilities_header(void)
 	printf("  thread capabilities:\n");
 }
 
-static void display_thread_capabilities(const struct dabba_thread_cap
-					*const thread_cap, const size_t elem_nr)
+static void display_thread_capabilities(const struct dabba_ipc_msg *const msg)
 {
+	const struct dabba_thread_cap *thread_cap;
 	size_t a;
-	assert(thread_cap);
 
-	for (a = 0; a < elem_nr; a++) {
-		printf("    %s:\n", sched_policy_key_get(thread_cap[a].policy));
+	assert(msg);
+	assert(msg->msg_body.elem_nr <= DABBA_THREAD_CAP_MAX_SIZE);
+
+	for (a = 0; a < msg->msg_body.elem_nr; a++) {
+		thread_cap = &msg->msg_body.msg.thread_cap[a];
+		printf("    %s:\n", sched_policy_key_get(thread_cap->policy));
 		printf("        scheduling priority:\n");
-		printf("            minimum: %i\n", thread_cap[a].prio_min);
-		printf("            maximum: %i\n", thread_cap[a].prio_max);
+		printf("            minimum: %i\n", thread_cap->prio_min);
+		printf("            maximum: %i\n", thread_cap->prio_max);
 	}
 }
 
@@ -525,7 +529,6 @@ static int prepare_thread_modify_query(int argc, char **argv,
 
 int cmd_thread_list(int argc, const char **argv)
 {
-	int rc;
 	struct dabba_ipc_msg msg;
 
 	assert(argc >= 0);
@@ -537,20 +540,7 @@ int cmd_thread_list(int argc, const char **argv)
 
 	display_thread_list_header();
 
-	do {
-		msg.msg_body.offset += msg.msg_body.elem_nr;
-		msg.msg_body.elem_nr = 0;
-
-		rc = dabba_ipc_msg(&msg);
-
-		if (rc)
-			break;
-
-		display_thread_list(msg.msg_body.msg.thread,
-				    msg.msg_body.elem_nr);
-	} while (msg.msg_body.elem_nr);
-
-	return rc;
+	return dabba_ipc_fetch_all(&msg, display_thread_list);
 }
 
 /**
@@ -593,7 +583,6 @@ int cmd_thread_modify(int argc, const char **argv)
 
 int cmd_thread_capabilities(int argc, const char **argv)
 {
-	int rc;
 	struct dabba_ipc_msg msg;
 
 	assert(argc >= 0);
@@ -605,20 +594,7 @@ int cmd_thread_capabilities(int argc, const char **argv)
 
 	display_thread_capabilities_header();
 
-	do {
-		msg.msg_body.offset += msg.msg_body.elem_nr;
-		msg.msg_body.elem_nr = 0;
-
-		rc = dabba_ipc_msg(&msg);
-
-		if (rc)
-			break;
-
-		display_thread_capabilities(msg.msg_body.msg.thread_cap,
-					    msg.msg_body.elem_nr);
-	} while (msg.msg_body.elem_nr);
-
-	return rc;
+	return dabba_ipc_fetch_all(&msg, display_thread_capabilities);
 }
 
 /**

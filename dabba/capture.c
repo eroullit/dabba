@@ -230,22 +230,23 @@ static void display_capture_list_msg_header(void)
 	printf("  captures:\n");
 }
 
-static void display_capture_list(const struct dabba_capture *const capture_msg,
-				 const size_t elem_nr)
+static void display_capture_list(const struct dabba_ipc_msg *const msg)
 {
+	const struct dabba_capture *capture_msg;
 	size_t a;
 
-	assert(capture_msg);
-	assert(elem_nr <= DABBA_CAPTURE_MAX_SIZE);
+	assert(msg);
+	assert(msg->msg_body.elem_nr <= DABBA_CAPTURE_MAX_SIZE);
 
-	for (a = 0; a < elem_nr; a++) {
-		printf("    - id: %" PRIu64 "\n", (uint64_t) capture_msg[a].id);
+	for (a = 0; a < msg->msg_body.elem_nr; a++) {
+		capture_msg = &msg->msg_body.msg.capture[a];
+		printf("    - id: %" PRIu64 "\n", (uint64_t) capture_msg->id);
 		printf("      packet mmap size: %" PRIu64 "\n",
-		       capture_msg[a].frame_nr * capture_msg[a].frame_size);
+		       capture_msg->frame_nr * capture_msg->frame_size);
 		printf("      frame number: %" PRIu64 "\n",
-		       capture_msg[a].frame_nr);
-		printf("      pcap: %s\n", capture_msg[a].pcap_name);
-		printf("      interface: %s\n", capture_msg[a].dev_name);
+		       capture_msg->frame_nr);
+		printf("      pcap: %s\n", capture_msg->pcap_name);
+		printf("      interface: %s\n", capture_msg->dev_name);
 	}
 }
 
@@ -289,7 +290,6 @@ int cmd_capture_start(int argc, const char **argv)
 
 int cmd_capture_list(int argc, const char **argv)
 {
-	int rc;
 	struct dabba_ipc_msg msg;
 
 	assert(argc >= 0);
@@ -301,20 +301,7 @@ int cmd_capture_list(int argc, const char **argv)
 
 	display_capture_list_msg_header();
 
-	do {
-		msg.msg_body.offset += msg.msg_body.elem_nr;
-		msg.msg_body.elem_nr = 0;
-
-		rc = dabba_ipc_msg(&msg);
-
-		if (rc)
-			break;
-
-		display_capture_list(msg.msg_body.msg.capture,
-				     msg.msg_body.elem_nr);
-	} while (msg.msg_body.elem_nr);
-
-	return rc;
+	return dabba_ipc_fetch_all(&msg, display_capture_list);
 }
 
 static struct option *capture_stop_options_get(void)
