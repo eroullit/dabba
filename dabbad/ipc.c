@@ -37,19 +37,9 @@
 #include <dabbad/capture.h>
 #include <dabbad/thread.h>
 
-/**
- * \internal
- * \brief Handle request received in incoming IPC message
- * \return 0 on success, -1 on failure. Set errno accordingly on failure.
- *
- * This function checks the operation to perform in the IPC message and passes 
- * it to the right processing function.
- */
-
-static int dabbad_handle_msg(struct dabba_ipc_msg *msg)
+static int dabbad_handle_bulk_get_msg(struct dabba_ipc_msg *msg)
 {
 	int rc;
-	assert(msg);
 
 	switch (msg->msg_body.type) {
 	case DABBA_INTERFACE_LIST:
@@ -70,26 +60,115 @@ static int dabbad_handle_msg(struct dabba_ipc_msg *msg)
 	case DABBA_INTERFACE_OFFLOAD:
 		rc = dabbad_interface_bulk_get(msg, interface_offload);
 		break;
+	case DABBA_CAPTURE_LIST:
+		rc = dabbad_capture_list(msg);
+		break;
+	case DABBA_THREAD_LIST:
+		rc = dabbad_thread_list(msg);
+		break;
+	case DABBA_THREAD_CAP_LIST:
+		rc = dabbad_thread_cap_list(msg);
+		break;
+	default:
+		rc = -1;
+		errno = ENOSYS;
+		break;
+	}
+
+	return rc;
+}
+
+static int dabbad_handle_filter_get_msg(struct dabba_ipc_msg *msg)
+{
+	int rc;
+
+	switch (msg->msg_body.type) {
+	case DABBA_INTERFACE_LIST:
+		rc = dabbad_interface_filter_get(msg, interface_list_name_get,
+						 interface_list);
+		break;
+	default:
+		rc = -1;
+		errno = ENOSYS;
+		break;
+	}
+
+	return rc;
+}
+
+static int dabbad_handle_filter_modify_msg(struct dabba_ipc_msg *msg)
+{
+	int rc;
+
+	switch (msg->msg_body.type) {
 	case DABBA_INTERFACE_MODIFY:
 		rc = dabbad_interface_modify(msg);
 		break;
 	case DABBA_CAPTURE_START:
 		rc = dabbad_capture_start(msg);
 		break;
-	case DABBA_CAPTURE_LIST:
-		rc = dabbad_capture_list(msg);
-		break;
 	case DABBA_CAPTURE_STOP:
 		rc = dabbad_capture_stop(msg);
-		break;
-	case DABBA_THREAD_LIST:
-		rc = dabbad_thread_list(msg);
 		break;
 	case DABBA_THREAD_MODIFY:
 		rc = dabbad_thread_modify(msg);
 		break;
-	case DABBA_THREAD_CAP_LIST:
-		rc = dabbad_thread_cap_list(msg);
+	default:
+		rc = -1;
+		errno = ENOSYS;
+		break;
+	}
+
+	return rc;
+}
+
+static int dabbad_handle_get_msg(struct dabba_ipc_msg *msg)
+{
+	int rc;
+
+	switch (msg->msg_body.method_type) {
+	case MT_BULK:
+		rc = dabbad_handle_bulk_get_msg(msg);
+		break;
+	case MT_FILTERED:
+		rc = dabbad_handle_filter_get_msg(msg);
+		break;
+	default:
+		rc = -1;
+		errno = ENOSYS;
+		break;
+	}
+
+	return rc;
+}
+
+static int dabbad_handle_modify_msg(struct dabba_ipc_msg *msg)
+{
+	return dabbad_handle_filter_modify_msg(msg);
+}
+
+/**
+ * \internal
+ * \brief Handle request received in incoming IPC message
+ * \return 0 on success, -1 on failure. Set errno accordingly on failure.
+ *
+ * This function checks the operation to perform in the IPC message and passes 
+ * it to the right processing function.
+ */
+
+static int dabbad_handle_msg(struct dabba_ipc_msg *msg)
+{
+	int rc;
+	assert(msg);
+
+	printf("op type %i\n", msg->msg_body.op_type);
+	switch (msg->msg_body.op_type) {
+	case OP_GET:
+		rc = dabbad_handle_get_msg(msg);
+		break;
+
+	case OP_MODIFY:
+		rc = dabbad_handle_modify_msg(msg);
 		break;
 	default:
 		rc = -1;

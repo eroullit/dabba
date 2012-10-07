@@ -67,6 +67,16 @@ enum dabba_msg_type {
 	DABBA_THREAD_CAP_LIST
 };
 
+enum dabba_op_type {
+	OP_GET,
+	OP_MODIFY
+};
+
+enum dabba_method_type {
+	MT_BULK,
+	MT_FILTERED
+};
+
 enum dabba_msg_entity {
 	DABBA_CLIENT_MSG = 1,
 	DABBA_DAEMON_MSG,
@@ -217,6 +227,8 @@ struct dabba_ipc_msg {
 
 	struct dabba_msg {
 		uint16_t type; /**< dabbad message type */
+		uint16_t op_type; /**< dabbad operation type */
+		uint16_t method_type; /**< dabbad method type */
 		uint16_t elem_nr; /**< dabbad #element present in the message */
 		uint16_t offset; /**< dabbad element offset to start with */
 		int16_t error; /**< error code when processing the message */
