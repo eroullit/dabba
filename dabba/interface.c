@@ -161,6 +161,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabba/dabba.h>
 #include <dabba/ipc.h>
 #include <dabba/interface-settings.h>
+#include <dabba/interface-driver.h>
 #include <dabba/help.h>
 #include <dabba/macros.h>
 
@@ -262,27 +263,6 @@ static void display_interface_list(const struct dabba_ipc_msg *const msg)
 	}
 }
 
-static void display_interface_driver(const struct dabba_ipc_msg *const msg)
-{
-	size_t a;
-	const struct dabba_interface_driver *iface;
-
-	assert(msg);
-	assert(msg->msg_body.elem_nr <= DABBA_INTERFACE_DRIVER_MAX_SIZE);
-	assert(msg->msg_body.type == DABBA_INTERFACE_DRIVER);
-
-	for (a = 0; a < msg->msg_body.elem_nr; a++) {
-		iface = &msg->msg_body.msg.interface_driver[a];
-		printf("    - name: %s\n", iface->name);
-		printf("      driver name: %s\n", iface->driver_info.driver);
-		printf("      driver version: %s\n",
-		       iface->driver_info.version);
-		printf("      firmware version: %s\n",
-		       iface->driver_info.fw_version);
-		printf("      bus info: %s\n", iface->driver_info.bus_info);
-	}
-}
-
 static void display_interface_capabilities(const struct dabba_ipc_msg *const
 					   msg)
 {
@@ -319,53 +299,59 @@ static void display_interface_capabilities(const struct dabba_ipc_msg *const
 		       "            100:   {half: %s, full: %s}\n"
 		       "            1000:  {half: %s, full: %s}\n"
 		       "            10000: {half: false, full: %s}\n",
-		       print_tf(iface->settings.
-				supported & SUPPORTED_10baseT_Half),
-		       print_tf(iface->settings.
-				supported & SUPPORTED_10baseT_Full),
-		       print_tf(iface->settings.
-				supported & SUPPORTED_100baseT_Half),
-		       print_tf(iface->settings.
-				supported & SUPPORTED_100baseT_Full),
-		       print_tf(iface->settings.
-				supported & SUPPORTED_1000baseT_Half),
-		       print_tf(iface->settings.
-				supported & SUPPORTED_1000baseT_Full),
-		       print_tf(iface->settings.
-				supported & SUPPORTED_10000baseT_Full));
+		       print_tf(iface->
+				settings.supported & SUPPORTED_10baseT_Half),
+		       print_tf(iface->
+				settings.supported & SUPPORTED_10baseT_Full),
+		       print_tf(iface->
+				settings.supported & SUPPORTED_100baseT_Half),
+		       print_tf(iface->
+				settings.supported & SUPPORTED_100baseT_Full),
+		       print_tf(iface->
+				settings.supported & SUPPORTED_1000baseT_Half),
+		       print_tf(iface->
+				settings.supported & SUPPORTED_1000baseT_Full),
+		       print_tf(iface->
+				settings.supported &
+				SUPPORTED_10000baseT_Full));
 		printf("        advertised:\n");
 		printf("          autoneg: %s\n",
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_Autoneg));
+		       print_tf(iface->
+				settings.advertising & ADVERTISED_Autoneg));
 		printf("          pause: %s\n",
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_Pause));
+		       print_tf(iface->
+				settings.advertising & ADVERTISED_Pause));
 		printf("          speed:\n");
 		printf("            10:    {half: %s, full: %s}\n"
 		       "            100:   {half: %s, full: %s}\n"
 		       "            1000:  {half: %s, full: %s}\n"
 		       "            10000: {half: false, full: %s}\n",
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_10baseT_Half),
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_10baseT_Full),
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_100baseT_Half),
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_100baseT_Full),
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_1000baseT_Half),
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_1000baseT_Full),
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_10000baseT_Full));
+		       print_tf(iface->
+				settings.advertising & ADVERTISED_10baseT_Half),
+		       print_tf(iface->
+				settings.advertising & ADVERTISED_10baseT_Full),
+		       print_tf(iface->
+				settings.advertising &
+				ADVERTISED_100baseT_Half),
+		       print_tf(iface->
+				settings.advertising &
+				ADVERTISED_100baseT_Full),
+		       print_tf(iface->
+				settings.advertising &
+				ADVERTISED_1000baseT_Half),
+		       print_tf(iface->
+				settings.advertising &
+				ADVERTISED_1000baseT_Full),
+		       print_tf(iface->
+				settings.advertising &
+				ADVERTISED_10000baseT_Full));
 		printf("        link-partner advertised:\n");
 		printf("          autoneg: %s\n",
-		       print_tf(iface->settings.
-				lp_advertising & ADVERTISED_Autoneg));
+		       print_tf(iface->
+				settings.lp_advertising & ADVERTISED_Autoneg));
 		printf("          pause: %s\n",
-		       print_tf(iface->settings.
-				lp_advertising & ADVERTISED_Pause));
+		       print_tf(iface->
+				settings.lp_advertising & ADVERTISED_Pause));
 		printf("          speed:\n");
 		printf("            10:    {half: %s, full: %s}\n"
 		       "            100:   {half: %s, full: %s}\n"
@@ -517,31 +503,6 @@ int cmd_interface_list(int argc, const char **argv)
 	display_interface_list_header();
 
 	return dabba_ipc_fetch_all(&msg, display_interface_list);
-}
-
-/**
- * \brief Get interface driver information and output them on \c stdout
- * \param[in]           argc	        Argument counter
- * \param[in]           argv		Argument vector
- * \return 0 on success, else on failure.
- */
-
-int cmd_interface_driver(int argc, const char **argv)
-{
-	struct dabba_ipc_msg msg;
-
-	assert(argc >= 0);
-	assert(argv);
-
-	memset(&msg, 0, sizeof(msg));
-
-	msg.msg_body.type = DABBA_INTERFACE_DRIVER;
-	msg.msg_body.op_type = OP_GET;
-	msg.msg_body.method_type = MT_BULK;
-
-	display_interface_list_header();
-
-	return dabba_ipc_fetch_all(&msg, display_interface_driver);
 }
 
 /**
