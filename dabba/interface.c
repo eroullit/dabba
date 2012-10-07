@@ -160,6 +160,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <libdabba/macros.h>
 #include <dabba/dabba.h>
 #include <dabba/ipc.h>
+#include <dabba/interface-settings.h>
 #include <dabba/help.h>
 #include <dabba/macros.h>
 
@@ -170,7 +171,7 @@ enum interface_modify_option {
 	OPT_INTERFACE_ID,
 };
 
-static const char *ethtool_port_str_get(const uint8_t port)
+const char *ethtool_port_str_get(const uint8_t port)
 {
 	static const char *const port_str[] = {
 		[PORT_TP] = "tp",
@@ -282,34 +283,6 @@ static void display_interface_driver(const struct dabba_ipc_msg *const msg)
 	}
 }
 
-static void display_interface_settings(const struct dabba_ipc_msg *const msg)
-{
-	size_t a;
-	const struct dabba_interface_settings *iface;
-
-	assert(msg);
-	assert(msg->msg_body.elem_nr <= DABBA_INTERFACE_SETTINGS_MAX_SIZE);
-	assert(msg->msg_body.type == DABBA_INTERFACE_SETTINGS);
-
-	for (a = 0; a < msg->msg_body.elem_nr; a++) {
-		iface = &msg->msg_body.msg.interface_settings[a];
-		printf("    - name: %s\n", iface->name);
-		printf("      settings:\n");
-		printf("        speed: %u\n",
-		       ethtool_cmd_speed(&iface->settings));
-		printf("        duplex: %s\n",
-		       iface->settings.duplex == DUPLEX_FULL ? "full" : "half");
-		printf("        autoneg: %s\n",
-		       print_tf(iface->settings.autoneg == AUTONEG_ENABLE));
-		printf("        mtu: %u\n", iface->mtu);
-		printf("        tx qlen: %u\n", iface->tx_qlen);
-		printf("        port: %s\n",
-		       ethtool_port_str_get(iface->settings.port));
-		printf("        max rx packet: %u\n", iface->settings.maxrxpkt);
-		printf("        max tx packet: %u\n", iface->settings.maxtxpkt);
-	}
-}
-
 static void display_interface_capabilities(const struct dabba_ipc_msg *const
 					   msg)
 {
@@ -346,59 +319,53 @@ static void display_interface_capabilities(const struct dabba_ipc_msg *const
 		       "            100:   {half: %s, full: %s}\n"
 		       "            1000:  {half: %s, full: %s}\n"
 		       "            10000: {half: false, full: %s}\n",
-		       print_tf(iface->
-				settings.supported & SUPPORTED_10baseT_Half),
-		       print_tf(iface->
-				settings.supported & SUPPORTED_10baseT_Full),
-		       print_tf(iface->
-				settings.supported & SUPPORTED_100baseT_Half),
-		       print_tf(iface->
-				settings.supported & SUPPORTED_100baseT_Full),
-		       print_tf(iface->
-				settings.supported & SUPPORTED_1000baseT_Half),
-		       print_tf(iface->
-				settings.supported & SUPPORTED_1000baseT_Full),
-		       print_tf(iface->
-				settings.supported &
-				SUPPORTED_10000baseT_Full));
+		       print_tf(iface->settings.
+				supported & SUPPORTED_10baseT_Half),
+		       print_tf(iface->settings.
+				supported & SUPPORTED_10baseT_Full),
+		       print_tf(iface->settings.
+				supported & SUPPORTED_100baseT_Half),
+		       print_tf(iface->settings.
+				supported & SUPPORTED_100baseT_Full),
+		       print_tf(iface->settings.
+				supported & SUPPORTED_1000baseT_Half),
+		       print_tf(iface->settings.
+				supported & SUPPORTED_1000baseT_Full),
+		       print_tf(iface->settings.
+				supported & SUPPORTED_10000baseT_Full));
 		printf("        advertised:\n");
 		printf("          autoneg: %s\n",
-		       print_tf(iface->
-				settings.advertising & ADVERTISED_Autoneg));
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_Autoneg));
 		printf("          pause: %s\n",
-		       print_tf(iface->
-				settings.advertising & ADVERTISED_Pause));
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_Pause));
 		printf("          speed:\n");
 		printf("            10:    {half: %s, full: %s}\n"
 		       "            100:   {half: %s, full: %s}\n"
 		       "            1000:  {half: %s, full: %s}\n"
 		       "            10000: {half: false, full: %s}\n",
-		       print_tf(iface->
-				settings.advertising & ADVERTISED_10baseT_Half),
-		       print_tf(iface->
-				settings.advertising & ADVERTISED_10baseT_Full),
-		       print_tf(iface->
-				settings.advertising &
-				ADVERTISED_100baseT_Half),
-		       print_tf(iface->
-				settings.advertising &
-				ADVERTISED_100baseT_Full),
-		       print_tf(iface->
-				settings.advertising &
-				ADVERTISED_1000baseT_Half),
-		       print_tf(iface->
-				settings.advertising &
-				ADVERTISED_1000baseT_Full),
-		       print_tf(iface->
-				settings.advertising &
-				ADVERTISED_10000baseT_Full));
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_10baseT_Half),
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_10baseT_Full),
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_100baseT_Half),
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_100baseT_Full),
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_1000baseT_Half),
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_1000baseT_Full),
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_10000baseT_Full));
 		printf("        link-partner advertised:\n");
 		printf("          autoneg: %s\n",
-		       print_tf(iface->
-				settings.lp_advertising & ADVERTISED_Autoneg));
+		       print_tf(iface->settings.
+				lp_advertising & ADVERTISED_Autoneg));
 		printf("          pause: %s\n",
-		       print_tf(iface->
-				settings.lp_advertising & ADVERTISED_Pause));
+		       print_tf(iface->settings.
+				lp_advertising & ADVERTISED_Pause));
 		printf("          speed:\n");
 		printf("            10:    {half: %s, full: %s}\n"
 		       "            100:   {half: %s, full: %s}\n"
@@ -575,31 +542,6 @@ int cmd_interface_driver(int argc, const char **argv)
 	display_interface_list_header();
 
 	return dabba_ipc_fetch_all(&msg, display_interface_driver);
-}
-
-/**
- * \brief Get interface hardware settings and output them on \c stdout
- * \param[in]           argc	        Argument counter
- * \param[in]           argv		Argument vector
- * \return 0 on success, else on failure.
- */
-
-int cmd_interface_settings(int argc, const char **argv)
-{
-	struct dabba_ipc_msg msg;
-
-	assert(argc >= 0);
-	assert(argv);
-
-	memset(&msg, 0, sizeof(msg));
-
-	msg.msg_body.type = DABBA_INTERFACE_SETTINGS;
-	msg.msg_body.op_type = OP_GET;
-	msg.msg_body.method_type = MT_BULK;
-
-	display_interface_list_header();
-
-	return dabba_ipc_fetch_all(&msg, display_interface_settings);
 }
 
 /**
