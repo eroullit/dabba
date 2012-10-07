@@ -138,8 +138,8 @@ void interface_settings(struct nl_object *obj, void *arg)
 
 	if (msg->msg_body.elem_nr < ifsettings_size) {
 		ifsettings =
-		    &msg->msg_body.msg.interface_settings[msg->
-							  msg_body.elem_nr];
+		    &msg->msg_body.msg.interface_settings[msg->msg_body.
+							  elem_nr];
 		strlcpy(ifsettings->name, rtnl_link_get_name(link), IFNAMSIZ);
 		dev_settings_get(ifsettings->name, &ifsettings->settings);
 		ifsettings->mtu = rtnl_link_get_mtu(link);
@@ -174,8 +174,8 @@ void interface_coalesce(struct nl_object *obj, void *arg)
 
 	if (msg->msg_body.elem_nr < ifcoalesce_size) {
 		ifcoalesce =
-		    &msg->msg_body.msg.interface_coalesce[msg->
-							  msg_body.elem_nr];
+		    &msg->msg_body.msg.interface_coalesce[msg->msg_body.
+							  elem_nr];
 		strlcpy(ifcoalesce->name, rtnl_link_get_name(link), IFNAMSIZ);
 		dev_coalesce_get(ifcoalesce->name, &ifcoalesce->coalesce);
 		msg->msg_body.elem_nr++;
@@ -207,8 +207,9 @@ void interface_offload(struct nl_object *obj, void *arg)
 	}
 }
 
-int dabbad_interface_get_all(struct dabba_ipc_msg *msg,
-			     void (*msg_cb) (struct nl_object * obj, void *arg))
+int dabbad_interface_bulk_get(struct dabba_ipc_msg *msg,
+			      void (*msg_cb) (struct nl_object * obj,
+					      void *arg))
 {
 	struct nl_handle *sock = NULL;
 	struct nl_cache *cache = NULL;
@@ -242,6 +243,70 @@ int dabbad_interface_get_all(struct dabba_ipc_msg *msg,
 			nl_cache_remove(nl_cache_get_first(cache));
 
 	nl_cache_foreach(cache, msg_cb, msg);
+
+ out:
+	nl_cache_free(cache);
+	nl_handle_destroy(sock);
+
+	return rc;
+}
+
+char *interface_list_name_get(struct dabba_ipc_msg *msg, const uint16_t index)
+{
+	return msg->msg_body.msg.interface_list[index].name;
+}
+
+int dabbad_interface_filter_get(struct dabba_ipc_msg *msg,
+				char *(*key_cb) (struct dabba_ipc_msg * msg,
+						 const uint16_t index),
+				void (*msg_cb) (struct nl_object * obj,
+						void *arg))
+{
+	struct nl_handle *sock = NULL;
+	struct nl_cache *cache = NULL;
+	struct rtnl_link *link;
+	char *interface_name;
+	int rc = 0;
+	size_t a, ielem_nr;
+
+	assert(msg);
+	assert(key_cb);
+	assert(msg_cb);
+
+	sock = nl_handle_alloc();
+
+	if (!sock) {
+		rc = ENOMEM;
+		goto out;
+	}
+
+	rc = nl_connect(sock, NETLINK_ROUTE);
+
+	if (rc)
+		goto out;
+
+	cache = rtnl_link_alloc_cache(sock);
+
+	if (!cache) {
+		rc = ENOMEM;
+		goto out;
+	}
+
+	ielem_nr = msg->msg_body.elem_nr;
+	msg->msg_body.elem_nr = 0;
+
+	for (a = 0; a < ielem_nr; a++) {
+		interface_name = key_cb(msg, a);
+
+		/* Skip this object silently for now */
+		if (!interface_name
+		    || !(link = rtnl_link_get_by_name(cache, interface_name))) {
+			msg->msg_body.elem_nr++;
+			break;
+		}
+
+		msg_cb(OBJ_CAST(link), msg);
+	}
 
  out:
 	nl_cache_free(cache);

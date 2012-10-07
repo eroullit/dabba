@@ -53,22 +53,22 @@ static int dabbad_handle_msg(struct dabba_ipc_msg *msg)
 
 	switch (msg->msg_body.type) {
 	case DABBA_INTERFACE_LIST:
-		rc = dabbad_interface_get_all(msg, interface_list);
+		rc = dabbad_interface_bulk_get(msg, interface_list);
 		break;
 	case DABBA_INTERFACE_DRIVER:
-		rc = dabbad_interface_get_all(msg, interface_driver);
+		rc = dabbad_interface_bulk_get(msg, interface_driver);
 		break;
 	case DABBA_INTERFACE_SETTINGS:
-		rc = dabbad_interface_get_all(msg, interface_settings);
+		rc = dabbad_interface_bulk_get(msg, interface_settings);
 		break;
 	case DABBA_INTERFACE_PAUSE:
-		rc = dabbad_interface_get_all(msg, interface_pause);
+		rc = dabbad_interface_bulk_get(msg, interface_pause);
 		break;
 	case DABBA_INTERFACE_COALESCE:
-		rc = dabbad_interface_get_all(msg, interface_coalesce);
+		rc = dabbad_interface_bulk_get(msg, interface_coalesce);
 		break;
 	case DABBA_INTERFACE_OFFLOAD:
-		rc = dabbad_interface_get_all(msg, interface_offload);
+		rc = dabbad_interface_bulk_get(msg, interface_offload);
 		break;
 	case DABBA_INTERFACE_MODIFY:
 		rc = dabbad_interface_modify(msg);

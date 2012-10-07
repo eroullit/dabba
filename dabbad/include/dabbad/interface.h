@@ -35,9 +35,18 @@ void interface_pause(struct nl_object *obj, void *arg);
 void interface_coalesce(struct nl_object *obj, void *arg);
 void interface_offload(struct nl_object *obj, void *arg);
 
-int dabbad_interface_get_all(struct dabba_ipc_msg *msg,
-			     void (*msg_cb) (struct nl_object * obj,
-					     void *arg));
+char *interface_list_name_get(struct dabba_ipc_msg *msg, const uint16_t index);
+
+int dabbad_interface_bulk_get(struct dabba_ipc_msg *msg,
+			      void (*msg_cb) (struct nl_object * obj,
+					      void *arg));
+
+int dabbad_interface_filter_get(struct dabba_ipc_msg *msg,
+				char *(*key_cb) (struct dabba_ipc_msg * msg,
+						 const uint16_t index),
+				void (*msg_cb) (struct nl_object * obj,
+						void *arg));
+
 int dabbad_interface_modify(struct dabba_ipc_msg *msg);
 
 #endif				/* INTERFACE_H */
