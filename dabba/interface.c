@@ -165,6 +165,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabba/interface-capabilities.h>
 #include <dabba/interface-coalesce.h>
 #include <dabba/interface-pause.h>
+#include <dabba/interface-offload.h>
 #include <dabba/help.h>
 #include <dabba/macros.h>
 
@@ -266,31 +267,6 @@ static void display_interface_list(const struct dabba_ipc_msg *const msg)
 	}
 }
 
-static void display_interface_offload(const struct dabba_ipc_msg *const msg)
-{
-	size_t a;
-	const struct dabba_interface_offload *iface;
-
-	assert(msg);
-	assert(msg->msg_body.elem_nr <= DABBA_INTERFACE_OFFLOAD_MAX_SIZE);
-	assert(msg->msg_body.type == DABBA_INTERFACE_OFFLOAD);
-
-	for (a = 0; a < msg->msg_body.elem_nr; a++) {
-		iface = &msg->msg_body.msg.interface_offload[a];
-		printf("    - name: %s\n", iface->name);
-		printf("      offload:\n");
-		printf("        rx checksum: %s\n", print_tf(iface->rx_csum));
-		printf("        tx checksum: %s\n", print_tf(iface->tx_csum));
-		printf("        scatter gather: %s\n", print_tf(iface->sg));
-		printf("        tcp segment: %s\n", print_tf(iface->tso));
-		printf("        udp fragment: %s\n", print_tf(iface->ufo));
-		printf("        generic segmentation: %s\n",
-		       print_tf(iface->gso));
-		printf("        generic receive: %s\n", print_tf(iface->gro));
-		printf("        rx hashing: %s\n", print_tf(iface->rxhash));
-	}
-}
-
 /**
  * \brief Get current interface list information and output them on \c stdout
  * \param[in]           argc	        Argument counter
@@ -318,31 +294,6 @@ int cmd_interface_list(int argc, const char **argv)
 	display_interface_list_header();
 
 	return dabba_ipc_fetch_all(&msg, display_interface_list);
-}
-
-/**
- * \brief Get interface offload parameters and output them on \c stdout
- * \param[in]           argc	        Argument counter
- * \param[in]           argv		Argument vector
- * \return 0 on success, else on failure.
- */
-
-int cmd_interface_offload(int argc, const char **argv)
-{
-	struct dabba_ipc_msg msg;
-
-	assert(argc >= 0);
-	assert(argv);
-
-	memset(&msg, 0, sizeof(msg));
-
-	msg.msg_body.type = DABBA_INTERFACE_OFFLOAD;
-	msg.msg_body.op_type = OP_GET;
-	msg.msg_body.method_type = MT_BULK;
-
-	display_interface_list_header();
-
-	return dabba_ipc_fetch_all(&msg, display_interface_offload);
 }
 
 static int prepare_interface_modify_query(int argc, char **argv, struct dabba_interface_list
