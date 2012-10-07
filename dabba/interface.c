@@ -349,59 +349,53 @@ static void display_interface_capabilities(const struct dabba_ipc_msg *const
 		       "            100:   {half: %s, full: %s}\n"
 		       "            1000:  {half: %s, full: %s}\n"
 		       "            10000: {half: false, full: %s}\n",
-		       print_tf(iface->
-				settings.supported & SUPPORTED_10baseT_Half),
-		       print_tf(iface->
-				settings.supported & SUPPORTED_10baseT_Full),
-		       print_tf(iface->
-				settings.supported & SUPPORTED_100baseT_Half),
-		       print_tf(iface->
-				settings.supported & SUPPORTED_100baseT_Full),
-		       print_tf(iface->
-				settings.supported & SUPPORTED_1000baseT_Half),
-		       print_tf(iface->
-				settings.supported & SUPPORTED_1000baseT_Full),
-		       print_tf(iface->
-				settings.supported &
-				SUPPORTED_10000baseT_Full));
+		       print_tf(iface->settings.
+				supported & SUPPORTED_10baseT_Half),
+		       print_tf(iface->settings.
+				supported & SUPPORTED_10baseT_Full),
+		       print_tf(iface->settings.
+				supported & SUPPORTED_100baseT_Half),
+		       print_tf(iface->settings.
+				supported & SUPPORTED_100baseT_Full),
+		       print_tf(iface->settings.
+				supported & SUPPORTED_1000baseT_Half),
+		       print_tf(iface->settings.
+				supported & SUPPORTED_1000baseT_Full),
+		       print_tf(iface->settings.
+				supported & SUPPORTED_10000baseT_Full));
 		printf("        advertised:\n");
 		printf("          autoneg: %s\n",
-		       print_tf(iface->
-				settings.advertising & ADVERTISED_Autoneg));
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_Autoneg));
 		printf("          pause: %s\n",
-		       print_tf(iface->
-				settings.advertising & ADVERTISED_Pause));
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_Pause));
 		printf("          speed:\n");
 		printf("            10:    {half: %s, full: %s}\n"
 		       "            100:   {half: %s, full: %s}\n"
 		       "            1000:  {half: %s, full: %s}\n"
 		       "            10000: {half: false, full: %s}\n",
-		       print_tf(iface->
-				settings.advertising & ADVERTISED_10baseT_Half),
-		       print_tf(iface->
-				settings.advertising & ADVERTISED_10baseT_Full),
-		       print_tf(iface->
-				settings.advertising &
-				ADVERTISED_100baseT_Half),
-		       print_tf(iface->
-				settings.advertising &
-				ADVERTISED_100baseT_Full),
-		       print_tf(iface->
-				settings.advertising &
-				ADVERTISED_1000baseT_Half),
-		       print_tf(iface->
-				settings.advertising &
-				ADVERTISED_1000baseT_Full),
-		       print_tf(iface->
-				settings.advertising &
-				ADVERTISED_10000baseT_Full));
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_10baseT_Half),
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_10baseT_Full),
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_100baseT_Half),
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_100baseT_Full),
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_1000baseT_Half),
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_1000baseT_Full),
+		       print_tf(iface->settings.
+				advertising & ADVERTISED_10000baseT_Full));
 		printf("        link-partner advertised:\n");
 		printf("          autoneg: %s\n",
-		       print_tf(iface->
-				settings.lp_advertising & ADVERTISED_Autoneg));
+		       print_tf(iface->settings.
+				lp_advertising & ADVERTISED_Autoneg));
 		printf("          pause: %s\n",
-		       print_tf(iface->
-				settings.lp_advertising & ADVERTISED_Pause));
+		       print_tf(iface->settings.
+				lp_advertising & ADVERTISED_Pause));
 		printf("          speed:\n");
 		printf("            10:    {half: %s, full: %s}\n"
 		       "            100:   {half: %s, full: %s}\n"
@@ -547,6 +541,8 @@ int cmd_interface_list(int argc, const char **argv)
 	memset(&msg, 0, sizeof(msg));
 
 	msg.msg_body.type = DABBA_INTERFACE_LIST;
+	msg.msg_body.op_type = OP_GET;
+	msg.msg_body.method_type = MT_BULK;
 
 	display_interface_list_header();
 
@@ -570,6 +566,8 @@ int cmd_interface_driver(int argc, const char **argv)
 	memset(&msg, 0, sizeof(msg));
 
 	msg.msg_body.type = DABBA_INTERFACE_DRIVER;
+	msg.msg_body.op_type = OP_GET;
+	msg.msg_body.method_type = MT_BULK;
 
 	display_interface_list_header();
 
@@ -593,6 +591,8 @@ int cmd_interface_settings(int argc, const char **argv)
 	memset(&msg, 0, sizeof(msg));
 
 	msg.msg_body.type = DABBA_INTERFACE_SETTINGS;
+	msg.msg_body.op_type = OP_GET;
+	msg.msg_body.method_type = MT_BULK;
 
 	display_interface_list_header();
 
@@ -616,6 +616,8 @@ int cmd_interface_capabilities(int argc, const char **argv)
 	memset(&msg, 0, sizeof(msg));
 
 	msg.msg_body.type = DABBA_INTERFACE_SETTINGS;
+	msg.msg_body.op_type = OP_GET;
+	msg.msg_body.method_type = MT_BULK;
 
 	display_interface_list_header();
 
@@ -639,6 +641,8 @@ int cmd_interface_pause(int argc, const char **argv)
 	memset(&msg, 0, sizeof(msg));
 
 	msg.msg_body.type = DABBA_INTERFACE_PAUSE;
+	msg.msg_body.op_type = OP_GET;
+	msg.msg_body.method_type = MT_BULK;
 
 	display_interface_list_header();
 
@@ -662,6 +666,8 @@ int cmd_interface_coalesce(int argc, const char **argv)
 	memset(&msg, 0, sizeof(msg));
 
 	msg.msg_body.type = DABBA_INTERFACE_COALESCE;
+	msg.msg_body.op_type = OP_GET;
+	msg.msg_body.method_type = MT_BULK;
 
 	display_interface_list_header();
 
@@ -685,6 +691,8 @@ int cmd_interface_offload(int argc, const char **argv)
 	memset(&msg, 0, sizeof(msg));
 
 	msg.msg_body.type = DABBA_INTERFACE_OFFLOAD;
+	msg.msg_body.op_type = OP_GET;
+	msg.msg_body.method_type = MT_BULK;
 
 	display_interface_list_header();
 
@@ -748,6 +756,8 @@ int cmd_interface_modify(int argc, const char **argv)
 	memset(&msg, 0, sizeof(msg));
 
 	msg.msg_body.type = DABBA_INTERFACE_MODIFY;
+	msg.msg_body.op_type = OP_MODIFY;
+	msg.msg_body.method_type = MT_FILTERED;
 	msg.msg_body.elem_nr = 1;
 
 	rc = prepare_interface_modify_query(argc, (char **)argv,
