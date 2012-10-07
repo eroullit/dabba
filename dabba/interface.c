@@ -164,6 +164,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabba/interface-driver.h>
 #include <dabba/interface-capabilities.h>
 #include <dabba/interface-coalesce.h>
+#include <dabba/interface-pause.h>
 #include <dabba/help.h>
 #include <dabba/macros.h>
 
@@ -265,25 +266,6 @@ static void display_interface_list(const struct dabba_ipc_msg *const msg)
 	}
 }
 
-static void display_interface_pause(const struct dabba_ipc_msg *const msg)
-{
-	size_t a;
-	const struct dabba_interface_pause *iface;
-
-	assert(msg);
-	assert(msg->msg_body.elem_nr <= DABBA_INTERFACE_PAUSE_MAX_SIZE);
-	assert(msg->msg_body.type == DABBA_INTERFACE_PAUSE);
-
-	for (a = 0; a < msg->msg_body.elem_nr; a++) {
-		iface = &msg->msg_body.msg.interface_pause[a];
-		printf("    - name: %s\n", iface->name);
-		printf("      pause:\n");
-		printf("        autoneg: %s\n", print_tf(iface->pause.autoneg));
-		printf("        rx: %s\n", print_tf(iface->pause.rx_pause));
-		printf("        tx: %s\n", print_tf(iface->pause.tx_pause));
-	}
-}
-
 static void display_interface_offload(const struct dabba_ipc_msg *const msg)
 {
 	size_t a;
@@ -336,31 +318,6 @@ int cmd_interface_list(int argc, const char **argv)
 	display_interface_list_header();
 
 	return dabba_ipc_fetch_all(&msg, display_interface_list);
-}
-
-/**
- * \brief Get interface pause parameters and output them on \c stdout
- * \param[in]           argc	        Argument counter
- * \param[in]           argv		Argument vector
- * \return 0 on success, else on failure.
- */
-
-int cmd_interface_pause(int argc, const char **argv)
-{
-	struct dabba_ipc_msg msg;
-
-	assert(argc >= 0);
-	assert(argv);
-
-	memset(&msg, 0, sizeof(msg));
-
-	msg.msg_body.type = DABBA_INTERFACE_PAUSE;
-	msg.msg_body.op_type = OP_GET;
-	msg.msg_body.method_type = MT_BULK;
-
-	display_interface_list_header();
-
-	return dabba_ipc_fetch_all(&msg, display_interface_pause);
 }
 
 /**

@@ -13,7 +13,7 @@ IF(DOXYGEN_FOUND)
 	ADD_DEPENDENCIES(doc ${PROJECT_NAME}-doc)
 ENDIF(DOXYGEN_FOUND)
 
-ADD_EXECUTABLE(${PROJECT_NAME} dabba.c help.c interface.c interface-settings.c interface-driver.c interface-capabilities.c interface-coalesce.c ipc.c capture.c thread.c)
+ADD_EXECUTABLE(${PROJECT_NAME} dabba.c help.c interface.c interface-settings.c interface-driver.c interface-capabilities.c interface-coalesce.c interface-pause.c ipc.c capture.c thread.c)
 
 POD2MAN(${CMAKE_CURRENT_SOURCE_DIR}/dabba.c dabba 1)
 POD2MAN(${CMAKE_CURRENT_SOURCE_DIR}/interface.c dabba-interface 1)
