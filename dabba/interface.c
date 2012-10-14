@@ -45,7 +45,7 @@ Give the user the possibility to manage the available network interfaces.
 
 =over
 
-=item list
+=item status
 
 Fetch and print status information and statistics about currently
 supported interfaces.
@@ -215,7 +215,7 @@ static void display_interface_list_header(void)
  * \param[in]           elem_nr		number of interfaces to report
  */
 
-static void display_interface_list(const struct dabba_ipc_msg *const msg)
+static void display_interface_status(const struct dabba_ipc_msg *const msg)
 {
 	size_t a;
 	const struct dabba_interface_list *iface;
@@ -278,7 +278,7 @@ static void display_interface_list(const struct dabba_ipc_msg *const msg)
  * dabba daemon to reply.
  */
 
-int cmd_interface_list(int argc, const char **argv)
+int cmd_interface_status(int argc, const char **argv)
 {
 	struct dabba_ipc_msg msg;
 
@@ -293,7 +293,7 @@ int cmd_interface_list(int argc, const char **argv)
 
 	display_interface_list_header();
 
-	return dabba_ipc_fetch_all(&msg, display_interface_list);
+	return dabba_ipc_fetch_all(&msg, display_interface_status);
 }
 
 static int prepare_interface_modify_query(int argc, char **argv, struct dabba_interface_list
@@ -382,7 +382,7 @@ int cmd_interface(int argc, const char **argv)
 	const char *cmd = argv[0];
 	size_t i;
 	static struct cmd_struct interface_commands[] = {
-		{"list", cmd_interface_list},
+		{"status", cmd_interface_status},
 		{"driver", cmd_interface_driver},
 		{"settings", cmd_interface_settings},
 		{"capabilities", cmd_interface_capabilities},

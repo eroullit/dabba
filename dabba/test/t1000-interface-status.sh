@@ -17,29 +17,29 @@
 # 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 #
 
-test_description='Test dabba interface list command'
+test_description='Test dabba interface status command'
 
 . ./dabba-test-lib.sh
 
-generate_list(){
-        rm -f dev_list
+generate_status(){
+        rm -f dev_status
         for dev in `sed '1,2d' /proc/net/dev | awk -F ':' '{ print $1 }' | tr -d ' '`
         do
-            echo "    - name: $dev" >> dev_list
+            echo "    - name: $dev" >> dev_status
         done
 }
 
-generate_yaml_list()
+generate_yaml_status()
 {
-generate_list
+generate_status
 
 cat <<EOF
-`cat dev_list`
+`cat dev_status`
 EOF
 }
 
-#test_expect_success 'invoke dabba interface list w/o dabbad' "
-#    test_must_fail $DABBA_PATH/dabba interface list
+#test_expect_success 'invoke dabba interface status w/o dabbad' "
+#    test_must_fail $DABBA_PATH/dabba interface status
 #"
 
 test_expect_success DUMMY_DEV "Setup: Remove all dummy interfaces" "
@@ -63,22 +63,22 @@ test_expect_success "Check 'dabba interface' help output" "
     EOF
 "
 
-test_expect_success "invoke dabba interface list with dabbad" "
-    '$DABBA_PATH'/dabba interface list > result &&
+test_expect_success "invoke dabba interface status with dabbad" "
+    '$DABBA_PATH'/dabba interface status > result &&
     grep '\- name: ' result > name_result &&
-    generate_yaml_list > expected &&
+    generate_yaml_status > expected &&
     sort -o expected_sorted expected &&
     sort -o result_sorted name_result &&
     test_cmp expected_sorted result_sorted
 "
 
-test_expect_success PYTHON_YAML "Parse interface list YAML output" "
+test_expect_success PYTHON_YAML "Parse interface status YAML output" "
     yaml2dict result > parsed
 "
 
 for i in `seq 0 $(($(number_of_interface_get)-1))`
 do
-    test_expect_success PYTHON_YAML "Query interface list output" "
+    test_expect_success PYTHON_YAML "Query interface status output" "
         dictkeys2values interfaces $i name < parsed > interface_name &&
         dictkeys2values interfaces $i status < parsed > interface_status &&
         dictkeys2values interfaces $i statistics < parsed > interface_statistics
