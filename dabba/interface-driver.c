@@ -28,6 +28,7 @@
 /* __LICENSE_HEADER_END__ */
 
 #include <stdio.h>
+#include <getopt.h>
 #include <assert.h>
 
 #include <dabbad/dabbad.h>
@@ -77,7 +78,7 @@ int cmd_interface_driver(int argc, const char **argv)
 	memset(&msg, 0, sizeof(msg));
 
 	msg.msg_body.type = DABBA_INTERFACE_DRIVER;
-	msg.msg_body.op_type = OP_GET;
+	msg.msg_body.op_type = dabba_operation_get(argv[optind++]);
 	msg.msg_body.method_type = MT_BULK;
 
 	display_interface_driver_header();

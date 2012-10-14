@@ -35,6 +35,35 @@
 #include <dabba/ipc.h>
 
 /**
+ * \brief Parse operation string to operation code
+ * \param[in]       op_name	        Operation string
+ * \return operation code or -1 the operation is unknown
+ */
+
+enum dabba_op_type dabba_operation_get(const char *const op_str)
+{
+	struct dabba_op {
+		enum dabba_op_type op;
+		char *name;
+	};
+
+	struct dabba_op op_map[] = {
+		{OP_GET, "get"},
+		{OP_MODIFY, "modify"},
+		{-1, NULL}
+	};
+	size_t a;
+
+	assert(op_str);
+
+	for (a = 0; op_map[a].name; a++)
+		if (!strcmp(op_str, op_map[a].name))
+			break;
+
+	return op_map[a].op;
+}
+
+/**
  * \brief Communicate via IPC to the dabba daemon
  * \param[in,out]       msg	        IPC message
  * \return 0 on success, else on failure.
