@@ -30,7 +30,7 @@ test_expect_success "Setup: Start dabbad" "
 "
 
 test_expect_success 'invoke dabba interface capabilities command with dabbad' "
-    '$DABBA_PATH'/dabba interface capabilities > result
+    '$DABBA_PATH'/dabba interface capabilities get > result
 "
 
 test_expect_success PYTHON_YAML "Parse interface capabilities YAML output" "
