@@ -160,6 +160,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <libdabba/macros.h>
 #include <dabba/dabba.h>
 #include <dabba/ipc.h>
+#include <dabba/interface-status.h>
 #include <dabba/interface-settings.h>
 #include <dabba/interface-driver.h>
 #include <dabba/interface-capabilities.h>
@@ -201,99 +202,6 @@ static struct option *interface_modify_options_get(void)
 	};
 
 	return interface_modify_option;
-}
-
-static void display_interface_list_header(void)
-{
-	printf("---\n");
-	printf("  interfaces:\n");
-}
-
-/**
- * \brief Print fetch interface information in a YAML format
- * \param[in]           interface_msg	interface information IPC message
- * \param[in]           elem_nr		number of interfaces to report
- */
-
-static void display_interface_status(const struct dabba_ipc_msg *const msg)
-{
-	size_t a;
-	const struct dabba_interface_list *iface;
-
-	assert(msg);
-	assert(msg->msg_body.elem_nr <= DABBA_INTERFACE_LIST_MAX_SIZE);
-	assert(msg->msg_body.type == DABBA_INTERFACE_LIST);
-
-	for (a = 0; a < msg->msg_body.elem_nr; a++) {
-		iface = &msg->msg_body.msg.interface_list[a];
-		printf("    - name: %s\n", iface->name);
-		printf("      status: {");
-		printf("link: %s, ", print_tf(iface->link));
-		printf("up: %s, ", print_tf(iface->up == TRUE));
-		printf("running: %s, ", print_tf(iface->running == TRUE));
-		printf("promiscuous: %s, ", print_tf(iface->promisc == TRUE));
-		printf("loopback: %s", print_tf(iface->loopback == TRUE));
-		printf("}\n");
-		printf("      statistics:\n");
-		printf("          rx: {");
-		printf("byte: %" PRIu64 ", ", iface->rx.byte);
-		printf("packet: %" PRIu64 ", ", iface->rx.packet);
-		printf("error: %" PRIu64 ", ", iface->rx.error);
-		printf("dropped: %" PRIu64 ", ", iface->rx.dropped);
-		printf("compressed: %" PRIu64 "", iface->rx.compressed);
-		printf("}\n");
-		printf("          tx: {");
-		printf("byte: %" PRIu64 ", ", iface->tx.byte);
-		printf("packet: %" PRIu64 ", ", iface->tx.packet);
-		printf("error: %" PRIu64 ", ", iface->tx.error);
-		printf("dropped: %" PRIu64 ", ", iface->tx.dropped);
-		printf("compressed: %" PRIu64 "", iface->tx.compressed);
-		printf("}\n");
-		printf("          rx error: {");
-		printf("fifo: %" PRIu64 ", ", iface->rx_error.fifo);
-		printf("frame: %" PRIu64 ", ", iface->rx_error.frame);
-		printf("crc: %" PRIu64 ", ", iface->rx_error.crc);
-		printf("length: %" PRIu64 ", ", iface->rx_error.length);
-		printf("missed: %" PRIu64 ", ", iface->rx_error.missed);
-		printf("overflow: %" PRIu64 "", iface->rx_error.over);
-		printf("}\n");
-		printf("          tx error: {");
-		printf("fifo: %" PRIu64 ", ", iface->tx_error.fifo);
-		printf("carrier: %" PRIu64 ", ", iface->tx_error.carrier);
-		printf("heartbeat: %" PRIu64 ", ", iface->tx_error.heartbeat);
-		printf("window: %" PRIu64 ", ", iface->tx_error.window);
-		printf("aborted: %" PRIu64 "", iface->tx_error.aborted);
-		printf("}\n");
-	}
-}
-
-/**
- * \brief Get current interface list information and output them on \c stdout
- * \param[in]           argc	        Argument counter
- * \param[in]           argv		Argument vector
- * \return 0 on success, else on failure.
- *
- * This function prepares an IPC message to query the supported network
- * interfaces present on the system. Once the message is sent, it waits for the
- * dabba daemon to reply.
- */
-
-int cmd_interface_status(int argc, const char **argv)
-{
-	struct dabba_ipc_msg msg;
-
-	assert(argc >= 0);
-	assert(argv);
-
-	memset(&msg, 0, sizeof(msg));
-
-	msg.msg_body.type = DABBA_INTERFACE_LIST;
-	msg.msg_body.op_type = OP_GET;
-	msg.msg_body.method_type = MT_BULK;
-
-	display_interface_list_header();
-
-	return dabba_ipc_fetch_all(&msg, display_interface_status);
 }
 
 static int prepare_interface_modify_query(int argc, char **argv, struct dabba_interface_list
