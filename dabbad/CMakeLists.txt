@@ -8,7 +8,8 @@ INCLUDE(Pod2Man)
 FILE(GLOB DABBAD_HDRS ${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/include/${PROJECT_NAME}/*.h)
 
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/include
-                        ${CMAKE_SOURCE_DIR}/libdabba/include)
+                        ${CMAKE_SOURCE_DIR}/libdabba/include
+			${NL_INCLUDE_DIRS})
 
 IF(DOXYGEN_FOUND)
 	CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
