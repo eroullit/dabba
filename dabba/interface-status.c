@@ -120,6 +120,9 @@ int cmd_interface_status(int argc, const char **argv)
 
 	memset(&msg, 0, sizeof(msg));
 
+	if (!dabba_operation_is_present(argc, optind))
+		return -1;
+
 	msg.msg_body.type = DABBA_INTERFACE_LIST;
 	msg.msg_body.op_type = dabba_operation_get(argv[optind++]);
 	msg.msg_body.method_type = MT_BULK;

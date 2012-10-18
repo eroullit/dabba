@@ -63,6 +63,16 @@ enum dabba_op_type dabba_operation_get(const char *const op_str)
 	return op_map[a].op;
 }
 
+int dabba_operation_is_present(const int argc, const int optind)
+{
+	int op_present = (argc - optind) == 1;
+
+	if (!op_present)
+		printf("No operation was given\n");
+
+	return op_present;
+}
+
 /**
  * \brief Communicate via IPC to the dabba daemon
  * \param[in,out]       msg	        IPC message

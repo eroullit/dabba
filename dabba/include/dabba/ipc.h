@@ -27,6 +27,7 @@
 #include <dabbad/dabbad.h>
 
 enum dabba_op_type dabba_operation_get(const char *const op_name);
+int dabba_operation_is_present(const int argc, const int optind);
 int dabba_ipc_msg(struct dabba_ipc_msg *msg);
 int dabba_ipc_fetch_all(struct dabba_ipc_msg *msg,
 			void (*msg_cb) (const struct dabba_ipc_msg *
