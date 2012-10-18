@@ -27,14 +27,13 @@
 
 /* __LICENSE_HEADER_END__ */
 
-#include <assert.h>
-#include <stdio.h>
-#include <errno.h>
-#include <net/if.h>
-#include <sys/types.h>
-#include <ifaddrs.h>
-#include <linux/if_link.h>
+/* HACK prevent libnl3 include clash between <net/if.h> and <linux/if.h> */
+#ifndef _LINUX_IF_H
+#define _LINUX_IF_H
+#endif				/* _LINUX_IF_H */
 
+#include <assert.h>
+#include <errno.h>
 #include <libdabba/macros.h>
 #include <libdabba/strlcpy.h>
 #include <libdabba/interface.h>
@@ -211,7 +210,7 @@ int dabbad_interface_bulk_get(struct dabba_ipc_msg *msg,
 			      void (*msg_cb) (struct nl_object * obj,
 					      void *arg))
 {
-	struct nl_handle *sock = NULL;
+	struct nl_sock *sock = NULL;
 	struct nl_cache *cache = NULL;
 	int rc = 0;
 	size_t off;
@@ -219,7 +218,7 @@ int dabbad_interface_bulk_get(struct dabba_ipc_msg *msg,
 	assert(msg);
 	assert(msg_cb);
 
-	sock = nl_handle_alloc();
+	sock = nl_socket_alloc();
 
 	if (!sock) {
 		rc = ENOMEM;
@@ -231,12 +230,10 @@ int dabbad_interface_bulk_get(struct dabba_ipc_msg *msg,
 	if (rc)
 		goto out;
 
-	cache = rtnl_link_alloc_cache(sock);
+	rc = rtnl_link_alloc_cache(sock, AF_UNSPEC, &cache);
 
-	if (!cache) {
-		rc = ENOMEM;
+	if (rc)
 		goto out;
-	}
 
 	for (off = 0; off < msg->msg_body.offset; off++)
 		if (!nl_cache_is_empty(cache))
@@ -246,7 +243,7 @@ int dabbad_interface_bulk_get(struct dabba_ipc_msg *msg,
 
  out:
 	nl_cache_free(cache);
-	nl_handle_destroy(sock);
+	nl_socket_free(sock);
 
 	return rc;
 }
@@ -262,7 +259,7 @@ int dabbad_interface_filter_get(struct dabba_ipc_msg *msg,
 				void (*msg_cb) (struct nl_object * obj,
 						void *arg))
 {
-	struct nl_handle *sock = NULL;
+	struct nl_sock *sock = NULL;
 	struct nl_cache *cache = NULL;
 	struct rtnl_link *link;
 	char *interface_name;
@@ -273,7 +270,7 @@ int dabbad_interface_filter_get(struct dabba_ipc_msg *msg,
 	assert(key_cb);
 	assert(msg_cb);
 
-	sock = nl_handle_alloc();
+	sock = nl_socket_alloc();
 
 	if (!sock) {
 		rc = ENOMEM;
@@ -285,12 +282,10 @@ int dabbad_interface_filter_get(struct dabba_ipc_msg *msg,
 	if (rc)
 		goto out;
 
-	cache = rtnl_link_alloc_cache(sock);
+	rc = rtnl_link_alloc_cache(sock, AF_UNSPEC, &cache);
 
-	if (!cache) {
-		rc = ENOMEM;
+	if (rc)
 		goto out;
-	}
 
 	ielem_nr = msg->msg_body.elem_nr;
 	msg->msg_body.elem_nr = 0;
@@ -310,7 +305,7 @@ int dabbad_interface_filter_get(struct dabba_ipc_msg *msg,
 
  out:
 	nl_cache_free(cache);
-	nl_handle_destroy(sock);
+	nl_socket_free(sock);
 
 	return rc;
 }
