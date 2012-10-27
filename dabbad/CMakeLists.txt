@@ -19,7 +19,7 @@ ENDIF(DOXYGEN_FOUND)
 
 ADD_EXECUTABLE(${PROJECT_NAME} dabbad.c interface.c ipc.c help.c capture.c misc.c thread.c)
 
-TARGET_LINK_LIBRARIES (${PROJECT_NAME} libdabba ${CMAKE_THREAD_LIBS_INIT} ${NL_LIBRARIES})
+TARGET_LINK_LIBRARIES (${PROJECT_NAME} libdabba libdabba-rpc ${CMAKE_THREAD_LIBS_INIT} ${NL_LIBRARIES})
 
 POD2MAN(${CMAKE_CURRENT_SOURCE_DIR}/dabbad.c dabbad 8)
 

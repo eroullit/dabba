@@ -1,0 +1,21 @@
+package dabba;
+
+message interface_id
+{
+    required string name = 1;
+}
+
+message interface_list
+{
+    required interface_id list = 1;
+}
+
+message interface_status
+{
+    required interface_id id = 1;
+    optional bool up = 2;
+    optional bool running = 3;
+    optional bool promiscous = 4;
+    optional bool loopback = 5;
+    optional bool connectivity = 6;
+}
