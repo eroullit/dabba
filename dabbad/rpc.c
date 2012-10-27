@@ -30,13 +30,48 @@
 #include <google/protobuf-c/protobuf-c-rpc.h>
 #include <libdabba-rpc/dabba.pb-c.h>
 
+static void dabbad_interface_id_get_all(Dabba__DabbaService_Service * service,
+					const Dabba__Dummy * dummy,
+					Dabba__InterfaceIdList_Closure closure,
+					void *closure_data)
+{
+	service = service;
+	dummy = dummy;
+	closure(NULL, closure_data);
+}
+
+static void dabbad_interface_status_get_all(Dabba__DabbaService_Service *
+					    service, const Dabba__Dummy * dummy,
+					    Dabba__InterfaceStatusList_Closure
+					    closure, void *closure_data)
+{
+	service = service;
+	dummy = dummy;
+	closure(NULL, closure_data);
+}
+
+static void dabbad_interface_status_get_by_id(Dabba__DabbaService_Service *
+					      service,
+					      const Dabba__InterfaceId * id,
+					      Dabba__InterfaceStatus_Closure
+					      closure, void *closure_data)
+{
+	service = service;
+	id = id;
+	closure(NULL, closure_data);
+}
+
+static Dabba__DabbaService_Service dabba_service =
+DABBA__DABBA_SERVICE__INIT(dabbad_);
+
 int dabbad_rpc_msg_poll(void)
 {
 	ProtobufC_RPC_Server *server;
 
 	/* 0xDABA = 55994 */
 	server =
-	    protobuf_c_rpc_server_new(PROTOBUF_C_RPC_ADDRESS_TCP, "55994", NULL,
+	    protobuf_c_rpc_server_new(PROTOBUF_C_RPC_ADDRESS_TCP, "55994",
+				      (ProtobufCService *) & dabba_service,
 				      NULL);
 
 	for (;;)
