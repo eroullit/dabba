@@ -104,10 +104,12 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <fcntl.h>
 
 #include <dabbad/ipc.h>
+#include <dabbad/rpc.h>
 #include <dabbad/help.h>
 
 enum dabbad_opts {
 	OPT_DAEMONIZE,
+	OPT_RPC,
 	OPT_VERSION,
 	OPT_HELP
 };
@@ -121,6 +123,7 @@ const struct option *dabbad_options_get(void)
 {
 	static const struct option dabbad_long_options[] = {
 		{"daemonize", no_argument, NULL, OPT_DAEMONIZE},
+		{"rpc", no_argument, NULL, OPT_RPC},
 		{"version", no_argument, NULL, OPT_VERSION},
 		{"help", no_argument, NULL, OPT_HELP},
 		{NULL, 0, NULL, 0}
@@ -173,7 +176,7 @@ static inline int dabbad_pidfile_create(void)
 int main(int argc, char **argv)
 {
 	int opt, opt_idx, qid;
-	int daemonize = 0;
+	int daemonize = 0, rpc_enabled = 0;
 
 	assert(argc);
 	assert(argv);
@@ -184,6 +187,9 @@ int main(int argc, char **argv)
 		switch (opt) {
 		case OPT_DAEMONIZE:
 			daemonize = 1;
+			break;
+		case OPT_RPC:
+			rpc_enabled = 1;
 			break;
 		case OPT_VERSION:
 			print_version();
@@ -209,5 +215,5 @@ int main(int argc, char **argv)
 		}
 	}
 
-	return dabbad_ipc_msg_poll(qid);
+	return rpc_enabled ? dabbad_rpc_msg_poll() : dabbad_ipc_msg_poll(qid);
 }
