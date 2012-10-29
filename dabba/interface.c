@@ -157,7 +157,9 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <assert.h>
 #include <errno.h>
 #include <getopt.h>
+#include <google/protobuf-c/protobuf-c-rpc.h>
 #include <libdabba/macros.h>
+#include <libdabba-rpc/dabba.pb-c.h>
 #include <dabba/dabba.h>
 #include <dabba/ipc.h>
 #include <dabba/interface-status.h>
@@ -274,6 +276,52 @@ int cmd_interface_modify(int argc, const char **argv)
 	return dabba_ipc_msg(&msg);
 }
 
+static void interface_list_print(const Dabba__InterfaceIdList * result,
+				 void *closure_data)
+{
+	size_t a;
+	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
+
+	printf("---\n");
+	printf("  interfaces:\n");
+
+	if (result)
+		for (a = 0; a < result->n_list && result->list[a]; a++)
+			printf("    - %s\n", result->list[a]->name);
+
+	*status = 1;
+}
+
+int cmd_interface_list(int argc, const char **argv)
+{
+	ProtobufCService *service;
+	ProtobufC_RPC_Client *client;
+	protobuf_c_boolean is_done = 0;
+	Dabba__Dummy dummy = DABBA__DUMMY__INIT;
+
+	assert(argc >= 0);
+	assert(argv);
+
+	service =
+	    protobuf_c_rpc_client_new(PROTOBUF_C_RPC_ADDRESS_TCP,
+				      "localhost:55994",
+				      &dabba__dabba_service__descriptor, NULL);
+
+	client = (ProtobufC_RPC_Client *) service;
+
+	while (!protobuf_c_rpc_client_is_connected(client))
+		protobuf_c_dispatch_run(protobuf_c_dispatch_default());
+
+	dabba__dabba_service__interface_id_get_all(service, &dummy,
+						   interface_list_print,
+						   &is_done);
+
+	while (!is_done)
+		protobuf_c_dispatch_run(protobuf_c_dispatch_default());
+
+	return 0;
+}
+
 /**
  * \brief Parse which interface sub-command.
  * \param[in]           argc	        Argument counter
@@ -291,6 +339,7 @@ int cmd_interface(int argc, const char **argv)
 	size_t i;
 	static struct cmd_struct interface_commands[] = {
 		{"status", cmd_interface_status},
+		{"list", cmd_interface_list},
 		{"driver", cmd_interface_driver},
 		{"settings", cmd_interface_settings},
 		{"capabilities", cmd_interface_capabilities},
