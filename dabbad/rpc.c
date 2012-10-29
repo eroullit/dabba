@@ -29,16 +29,7 @@
 
 #include <google/protobuf-c/protobuf-c-rpc.h>
 #include <libdabba-rpc/dabba.pb-c.h>
-
-static void dabbad_interface_id_get_all(Dabba__DabbaService_Service * service,
-					const Dabba__Dummy * dummy,
-					Dabba__InterfaceIdList_Closure closure,
-					void *closure_data)
-{
-	service = service;
-	dummy = dummy;
-	closure(NULL, closure_data);
-}
+#include <dabbad/interface.h>
 
 static void dabbad_interface_status_get_all(Dabba__DabbaService_Service *
 					    service, const Dabba__Dummy * dummy,

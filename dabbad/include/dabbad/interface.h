@@ -25,6 +25,7 @@
 #define	INTERFACE_H
 
 #include <dabbad/dabbad.h>
+#include <libdabba-rpc/dabba.pb-c.h>
 
 struct nl_object;
 
@@ -48,5 +49,10 @@ int dabbad_interface_filter_get(struct dabba_ipc_msg *msg,
 						void *arg));
 
 int dabbad_interface_modify(struct dabba_ipc_msg *msg);
+
+void dabbad_interface_id_get_all(Dabba__DabbaService_Service * service,
+				 const Dabba__Dummy * dummy,
+				 Dabba__InterfaceIdList_Closure closure,
+				 void *closure_data);
 
 #endif				/* INTERFACE_H */

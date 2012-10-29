@@ -34,12 +34,13 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <netlink/cache.h>
+#include <netlink/route/link.h>
 #include <libdabba/macros.h>
 #include <libdabba/strlcpy.h>
 #include <libdabba/interface.h>
 #include <dabbad/interface.h>
-#include <netlink/cache.h>
-#include <netlink/route/link.h>
+#include <libdabba-rpc/dabba.pb-c.h>
 
 static void interface_stats_copy(struct dabba_interface_list *iflist,
 				 struct rtnl_link *link)
@@ -137,8 +138,8 @@ void interface_settings(struct nl_object *obj, void *arg)
 
 	if (msg->msg_body.elem_nr < ifsettings_size) {
 		ifsettings =
-		    &msg->msg_body.msg.interface_settings[msg->msg_body.
-							  elem_nr];
+		    &msg->msg_body.msg.interface_settings[msg->
+							  msg_body.elem_nr];
 		strlcpy(ifsettings->name, rtnl_link_get_name(link), IFNAMSIZ);
 		dev_settings_get(ifsettings->name, &ifsettings->settings);
 		ifsettings->mtu = rtnl_link_get_mtu(link);
@@ -173,8 +174,8 @@ void interface_coalesce(struct nl_object *obj, void *arg)
 
 	if (msg->msg_body.elem_nr < ifcoalesce_size) {
 		ifcoalesce =
-		    &msg->msg_body.msg.interface_coalesce[msg->msg_body.
-							  elem_nr];
+		    &msg->msg_body.msg.interface_coalesce[msg->
+							  msg_body.elem_nr];
 		strlcpy(ifcoalesce->name, rtnl_link_get_name(link), IFNAMSIZ);
 		dev_coalesce_get(ifcoalesce->name, &ifcoalesce->coalesce);
 		msg->msg_body.elem_nr++;
@@ -342,4 +343,70 @@ int dabbad_interface_modify(struct dabba_ipc_msg *msg)
 		flags &= ~IFF_PROMISC;
 
 	return dev_flags_set(msg->msg_body.msg.interface_list[0].name, flags);
+}
+
+void __interface_id_get_all(struct nl_object *obj, void *arg)
+{
+	struct rtnl_link *link = (struct rtnl_link *)obj;
+	Dabba__InterfaceIdList *id_listp = (Dabba__InterfaceIdList *) arg;
+	size_t a;
+
+	for (a = 0; a < id_listp->n_list; a++)
+		if (!id_listp->list[a]->name) {
+			id_listp->list[a]->name = rtnl_link_get_name(link);
+			break;
+		}
+}
+
+void dabbad_interface_id_get_all(Dabba__DabbaService_Service * service,
+				 const Dabba__Dummy * dummy,
+				 Dabba__InterfaceIdList_Closure closure,
+				 void *closure_data)
+{
+	Dabba__InterfaceIdList id_list = DABBA__INTERFACE_ID_LIST__INIT;
+	Dabba__InterfaceId id_init = DABBA__INTERFACE_ID__INIT;
+	Dabba__InterfaceIdList *id_listp = NULL;
+	struct nl_sock *sock = NULL;
+	struct nl_cache *cache = NULL;
+	size_t a;
+
+	assert(service);
+	assert(dummy);
+
+	sock = nl_socket_alloc();
+
+	if (!sock)
+		goto out;
+
+	if (nl_connect(sock, NETLINK_ROUTE))
+		goto out;
+
+	if (rtnl_link_alloc_cache(sock, AF_UNSPEC, &cache))
+		goto out;
+
+	id_list.n_list = nl_cache_nitems(cache);
+	id_list.list = calloc(id_list.n_list, sizeof(*id_list.list));
+
+	if (!id_list.list)
+		goto out;
+
+	for (a = 0; a < id_list.n_list; a++) {
+		if (!(id_list.list[a] = calloc(1, sizeof(*id_list.list[a]))))
+			goto out;
+
+		*id_list.list[a] = id_init;
+	}
+
+	nl_cache_foreach(cache, __interface_id_get_all, &id_list);
+	id_listp = &id_list;
+
+ out:
+	closure(id_listp, closure_data);
+
+	for (a = 0; a < id_list.n_list; a++)
+		free(id_list.list[a]);
+
+	free(id_list.list);
+	nl_cache_free(cache);
+	nl_socket_free(sock);
 }
