@@ -5,7 +5,7 @@ message interface_id
     required string name = 1;
 }
 
-message interface_list
+message interface_id_list
 {
     required interface_id list = 1;
 }
@@ -18,4 +18,21 @@ message interface_status
     optional bool promiscous = 4;
     optional bool loopback = 5;
     optional bool connectivity = 6;
+}
+
+message interface_status_list
+{
+    repeated interface_status list = 1;
+}
+
+message dummy
+{
+    optional int32 unused = 1;
+}
+
+service dabba_service
+{
+    rpc interface_status_get_by_id (interface_id) returns (interface_status);
+    rpc interface_status_get_all (dummy) returns (interface_status_list);
+    rpc interface_id_get_all (dummy) returns (interface_id_list);
 }
