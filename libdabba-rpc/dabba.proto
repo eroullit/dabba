@@ -7,7 +7,7 @@ message interface_id
 
 message interface_id_list
 {
-    required interface_id list = 1;
+    repeated interface_id list = 1;
 }
 
 message interface_status
