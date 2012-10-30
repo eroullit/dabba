@@ -31,10 +31,13 @@
 #include <getopt.h>
 #include <inttypes.h>
 #include <assert.h>
-
+#include <errno.h>
+#include <google/protobuf-c/protobuf-c-rpc.h>
+#include <libdabba-rpc/dabba.pb-c.h>
 #include <dabbad/dabbad.h>
 #include <dabba/macros.h>
 #include <dabba/ipc.h>
+#include <dabba/help.h>
 
 static void display_interface_status_header(void)
 {
@@ -42,65 +45,65 @@ static void display_interface_status_header(void)
 	printf("  interfaces:\n");
 }
 
-/**
- * \brief Print fetch interface information in a YAML format
- * \param[in]           interface_msg	interface information IPC message
- * \param[in]           elem_nr		number of interfaces to report
- */
-
-static void display_interface_status(const struct dabba_ipc_msg *const msg)
+static void interface_status_print(const Dabba__InterfaceStatus * result,
+				   void *closure_data)
 {
-	size_t a;
-	const struct dabba_interface_list *iface;
+	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
 
-	assert(msg);
-	assert(msg->msg_body.elem_nr <= DABBA_INTERFACE_LIST_MAX_SIZE);
-	assert(msg->msg_body.type == DABBA_INTERFACE_LIST);
+	assert(closure_data);
 
-	for (a = 0; a < msg->msg_body.elem_nr; a++) {
-		iface = &msg->msg_body.msg.interface_list[a];
-		printf("    - name: %s\n", iface->name);
+	display_interface_status_header();
+
+	if (result && result->id) {
+		printf("    - name: %s\n", result->id->name);
 		printf("      status: {");
-		printf("link: %s, ", print_tf(iface->link));
-		printf("up: %s, ", print_tf(iface->up == TRUE));
-		printf("running: %s, ", print_tf(iface->running == TRUE));
-		printf("promiscuous: %s, ", print_tf(iface->promisc == TRUE));
-		printf("loopback: %s", print_tf(iface->loopback == TRUE));
+		printf("connectivity: %s, ", print_tf(result->connectivity));
+		printf("up: %s, ", print_tf(result->up));
+		printf("running: %s, ", print_tf(result->running));
+		printf("promiscuous: %s, ", print_tf(result->promiscous));
+		printf("loopback: %s", print_tf(result->loopback));
 		printf("}\n");
 	}
-#if 0
-	printf("      statistics:\n");
-	printf("          rx: {");
-	printf("byte: %" PRIu64 ", ", iface->rx.byte);
-	printf("packet: %" PRIu64 ", ", iface->rx.packet);
-	printf("error: %" PRIu64 ", ", iface->rx.error);
-	printf("dropped: %" PRIu64 ", ", iface->rx.dropped);
-	printf("compressed: %" PRIu64 "", iface->rx.compressed);
-	printf("}\n");
-	printf("          tx: {");
-	printf("byte: %" PRIu64 ", ", iface->tx.byte);
-	printf("packet: %" PRIu64 ", ", iface->tx.packet);
-	printf("error: %" PRIu64 ", ", iface->tx.error);
-	printf("dropped: %" PRIu64 ", ", iface->tx.dropped);
-	printf("compressed: %" PRIu64 "", iface->tx.compressed);
-	printf("}\n");
-	printf("          rx error: {");
-	printf("fifo: %" PRIu64 ", ", iface->rx_error.fifo);
-	printf("frame: %" PRIu64 ", ", iface->rx_error.frame);
-	printf("crc: %" PRIu64 ", ", iface->rx_error.crc);
-	printf("length: %" PRIu64 ", ", iface->rx_error.length);
-	printf("missed: %" PRIu64 ", ", iface->rx_error.missed);
-	printf("overflow: %" PRIu64 "", iface->rx_error.over);
-	printf("}\n");
-	printf("          tx error: {");
-	printf("fifo: %" PRIu64 ", ", iface->tx_error.fifo);
-	printf("carrier: %" PRIu64 ", ", iface->tx_error.carrier);
-	printf("heartbeat: %" PRIu64 ", ", iface->tx_error.heartbeat);
-	printf("window: %" PRIu64 ", ", iface->tx_error.window);
-	printf("aborted: %" PRIu64 "", iface->tx_error.aborted);
-	printf("}\n");
+
+	*status = 1;
 }
-#endif
+
+static int prepare_interface_status_query(int argc, char **argv,
+					  char **server_name,
+					  Dabba__InterfaceId * id)
+{
+	enum interface_status_option {
+		OPT_SERVER_ID,
+		OPT_INTERFACE_ID,
+		OPT_HELP,
+	};
+
+	const struct option interface_status_option[] = {
+		{"id", required_argument, NULL, OPT_INTERFACE_ID},
+		{"server", required_argument, NULL, OPT_SERVER_ID},
+		{NULL, 0, NULL, 0},
+	};
+	int ret, rc = 0;
+
+	while ((ret =
+		getopt_long_only(argc, argv, "", interface_status_option,
+				 NULL)) != EOF) {
+		switch (ret) {
+		case OPT_SERVER_ID:
+			*server_name = optarg;
+			break;
+		case OPT_INTERFACE_ID:
+			id->name = optarg;
+			break;
+		case OPT_HELP:
+		default:
+			show_usage(interface_status_option);
+			rc = -1;
+			break;
+		}
+	}
+
+	return rc;
 }
 
 /**
@@ -116,21 +119,40 @@ static void display_interface_status(const struct dabba_ipc_msg *const msg)
 
 int cmd_interface_status(int argc, const char **argv)
 {
-	struct dabba_ipc_msg msg;
+	ProtobufCService *service;
+	ProtobufC_RPC_Client *client;
+	protobuf_c_boolean is_done = 0;
+	Dabba__InterfaceId id = DABBA__INTERFACE_ID__INIT;
+	char *server_name = NULL;
+	int rc;
 
 	assert(argc >= 0);
 	assert(argv);
 
-	memset(&msg, 0, sizeof(msg));
+	rc = prepare_interface_status_query(argc, (char **)argv, &server_name,
+					    &id);
 
-	if (!dabba_operation_is_present(argc, optind))
-		return -1;
+	if (rc)
+		return rc;
 
-	msg.msg_body.type = DABBA_INTERFACE_LIST;
-	msg.msg_body.op_type = dabba_operation_get(argv[optind++]);
-	msg.msg_body.method_type = MT_BULK;
+	if (!server_name || !id.name)
+		return EINVAL;
 
-	display_interface_status_header();
+	service =
+	    protobuf_c_rpc_client_new(PROTOBUF_C_RPC_ADDRESS_TCP, server_name,
+				      &dabba__dabba_service__descriptor, NULL);
 
-	return dabba_ipc_fetch_all(&msg, display_interface_status);
+	client = (ProtobufC_RPC_Client *) service;
+
+	while (!protobuf_c_rpc_client_is_connected(client))
+		protobuf_c_dispatch_run(protobuf_c_dispatch_default());
+
+	dabba__dabba_service__interface_status_get_by_id(service, &id,
+							 interface_status_print,
+							 &is_done);
+
+	while (!is_done)
+		protobuf_c_dispatch_run(protobuf_c_dispatch_default());
+
+	return 0;
 }
