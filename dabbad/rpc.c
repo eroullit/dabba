@@ -41,17 +41,6 @@ static void dabbad_interface_status_get_all(Dabba__DabbaService_Service *
 	closure(NULL, closure_data);
 }
 
-static void dabbad_interface_status_get_by_id(Dabba__DabbaService_Service *
-					      service,
-					      const Dabba__InterfaceId * id,
-					      Dabba__InterfaceStatus_Closure
-					      closure, void *closure_data)
-{
-	service = service;
-	id = id;
-	closure(NULL, closure_data);
-}
-
 static Dabba__DabbaService_Service dabba_service =
 DABBA__DABBA_SERVICE__INIT(dabbad_);
 

@@ -138,8 +138,8 @@ void interface_settings(struct nl_object *obj, void *arg)
 
 	if (msg->msg_body.elem_nr < ifsettings_size) {
 		ifsettings =
-		    &msg->msg_body.msg.interface_settings[msg->
-							  msg_body.elem_nr];
+		    &msg->msg_body.msg.interface_settings[msg->msg_body.
+							  elem_nr];
 		strlcpy(ifsettings->name, rtnl_link_get_name(link), IFNAMSIZ);
 		dev_settings_get(ifsettings->name, &ifsettings->settings);
 		ifsettings->mtu = rtnl_link_get_mtu(link);
@@ -174,8 +174,8 @@ void interface_coalesce(struct nl_object *obj, void *arg)
 
 	if (msg->msg_body.elem_nr < ifcoalesce_size) {
 		ifcoalesce =
-		    &msg->msg_body.msg.interface_coalesce[msg->
-							  msg_body.elem_nr];
+		    &msg->msg_body.msg.interface_coalesce[msg->msg_body.
+							  elem_nr];
 		strlcpy(ifcoalesce->name, rtnl_link_get_name(link), IFNAMSIZ);
 		dev_coalesce_get(ifcoalesce->name, &ifcoalesce->coalesce);
 		msg->msg_body.elem_nr++;
@@ -407,6 +407,64 @@ void dabbad_interface_id_get_all(Dabba__DabbaService_Service * service,
 		free(id_list.list[a]);
 
 	free(id_list.list);
+	nl_cache_free(cache);
+	nl_socket_free(sock);
+}
+
+void dabbad_interface_status_get_by_id(Dabba__DabbaService_Service *
+				       service,
+				       const Dabba__InterfaceId * id,
+				       Dabba__InterfaceStatus_Closure
+				       closure, void *closure_data)
+{
+	Dabba__InterfaceStatus status = DABBA__INTERFACE_STATUS__INIT;
+	Dabba__InterfaceStatus *statusp = NULL;
+	struct nl_sock *sock = NULL;
+	struct nl_cache *cache = NULL;
+	struct rtnl_link *link;
+	unsigned int flags;
+
+	assert(service);
+	assert(closure_data);
+
+	if (!id || !id->name)
+		goto out;
+
+	sock = nl_socket_alloc();
+
+	if (!sock)
+		goto out;
+
+	if (nl_connect(sock, NETLINK_ROUTE))
+		goto out;
+
+	if (rtnl_link_alloc_cache(sock, AF_UNSPEC, &cache))
+		goto out;
+
+	link = rtnl_link_get_by_name(cache, id->name);
+
+	if (!link)
+		goto out;
+
+	flags = rtnl_link_get_flags(link);
+
+	status.has_connectivity = 1;
+	status.has_loopback = 1;
+	status.has_promiscous = 1;
+	status.has_running = 1;
+	status.has_up = 1;
+
+	dev_link_get(id->name, (uint32_t *) & status.connectivity);
+	status.loopback = (flags & IFF_LOOPBACK) == IFF_LOOPBACK;
+	status.up = (flags & IFF_UP) == IFF_UP;
+	status.running = (flags & IFF_RUNNING) == IFF_RUNNING;
+	status.promiscous = (flags & IFF_PROMISC) == IFF_PROMISC;
+
+	status.id->name = rtnl_link_get_name(link);
+	statusp = &status;
+
+ out:
+	closure(statusp, closure_data);
 	nl_cache_free(cache);
 	nl_socket_free(sock);
 }
