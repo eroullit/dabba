@@ -413,11 +413,12 @@ void dabbad_interface_id_get_all(Dabba__DabbaService_Service * service,
 
 void dabbad_interface_status_get_by_id(Dabba__DabbaService_Service *
 				       service,
-				       const Dabba__InterfaceId * id,
+				       const Dabba__InterfaceId * idp,
 				       Dabba__InterfaceStatus_Closure
 				       closure, void *closure_data)
 {
 	Dabba__InterfaceStatus status = DABBA__INTERFACE_STATUS__INIT;
+	Dabba__InterfaceId id = DABBA__INTERFACE_ID__INIT;
 	Dabba__InterfaceStatus *statusp = NULL;
 	struct nl_sock *sock = NULL;
 	struct nl_cache *cache = NULL;
@@ -427,8 +428,10 @@ void dabbad_interface_status_get_by_id(Dabba__DabbaService_Service *
 	assert(service);
 	assert(closure_data);
 
-	if (!id || !id->name)
+	if (!idp || !idp->name)
 		goto out;
+
+	status.id = &id;
 
 	sock = nl_socket_alloc();
 
@@ -441,7 +444,7 @@ void dabbad_interface_status_get_by_id(Dabba__DabbaService_Service *
 	if (rtnl_link_alloc_cache(sock, AF_UNSPEC, &cache))
 		goto out;
 
-	link = rtnl_link_get_by_name(cache, id->name);
+	link = rtnl_link_get_by_name(cache, idp->name);
 
 	if (!link)
 		goto out;
@@ -454,7 +457,7 @@ void dabbad_interface_status_get_by_id(Dabba__DabbaService_Service *
 	status.has_running = 1;
 	status.has_up = 1;
 
-	dev_link_get(id->name, (uint32_t *) & status.connectivity);
+	dev_link_get(idp->name, (uint32_t *) & status.connectivity);
 	status.loopback = (flags & IFF_LOOPBACK) == IFF_LOOPBACK;
 	status.up = (flags & IFF_UP) == IFF_UP;
 	status.running = (flags & IFF_RUNNING) == IFF_RUNNING;
