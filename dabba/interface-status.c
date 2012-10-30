@@ -67,37 +67,40 @@ static void display_interface_status(const struct dabba_ipc_msg *const msg)
 		printf("promiscuous: %s, ", print_tf(iface->promisc == TRUE));
 		printf("loopback: %s", print_tf(iface->loopback == TRUE));
 		printf("}\n");
-		printf("      statistics:\n");
-		printf("          rx: {");
-		printf("byte: %" PRIu64 ", ", iface->rx.byte);
-		printf("packet: %" PRIu64 ", ", iface->rx.packet);
-		printf("error: %" PRIu64 ", ", iface->rx.error);
-		printf("dropped: %" PRIu64 ", ", iface->rx.dropped);
-		printf("compressed: %" PRIu64 "", iface->rx.compressed);
-		printf("}\n");
-		printf("          tx: {");
-		printf("byte: %" PRIu64 ", ", iface->tx.byte);
-		printf("packet: %" PRIu64 ", ", iface->tx.packet);
-		printf("error: %" PRIu64 ", ", iface->tx.error);
-		printf("dropped: %" PRIu64 ", ", iface->tx.dropped);
-		printf("compressed: %" PRIu64 "", iface->tx.compressed);
-		printf("}\n");
-		printf("          rx error: {");
-		printf("fifo: %" PRIu64 ", ", iface->rx_error.fifo);
-		printf("frame: %" PRIu64 ", ", iface->rx_error.frame);
-		printf("crc: %" PRIu64 ", ", iface->rx_error.crc);
-		printf("length: %" PRIu64 ", ", iface->rx_error.length);
-		printf("missed: %" PRIu64 ", ", iface->rx_error.missed);
-		printf("overflow: %" PRIu64 "", iface->rx_error.over);
-		printf("}\n");
-		printf("          tx error: {");
-		printf("fifo: %" PRIu64 ", ", iface->tx_error.fifo);
-		printf("carrier: %" PRIu64 ", ", iface->tx_error.carrier);
-		printf("heartbeat: %" PRIu64 ", ", iface->tx_error.heartbeat);
-		printf("window: %" PRIu64 ", ", iface->tx_error.window);
-		printf("aborted: %" PRIu64 "", iface->tx_error.aborted);
-		printf("}\n");
 	}
+#if 0
+	printf("      statistics:\n");
+	printf("          rx: {");
+	printf("byte: %" PRIu64 ", ", iface->rx.byte);
+	printf("packet: %" PRIu64 ", ", iface->rx.packet);
+	printf("error: %" PRIu64 ", ", iface->rx.error);
+	printf("dropped: %" PRIu64 ", ", iface->rx.dropped);
+	printf("compressed: %" PRIu64 "", iface->rx.compressed);
+	printf("}\n");
+	printf("          tx: {");
+	printf("byte: %" PRIu64 ", ", iface->tx.byte);
+	printf("packet: %" PRIu64 ", ", iface->tx.packet);
+	printf("error: %" PRIu64 ", ", iface->tx.error);
+	printf("dropped: %" PRIu64 ", ", iface->tx.dropped);
+	printf("compressed: %" PRIu64 "", iface->tx.compressed);
+	printf("}\n");
+	printf("          rx error: {");
+	printf("fifo: %" PRIu64 ", ", iface->rx_error.fifo);
+	printf("frame: %" PRIu64 ", ", iface->rx_error.frame);
+	printf("crc: %" PRIu64 ", ", iface->rx_error.crc);
+	printf("length: %" PRIu64 ", ", iface->rx_error.length);
+	printf("missed: %" PRIu64 ", ", iface->rx_error.missed);
+	printf("overflow: %" PRIu64 "", iface->rx_error.over);
+	printf("}\n");
+	printf("          tx error: {");
+	printf("fifo: %" PRIu64 ", ", iface->tx_error.fifo);
+	printf("carrier: %" PRIu64 ", ", iface->tx_error.carrier);
+	printf("heartbeat: %" PRIu64 ", ", iface->tx_error.heartbeat);
+	printf("window: %" PRIu64 ", ", iface->tx_error.window);
+	printf("aborted: %" PRIu64 "", iface->tx_error.aborted);
+	printf("}\n");
+}
+#endif
 }
 
 /**
