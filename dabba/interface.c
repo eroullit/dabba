@@ -303,9 +303,8 @@ int cmd_interface_list(int argc, const char **argv)
 	/* TODO Make server name configurable */
 	service = dabba_rpc_client_connect(NULL);
 
-	dabba__dabba_service__interface_id_get_all(service, &dummy,
-						   interface_list_print,
-						   &is_done);
+	dabba__dabba_service__interface_id_get(service, &dummy,
+					       interface_list_print, &is_done);
 
 	dabba_rpc_call_is_done(&is_done);
 

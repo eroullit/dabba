@@ -379,10 +379,10 @@ void __interface_id_get_all(struct nl_object *obj, void *arg)
 		}
 }
 
-void dabbad_interface_id_get_all(Dabba__DabbaService_Service * service,
-				 const Dabba__Dummy * dummy,
-				 Dabba__InterfaceIdList_Closure closure,
-				 void *closure_data)
+void dabbad_interface_id_get(Dabba__DabbaService_Service * service,
+			     const Dabba__Dummy * dummy,
+			     Dabba__InterfaceIdList_Closure closure,
+			     void *closure_data)
 {
 	Dabba__InterfaceIdList id_list = DABBA__INTERFACE_ID_LIST__INIT;
 	Dabba__InterfaceIdList *id_listp = NULL;
@@ -448,45 +448,6 @@ void __interface_status_get(Dabba__InterfaceStatus * const status,
 	status->promiscous = (flags & IFF_PROMISC) == IFF_PROMISC;
 }
 
-void dabbad_interface_status_get_by_id(Dabba__DabbaService_Service *
-				       service,
-				       const Dabba__InterfaceId * idp,
-				       Dabba__InterfaceStatus_Closure
-				       closure, void *closure_data)
-{
-	Dabba__InterfaceStatus status = DABBA__INTERFACE_STATUS__INIT;
-	Dabba__InterfaceId id = DABBA__INTERFACE_ID__INIT;
-	Dabba__InterfaceStatus *statusp = NULL;
-	struct nl_sock *sock = NULL;
-	struct nl_cache *cache = NULL;
-	struct rtnl_link *link = NULL;
-
-	assert(service);
-	assert(closure_data);
-
-	if (!idp || !idp->name)
-		goto out;
-
-	cache = link_cache_alloc(&sock);
-
-	if (!cache)
-		goto out;
-
-	link = rtnl_link_get_by_name(cache, idp->name);
-
-	if (!link)
-		goto out;
-
-	status.id = &id;
-	__interface_status_get(&status, link);
-	statusp = &status;
-	rtnl_link_put(link);
-
- out:
-	closure(statusp, closure_data);
-	link_cache_destroy(sock, cache);
-}
-
 void interface_status_list(struct nl_object *obj, void *arg)
 {
 	struct rtnl_link *link = (struct rtnl_link *)obj;
@@ -504,36 +465,38 @@ void interface_status_list(struct nl_object *obj, void *arg)
 	}
 }
 
-void dabbad_interface_status_get_all(Dabba__DabbaService_Service * service,
-				     const Dabba__Dummy * dummy,
-				     Dabba__InterfaceStatusList_Closure
-				     closure, void *closure_data)
+void dabbad_interface_status_get(Dabba__DabbaService_Service * service,
+				 const Dabba__InterfaceIdList * id_list,
+				 Dabba__InterfaceStatusList_Closure
+				 closure, void *closure_data)
 {
 	Dabba__InterfaceStatusList status_list =
 	    DABBA__INTERFACE_STATUS_LIST__INIT;
 	Dabba__InterfaceStatusList *status_listp = NULL;
 	struct nl_sock *sock = NULL;
-	struct nl_cache *cache = NULL;
-	size_t a;
+	struct nl_cache *cache;
+	struct rtnl_link *link;
+	size_t a, ifnr = 0;
 
 	assert(service);
-	assert(dummy);
 	assert(closure_data);
 
 	cache = link_cache_alloc(&sock);
+	link = rtnl_link_alloc();
 
-	if (!cache)
+	if (!link || !cache)
 		goto out;
 
-	status_list.n_list = nl_cache_nitems(cache);
-	status_list.list =
-	    calloc(status_list.n_list, sizeof(*status_list.list));
+	ifnr =
+	    id_list->n_list ? id_list->n_list : (size_t) nl_cache_nitems(cache);
+
+	status_list.list = calloc(ifnr, sizeof(*status_list.list));
 
 	if (!status_list.list)
 		goto out;
 
-	for (a = 0; a < status_list.n_list; a++) {
-		status_list.list[a] = calloc(1, sizeof(*status_list.list[a]));
+	for (a = 0; a < ifnr; a++) {
+		status_list.list[a] = malloc(sizeof(*status_list.list[a]));
 
 		if (!status_list.list[a])
 			goto out;
@@ -541,7 +504,7 @@ void dabbad_interface_status_get_all(Dabba__DabbaService_Service * service,
 		dabba__interface_status__init(status_list.list[a]);
 
 		status_list.list[a]->id =
-		    calloc(1, sizeof(*status_list.list[a]->id));
+		    malloc(sizeof(*status_list.list[a]->id));
 
 		if (!status_list.list[a]->id)
 			goto out;
@@ -549,16 +512,27 @@ void dabbad_interface_status_get_all(Dabba__DabbaService_Service * service,
 		dabba__interface_id__init(status_list.list[a]->id);
 	}
 
-	nl_cache_foreach(cache, interface_status_list, &status_list);
+	status_list.n_list = ifnr;
+
+	if (id_list->n_list) {
+		for (a = 0; a < id_list->n_list; a++) {
+			rtnl_link_set_name(link, id_list->list[a]->name);
+			nl_cache_foreach_filter(cache, OBJ_CAST(link),
+						interface_status_list,
+						&status_list);
+		}
+	} else
+		nl_cache_foreach(cache, interface_status_list, &status_list);
+
 	status_listp = &status_list;
 
  out:
 	closure(status_listp, closure_data);
-	for (a = 0; a < status_list.n_list; a++) {
+	for (a = 0; a < ifnr; a++) {
 		free(status_list.list[a]->id);
 		free(status_list.list[a]);
 	}
-
 	free(status_list.list);
+	nl_object_free(OBJ_CAST(link));
 	link_cache_destroy(sock, cache);
 }

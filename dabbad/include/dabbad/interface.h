@@ -50,10 +50,15 @@ int dabbad_interface_filter_get(struct dabba_ipc_msg *msg,
 
 int dabbad_interface_modify(struct dabba_ipc_msg *msg);
 
-void dabbad_interface_id_get_all(Dabba__DabbaService_Service * service,
-				 const Dabba__Dummy * dummy,
-				 Dabba__InterfaceIdList_Closure closure,
-				 void *closure_data);
+void dabbad_interface_id_get(Dabba__DabbaService_Service * service,
+			     const Dabba__Dummy * dummy,
+			     Dabba__InterfaceIdList_Closure closure,
+			     void *closure_data);
+
+void dabbad_interface_status_get(Dabba__DabbaService_Service * service,
+				 const Dabba__InterfaceIdList * id_list,
+				 Dabba__InterfaceStatusList_Closure
+				 closure, void *closure_data);
 
 void dabbad_interface_status_get_by_id(Dabba__DabbaService_Service *
 				       service,

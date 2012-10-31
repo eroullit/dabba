@@ -28,6 +28,7 @@
 /* __LICENSE_HEADER_END__ */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <getopt.h>
 #include <inttypes.h>
 #include <assert.h>
@@ -42,29 +43,6 @@ static void display_interface_status_header(void)
 {
 	printf("---\n");
 	printf("  interfaces:\n");
-}
-
-static void interface_status_print(const Dabba__InterfaceStatus * result,
-				   void *closure_data)
-{
-	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
-
-	assert(closure_data);
-
-	display_interface_status_header();
-
-	if (result && result->id) {
-		printf("    - name: %s\n", result->id->name);
-		printf("      status: {");
-		printf("connectivity: %s, ", print_tf(result->connectivity));
-		printf("up: %s, ", print_tf(result->up));
-		printf("running: %s, ", print_tf(result->running));
-		printf("promiscuous: %s, ", print_tf(result->promiscous));
-		printf("loopback: %s", print_tf(result->loopback));
-		printf("}\n");
-	}
-
-	*status = 1;
 }
 
 static void interface_status_list_print(const Dabba__InterfaceStatusList *
@@ -95,7 +73,7 @@ static void interface_status_list_print(const Dabba__InterfaceStatusList *
 
 static int prepare_interface_status_query(int argc, char **argv,
 					  char **server_name,
-					  Dabba__InterfaceId * id)
+					  Dabba__InterfaceIdList * list)
 {
 	enum interface_status_option {
 		OPT_SERVER_ID,
@@ -110,6 +88,8 @@ static int prepare_interface_status_query(int argc, char **argv,
 	};
 	int ret, rc = 0;
 
+	assert(list);
+
 	while ((ret =
 		getopt_long_only(argc, argv, "", interface_status_option,
 				 NULL)) != EOF) {
@@ -118,7 +98,19 @@ static int prepare_interface_status_query(int argc, char **argv,
 			*server_name = optarg;
 			break;
 		case OPT_INTERFACE_ID:
-			id->name = optarg;
+			list->list =
+			    realloc(list->list,
+				    sizeof(*list->list) * (list->n_list + 1));
+
+			if (!list->list)
+				return ENOMEM;
+
+			list->list[list->n_list] =
+			    malloc(sizeof(*list->list[list->n_list]));
+			dabba__interface_id__init(list->list[list->n_list]);
+			list->list[list->n_list]->name = optarg;
+			list->n_list++;
+
 			break;
 		case OPT_HELP:
 		default:
@@ -146,32 +138,33 @@ int cmd_interface_status(int argc, const char **argv)
 {
 	ProtobufCService *service;
 	protobuf_c_boolean is_done = 0;
-	Dabba__InterfaceId id = DABBA__INTERFACE_ID__INIT;
-	Dabba__Dummy dummy = DABBA__DUMMY__INIT;
+	Dabba__InterfaceIdList id_list = DABBA__INTERFACE_ID_LIST__INIT;
 	char *server_name = NULL;
+	size_t a;
 	int rc;
 
 	assert(argc >= 0);
 	assert(argv);
 
 	rc = prepare_interface_status_query(argc, (char **)argv, &server_name,
-					    &id);
+					    &id_list);
 
 	if (rc)
-		return rc;
+		goto out;
 
 	service = dabba_rpc_client_connect(server_name);
 
-	if (!id.name)
-		dabba__dabba_service__interface_status_get_all(service, &dummy,
-							       interface_status_list_print,
-							       &is_done);
-	else
-		dabba__dabba_service__interface_status_get_by_id(service, &id,
-								 interface_status_print,
-								 &is_done);
+	dabba__dabba_service__interface_status_get(service, &id_list,
+						   interface_status_list_print,
+						   &is_done);
 
 	dabba_rpc_call_is_done(&is_done);
 
-	return 0;
+ out:
+	for (a = 0; a < id_list.n_list; a++)
+		free(id_list.list[a]);
+
+	free(id_list.list);
+
+	return rc;
 }

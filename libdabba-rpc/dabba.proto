@@ -32,7 +32,6 @@ message dummy
 
 service dabba_service
 {
-    rpc interface_status_get_by_id (interface_id) returns (interface_status);
-    rpc interface_status_get_all (dummy) returns (interface_status_list);
-    rpc interface_id_get_all (dummy) returns (interface_id_list);
+    rpc interface_status_get (interface_id_list) returns (interface_status_list);
+    rpc interface_id_get (dummy) returns (interface_id_list);
 }
