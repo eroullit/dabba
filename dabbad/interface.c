@@ -345,6 +345,27 @@ int dabbad_interface_modify(struct dabba_ipc_msg *msg)
 	return dev_flags_set(msg->msg_body.msg.interface_list[0].name, flags);
 }
 
+struct nl_cache *link_cache_alloc(struct nl_sock **sock)
+{
+	struct nl_cache *cache = NULL;
+
+	assert(sock);
+
+	*sock = nl_socket_alloc();
+
+	if (!sock || nl_connect(*sock, NETLINK_ROUTE)
+	    || rtnl_link_alloc_cache(*sock, AF_UNSPEC, &cache))
+		return NULL;
+
+	return cache;
+}
+
+void link_cache_destroy(struct nl_sock *sock, struct nl_cache *cache)
+{
+	nl_cache_free(cache);
+	nl_socket_free(sock);
+}
+
 void __interface_id_get_all(struct nl_object *obj, void *arg)
 {
 	struct rtnl_link *link = (struct rtnl_link *)obj;
@@ -373,15 +394,9 @@ void dabbad_interface_id_get_all(Dabba__DabbaService_Service * service,
 	assert(service);
 	assert(dummy);
 
-	sock = nl_socket_alloc();
+	cache = link_cache_alloc(&sock);
 
-	if (!sock)
-		goto out;
-
-	if (nl_connect(sock, NETLINK_ROUTE))
-		goto out;
-
-	if (rtnl_link_alloc_cache(sock, AF_UNSPEC, &cache))
+	if (!cache)
 		goto out;
 
 	id_list.n_list = nl_cache_nitems(cache);
@@ -407,8 +422,7 @@ void dabbad_interface_id_get_all(Dabba__DabbaService_Service * service,
 		free(id_list.list[a]);
 
 	free(id_list.list);
-	nl_cache_free(cache);
-	nl_socket_free(sock);
+	link_cache_destroy(sock, cache);
 }
 
 void __interface_status_get(Dabba__InterfaceStatus * const status,
@@ -446,7 +460,7 @@ void dabbad_interface_status_get_by_id(Dabba__DabbaService_Service *
 	Dabba__InterfaceStatus *statusp = NULL;
 	struct nl_sock *sock = NULL;
 	struct nl_cache *cache = NULL;
-	struct rtnl_link *link;
+	struct rtnl_link *link = NULL;
 
 	assert(service);
 	assert(closure_data);
@@ -454,17 +468,9 @@ void dabbad_interface_status_get_by_id(Dabba__DabbaService_Service *
 	if (!idp || !idp->name)
 		goto out;
 
-	status.id = &id;
+	cache = link_cache_alloc(&sock);
 
-	sock = nl_socket_alloc();
-
-	if (!sock)
-		goto out;
-
-	if (nl_connect(sock, NETLINK_ROUTE))
-		goto out;
-
-	if (rtnl_link_alloc_cache(sock, AF_UNSPEC, &cache))
+	if (!cache)
 		goto out;
 
 	link = rtnl_link_get_by_name(cache, idp->name);
@@ -472,13 +478,13 @@ void dabbad_interface_status_get_by_id(Dabba__DabbaService_Service *
 	if (!link)
 		goto out;
 
+	status.id = &id;
 	__interface_status_get(&status, link);
 	statusp = &status;
 
  out:
 	closure(statusp, closure_data);
-	nl_cache_free(cache);
-	nl_socket_free(sock);
+	link_cache_destroy(sock, cache);
 }
 
 void interface_status_list(struct nl_object *obj, void *arg)
@@ -516,15 +522,9 @@ void dabbad_interface_status_get_all(Dabba__DabbaService_Service * service,
 	assert(dummy);
 	assert(closure_data);
 
-	sock = nl_socket_alloc();
+	cache = link_cache_alloc(&sock);
 
-	if (!sock)
-		goto out;
-
-	if (nl_connect(sock, NETLINK_ROUTE))
-		goto out;
-
-	if (rtnl_link_alloc_cache(sock, AF_UNSPEC, &cache))
+	if (!cache)
 		goto out;
 
 	status_list.n_list = nl_cache_nitems(cache);
@@ -562,6 +562,5 @@ void dabbad_interface_status_get_all(Dabba__DabbaService_Service * service,
 	}
 
 	free(status_list.list);
-	nl_cache_free(cache);
-	nl_socket_free(sock);
+	link_cache_destroy(sock, cache);
 }
