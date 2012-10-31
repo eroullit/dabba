@@ -481,6 +481,7 @@ void dabbad_interface_status_get_by_id(Dabba__DabbaService_Service *
 	status.id = &id;
 	__interface_status_get(&status, link);
 	statusp = &status;
+	rtnl_link_put(link);
 
  out:
 	closure(statusp, closure_data);
