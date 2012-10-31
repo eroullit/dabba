@@ -157,11 +157,10 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <assert.h>
 #include <errno.h>
 #include <getopt.h>
-#include <google/protobuf-c/protobuf-c-rpc.h>
 #include <libdabba/macros.h>
-#include <libdabba-rpc/dabba.pb-c.h>
 #include <dabba/dabba.h>
 #include <dabba/ipc.h>
+#include <dabba/rpc.h>
 #include <dabba/interface-status.h>
 #include <dabba/interface-settings.h>
 #include <dabba/interface-driver.h>
@@ -295,29 +294,20 @@ static void interface_list_print(const Dabba__InterfaceIdList * result,
 int cmd_interface_list(int argc, const char **argv)
 {
 	ProtobufCService *service;
-	ProtobufC_RPC_Client *client;
 	protobuf_c_boolean is_done = 0;
 	Dabba__Dummy dummy = DABBA__DUMMY__INIT;
 
 	assert(argc >= 0);
 	assert(argv);
 
-	service =
-	    protobuf_c_rpc_client_new(PROTOBUF_C_RPC_ADDRESS_TCP,
-				      "localhost:55994",
-				      &dabba__dabba_service__descriptor, NULL);
-
-	client = (ProtobufC_RPC_Client *) service;
-
-	while (!protobuf_c_rpc_client_is_connected(client))
-		protobuf_c_dispatch_run(protobuf_c_dispatch_default());
+	/* TODO Make server name configurable */
+	service = dabba_rpc_client_connect(NULL);
 
 	dabba__dabba_service__interface_id_get_all(service, &dummy,
 						   interface_list_print,
 						   &is_done);
 
-	while (!is_done)
-		protobuf_c_dispatch_run(protobuf_c_dispatch_default());
+	dabba_rpc_call_is_done(&is_done);
 
 	return 0;
 }

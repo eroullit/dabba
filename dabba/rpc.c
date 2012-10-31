@@ -1,3 +1,9 @@
+/**
+ * \file rpc.c
+ * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2012
+ * \date 2012
+ */
+
 /* __LICENSE_HEADER_BEGIN__ */
 
 /*
@@ -21,9 +27,31 @@
 
 /* __LICENSE_HEADER_END__ */
 
-#ifndef DABBA_RPC_H
-#define	DABBA_RPC_H
+#include <dabba/rpc.h>
 
-int dabbad_rpc_msg_poll(void);
+ProtobufCService *dabba_rpc_client_connect(const char *server_name)
+{
+	ProtobufCService *service;
+	ProtobufC_RPC_Client *client;
 
-#endif				/* RPC_H */
+	if (!server_name)
+		server_name = "localhost:55994";
+
+	service =
+	    protobuf_c_rpc_client_new(PROTOBUF_C_RPC_ADDRESS_TCP, server_name,
+				      &dabba__dabba_service__descriptor, NULL);
+
+	client = (ProtobufC_RPC_Client *) service;
+
+	while (!protobuf_c_rpc_client_is_connected(client))
+		protobuf_c_dispatch_run(protobuf_c_dispatch_default());
+
+	return service;
+}
+
+void dabba_rpc_call_is_done(protobuf_c_boolean * is_done)
+{
+	assert(is_done);
+	while (!(*is_done))
+		protobuf_c_dispatch_run(protobuf_c_dispatch_default());
+}

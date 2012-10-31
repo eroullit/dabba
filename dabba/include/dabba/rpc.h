@@ -24,6 +24,10 @@
 #ifndef DABBA_RPC_H
 #define	DABBA_RPC_H
 
-int dabbad_rpc_msg_poll(void);
+#include <google/protobuf-c/protobuf-c-rpc.h>
+#include <libdabba-rpc/dabba.pb-c.h>
 
-#endif				/* RPC_H */
+ProtobufCService *dabba_rpc_client_connect(const char *server_name);
+void dabba_rpc_call_is_done(protobuf_c_boolean * is_done);
+
+#endif				/* DABBA_RPC_H */

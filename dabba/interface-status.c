@@ -32,11 +32,10 @@
 #include <inttypes.h>
 #include <assert.h>
 #include <errno.h>
-#include <google/protobuf-c/protobuf-c-rpc.h>
-#include <libdabba-rpc/dabba.pb-c.h>
 #include <dabbad/dabbad.h>
 #include <dabba/macros.h>
 #include <dabba/ipc.h>
+#include <dabba/rpc.h>
 #include <dabba/help.h>
 
 static void display_interface_status_header(void)
@@ -120,7 +119,6 @@ static int prepare_interface_status_query(int argc, char **argv,
 int cmd_interface_status(int argc, const char **argv)
 {
 	ProtobufCService *service;
-	ProtobufC_RPC_Client *client;
 	protobuf_c_boolean is_done = 0;
 	Dabba__InterfaceId id = DABBA__INTERFACE_ID__INIT;
 	char *server_name = NULL;
@@ -135,24 +133,16 @@ int cmd_interface_status(int argc, const char **argv)
 	if (rc)
 		return rc;
 
-	if (!server_name || !id.name)
+	if (!id.name)
 		return EINVAL;
 
-	service =
-	    protobuf_c_rpc_client_new(PROTOBUF_C_RPC_ADDRESS_TCP, server_name,
-				      &dabba__dabba_service__descriptor, NULL);
-
-	client = (ProtobufC_RPC_Client *) service;
-
-	while (!protobuf_c_rpc_client_is_connected(client))
-		protobuf_c_dispatch_run(protobuf_c_dispatch_default());
+	service = dabba_rpc_client_connect(server_name);
 
 	dabba__dabba_service__interface_status_get_by_id(service, &id,
 							 interface_status_print,
 							 &is_done);
 
-	while (!is_done)
-		protobuf_c_dispatch_run(protobuf_c_dispatch_default());
+	dabba_rpc_call_is_done(&is_done);
 
 	return 0;
 }
