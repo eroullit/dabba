@@ -471,3 +471,106 @@ void dabbad_interface_status_get_by_id(Dabba__DabbaService_Service *
 	nl_cache_free(cache);
 	nl_socket_free(sock);
 }
+
+void interface_status_list(struct nl_object *obj, void *arg)
+{
+	struct rtnl_link *link = (struct rtnl_link *)obj;
+	Dabba__InterfaceStatusList *status_list = arg;
+	Dabba__InterfaceStatus *status;
+	uint16_t flags;
+	size_t a;
+
+	for (a = 0; a < status_list->n_list; a++) {
+		status = status_list->list[a];
+
+		if (!status->id->name) {
+			status->has_connectivity = 1;
+			status->has_loopback = 1;
+			status->has_promiscous = 1;
+			status->has_running = 1;
+			status->has_up = 1;
+
+			status->id->name = rtnl_link_get_name(link);
+			flags = rtnl_link_get_flags(link);
+
+			dev_link_get(status->id->name,
+				     (uint32_t *) & status->connectivity);
+			status->loopback =
+			    (flags & IFF_LOOPBACK) == IFF_LOOPBACK;
+			status->up = (flags & IFF_UP) == IFF_UP;
+			status->running = (flags & IFF_RUNNING) == IFF_RUNNING;
+			status->promiscous =
+			    (flags & IFF_PROMISC) == IFF_PROMISC;
+
+			break;
+		}
+	}
+}
+
+void dabbad_interface_status_get_all(Dabba__DabbaService_Service * service,
+				     const Dabba__Dummy * dummy,
+				     Dabba__InterfaceStatusList_Closure
+				     closure, void *closure_data)
+{
+	Dabba__InterfaceStatusList status_list =
+	    DABBA__INTERFACE_STATUS_LIST__INIT;
+	Dabba__InterfaceStatusList *status_listp = NULL;
+	Dabba__InterfaceStatus status_init = DABBA__INTERFACE_STATUS__INIT;
+	Dabba__InterfaceId id_init = DABBA__INTERFACE_ID__INIT;
+	struct nl_sock *sock = NULL;
+	struct nl_cache *cache = NULL;
+	size_t a;
+
+	assert(service);
+	assert(dummy);
+	assert(closure_data);
+
+	sock = nl_socket_alloc();
+
+	if (!sock)
+		goto out;
+
+	if (nl_connect(sock, NETLINK_ROUTE))
+		goto out;
+
+	if (rtnl_link_alloc_cache(sock, AF_UNSPEC, &cache))
+		goto out;
+
+	status_list.n_list = nl_cache_nitems(cache);
+	status_list.list =
+	    calloc(status_list.n_list, sizeof(*status_list.list));
+
+	if (!status_list.list)
+		goto out;
+
+	for (a = 0; a < status_list.n_list; a++) {
+		status_list.list[a] = calloc(1, sizeof(*status_list.list[a]));
+
+		if (!status_list.list[a])
+			goto out;
+
+		*status_list.list[a] = status_init;
+
+		status_list.list[a]->id =
+		    calloc(1, sizeof(*status_list.list[a]->id));
+
+		if (!status_list.list[a]->id)
+			goto out;
+
+		*status_list.list[a]->id = id_init;
+	}
+
+	nl_cache_foreach(cache, interface_status_list, &status_list);
+	status_listp = &status_list;
+
+ out:
+	closure(status_listp, closure_data);
+	for (a = 0; a < status_list.n_list; a++) {
+		free(status_list.list[a]->id);
+		free(status_list.list[a]);
+	}
+
+	free(status_list.list);
+	nl_cache_free(cache);
+	nl_socket_free(sock);
+}

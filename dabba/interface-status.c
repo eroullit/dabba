@@ -67,6 +67,32 @@ static void interface_status_print(const Dabba__InterfaceStatus * result,
 	*status = 1;
 }
 
+static void interface_status_list_print(const Dabba__InterfaceStatusList *
+					result, void *closure_data)
+{
+	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
+	size_t a;
+
+	assert(closure_data);
+
+	display_interface_status_header();
+
+	for (a = 0; result && a < result->n_list; a++) {
+		printf("    - name: %s\n", result->list[a]->id->name);
+		printf("      status: {");
+		printf("connectivity: %s, ",
+		       print_tf(result->list[a]->connectivity));
+		printf("up: %s, ", print_tf(result->list[a]->up));
+		printf("running: %s, ", print_tf(result->list[a]->running));
+		printf("promiscuous: %s, ",
+		       print_tf(result->list[a]->promiscous));
+		printf("loopback: %s", print_tf(result->list[a]->loopback));
+		printf("}\n");
+	}
+
+	*status = 1;
+}
+
 static int prepare_interface_status_query(int argc, char **argv,
 					  char **server_name,
 					  Dabba__InterfaceId * id)
@@ -121,6 +147,7 @@ int cmd_interface_status(int argc, const char **argv)
 	ProtobufCService *service;
 	protobuf_c_boolean is_done = 0;
 	Dabba__InterfaceId id = DABBA__INTERFACE_ID__INIT;
+	Dabba__Dummy dummy = DABBA__DUMMY__INIT;
 	char *server_name = NULL;
 	int rc;
 
@@ -133,14 +160,16 @@ int cmd_interface_status(int argc, const char **argv)
 	if (rc)
 		return rc;
 
-	if (!id.name)
-		return EINVAL;
-
 	service = dabba_rpc_client_connect(server_name);
 
-	dabba__dabba_service__interface_status_get_by_id(service, &id,
-							 interface_status_print,
-							 &is_done);
+	if (!id.name)
+		dabba__dabba_service__interface_status_get_all(service, &dummy,
+							       interface_status_list_print,
+							       &is_done);
+	else
+		dabba__dabba_service__interface_status_get_by_id(service, &id,
+								 interface_status_print,
+								 &is_done);
 
 	dabba_rpc_call_is_done(&is_done);
 
