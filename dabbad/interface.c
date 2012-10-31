@@ -138,8 +138,8 @@ void interface_settings(struct nl_object *obj, void *arg)
 
 	if (msg->msg_body.elem_nr < ifsettings_size) {
 		ifsettings =
-		    &msg->msg_body.msg.interface_settings[msg->
-							  msg_body.elem_nr];
+		    &msg->msg_body.msg.interface_settings[msg->msg_body.
+							  elem_nr];
 		strlcpy(ifsettings->name, rtnl_link_get_name(link), IFNAMSIZ);
 		dev_settings_get(ifsettings->name, &ifsettings->settings);
 		ifsettings->mtu = rtnl_link_get_mtu(link);
@@ -174,8 +174,8 @@ void interface_coalesce(struct nl_object *obj, void *arg)
 
 	if (msg->msg_body.elem_nr < ifcoalesce_size) {
 		ifcoalesce =
-		    &msg->msg_body.msg.interface_coalesce[msg->
-							  msg_body.elem_nr];
+		    &msg->msg_body.msg.interface_coalesce[msg->msg_body.
+							  elem_nr];
 		strlcpy(ifcoalesce->name, rtnl_link_get_name(link), IFNAMSIZ);
 		dev_coalesce_get(ifcoalesce->name, &ifcoalesce->coalesce);
 		msg->msg_body.elem_nr++;
@@ -385,7 +385,6 @@ void dabbad_interface_id_get_all(Dabba__DabbaService_Service * service,
 				 void *closure_data)
 {
 	Dabba__InterfaceIdList id_list = DABBA__INTERFACE_ID_LIST__INIT;
-	Dabba__InterfaceId id_init = DABBA__INTERFACE_ID__INIT;
 	Dabba__InterfaceIdList *id_listp = NULL;
 	struct nl_sock *sock = NULL;
 	struct nl_cache *cache = NULL;
@@ -409,7 +408,7 @@ void dabbad_interface_id_get_all(Dabba__DabbaService_Service * service,
 		if (!(id_list.list[a] = calloc(1, sizeof(*id_list.list[a]))))
 			goto out;
 
-		*id_list.list[a] = id_init;
+		dabba__interface_id__init(id_list.list[a]);
 	}
 
 	nl_cache_foreach(cache, __interface_id_get_all, &id_list);
@@ -513,8 +512,6 @@ void dabbad_interface_status_get_all(Dabba__DabbaService_Service * service,
 	Dabba__InterfaceStatusList status_list =
 	    DABBA__INTERFACE_STATUS_LIST__INIT;
 	Dabba__InterfaceStatusList *status_listp = NULL;
-	Dabba__InterfaceStatus status_init = DABBA__INTERFACE_STATUS__INIT;
-	Dabba__InterfaceId id_init = DABBA__INTERFACE_ID__INIT;
 	struct nl_sock *sock = NULL;
 	struct nl_cache *cache = NULL;
 	size_t a;
@@ -541,7 +538,7 @@ void dabbad_interface_status_get_all(Dabba__DabbaService_Service * service,
 		if (!status_list.list[a])
 			goto out;
 
-		*status_list.list[a] = status_init;
+		dabba__interface_status__init(status_list.list[a]);
 
 		status_list.list[a]->id =
 		    calloc(1, sizeof(*status_list.list[a]->id));
@@ -549,7 +546,7 @@ void dabbad_interface_status_get_all(Dabba__DabbaService_Service * service,
 		if (!status_list.list[a]->id)
 			goto out;
 
-		*status_list.list[a]->id = id_init;
+		dabba__interface_id__init(status_list.list[a]->id);
 	}
 
 	nl_cache_foreach(cache, interface_status_list, &status_list);
