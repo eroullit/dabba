@@ -61,4 +61,9 @@ void dabbad_interface_status_get_by_id(Dabba__DabbaService_Service *
 				       Dabba__InterfaceStatus_Closure
 				       closure, void *closure_data);
 
+void dabbad_interface_status_get_all(Dabba__DabbaService_Service * service,
+				     const Dabba__Dummy * dummy,
+				     Dabba__InterfaceStatusList_Closure
+				     closure, void *closure_data);
+
 #endif				/* INTERFACE_H */

@@ -31,16 +31,6 @@
 #include <libdabba-rpc/dabba.pb-c.h>
 #include <dabbad/interface.h>
 
-static void dabbad_interface_status_get_all(Dabba__DabbaService_Service *
-					    service, const Dabba__Dummy * dummy,
-					    Dabba__InterfaceStatusList_Closure
-					    closure, void *closure_data)
-{
-	service = service;
-	dummy = dummy;
-	closure(NULL, closure_data);
-}
-
 static Dabba__DabbaService_Service dabba_service =
 DABBA__DABBA_SERVICE__INIT(dabbad_);
 
