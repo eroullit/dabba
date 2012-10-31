@@ -138,8 +138,8 @@ void interface_settings(struct nl_object *obj, void *arg)
 
 	if (msg->msg_body.elem_nr < ifsettings_size) {
 		ifsettings =
-		    &msg->msg_body.msg.interface_settings[msg->msg_body.
-							  elem_nr];
+		    &msg->msg_body.msg.interface_settings[msg->
+							  msg_body.elem_nr];
 		strlcpy(ifsettings->name, rtnl_link_get_name(link), IFNAMSIZ);
 		dev_settings_get(ifsettings->name, &ifsettings->settings);
 		ifsettings->mtu = rtnl_link_get_mtu(link);
@@ -174,8 +174,8 @@ void interface_coalesce(struct nl_object *obj, void *arg)
 
 	if (msg->msg_body.elem_nr < ifcoalesce_size) {
 		ifcoalesce =
-		    &msg->msg_body.msg.interface_coalesce[msg->msg_body.
-							  elem_nr];
+		    &msg->msg_body.msg.interface_coalesce[msg->
+							  msg_body.elem_nr];
 		strlcpy(ifcoalesce->name, rtnl_link_get_name(link), IFNAMSIZ);
 		dev_coalesce_get(ifcoalesce->name, &ifcoalesce->coalesce);
 		msg->msg_body.elem_nr++;
@@ -411,6 +411,30 @@ void dabbad_interface_id_get_all(Dabba__DabbaService_Service * service,
 	nl_socket_free(sock);
 }
 
+void __interface_status_get(Dabba__InterfaceStatus * const status,
+			    struct rtnl_link *const link)
+{
+	uint16_t flags;
+
+	assert(status);
+	assert(link);
+
+	status->has_connectivity = 1;
+	status->has_loopback = 1;
+	status->has_promiscous = 1;
+	status->has_running = 1;
+	status->has_up = 1;
+
+	status->id->name = rtnl_link_get_name(link);
+	flags = rtnl_link_get_flags(link);
+
+	dev_link_get(status->id->name, (uint32_t *) & status->connectivity);
+	status->loopback = (flags & IFF_LOOPBACK) == IFF_LOOPBACK;
+	status->up = (flags & IFF_UP) == IFF_UP;
+	status->running = (flags & IFF_RUNNING) == IFF_RUNNING;
+	status->promiscous = (flags & IFF_PROMISC) == IFF_PROMISC;
+}
+
 void dabbad_interface_status_get_by_id(Dabba__DabbaService_Service *
 				       service,
 				       const Dabba__InterfaceId * idp,
@@ -423,7 +447,6 @@ void dabbad_interface_status_get_by_id(Dabba__DabbaService_Service *
 	struct nl_sock *sock = NULL;
 	struct nl_cache *cache = NULL;
 	struct rtnl_link *link;
-	unsigned int flags;
 
 	assert(service);
 	assert(closure_data);
@@ -449,21 +472,7 @@ void dabbad_interface_status_get_by_id(Dabba__DabbaService_Service *
 	if (!link)
 		goto out;
 
-	flags = rtnl_link_get_flags(link);
-
-	status.has_connectivity = 1;
-	status.has_loopback = 1;
-	status.has_promiscous = 1;
-	status.has_running = 1;
-	status.has_up = 1;
-
-	dev_link_get(idp->name, (uint32_t *) & status.connectivity);
-	status.loopback = (flags & IFF_LOOPBACK) == IFF_LOOPBACK;
-	status.up = (flags & IFF_UP) == IFF_UP;
-	status.running = (flags & IFF_RUNNING) == IFF_RUNNING;
-	status.promiscous = (flags & IFF_PROMISC) == IFF_PROMISC;
-
-	status.id->name = rtnl_link_get_name(link);
+	__interface_status_get(&status, link);
 	statusp = &status;
 
  out:
@@ -477,31 +486,13 @@ void interface_status_list(struct nl_object *obj, void *arg)
 	struct rtnl_link *link = (struct rtnl_link *)obj;
 	Dabba__InterfaceStatusList *status_list = arg;
 	Dabba__InterfaceStatus *status;
-	uint16_t flags;
 	size_t a;
 
 	for (a = 0; a < status_list->n_list; a++) {
 		status = status_list->list[a];
 
 		if (!status->id->name) {
-			status->has_connectivity = 1;
-			status->has_loopback = 1;
-			status->has_promiscous = 1;
-			status->has_running = 1;
-			status->has_up = 1;
-
-			status->id->name = rtnl_link_get_name(link);
-			flags = rtnl_link_get_flags(link);
-
-			dev_link_get(status->id->name,
-				     (uint32_t *) & status->connectivity);
-			status->loopback =
-			    (flags & IFF_LOOPBACK) == IFF_LOOPBACK;
-			status->up = (flags & IFF_UP) == IFF_UP;
-			status->running = (flags & IFF_RUNNING) == IFF_RUNNING;
-			status->promiscous =
-			    (flags & IFF_PROMISC) == IFF_PROMISC;
-
+			__interface_status_get(status, link);
 			break;
 		}
 	}
