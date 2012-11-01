@@ -138,8 +138,8 @@ void interface_settings(struct nl_object *obj, void *arg)
 
 	if (msg->msg_body.elem_nr < ifsettings_size) {
 		ifsettings =
-		    &msg->msg_body.msg.interface_settings[msg->msg_body.
-							  elem_nr];
+		    &msg->msg_body.msg.interface_settings[msg->
+							  msg_body.elem_nr];
 		strlcpy(ifsettings->name, rtnl_link_get_name(link), IFNAMSIZ);
 		dev_settings_get(ifsettings->name, &ifsettings->settings);
 		ifsettings->mtu = rtnl_link_get_mtu(link);
@@ -174,8 +174,8 @@ void interface_coalesce(struct nl_object *obj, void *arg)
 
 	if (msg->msg_body.elem_nr < ifcoalesce_size) {
 		ifcoalesce =
-		    &msg->msg_body.msg.interface_coalesce[msg->msg_body.
-							  elem_nr];
+		    &msg->msg_body.msg.interface_coalesce[msg->
+							  msg_body.elem_nr];
 		strlcpy(ifcoalesce->name, rtnl_link_get_name(link), IFNAMSIZ);
 		dev_coalesce_get(ifcoalesce->name, &ifcoalesce->coalesce);
 		msg->msg_body.elem_nr++;
@@ -452,17 +452,31 @@ void interface_status_list(struct nl_object *obj, void *arg)
 {
 	struct rtnl_link *link = (struct rtnl_link *)obj;
 	Dabba__InterfaceStatusList *status_list = arg;
-	Dabba__InterfaceStatus *status;
-	size_t a;
+	Dabba__InterfaceStatus *statusp;
+	size_t lsize = sizeof(*status_list->list) * (status_list->n_list + 1);
 
-	for (a = 0; a < status_list->n_list; a++) {
-		status = status_list->list[a];
+	status_list->list = realloc(status_list->list, lsize);
 
-		if (!status->id->name) {
-			__interface_status_get(status, link);
-			break;
-		}
-	}
+	if (!status_list->list)
+		return;
+
+	status_list->list[status_list->n_list] =
+	    malloc(sizeof(*status_list->list[status_list->n_list]));
+	statusp = status_list->list[status_list->n_list];
+
+	if (!statusp)
+		return;
+
+	dabba__interface_status__init(statusp);
+
+	statusp->id = malloc(sizeof(*statusp));
+
+	if (!statusp->id)
+		return;
+
+	dabba__interface_id__init(statusp->id);
+	__interface_status_get(statusp, link);
+	status_list->n_list++;
 }
 
 void dabbad_interface_status_get(Dabba__DabbaService_Service * service,
@@ -476,7 +490,7 @@ void dabbad_interface_status_get(Dabba__DabbaService_Service * service,
 	struct nl_sock *sock = NULL;
 	struct nl_cache *cache;
 	struct rtnl_link *link;
-	size_t a, ifnr = 0;
+	size_t a;
 
 	assert(service);
 	assert(closure_data);
@@ -486,33 +500,6 @@ void dabbad_interface_status_get(Dabba__DabbaService_Service * service,
 
 	if (!link || !cache)
 		goto out;
-
-	ifnr =
-	    id_list->n_list ? id_list->n_list : (size_t) nl_cache_nitems(cache);
-
-	status_list.list = calloc(ifnr, sizeof(*status_list.list));
-
-	if (!status_list.list)
-		goto out;
-
-	for (a = 0; a < ifnr; a++) {
-		status_list.list[a] = malloc(sizeof(*status_list.list[a]));
-
-		if (!status_list.list[a])
-			goto out;
-
-		dabba__interface_status__init(status_list.list[a]);
-
-		status_list.list[a]->id =
-		    malloc(sizeof(*status_list.list[a]->id));
-
-		if (!status_list.list[a]->id)
-			goto out;
-
-		dabba__interface_id__init(status_list.list[a]->id);
-	}
-
-	status_list.n_list = ifnr;
 
 	if (id_list->n_list) {
 		for (a = 0; a < id_list->n_list; a++) {
@@ -528,7 +515,7 @@ void dabbad_interface_status_get(Dabba__DabbaService_Service * service,
 
  out:
 	closure(status_listp, closure_data);
-	for (a = 0; a < ifnr; a++) {
+	for (a = 0; a < status_list.n_list; a++) {
 		free(status_list.list[a]->id);
 		free(status_list.list[a]);
 	}
