@@ -138,8 +138,8 @@ void interface_settings(struct nl_object *obj, void *arg)
 
 	if (msg->msg_body.elem_nr < ifsettings_size) {
 		ifsettings =
-		    &msg->msg_body.msg.interface_settings[msg->msg_body.
-							  elem_nr];
+		    &msg->msg_body.msg.interface_settings[msg->
+							  msg_body.elem_nr];
 		strlcpy(ifsettings->name, rtnl_link_get_name(link), IFNAMSIZ);
 		dev_settings_get(ifsettings->name, &ifsettings->settings);
 		ifsettings->mtu = rtnl_link_get_mtu(link);
@@ -174,8 +174,8 @@ void interface_coalesce(struct nl_object *obj, void *arg)
 
 	if (msg->msg_body.elem_nr < ifcoalesce_size) {
 		ifcoalesce =
-		    &msg->msg_body.msg.interface_coalesce[msg->msg_body.
-							  elem_nr];
+		    &msg->msg_body.msg.interface_coalesce[msg->
+							  msg_body.elem_nr];
 		strlcpy(ifcoalesce->name, rtnl_link_get_name(link), IFNAMSIZ);
 		dev_coalesce_get(ifcoalesce->name, &ifcoalesce->coalesce);
 		msg->msg_body.elem_nr++;
@@ -405,7 +405,8 @@ void dabbad_interface_id_get(Dabba__DabbaService_Service * service,
 		goto out;
 
 	for (a = 0; a < id_list.n_list; a++) {
-		if (!(id_list.list[a] = calloc(1, sizeof(*id_list.list[a]))))
+		id_list.list[a] = malloc(sizeof(*id_list.list[a]));
+		if (!id_list.list[a])
 			goto out;
 
 		dabba__interface_id__init(id_list.list[a]);
