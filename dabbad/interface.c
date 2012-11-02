@@ -138,8 +138,8 @@ void interface_settings(struct nl_object *obj, void *arg)
 
 	if (msg->msg_body.elem_nr < ifsettings_size) {
 		ifsettings =
-		    &msg->msg_body.msg.interface_settings[msg->
-							  msg_body.elem_nr];
+		    &msg->msg_body.msg.interface_settings[msg->msg_body.
+							  elem_nr];
 		strlcpy(ifsettings->name, rtnl_link_get_name(link), IFNAMSIZ);
 		dev_settings_get(ifsettings->name, &ifsettings->settings);
 		ifsettings->mtu = rtnl_link_get_mtu(link);
@@ -174,8 +174,8 @@ void interface_coalesce(struct nl_object *obj, void *arg)
 
 	if (msg->msg_body.elem_nr < ifcoalesce_size) {
 		ifcoalesce =
-		    &msg->msg_body.msg.interface_coalesce[msg->
-							  msg_body.elem_nr];
+		    &msg->msg_body.msg.interface_coalesce[msg->msg_body.
+							  elem_nr];
 		strlcpy(ifcoalesce->name, rtnl_link_get_name(link), IFNAMSIZ);
 		dev_coalesce_get(ifcoalesce->name, &ifcoalesce->coalesce);
 		msg->msg_body.elem_nr++;
@@ -473,8 +473,10 @@ void interface_status_list(struct nl_object *obj, void *arg)
 
 	statusp->id = malloc(sizeof(*statusp));
 
-	if (!statusp->id)
+	if (!statusp->id) {
+		free(statusp);
 		return;
+	}
 
 	dabba__interface_id__init(statusp->id);
 	__interface_status_get(statusp, link);
