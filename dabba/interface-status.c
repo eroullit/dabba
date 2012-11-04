@@ -48,6 +48,7 @@ static void display_interface_status_header(void)
 static void interface_status_list_print(const Dabba__InterfaceStatusList *
 					result, void *closure_data)
 {
+	Dabba__InterfaceStatus *statusp;
 	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
 	size_t a;
 
@@ -56,15 +57,14 @@ static void interface_status_list_print(const Dabba__InterfaceStatusList *
 	display_interface_status_header();
 
 	for (a = 0; result && a < result->n_list; a++) {
-		printf("    - name: %s\n", result->list[a]->id->name);
+		statusp = result->list[a];
+		printf("    - name: %s\n", statusp->id->name);
 		printf("      status: {");
-		printf("connectivity: %s, ",
-		       print_tf(result->list[a]->connectivity));
-		printf("up: %s, ", print_tf(result->list[a]->up));
-		printf("running: %s, ", print_tf(result->list[a]->running));
-		printf("promiscuous: %s, ",
-		       print_tf(result->list[a]->promiscous));
-		printf("loopback: %s", print_tf(result->list[a]->loopback));
+		printf("connectivity: %s, ", print_tf(statusp->connectivity));
+		printf("up: %s, ", print_tf(statusp->up));
+		printf("running: %s, ", print_tf(statusp->running));
+		printf("promiscuous: %s, ", print_tf(statusp->promiscous));
+		printf("loopback: %s", print_tf(statusp->loopback));
 		printf("}\n");
 	}
 
@@ -80,13 +80,13 @@ static int prepare_interface_status_query(int argc, char **argv,
 		OPT_INTERFACE_ID,
 		OPT_HELP,
 	};
-
 	const struct option interface_status_option[] = {
 		{"id", required_argument, NULL, OPT_INTERFACE_ID},
 		{"server", required_argument, NULL, OPT_SERVER_ID},
 		{NULL, 0, NULL, 0},
 	};
 	int ret, rc = 0;
+	Dabba__InterfaceId **idpp;
 
 	assert(list);
 
@@ -98,16 +98,22 @@ static int prepare_interface_status_query(int argc, char **argv,
 			*server_name = optarg;
 			break;
 		case OPT_INTERFACE_ID:
-			list->list =
+			idpp =
 			    realloc(list->list,
 				    sizeof(*list->list) * (list->n_list + 1));
 
-			if (!list->list)
+			if (!idpp)
 				return ENOMEM;
 
+			list->list = idpp;
 			list->list[list->n_list] =
 			    malloc(sizeof(*list->list[list->n_list]));
+
+			if (!list->list[list->n_list])
+				return ENOMEM;
+
 			dabba__interface_id__init(list->list[list->n_list]);
+
 			list->list[list->n_list]->name = optarg;
 			list->n_list++;
 
