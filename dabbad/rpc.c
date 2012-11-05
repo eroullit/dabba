@@ -32,6 +32,7 @@
 #include <dabbad/interface.h>
 #include <dabbad/interface-list.h>
 #include <dabbad/interface-status.h>
+#include <dabbad/interface-driver.h>
 
 static Dabba__DabbaService_Service dabba_service =
 DABBA__DABBA_SERVICE__INIT(dabbad_);
