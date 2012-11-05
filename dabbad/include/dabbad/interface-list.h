@@ -1,9 +1,3 @@
-/**
- * \file rpc.c
- * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2012
- * \date 2012
- */
-
 /* __LICENSE_HEADER_BEGIN__ */
 
 /*
@@ -27,29 +21,14 @@
 
 /* __LICENSE_HEADER_END__ */
 
-#include <google/protobuf-c/protobuf-c-rpc.h>
+#ifndef INTERFACE_LIST_H
+#define	INTERFACE_LIST_H
+
 #include <libdabba-rpc/dabba.pb-c.h>
-#include <dabbad/interface.h>
-#include <dabbad/interface-list.h>
-#include <dabbad/interface-status.h>
 
-static Dabba__DabbaService_Service dabba_service =
-DABBA__DABBA_SERVICE__INIT(dabbad_);
+void dabbad_interface_id_get(Dabba__DabbaService_Service * service,
+			     const Dabba__Dummy * dummy,
+			     Dabba__InterfaceIdList_Closure closure,
+			     void *closure_data);
 
-int dabbad_rpc_msg_poll(void)
-{
-	ProtobufC_RPC_Server *server;
-
-	/* 0xDABA = 55994 */
-	server =
-	    protobuf_c_rpc_server_new(PROTOBUF_C_RPC_ADDRESS_TCP, "55994",
-				      (ProtobufCService *) & dabba_service,
-				      NULL);
-
-	for (;;)
-		protobuf_c_dispatch_run(protobuf_c_dispatch_default());
-
-	protobuf_c_rpc_server_destroy(server, 0);
-
-	return 0;
-}
+#endif				/* INTERFACE_LIST_H */

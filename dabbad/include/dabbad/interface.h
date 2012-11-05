@@ -25,8 +25,9 @@
 #define	INTERFACE_H
 
 #include <dabbad/dabbad.h>
-#include <libdabba-rpc/dabba.pb-c.h>
 
+struct nl_cache;
+struct nl_sock;
 struct nl_object;
 
 void interface_list(struct nl_object *obj, void *arg);
@@ -50,25 +51,7 @@ int dabbad_interface_filter_get(struct dabba_ipc_msg *msg,
 
 int dabbad_interface_modify(struct dabba_ipc_msg *msg);
 
-void dabbad_interface_id_get(Dabba__DabbaService_Service * service,
-			     const Dabba__Dummy * dummy,
-			     Dabba__InterfaceIdList_Closure closure,
-			     void *closure_data);
-
-void dabbad_interface_status_get(Dabba__DabbaService_Service * service,
-				 const Dabba__InterfaceIdList * id_list,
-				 Dabba__InterfaceStatusList_Closure
-				 closure, void *closure_data);
-
-void dabbad_interface_status_get_by_id(Dabba__DabbaService_Service *
-				       service,
-				       const Dabba__InterfaceId * id,
-				       Dabba__InterfaceStatus_Closure
-				       closure, void *closure_data);
-
-void dabbad_interface_status_get_all(Dabba__DabbaService_Service * service,
-				     const Dabba__Dummy * dummy,
-				     Dabba__InterfaceStatusList_Closure
-				     closure, void *closure_data);
+struct nl_cache *link_cache_alloc(struct nl_sock **sock);
+void link_cache_destroy(struct nl_sock *sock, struct nl_cache *cache);
 
 #endif				/* INTERFACE_H */
