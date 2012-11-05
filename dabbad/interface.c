@@ -138,8 +138,8 @@ void interface_settings(struct nl_object *obj, void *arg)
 
 	if (msg->msg_body.elem_nr < ifsettings_size) {
 		ifsettings =
-		    &msg->msg_body.msg.interface_settings[msg->
-							  msg_body.elem_nr];
+		    &msg->msg_body.msg.interface_settings[msg->msg_body.
+							  elem_nr];
 		strlcpy(ifsettings->name, rtnl_link_get_name(link), IFNAMSIZ);
 		dev_settings_get(ifsettings->name, &ifsettings->settings);
 		ifsettings->mtu = rtnl_link_get_mtu(link);
@@ -174,8 +174,8 @@ void interface_coalesce(struct nl_object *obj, void *arg)
 
 	if (msg->msg_body.elem_nr < ifcoalesce_size) {
 		ifcoalesce =
-		    &msg->msg_body.msg.interface_coalesce[msg->
-							  msg_body.elem_nr];
+		    &msg->msg_body.msg.interface_coalesce[msg->msg_body.
+							  elem_nr];
 		strlcpy(ifcoalesce->name, rtnl_link_get_name(link), IFNAMSIZ);
 		dev_coalesce_get(ifcoalesce->name, &ifcoalesce->coalesce);
 		msg->msg_body.elem_nr++;
@@ -366,17 +366,28 @@ void link_cache_destroy(struct nl_sock *sock, struct nl_cache *cache)
 	nl_socket_free(sock);
 }
 
-void __interface_id_get_all(struct nl_object *obj, void *arg)
+void __interface_id_get(struct nl_object *obj, void *arg)
 {
 	struct rtnl_link *link = (struct rtnl_link *)obj;
 	Dabba__InterfaceIdList *id_listp = (Dabba__InterfaceIdList *) arg;
-	size_t a;
+	Dabba__InterfaceId **idpp;
+	size_t lsize = sizeof(*id_listp->list) * (id_listp->n_list + 1);
 
-	for (a = 0; a < id_listp->n_list; a++)
-		if (!id_listp->list[a]->name) {
-			id_listp->list[a]->name = rtnl_link_get_name(link);
-			break;
-		}
+	idpp = realloc(id_listp->list, lsize);
+
+	if (!idpp)
+		return;
+
+	id_listp->list = idpp;
+	id_listp->list[id_listp->n_list] =
+	    malloc(sizeof(*id_listp->list[id_listp->n_list]));
+
+	if (!id_listp->list[id_listp->n_list])
+		return;
+
+	dabba__interface_id__init(id_listp->list[id_listp->n_list]);
+	id_listp->list[id_listp->n_list]->name = rtnl_link_get_name(link);
+	id_listp->n_list++;
 }
 
 void dabbad_interface_id_get(Dabba__DabbaService_Service * service,
@@ -398,21 +409,7 @@ void dabbad_interface_id_get(Dabba__DabbaService_Service * service,
 	if (!cache)
 		goto out;
 
-	id_list.n_list = nl_cache_nitems(cache);
-	id_list.list = calloc(id_list.n_list, sizeof(*id_list.list));
-
-	if (!id_list.list)
-		goto out;
-
-	for (a = 0; a < id_list.n_list; a++) {
-		id_list.list[a] = malloc(sizeof(*id_list.list[a]));
-		if (!id_list.list[a])
-			goto out;
-
-		dabba__interface_id__init(id_list.list[a]);
-	}
-
-	nl_cache_foreach(cache, __interface_id_get_all, &id_list);
+	nl_cache_foreach(cache, __interface_id_get, &id_list);
 	id_listp = &id_list;
 
  out:
