@@ -25,6 +25,20 @@ message interface_status_list
     repeated interface_status list = 1;
 }
 
+message interface_driver
+{
+    required interface_id id = 1;
+    optional string name = 2;
+    optional string version = 3;
+    optional string fw_version = 4;
+    optional string bus_info = 5;
+}
+
+message interface_driver_list
+{
+    repeated interface_driver list = 1;
+}
+
 message dummy
 {
     optional int32 unused = 1;
@@ -33,5 +47,6 @@ message dummy
 service dabba_service
 {
     rpc interface_status_get (interface_id_list) returns (interface_status_list);
+    rpc interface_driver_get (interface_id_list) returns (interface_driver_list);
     rpc interface_id_get (dummy) returns (interface_id_list);
 }
