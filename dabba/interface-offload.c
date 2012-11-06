@@ -28,12 +28,14 @@
 /* __LICENSE_HEADER_END__ */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <getopt.h>
+#include <errno.h>
 #include <assert.h>
-
 #include <dabbad/dabbad.h>
 #include <dabba/macros.h>
-#include <dabba/ipc.h>
+#include <dabba/rpc.h>
+#include <dabba/help.h>
 
 static void display_interface_offload_header(void)
 {
@@ -41,29 +43,94 @@ static void display_interface_offload_header(void)
 	printf("  interfaces:\n");
 }
 
-static void display_interface_offload(const struct dabba_ipc_msg *const msg)
+static void interface_offload_list_print(const Dabba__InterfaceOffloadList *
+					 result, void *closure_data)
 {
+	Dabba__InterfaceOffload *offloadp;
+	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
 	size_t a;
-	const struct dabba_interface_offload *iface;
 
-	assert(msg);
-	assert(msg->msg_body.elem_nr <= DABBA_INTERFACE_OFFLOAD_MAX_SIZE);
-	assert(msg->msg_body.type == DABBA_INTERFACE_OFFLOAD);
+	assert(closure_data);
 
-	for (a = 0; a < msg->msg_body.elem_nr; a++) {
-		iface = &msg->msg_body.msg.interface_offload[a];
-		printf("    - name: %s\n", iface->name);
+	display_interface_offload_header();
+
+	for (a = 0; result && a < result->n_list; a++) {
+		offloadp = result->list[a];
+		printf("    - name: %s\n", offloadp->id->name);
 		printf("      offload:\n");
-		printf("        rx checksum: %s\n", print_tf(iface->rx_csum));
-		printf("        tx checksum: %s\n", print_tf(iface->tx_csum));
-		printf("        scatter gather: %s\n", print_tf(iface->sg));
-		printf("        tcp segment: %s\n", print_tf(iface->tso));
-		printf("        udp fragment: %s\n", print_tf(iface->ufo));
+		printf("        rx checksum: %s\n",
+		       print_tf(offloadp->rx_csum));
+		printf("        tx checksum: %s\n",
+		       print_tf(offloadp->tx_csum));
+		printf("        scatter gather: %s\n", print_tf(offloadp->sg));
+		printf("        tcp segment: %s\n", print_tf(offloadp->tso));
+		printf("        udp fragment: %s\n", print_tf(offloadp->ufo));
 		printf("        generic segmentation: %s\n",
-		       print_tf(iface->gso));
-		printf("        generic receive: %s\n", print_tf(iface->gro));
-		printf("        rx hashing: %s\n", print_tf(iface->rxhash));
+		       print_tf(offloadp->gso));
+		printf("        generic receive: %s\n",
+		       print_tf(offloadp->gro));
+		printf("        rx hashing: %s\n", print_tf(offloadp->rxhash));
 	}
+
+	*status = 1;
+}
+
+static int prepare_interface_offload_query(int argc, char **argv,
+					   char **server_name,
+					   Dabba__InterfaceIdList * list)
+{
+	enum interface_pause_option {
+		OPT_SERVER_ID,
+		OPT_INTERFACE_ID,
+		OPT_HELP,
+	};
+	const struct option interface_pause_option[] = {
+		{"id", required_argument, NULL, OPT_INTERFACE_ID},
+		{"server", required_argument, NULL, OPT_SERVER_ID},
+		{NULL, 0, NULL, 0},
+	};
+	int ret, rc = 0;
+	Dabba__InterfaceId **idpp;
+
+	assert(list);
+
+	while ((ret =
+		getopt_long_only(argc, argv, "", interface_pause_option,
+				 NULL)) != EOF) {
+		switch (ret) {
+		case OPT_SERVER_ID:
+			*server_name = optarg;
+			break;
+		case OPT_INTERFACE_ID:
+			idpp =
+			    realloc(list->list,
+				    sizeof(*list->list) * (list->n_list + 1));
+
+			if (!idpp)
+				return ENOMEM;
+
+			list->list = idpp;
+			list->list[list->n_list] =
+			    malloc(sizeof(*list->list[list->n_list]));
+
+			if (!list->list[list->n_list])
+				return ENOMEM;
+
+			dabba__interface_id__init(list->list[list->n_list]);
+
+			list->list[list->n_list]->name = optarg;
+			list->n_list++;
+
+			break;
+		case OPT_HELP:
+		default:
+			show_usage(interface_pause_option);
+			rc = -1;
+			break;
+		}
+	}
+
+	return rc;
 }
 
 /**
@@ -75,21 +142,35 @@ static void display_interface_offload(const struct dabba_ipc_msg *const msg)
 
 int cmd_interface_offload(int argc, const char **argv)
 {
-	struct dabba_ipc_msg msg;
+	ProtobufCService *service;
+	protobuf_c_boolean is_done = 0;
+	Dabba__InterfaceIdList id_list = DABBA__INTERFACE_ID_LIST__INIT;
+	char *server_name = NULL;
+	size_t a;
+	int rc;
 
 	assert(argc >= 0);
 	assert(argv);
 
-	memset(&msg, 0, sizeof(msg));
+	rc = prepare_interface_offload_query(argc, (char **)argv, &server_name,
+					     &id_list);
 
-	if (!dabba_operation_is_present(argc, optind))
-		return -1;
+	if (rc)
+		goto out;
 
-	msg.msg_body.type = DABBA_INTERFACE_OFFLOAD;
-	msg.msg_body.op_type = dabba_operation_get(argv[optind++]);
-	msg.msg_body.method_type = MT_BULK;
+	service = dabba_rpc_client_connect(server_name);
 
-	display_interface_offload_header();
+	dabba__dabba_service__interface_offload_get(service, &id_list,
+						    interface_offload_list_print,
+						    &is_done);
 
-	return dabba_ipc_fetch_all(&msg, display_interface_offload);
+	dabba_rpc_call_is_done(&is_done);
+
+ out:
+	for (a = 0; a < id_list.n_list; a++)
+		free(id_list.list[a]);
+
+	free(id_list.list);
+
+	return rc;
 }
