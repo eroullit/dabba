@@ -1,5 +1,5 @@
 /**
- * \file interface-status.c
+ * \file interface-pause.c
  * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2012
  * \date 2012
  */
