@@ -36,6 +36,7 @@
 #include <dabbad/interface-pause.h>
 #include <dabbad/interface-offload.h>
 #include <dabbad/interface-settings.h>
+#include <dabbad/interface-coalesce.h>
 
 static Dabba__DabbaService_Service dabba_service =
 DABBA__DABBA_SERVICE__INIT(dabbad_);
