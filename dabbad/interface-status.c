@@ -39,7 +39,7 @@
 #include <dabbad/interface.h>
 #include <dabbad/interface-status.h>
 
-void __interface_status_get(struct nl_object *obj, void *arg)
+static void __interface_status_get(struct nl_object *obj, void *arg)
 {
 	struct rtnl_link *link = (struct rtnl_link *)obj;
 	Dabba__InterfaceStatusList *status_list = arg;
