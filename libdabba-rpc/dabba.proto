@@ -39,6 +39,19 @@ message interface_driver_list
     repeated interface_driver list = 1;
 }
 
+message interface_pause
+{
+    required interface_id id = 1;
+    optional uint32 autoneg = 2;
+    optional uint32 rx_pause = 3;
+    optional uint32 tx_pause = 4;
+}
+
+message interface_pause_list
+{
+    repeated interface_pause list = 1;
+}
+
 message dummy
 {
     optional int32 unused = 1;
@@ -48,5 +61,6 @@ service dabba_service
 {
     rpc interface_status_get (interface_id_list) returns (interface_status_list);
     rpc interface_driver_get (interface_id_list) returns (interface_driver_list);
+    rpc interface_pause_get (interface_id_list) returns (interface_pause_list);
     rpc interface_id_get (dummy) returns (interface_id_list);
 }
