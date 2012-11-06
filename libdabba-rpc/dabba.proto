@@ -71,6 +71,24 @@ message interface_offload_list
     repeated interface_offload list = 1;
 }
 
+message interface_settings
+{
+    required interface_id id = 1;
+    optional uint32 speed = 2;
+    optional bool duplex = 3;
+    optional bool autoneg = 4;
+    optional uint32 mtu = 5;
+    optional uint32 tx_qlen = 6;
+    optional uint32 port = 7;
+    optional uint32 maxrxpkt = 8;
+    optional uint32 maxtxpkt = 9;
+}
+
+message interface_settings_list
+{
+    repeated interface_settings list = 1;
+}
+
 message dummy
 {
     optional int32 unused = 1;
@@ -82,5 +100,6 @@ service dabba_service
     rpc interface_driver_get (interface_id_list) returns (interface_driver_list);
     rpc interface_pause_get (interface_id_list) returns (interface_pause_list);
     rpc interface_offload_get (interface_id_list) returns (interface_offload_list);
+    rpc interface_settings_get (interface_id_list) returns (interface_settings_list);
     rpc interface_id_get (dummy) returns (interface_id_list);
 }
