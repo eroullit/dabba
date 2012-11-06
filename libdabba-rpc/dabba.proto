@@ -89,6 +89,38 @@ message interface_settings_list
     repeated interface_settings list = 1;
 }
 
+message interface_coalesce
+{
+    required interface_id id = 1;
+    optional uint32 pkt_rate_high = 2;
+    optional uint32 pkt_rate_low = 3;
+    optional uint32 rate_sample_interval = 4;
+    optional uint32 stats_block_coalesce_usecs = 5;
+    optional uint32 use_adaptive_rx_coalesce = 6;
+    optional uint32 rx_coalesce_usecs = 7;
+    optional uint32 rx_coalesce_usecs_irq = 8;
+    optional uint32 rx_coalesce_usecs_high = 9;
+    optional uint32 rx_coalesce_usecs_low = 10;
+    optional uint32 rx_max_coalesced_frames = 11;
+    optional uint32 rx_max_coalesced_frames_irq = 12;
+    optional uint32 rx_max_coalesced_frames_high = 13;
+    optional uint32 rx_max_coalesced_frames_low = 14;
+    optional uint32 use_adaptive_tx_coalesce = 15;
+    optional uint32 tx_coalesce_usecs = 16;
+    optional uint32 tx_coalesce_usecs_irq = 17;
+    optional uint32 tx_coalesce_usecs_high = 18;
+    optional uint32 tx_coalesce_usecs_low = 19;
+    optional uint32 tx_max_coalesced_frames = 20;
+    optional uint32 tx_max_coalesced_frames_irq = 21;
+    optional uint32 tx_max_coalesced_frames_high = 22;
+    optional uint32 tx_max_coalesced_frames_low = 23;
+}
+
+message interface_coalesce_list
+{
+    repeated interface_coalesce list = 1;
+}
+
 message dummy
 {
     optional int32 unused = 1;
@@ -101,5 +133,6 @@ service dabba_service
     rpc interface_pause_get (interface_id_list) returns (interface_pause_list);
     rpc interface_offload_get (interface_id_list) returns (interface_offload_list);
     rpc interface_settings_get (interface_id_list) returns (interface_settings_list);
+    rpc interface_coalesce_get (interface_id_list) returns (interface_coalesce_list);
     rpc interface_id_get (dummy) returns (interface_id_list);
 }
