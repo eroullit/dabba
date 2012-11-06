@@ -28,13 +28,14 @@
 /* __LICENSE_HEADER_END__ */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <getopt.h>
+#include <errno.h>
 #include <assert.h>
-#include <linux/ethtool.h>
-
 #include <dabbad/dabbad.h>
 #include <dabba/macros.h>
-#include <dabba/ipc.h>
+#include <dabba/rpc.h>
+#include <dabba/help.h>
 
 extern const char *ethtool_port_str_get(const uint8_t port);
 
@@ -44,58 +45,125 @@ static void display_interface_settings_header(void)
 	printf("  interfaces:\n");
 }
 
-/**
- * \brief Get interface hardware settings and output them on \c stdout
- * \param[in]           argc	        Argument counter
- * \param[in]           argv		Argument vector
- * \return 0 on success, else on failure.
- */
-
-static void display_interface_settings(const struct dabba_ipc_msg *const msg)
+static void interface_settings_list_print(const Dabba__InterfaceSettingsList *
+					  result, void *closure_data)
 {
+	Dabba__InterfaceSettings *settingsp;
+	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
 	size_t a;
-	const struct dabba_interface_settings *iface;
 
-	assert(msg);
-	assert(msg->msg_body.elem_nr <= DABBA_INTERFACE_SETTINGS_MAX_SIZE);
-	assert(msg->msg_body.type == DABBA_INTERFACE_SETTINGS);
+	assert(closure_data);
 
-	for (a = 0; a < msg->msg_body.elem_nr; a++) {
-		iface = &msg->msg_body.msg.interface_settings[a];
-		printf("    - name: %s\n", iface->name);
+	display_interface_settings_header();
+
+	for (a = 0; result && a < result->n_list; a++) {
+		settingsp = result->list[a];
+		printf("    - name: %s\n", settingsp->id->name);
 		printf("      settings:\n");
-		printf("        speed: %u\n",
-		       ethtool_cmd_speed(&iface->settings));
+		printf("        speed: %u\n", settingsp->speed);
 		printf("        duplex: %s\n",
-		       iface->settings.duplex == DUPLEX_FULL ? "full" : "half");
-		printf("        autoneg: %s\n",
-		       print_tf(iface->settings.autoneg == AUTONEG_ENABLE));
-		printf("        mtu: %u\n", iface->mtu);
-		printf("        tx qlen: %u\n", iface->tx_qlen);
+		       settingsp->duplex ? "full" : "half");
+		printf("        autoneg: %s\n", print_tf(settingsp->autoneg));
+		printf("        mtu: %u\n", settingsp->mtu);
+		printf("        tx qlen: %u\n", settingsp->tx_qlen);
 		printf("        port: %s\n",
-		       ethtool_port_str_get(iface->settings.port));
-		printf("        max rx packet: %u\n", iface->settings.maxrxpkt);
-		printf("        max tx packet: %u\n", iface->settings.maxtxpkt);
+		       ethtool_port_str_get(settingsp->port));
+		printf("        max rx packet: %u\n", settingsp->maxrxpkt);
+		printf("        max tx packet: %u\n", settingsp->maxtxpkt);
 	}
+
+	*status = 1;
+}
+
+static int prepare_interface_settings_query(int argc, char **argv,
+					    char **server_name,
+					    Dabba__InterfaceIdList * list)
+{
+	enum interface_pause_option {
+		OPT_SERVER_ID,
+		OPT_INTERFACE_ID,
+		OPT_HELP,
+	};
+	const struct option interface_pause_option[] = {
+		{"id", required_argument, NULL, OPT_INTERFACE_ID},
+		{"server", required_argument, NULL, OPT_SERVER_ID},
+		{NULL, 0, NULL, 0},
+	};
+	int ret, rc = 0;
+	Dabba__InterfaceId **idpp;
+
+	assert(list);
+
+	while ((ret =
+		getopt_long_only(argc, argv, "", interface_pause_option,
+				 NULL)) != EOF) {
+		switch (ret) {
+		case OPT_SERVER_ID:
+			*server_name = optarg;
+			break;
+		case OPT_INTERFACE_ID:
+			idpp =
+			    realloc(list->list,
+				    sizeof(*list->list) * (list->n_list + 1));
+
+			if (!idpp)
+				return ENOMEM;
+
+			list->list = idpp;
+			list->list[list->n_list] =
+			    malloc(sizeof(*list->list[list->n_list]));
+
+			if (!list->list[list->n_list])
+				return ENOMEM;
+
+			dabba__interface_id__init(list->list[list->n_list]);
+
+			list->list[list->n_list]->name = optarg;
+			list->n_list++;
+
+			break;
+		case OPT_HELP:
+		default:
+			show_usage(interface_pause_option);
+			rc = -1;
+			break;
+		}
+	}
+
+	return rc;
 }
 
 int cmd_interface_settings(int argc, const char **argv)
 {
-	struct dabba_ipc_msg msg;
+	ProtobufCService *service;
+	protobuf_c_boolean is_done = 0;
+	Dabba__InterfaceIdList id_list = DABBA__INTERFACE_ID_LIST__INIT;
+	char *server_name = NULL;
+	size_t a;
+	int rc;
 
 	assert(argc >= 0);
 	assert(argv);
 
-	memset(&msg, 0, sizeof(msg));
+	rc = prepare_interface_settings_query(argc, (char **)argv, &server_name,
+					      &id_list);
 
-	if (!dabba_operation_is_present(argc, optind))
-		return -1;
+	if (rc)
+		goto out;
 
-	msg.msg_body.type = DABBA_INTERFACE_SETTINGS;
-	msg.msg_body.op_type = dabba_operation_get(argv[optind++]);
-	msg.msg_body.method_type = MT_BULK;
+	service = dabba_rpc_client_connect(server_name);
 
-	display_interface_settings_header();
+	dabba__dabba_service__interface_settings_get(service, &id_list,
+						     interface_settings_list_print,
+						     &is_done);
 
-	return dabba_ipc_fetch_all(&msg, display_interface_settings);
+	dabba_rpc_call_is_done(&is_done);
+
+ out:
+	for (a = 0; a < id_list.n_list; a++)
+		free(id_list.list[a]);
+
+	free(id_list.list);
+
+	return rc;
 }
