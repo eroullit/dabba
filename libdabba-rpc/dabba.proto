@@ -116,6 +116,48 @@ message interface_coalesce
     optional uint32 tx_max_coalesced_frames_low = 23;
 }
 
+message interface_duplex_capabilites
+{
+    optional bool half = 1;
+    optional bool full = 2;
+}
+
+message interface_option_capabilites
+{
+    optional bool autoneg = 1;
+    optional bool pause = 2;
+}
+
+message interface_speed_capabilites
+{
+    optional interface_duplex_capabilites ethernet = 1;
+    optional interface_duplex_capabilites fast_ethernet = 2;
+    optional interface_duplex_capabilites gbps_ethernet = 3;
+/* HACK field name starting by a digit are refused */
+    optional interface_duplex_capabilites _10gbps_ethernet = 4;
+}
+
+message interface_capabilities
+{
+    required interface_id id = 1;
+    optional bool tp = 3;
+    optional bool aui = 4;
+    optional bool mii = 5;
+    optional bool fibre = 6;
+    optional bool bnc = 7;
+    optional interface_option_capabilites supported_opt = 8;
+    optional interface_option_capabilites advertising_opt = 9;
+    optional interface_option_capabilites lp_advertising_opt = 10;
+    optional interface_speed_capabilites supported_speed = 11;
+    optional interface_speed_capabilites advertising_speed = 12;
+    optional interface_speed_capabilites lp_advertising_speed = 13;
+}
+
+message interface_capabilities_list
+{
+    repeated interface_capabilities list = 1;
+}
+
 message interface_coalesce_list
 {
     repeated interface_coalesce list = 1;
@@ -134,5 +176,6 @@ service dabba_service
     rpc interface_offload_get (interface_id_list) returns (interface_offload_list);
     rpc interface_settings_get (interface_id_list) returns (interface_settings_list);
     rpc interface_coalesce_get (interface_id_list) returns (interface_coalesce_list);
+    rpc interface_capabilities_get (interface_id_list) returns (interface_capabilities_list);
     rpc interface_id_get (dummy) returns (interface_id_list);
 }
