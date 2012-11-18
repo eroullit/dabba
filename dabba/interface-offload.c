@@ -79,12 +79,12 @@ static int prepare_interface_offload_query(int argc, char **argv,
 					   char **server_name,
 					   Dabba__InterfaceIdList * list)
 {
-	enum interface_pause_option {
+	enum interface_offload_option {
 		OPT_SERVER_ID,
 		OPT_INTERFACE_ID,
 		OPT_HELP,
 	};
-	const struct option interface_pause_option[] = {
+	const struct option interface_offload_option[] = {
 		{"id", required_argument, NULL, OPT_INTERFACE_ID},
 		{"server", required_argument, NULL, OPT_SERVER_ID},
 		{NULL, 0, NULL, 0},
@@ -95,7 +95,7 @@ static int prepare_interface_offload_query(int argc, char **argv,
 	assert(list);
 
 	while ((ret =
-		getopt_long_only(argc, argv, "", interface_pause_option,
+		getopt_long_only(argc, argv, "", interface_offload_option,
 				 NULL)) != EOF) {
 		switch (ret) {
 		case OPT_SERVER_ID:
@@ -124,7 +124,7 @@ static int prepare_interface_offload_query(int argc, char **argv,
 			break;
 		case OPT_HELP:
 		default:
-			show_usage(interface_pause_option);
+			show_usage(interface_offload_option);
 			rc = -1;
 			break;
 		}
