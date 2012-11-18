@@ -28,12 +28,16 @@
 /* __LICENSE_HEADER_END__ */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <getopt.h>
 #include <assert.h>
+#include <errno.h>
 
 #include <dabbad/dabbad.h>
-#include <dabba/macros.h>
 #include <dabba/ipc.h>
+#include <dabba/rpc.h>
+#include <dabba/help.h>
+#include <dabba/macros.h>
 
 extern const char *ethtool_port_str_get(const uint8_t port);
 
@@ -43,109 +47,95 @@ static void display_interface_capabilities_header(void)
 	printf("  interfaces:\n");
 }
 
-static void display_interface_capabilities(const struct dabba_ipc_msg *const
-					   msg)
+static void interface_capabilities_list_print(const
+					      Dabba__InterfaceCapabilitiesList *
+					      result, void *closure_data)
 {
+	Dabba__InterfaceCapabilities *capabilitiesp;
+	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
 	size_t a;
-	const struct dabba_interface_settings *iface;
 
-	assert(msg);
-	assert(msg->msg_body.elem_nr <= DABBA_INTERFACE_SETTINGS_MAX_SIZE);
-	assert(msg->msg_body.type == DABBA_INTERFACE_SETTINGS);
+	assert(closure_data);
 
-	for (a = 0; a < msg->msg_body.elem_nr; a++) {
-		iface = &msg->msg_body.msg.interface_settings[a];
-		printf("    - name: %s\n", iface->name);
+	display_interface_capabilities_header();
+
+	for (a = 0; result && a < result->n_list; a++) {
+		capabilitiesp = result->list[a];
+		printf("    - name: %s\n", capabilitiesp->id->name);
 		printf("      capabilities:\n");
 		printf("        port: {%s: %s, %s: %s, %s: %s, %s: %s, %s: %s",
 		       ethtool_port_str_get(PORT_TP),
-		       print_tf(iface->settings.supported & SUPPORTED_TP),
+		       print_tf(capabilitiesp->tp),
 		       ethtool_port_str_get(PORT_AUI),
-		       print_tf(iface->settings.supported & SUPPORTED_AUI),
+		       print_tf(capabilitiesp->aui),
 		       ethtool_port_str_get(PORT_MII),
-		       print_tf(iface->settings.supported & SUPPORTED_MII),
+		       print_tf(capabilitiesp->mii),
 		       ethtool_port_str_get(PORT_FIBRE),
-		       print_tf(iface->settings.supported & SUPPORTED_FIBRE),
+		       print_tf(capabilitiesp->fibre),
 		       ethtool_port_str_get(PORT_BNC),
-		       print_tf(iface->settings.supported & SUPPORTED_BNC));
+		       print_tf(capabilitiesp->bnc));
 		printf("}\n");
-		printf("        supported:\n");
-		printf("          autoneg: %s\n",
-		       print_tf(iface->settings.supported & SUPPORTED_Autoneg));
-		printf("          pause: %s\n",
-		       print_tf(iface->settings.supported & SUPPORTED_Pause));
-		printf("          speed:\n");
-		printf("            10:    {half: %s, full: %s}\n"
-		       "            100:   {half: %s, full: %s}\n"
-		       "            1000:  {half: %s, full: %s}\n"
-		       "            10000: {half: false, full: %s}\n",
-		       print_tf(iface->settings.
-				supported & SUPPORTED_10baseT_Half),
-		       print_tf(iface->settings.
-				supported & SUPPORTED_10baseT_Full),
-		       print_tf(iface->settings.
-				supported & SUPPORTED_100baseT_Half),
-		       print_tf(iface->settings.
-				supported & SUPPORTED_100baseT_Full),
-		       print_tf(iface->settings.
-				supported & SUPPORTED_1000baseT_Half),
-		       print_tf(iface->settings.
-				supported & SUPPORTED_1000baseT_Full),
-		       print_tf(iface->settings.
-				supported & SUPPORTED_10000baseT_Full));
-		printf("        advertised:\n");
-		printf("          autoneg: %s\n",
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_Autoneg));
-		printf("          pause: %s\n",
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_Pause));
-		printf("          speed:\n");
-		printf("            10:    {half: %s, full: %s}\n"
-		       "            100:   {half: %s, full: %s}\n"
-		       "            1000:  {half: %s, full: %s}\n"
-		       "            10000: {half: false, full: %s}\n",
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_10baseT_Half),
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_10baseT_Full),
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_100baseT_Half),
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_100baseT_Full),
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_1000baseT_Half),
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_1000baseT_Full),
-		       print_tf(iface->settings.
-				advertising & ADVERTISED_10000baseT_Full));
-		printf("        link-partner advertised:\n");
-		printf("          autoneg: %s\n",
-		       print_tf(iface->settings.
-				lp_advertising & ADVERTISED_Autoneg));
-		printf("          pause: %s\n",
-		       print_tf(iface->settings.
-				lp_advertising & ADVERTISED_Pause));
-		printf("          speed:\n");
-		printf("            10:    {half: %s, full: %s}\n"
-		       "            100:   {half: %s, full: %s}\n"
-		       "            1000:  {half: %s, full: %s}\n"
-		       "            10000: {half: false, full: %s}\n",
-		       print_tf(iface->settings.lp_advertising &
-				ADVERTISED_10baseT_Half),
-		       print_tf(iface->settings.lp_advertising &
-				ADVERTISED_10baseT_Full),
-		       print_tf(iface->settings.lp_advertising &
-				ADVERTISED_100baseT_Half),
-		       print_tf(iface->settings.lp_advertising &
-				ADVERTISED_100baseT_Full),
-		       print_tf(iface->settings.lp_advertising &
-				ADVERTISED_1000baseT_Half),
-		       print_tf(iface->settings.lp_advertising &
-				ADVERTISED_1000baseT_Full),
-		       print_tf(iface->settings.lp_advertising &
-				ADVERTISED_10000baseT_Full));
 	}
+
+	*status = 1;
+}
+
+static int prepare_interface_capabilities_query(int argc, char **argv,
+						char **server_name,
+						Dabba__InterfaceIdList * list)
+{
+	enum interface_coalesce_option {
+		OPT_SERVER_ID,
+		OPT_INTERFACE_ID,
+		OPT_HELP,
+	};
+	const struct option interface_coalesce_option[] = {
+		{"id", required_argument, NULL, OPT_INTERFACE_ID},
+		{"server", required_argument, NULL, OPT_SERVER_ID},
+		{NULL, 0, NULL, 0},
+	};
+	int ret, rc = 0;
+	Dabba__InterfaceId **idpp;
+
+	assert(list);
+
+	while ((ret =
+		getopt_long_only(argc, argv, "", interface_coalesce_option,
+				 NULL)) != EOF) {
+		switch (ret) {
+		case OPT_SERVER_ID:
+			*server_name = optarg;
+			break;
+		case OPT_INTERFACE_ID:
+			idpp =
+			    realloc(list->list,
+				    sizeof(*list->list) * (list->n_list + 1));
+
+			if (!idpp)
+				return ENOMEM;
+
+			list->list = idpp;
+			list->list[list->n_list] =
+			    malloc(sizeof(*list->list[list->n_list]));
+
+			if (!list->list[list->n_list])
+				return ENOMEM;
+
+			dabba__interface_id__init(list->list[list->n_list]);
+
+			list->list[list->n_list]->name = optarg;
+			list->n_list++;
+
+			break;
+		case OPT_HELP:
+		default:
+			show_usage(interface_coalesce_option);
+			rc = -1;
+			break;
+		}
+	}
+
+	return rc;
 }
 
 /**
@@ -157,21 +147,35 @@ static void display_interface_capabilities(const struct dabba_ipc_msg *const
 
 int cmd_interface_capabilities(int argc, const char **argv)
 {
-	struct dabba_ipc_msg msg;
+	ProtobufCService *service;
+	protobuf_c_boolean is_done = 0;
+	Dabba__InterfaceIdList id_list = DABBA__INTERFACE_ID_LIST__INIT;
+	char *server_name = NULL;
+	size_t a;
+	int rc;
 
 	assert(argc >= 0);
 	assert(argv);
 
-	memset(&msg, 0, sizeof(msg));
+	rc = prepare_interface_capabilities_query(argc, (char **)argv,
+						  &server_name, &id_list);
 
-	if (!dabba_operation_is_present(argc, optind))
-		return -1;
+	if (rc)
+		goto out;
 
-	msg.msg_body.type = DABBA_INTERFACE_SETTINGS;
-	msg.msg_body.op_type = dabba_operation_get(argv[optind++]);
-	msg.msg_body.method_type = MT_BULK;
+	service = dabba_rpc_client_connect(server_name);
 
-	display_interface_capabilities_header();
+	dabba__dabba_service__interface_capabilities_get(service, &id_list,
+							 interface_capabilities_list_print,
+							 &is_done);
 
-	return dabba_ipc_fetch_all(&msg, display_interface_capabilities);
+	dabba_rpc_call_is_done(&is_done);
+
+ out:
+	for (a = 0; a < id_list.n_list; a++)
+		free(id_list.list[a]);
+
+	free(id_list.list);
+
+	return rc;
 }
