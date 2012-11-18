@@ -161,6 +161,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabba/dabba.h>
 #include <dabba/ipc.h>
 #include <dabba/rpc.h>
+#include <dabba/interface-list.h>
 #include <dabba/interface-status.h>
 #include <dabba/interface-settings.h>
 #include <dabba/interface-driver.h>
@@ -273,42 +274,6 @@ int cmd_interface_modify(int argc, const char **argv)
 		return rc;
 
 	return dabba_ipc_msg(&msg);
-}
-
-static void interface_list_print(const Dabba__InterfaceIdList * result,
-				 void *closure_data)
-{
-	size_t a;
-	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
-
-	printf("---\n");
-	printf("  interfaces:\n");
-
-	if (result)
-		for (a = 0; a < result->n_list && result->list[a]; a++)
-			printf("    - %s\n", result->list[a]->name);
-
-	*status = 1;
-}
-
-int cmd_interface_list(int argc, const char **argv)
-{
-	ProtobufCService *service;
-	protobuf_c_boolean is_done = 0;
-	Dabba__Dummy dummy = DABBA__DUMMY__INIT;
-
-	assert(argc >= 0);
-	assert(argv);
-
-	/* TODO Make server name configurable */
-	service = dabba_rpc_client_connect(NULL);
-
-	dabba__dabba_service__interface_id_get(service, &dummy,
-					       interface_list_print, &is_done);
-
-	dabba_rpc_call_is_done(&is_done);
-
-	return 0;
 }
 
 /**
