@@ -116,6 +116,11 @@ message interface_coalesce
     optional uint32 tx_max_coalesced_frames_low = 23;
 }
 
+message interface_coalesce_list
+{
+    repeated interface_coalesce list = 1;
+}
+
 message interface_duplex_capabilites
 {
     optional bool half = 1;
@@ -156,11 +161,6 @@ message interface_capabilities
 message interface_capabilities_list
 {
     repeated interface_capabilities list = 1;
-}
-
-message interface_coalesce_list
-{
-    repeated interface_coalesce list = 1;
 }
 
 message dummy
