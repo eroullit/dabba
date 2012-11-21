@@ -169,6 +169,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabba/interface-coalesce.h>
 #include <dabba/interface-pause.h>
 #include <dabba/interface-offload.h>
+#include <dabba/interface-statistics.h>
 #include <dabba/help.h>
 #include <dabba/macros.h>
 
@@ -300,6 +301,7 @@ int cmd_interface(int argc, const char **argv)
 		{"pause", cmd_interface_pause},
 		{"coalesce", cmd_interface_coalesce},
 		{"offload", cmd_interface_offload},
+		{"statistics", cmd_interface_statistics},
 		{"modify", cmd_interface_modify}
 	};
 
