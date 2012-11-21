@@ -194,6 +194,30 @@ message interface_statistics_list
     repeated interface_statistics list = 1;
 }
 
+message thread_id
+{
+    required uint64 id = 1;
+}
+
+message thread_list
+{
+    repeated thread_id list = 1;
+}
+
+message thread_settings
+{
+    required thread_id id = 1;
+    optional string cpu_set = 2;
+    optional int32 usage_flags = 3;
+    optional int32 sched_policy = 4;
+    optional int32 sched_priority = 5;
+}
+
+message thread_settings_list
+{
+    repeated thread_settings list = 1;
+}
+
 message dummy
 {
     optional int32 unused = 1;
