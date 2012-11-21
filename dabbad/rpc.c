@@ -38,6 +38,7 @@
 #include <dabbad/interface-settings.h>
 #include <dabbad/interface-coalesce.h>
 #include <dabbad/interface-capabilities.h>
+#include <dabbad/interface-statistics.h>
 
 static Dabba__DabbaService_Service dabba_service =
 DABBA__DABBA_SERVICE__INIT(dabbad_);
