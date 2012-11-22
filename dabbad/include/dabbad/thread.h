@@ -28,6 +28,7 @@
 #include <sched.h>
 #include <pthread.h>
 #include <sys/queue.h>
+#include <libdabba-rpc/dabba.pb-c.h>
 
 enum packet_thread_type {
 	CAPTURE_THREAD
@@ -64,5 +65,10 @@ int dabbad_thread_stop(struct packet_thread *pkt_thread);
 int dabbad_thread_list(struct dabba_ipc_msg *msg);
 int dabbad_thread_modify(struct dabba_ipc_msg *msg);
 int dabbad_thread_cap_list(struct dabba_ipc_msg *msg);
+
+void dabbad_thread_id_get(Dabba__DabbaService_Service * service,
+			  const Dabba__Dummy * dummy,
+			  Dabba__ThreadIdList_Closure closure,
+			  void *closure_data);
 
 #endif				/* DABBAD_THREAD_H */
