@@ -199,7 +199,7 @@ message thread_id
     required uint64 id = 1;
 }
 
-message thread_list
+message thread_id_list
 {
     repeated thread_id list = 1;
 }
