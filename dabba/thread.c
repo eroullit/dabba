@@ -436,6 +436,31 @@ static void thread_list_print(const Dabba__ThreadIdList * result,
 	*status = 1;
 }
 
+static void thread_settings_list_header_print(void)
+{
+	printf("---\n");
+	printf("  threads:\n");
+}
+
+static void thread_settings_list_print(const Dabba__ThreadSettingsList * result,
+				       void *closure_data)
+{
+	size_t a;
+	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
+
+	thread_settings_list_header_print();
+
+	for (a = 0; result && a < result->n_list; a++) {
+		printf("    - %" PRIu64 "\n", result->list[a]->id->id);
+		printf("      policy: %i\n", result->list[a]->sched_policy);
+		printf("      priority: %i\n", result->list[a]->sched_priority);
+		/* TODO map priority/policy protobuf enums to string */
+		/* TODO Add CPU set string output */
+	}
+
+	*status = 1;
+}
+
 static void display_thread_capabilities_header(void)
 {
 	printf("---\n");
@@ -542,6 +567,28 @@ int cmd_thread_list(int argc, const char **argv)
 	return 0;
 }
 
+int cmd_thread_settings(int argc, const char **argv)
+{
+	ProtobufCService *service;
+	protobuf_c_boolean is_done = 0;
+	Dabba__ThreadIdList id_list = DABBA__THREAD_ID_LIST__INIT;
+
+	assert(argc >= 0);
+	assert(argv);
+
+	/* TODO Allow thread id argument to filter output */
+	/* TODO Make server name configurable */
+	service = dabba_rpc_client_connect(NULL);
+
+	dabba__dabba_service__thread_settings_get(service, &id_list,
+						  thread_settings_list_print,
+						  &is_done);
+
+	dabba_rpc_call_is_done(&is_done);
+
+	return 0;
+}
+
 /**
  * \brief Prepare a command to modify scheduling paramters of a specific thread.
  * \param[in]           argc	        Argument counter
@@ -618,6 +665,7 @@ int cmd_thread(int argc, const char **argv)
 	static struct cmd_struct thread_commands[] = {
 		{"modify", cmd_thread_modify},
 		{"list", cmd_thread_list},
+		{"settings", cmd_thread_settings},
 		{"capabilities", cmd_thread_capabilities},
 	};
 
