@@ -506,3 +506,53 @@ int dabbad_thread_cap_list(struct dabba_ipc_msg *msg)
 
 	return 0;
 }
+
+void dabbad_thread_capabilities_get(Dabba__DabbaService_Service * service,
+				    const Dabba__Dummy * dummy,
+				    Dabba__ThreadCapabilitiesList_Closure
+				    closure, void *closure_data)
+{
+	Dabba__ThreadCapabilitiesList capabilities_list =
+	    DABBA__THREAD_CAPABILITIES_LIST__INIT;
+	Dabba__ThreadCapabilitiesList *capabilitiesp = NULL;
+	int policy[] = { SCHED_FIFO, SCHED_RR, SCHED_OTHER };
+	size_t a, psize = ARRAY_SIZE(policy);
+
+	assert(service);
+	assert(dummy);
+
+	capabilities_list.list = calloc(psize, sizeof(*capabilities_list.list));
+
+	if (!capabilities_list.list)
+		goto out;
+
+	capabilities_list.n_list = psize;
+
+	for (a = 0; a < capabilities_list.n_list; a++) {
+		capabilities_list.list[a] =
+		    malloc(sizeof(*capabilities_list.list[a]));
+
+		if (!capabilities_list.list[a])
+			goto out;
+
+		dabba__thread_capabilities__init(capabilities_list.list[a]);
+	}
+
+	for (a = 0; a < psize; a++) {
+		capabilities_list.list[a]->policy = policy[a];
+		capabilities_list.list[a]->prio_min =
+		    sched_get_priority_min(policy[a]);
+		capabilities_list.list[a]->prio_max =
+		    sched_get_priority_max(policy[a]);
+	}
+
+	capabilitiesp = &capabilities_list;
+
+ out:
+	closure(capabilitiesp, closure_data);
+
+	for (a = 0; a < psize; a++)
+		free(capabilities_list.list[a]);
+
+	free(capabilities_list.list);
+}

@@ -76,4 +76,9 @@ void dabbad_thread_settings_get(Dabba__DabbaService_Service * service,
 				Dabba__ThreadSettingsList_Closure closure,
 				void *closure_data);
 
+void dabbad_thread_capabilities_get(Dabba__DabbaService_Service * service,
+				    const Dabba__Dummy * dummy,
+				    Dabba__ThreadCapabilitiesList_Closure
+				    closure, void *closure_data);
+
 #endif				/* DABBAD_THREAD_H */
