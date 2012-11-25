@@ -208,9 +208,8 @@ message thread_settings
 {
     required thread_id id = 1;
     optional string cpu_set = 2;
-    optional int32 usage_flags = 3;
-    optional int32 sched_policy = 4;
-    optional int32 sched_priority = 5;
+    optional int32 sched_policy = 3;
+    optional int32 sched_priority = 4;
 }
 
 message thread_settings_list
@@ -235,4 +234,5 @@ service dabba_service
     rpc interface_statistics_get (interface_id_list) returns (interface_statistics_list);
     rpc interface_id_get (dummy) returns (interface_id_list);
     rpc thread_id_get (dummy) returns (thread_id_list);
+    rpc thread_settings_get (thread_id_list) returns (thread_settings_list);
 }
