@@ -191,6 +191,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabbad/thread.h>
 #include <dabba/dabba.h>
 #include <dabba/ipc.h>
+#include <dabba/rpc.h>
 #include <dabba/help.h>
 
 enum thread_modify_option {
@@ -370,6 +371,8 @@ static int str_to_cpu_affinity(char *str, cpu_set_t * mask)
 	return 0;
 }
 
+static void display_thread_cpu_affinity(const cpu_set_t * const cpu)
+    __attribute__ ((unused));
 /**
  * \brief Print a CPU number list from a CPU set.
  * \param[in]           cpu	        Pointer to a CPU set
@@ -413,32 +416,24 @@ static void display_thread_cpu_affinity(const cpu_set_t * const cpu)
 		}
 }
 
-static void display_thread_list_header(void)
+static void thread_list_header_print(void)
 {
 	printf("---\n");
 	printf("  threads:\n");
 }
 
-static void display_thread_list(const struct dabba_ipc_msg *const msg)
+static void thread_list_print(const Dabba__ThreadIdList * result,
+			      void *closure_data)
 {
-	const struct dabba_thread *thread_msg;
 	size_t a;
+	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
 
-	assert(msg);
-	assert(msg->msg_body.elem_nr <= DABBA_THREAD_MAX_SIZE);
+	thread_list_header_print();
 
-	for (a = 0; a < msg->msg_body.elem_nr; a++) {
-		thread_msg = &msg->msg_body.msg.thread[a];
-		printf("    - id: %" PRIu64 "\n", (uint64_t) thread_msg->id);
-		printf("      type: %s\n", thread_key_get(thread_msg->type));
-		printf("      scheduling policy: %s\n",
-		       sched_policy_key_get(thread_msg->sched_policy));
-		printf("      scheduling priority: %i\n",
-		       thread_msg->sched_prio);
-		printf("      cpu affinity: ");
-		display_thread_cpu_affinity(&thread_msg->cpu);
-		printf("\n");
-	}
+	for (a = 0; result && a < result->n_list; a++)
+		printf("    - %" PRIu64 "\n", result->list[a]->id);
+
+	*status = 1;
 }
 
 static void display_thread_capabilities_header(void)
@@ -529,20 +524,22 @@ static int prepare_thread_modify_query(int argc, char **argv,
 
 int cmd_thread_list(int argc, const char **argv)
 {
-	struct dabba_ipc_msg msg;
+	ProtobufCService *service;
+	protobuf_c_boolean is_done = 0;
+	Dabba__Dummy dummy = DABBA__DUMMY__INIT;
 
 	assert(argc >= 0);
 	assert(argv);
 
-	memset(&msg, 0, sizeof(msg));
+	/* TODO Make server name configurable */
+	service = dabba_rpc_client_connect(NULL);
 
-	msg.msg_body.type = DABBA_THREAD_LIST;
-	msg.msg_body.op_type = OP_GET;
-	msg.msg_body.method_type = MT_BULK;
+	dabba__dabba_service__thread_id_get(service, &dummy,
+					    thread_list_print, &is_done);
 
-	display_thread_list_header();
+	dabba_rpc_call_is_done(&is_done);
 
-	return dabba_ipc_fetch_all(&msg, display_thread_list);
+	return 0;
 }
 
 /**
