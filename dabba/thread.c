@@ -467,21 +467,24 @@ static void display_thread_capabilities_header(void)
 	printf("  thread capabilities:\n");
 }
 
-static void display_thread_capabilities(const struct dabba_ipc_msg *const msg)
+static void thread_capabilities_list_print(const Dabba__ThreadCapabilitiesList *
+					   result, void *closure_data)
 {
-	const struct dabba_thread_cap *thread_cap;
+	const Dabba__ThreadCapabilities *cap;
+	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
 	size_t a;
 
-	assert(msg);
-	assert(msg->msg_body.elem_nr <= DABBA_THREAD_CAP_MAX_SIZE);
+	display_thread_capabilities_header();
 
-	for (a = 0; a < msg->msg_body.elem_nr; a++) {
-		thread_cap = &msg->msg_body.msg.thread_cap[a];
-		printf("    %s:\n", sched_policy_key_get(thread_cap->policy));
+	for (a = 0; a < result->n_list; a++) {
+		cap = result->list[a];
+		printf("    %s:\n", sched_policy_key_get(cap->policy));
 		printf("        scheduling priority:\n");
-		printf("            minimum: %i\n", thread_cap->prio_min);
-		printf("            maximum: %i\n", thread_cap->prio_max);
+		printf("            minimum: %i\n", cap->prio_min);
+		printf("            maximum: %i\n", cap->prio_max);
 	}
+
+	*status = 1;
 }
 
 static struct option *thread_modify_options_get(void)
@@ -631,20 +634,23 @@ int cmd_thread_modify(int argc, const char **argv)
 
 int cmd_thread_capabilities(int argc, const char **argv)
 {
-	struct dabba_ipc_msg msg;
+	ProtobufCService *service;
+	protobuf_c_boolean is_done = 0;
+	Dabba__Dummy id_list = DABBA__DUMMY__INIT;
 
 	assert(argc >= 0);
 	assert(argv);
 
-	memset(&msg, 0, sizeof(msg));
+	/* TODO Make server name configurable */
+	service = dabba_rpc_client_connect(NULL);
 
-	msg.msg_body.type = DABBA_THREAD_CAP_LIST;
-	msg.msg_body.op_type = OP_GET;
-	msg.msg_body.method_type = MT_BULK;
+	dabba__dabba_service__thread_capabilities_get(service, &id_list,
+						      thread_capabilities_list_print,
+						      &is_done);
 
-	display_thread_capabilities_header();
+	dabba_rpc_call_is_done(&is_done);
 
-	return dabba_ipc_fetch_all(&msg, display_thread_capabilities);
+	return 0;
 }
 
 /**
