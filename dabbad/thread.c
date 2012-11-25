@@ -309,6 +309,9 @@ void dabbad_thread_id_get(Dabba__DabbaService_Service * service,
 		a++;
 	}
 
+	if (a == 0)
+		goto out;
+
 	id_list.list = calloc(a, sizeof(*id_list.list));
 
 	if (!id_list.list)
@@ -342,6 +345,82 @@ void dabbad_thread_id_get(Dabba__DabbaService_Service * service,
 		free(id_list.list[a]);
 
 	free(id_list.list);
+}
+
+void dabbad_thread_settings_get(Dabba__DabbaService_Service * service,
+				const Dabba__ThreadIdList * id_listp,
+				Dabba__ThreadSettingsList_Closure closure,
+				void *closure_data)
+{
+	Dabba__ThreadSettingsList settings_list =
+	    DABBA__THREAD_SETTINGS_LIST__INIT;
+	Dabba__ThreadSettingsList *settings_listp = NULL;
+	Dabba__ThreadSettings *settingsp;
+	struct packet_thread *pkt_thread;
+	size_t a = 0;
+
+	assert(service);
+	assert(id_listp);
+
+	for (pkt_thread = dabbad_thread_first(); pkt_thread;
+	     pkt_thread = dabbad_thread_next(pkt_thread)) {
+		a++;
+	}
+
+	if (a == 0)
+		goto out;
+
+	settings_list.list = calloc(a, sizeof(*settings_list.list));
+
+	if (!settings_list.list)
+		goto out;
+
+	settings_list.n_list = a;
+
+	for (a = 0; a < settings_list.n_list; a++) {
+		settings_list.list[a] = malloc(sizeof(*settings_list.list[a]));
+
+		if (!settings_list.list[a])
+			goto out;
+
+		settings_list.list[a]->id =
+		    malloc(sizeof(*settings_list.list[a]->id));
+
+		if (!settings_list.list[a]->id)
+			goto out;
+
+		dabba__thread_settings__init(settings_list.list[a]);
+		dabba__thread_id__init(settings_list.list[a]->id);
+	}
+
+	settingsp = *settings_list.list;
+
+	for (pkt_thread = dabbad_thread_first(); pkt_thread;
+	     pkt_thread = dabbad_thread_next(pkt_thread)) {
+		settingsp->has_sched_policy = settingsp->has_sched_priority = 1;
+		settingsp->id->id = (uint64_t) pkt_thread->id;
+		dabbad_thread_sched_param_get(pkt_thread,
+					      (int16_t *) &
+					      settingsp->sched_priority,
+					      (int16_t *) &
+					      settingsp->sched_policy);
+		/* TODO prepare cpu set string */
+		settingsp++;
+	}
+
+	settings_listp = &settings_list;
+
+ out:
+	closure(settings_listp, closure_data);
+
+	for (a = 0; a < settings_list.n_list; a++) {
+		if (settings_list.list[a])
+			free(settings_list.list[a]->id);
+
+		free(settings_list.list[a]);
+	}
+
+	free(settings_list.list);
 }
 
 /**
