@@ -217,6 +217,18 @@ message thread_settings_list
     repeated thread_settings list = 1;
 }
 
+message thread_capabilities
+{
+    required int32 policy = 1;
+    required int32 prio_min = 2;
+    required int32 prio_max = 3;
+}
+
+message thread_capabilities_list
+{
+    repeated thread_capabilities list = 1;
+}
+
 message dummy
 {
     optional int32 unused = 1;
@@ -235,4 +247,5 @@ service dabba_service
     rpc interface_id_get (dummy) returns (interface_id_list);
     rpc thread_id_get (dummy) returns (thread_id_list);
     rpc thread_settings_get (thread_id_list) returns (thread_settings_list);
+    rpc thread_capabilities_get (dummy) returns (thread_capabilities_list);
 }
