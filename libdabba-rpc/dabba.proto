@@ -234,6 +234,20 @@ message dummy
     optional int32 unused = 1;
 }
 
+message capture_settings
+{
+    required thread_id id = 1;
+    optional string pcap = 2;
+    optional string interface = 3;
+    optional uint64 frame_nr = 4;
+    optional uint64 frame_size = 5;
+}
+
+message capture_settings_list
+{
+    repeated capture_settings list = 1;
+}
+
 service dabba_service
 {
     rpc interface_status_get (interface_id_list) returns (interface_status_list);
@@ -248,4 +262,5 @@ service dabba_service
     rpc thread_id_get (dummy) returns (thread_id_list);
     rpc thread_settings_get (thread_id_list) returns (thread_settings_list);
     rpc thread_capabilities_get (dummy) returns (thread_capabilities_list);
+    rpc capture_settings_get (thread_id_list) returns (capture_settings_list);
 }
