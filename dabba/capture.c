@@ -153,6 +153,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabba/dabba.h>
 #include <dabba/help.h>
 #include <dabba/ipc.h>
+#include <dabba/rpc.h>
 #include <dabba/thread.h>
 #include <dabbad/dabbad.h>
 
@@ -224,30 +225,32 @@ static int prepare_capture_start_query(int argc, char **argv,
 	return rc;
 }
 
-static void display_capture_list_msg_header(void)
+static void display_capture_list_header(void)
 {
 	printf("---\n");
 	printf("  captures:\n");
 }
 
-static void display_capture_list(const struct dabba_ipc_msg *const msg)
+static void capture_settings_list_print(const Dabba__CaptureSettingsList *
+					result, void *closure_data)
 {
-	const struct dabba_capture *capture_msg;
+	const Dabba__CaptureSettings *capture;
+	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
 	size_t a;
 
-	assert(msg);
-	assert(msg->msg_body.elem_nr <= DABBA_CAPTURE_MAX_SIZE);
+	display_capture_list_header();
 
-	for (a = 0; a < msg->msg_body.elem_nr; a++) {
-		capture_msg = &msg->msg_body.msg.capture[a];
-		printf("    - id: %" PRIu64 "\n", (uint64_t) capture_msg->id);
+	for (a = 0; a < result->n_list; a++) {
+		capture = result->list[a];
+		printf("    - id: %" PRIu64 "\n", (uint64_t) capture->id->id);
 		printf("      packet mmap size: %" PRIu64 "\n",
-		       capture_msg->frame_nr * capture_msg->frame_size);
-		printf("      frame number: %" PRIu64 "\n",
-		       capture_msg->frame_nr);
-		printf("      pcap: %s\n", capture_msg->pcap_name);
-		printf("      interface: %s\n", capture_msg->dev_name);
+		       capture->frame_nr * capture->frame_size);
+		printf("      frame number: %" PRIu64 "\n", capture->frame_nr);
+		printf("      pcap: %s\n", capture->pcap);
+		printf("      interface: %s\n", capture->interface);
 	}
+
+	*status = 1;
 }
 
 /**
@@ -290,22 +293,25 @@ int cmd_capture_start(int argc, const char **argv)
  * \return 0 on success, else on failure.
  */
 
-int cmd_capture_list(int argc, const char **argv)
+int cmd_capture_settings_list(int argc, const char **argv)
 {
-	struct dabba_ipc_msg msg;
+	ProtobufCService *service;
+	protobuf_c_boolean is_done = 0;
+	Dabba__ThreadIdList id_list = DABBA__THREAD_ID_LIST__INIT;
 
 	assert(argc >= 0);
 	assert(argv);
 
-	memset(&msg, 0, sizeof(msg));
+	/* TODO Make server name configurable */
+	service = dabba_rpc_client_connect(NULL);
 
-	msg.msg_body.type = DABBA_CAPTURE_LIST;
-	msg.msg_body.op_type = OP_GET;
-	msg.msg_body.method_type = MT_BULK;
+	dabba__dabba_service__capture_settings_get(service, &id_list,
+						   capture_settings_list_print,
+						   &is_done);
 
-	display_capture_list_msg_header();
+	dabba_rpc_call_is_done(&is_done);
 
-	return dabba_ipc_fetch_all(&msg, display_capture_list);
+	return 0;
 }
 
 static struct option *capture_stop_options_get(void)
@@ -391,7 +397,7 @@ int cmd_capture(int argc, const char **argv)
 	const char *cmd = argv[0];
 	size_t i;
 	static struct cmd_struct capture_commands[] = {
-		{"list", cmd_capture_list},
+		{"list", cmd_capture_settings_list},
 		{"start", cmd_capture_start},
 		{"stop", cmd_capture_stop},
 	};
