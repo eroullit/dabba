@@ -27,6 +27,11 @@
 
 /* __LICENSE_HEADER_END__ */
 
+/* HACK prevent libnl3 include clash between <net/if.h> and <linux/if.h> */
+#ifndef _LINUX_IF_H
+#define _LINUX_IF_H
+#endif				/* _LINUX_IF_H */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -36,12 +41,15 @@
 #include <sys/queue.h>
 #include <arpa/inet.h>
 #include <linux/if_ether.h>
+#include <netlink/cache.h>
+#include <netlink/route/link.h>
 
 #include <libdabba/macros.h>
 #include <libdabba/interface.h>
 #include <libdabba/packet_rx.h>
 #include <libdabba/pcap.h>
 #include <dabbad/dabbad.h>
+#include <dabbad/interface.h>
 #include <dabbad/capture.h>
 #include <dabbad/misc.h>
 
@@ -233,4 +241,94 @@ int dabbad_capture_stop(struct dabba_ipc_msg *msg)
 	}
 
 	return rc;
+}
+
+void dabbad_capture_settings_get(Dabba__DabbaService_Service * service,
+				 const Dabba__ThreadIdList * id_listp,
+				 Dabba__CaptureSettingsList_Closure closure,
+				 void *closure_data)
+{
+	Dabba__CaptureSettingsList capture_list =
+	    DABBA__CAPTURE_SETTINGS_LIST__INIT;
+	Dabba__CaptureSettingsList *capturep = NULL;
+	struct packet_capture_thread *pkt_capture;
+	struct packet_thread *pkt_thread;
+	struct nl_sock *sock;
+	struct nl_cache *cache;
+	size_t a = 0;
+	char pcap_path[NAME_MAX], ifname[IFNAMSIZ];
+
+	assert(service);
+	assert(id_listp);
+
+	cache = link_cache_alloc(&sock);
+
+	if (!cache)
+		goto out;
+
+	for (pkt_thread = dabbad_thread_type_first(CAPTURE_THREAD); pkt_thread;
+	     pkt_thread = dabbad_thread_type_next(pkt_thread, CAPTURE_THREAD)) {
+		a++;
+	}
+
+	capture_list.list = calloc(a, sizeof(*capture_list.list));
+
+	if (!capture_list.list)
+		goto out;
+
+	capture_list.n_list = a;
+
+	for (a = 0; a < capture_list.n_list; a++) {
+		capture_list.list[a] = malloc(sizeof(*capture_list.list[a]));
+
+		if (!capture_list.list[a])
+			goto out;
+
+		dabba__capture_settings__init(capture_list.list[a]);
+
+		capture_list.list[a]->id =
+		    malloc(sizeof(*capture_list.list[a]->id));
+
+		if (!capture_list.list[a]->id)
+			goto out;
+
+		dabba__thread_id__init(capture_list.list[a]->id);
+	}
+
+	for (pkt_thread = dabbad_thread_type_first(CAPTURE_THREAD); pkt_thread;
+	     pkt_thread = dabbad_thread_type_next(pkt_thread, CAPTURE_THREAD)) {
+		pkt_capture = dabbad_capture_thread_get(pkt_thread);
+
+		capture_list.list[a]->has_frame_nr =
+		    capture_list.list[a]->has_frame_size = 1;
+		capture_list.list[a]->frame_nr =
+		    pkt_capture->rx.pkt_mmap.layout.tp_frame_nr;
+		capture_list.list[a]->frame_size =
+		    pkt_capture->rx.pkt_mmap.layout.tp_frame_size;
+		capture_list.list[a]->id->id =
+		    (uint64_t) pkt_capture->thread.id;
+
+		fd_to_path(pkt_capture->rx.pcap_fd, pcap_path,
+			   sizeof(pcap_path));
+		rtnl_link_i2name(cache, pkt_capture->rx.pkt_mmap.ifindex,
+				 ifname, sizeof(ifname));
+
+		capture_list.list[a]->pcap = pcap_path;
+		capture_list.list[a]->interface = ifname;
+	}
+
+	capturep = &capture_list;
+
+ out:
+	closure(capturep, closure_data);
+
+	for (a = 0; a < capture_list.n_list; a++) {
+		if (capture_list.list[a])
+			free(capture_list.list[a]->id);
+
+		free(capture_list.list[a]);
+	}
+
+	free(capture_list.list);
+	link_cache_destroy(sock, cache);
 }

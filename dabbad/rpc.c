@@ -40,6 +40,7 @@
 #include <dabbad/interface-capabilities.h>
 #include <dabbad/interface-statistics.h>
 #include <dabbad/thread.h>
+#include <dabbad/capture.h>
 
 static Dabba__DabbaService_Service dabba_service =
 DABBA__DABBA_SERVICE__INIT(dabbad_);

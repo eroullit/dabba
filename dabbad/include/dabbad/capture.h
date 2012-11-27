@@ -38,4 +38,9 @@ int dabbad_capture_start(struct dabba_ipc_msg *msg);
 int dabbad_capture_list(struct dabba_ipc_msg *msg);
 int dabbad_capture_stop(struct dabba_ipc_msg *msg);
 
+void dabbad_capture_settings_get(Dabba__DabbaService_Service * service,
+				 const Dabba__ThreadIdList * id_listp,
+				 Dabba__CaptureSettingsList_Closure closure,
+				 void *closure_data);
+
 #endif				/* CAPTURE_H */
