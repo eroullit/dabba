@@ -219,8 +219,7 @@ static int prepare_capture_start_query(int argc, char **argv,
 	return rc;
 }
 
-static void capture_add_print(const Dabba__ThreadId * result,
-			      void *closure_data)
+static void capture_add_print(const Dabba__Dummy * result, void *closure_data)
 {
 	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
 
@@ -245,7 +244,7 @@ static void capture_settings_list_print(const Dabba__CaptureSettingsList *
 
 	display_capture_list_header();
 
-	for (a = 0; a < result->n_list; a++) {
+	for (a = 0; result && a < result->n_list; a++) {
 		capture = result->list[a];
 		printf("    - id: %" PRIu64 "\n", (uint64_t) capture->id->id);
 		printf("      packet mmap size: %" PRIu64 "\n",
@@ -270,12 +269,9 @@ int cmd_capture_start(int argc, const char **argv)
 	ProtobufCService *service;
 	protobuf_c_boolean is_done = 0;
 	Dabba__CaptureSettings capture_settings = DABBA__CAPTURE_SETTINGS__INIT;
-	Dabba__ThreadId dummy = DABBA__THREAD_ID__INIT;
 
 	assert(argc >= 0);
 	assert(argv);
-
-	capture_settings.id = &dummy;
 
 	prepare_capture_start_query(argc, (char **)argv, &capture_settings);
 

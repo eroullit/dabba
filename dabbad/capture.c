@@ -238,10 +238,9 @@ int dabbad_capture_stop(struct dabba_ipc_msg *msg)
 
 void dabbad_capture_start(Dabba__DabbaService_Service * service,
 			  const Dabba__CaptureSettings * capturep,
-			  Dabba__ThreadId_Closure closure, void *closure_data)
+			  Dabba__Dummy_Closure closure, void *closure_data)
 {
-	Dabba__ThreadId id = DABBA__THREAD_ID__INIT;
-	Dabba__ThreadId *idp = NULL;
+	Dabba__Dummy dummy = DABBA__DUMMY__INIT;
 	struct packet_capture_thread *pkt_capture;
 	int sock, rc;
 
@@ -282,13 +281,10 @@ void dabbad_capture_start(Dabba__DabbaService_Service * service,
 		packet_mmap_destroy(&pkt_capture->rx.pkt_mmap);
 		free(pkt_capture);
 		close(sock);
-	} else {
-		id.id = pkt_capture->thread.id;
-		idp = &id;
 	}
 
  out:
-	closure(idp, closure_data);
+	closure(&dummy, closure_data);
 }
 
 void dabbad_capture_settings_get(Dabba__DabbaService_Service * service,
