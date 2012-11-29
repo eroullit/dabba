@@ -183,38 +183,32 @@ static struct option *capture_start_options_get(void)
 }
 
 static int prepare_capture_start_query(int argc, char **argv,
-				       struct dabba_capture *capture_msg)
+				       Dabba__CaptureSettings * settingsp)
 {
 	int ret, rc = 0;
 
-	assert(capture_msg);
+	assert(settingsp);
 
 	/* Assume conservative values for now */
-	capture_msg->frame_size = PACKET_MMAP_ETH_FRAME_LEN;
-	capture_msg->frame_nr = DEFAULT_CAPTURE_FRAME_NUMBER;
+	settingsp->has_frame_nr = settingsp->has_frame_size = 1;
+	settingsp->frame_size = PACKET_MMAP_ETH_FRAME_LEN;
+	settingsp->frame_nr = DEFAULT_CAPTURE_FRAME_NUMBER;
 
 	while ((ret =
 		getopt_long_only(argc, argv, "", capture_start_options_get(),
 				 NULL)) != EOF) {
 		switch (ret) {
 		case OPT_CAPTURE_INTERFACE:
-			if (strlen(optarg) >= sizeof(capture_msg->dev_name))
-				rc = EINVAL;
-
-			strncpy(capture_msg->dev_name, optarg,
-				sizeof(capture_msg->dev_name));
+			settingsp->interface = optarg;
 			break;
 
 		case OPT_CAPTURE_PCAP:
-			if (strlen(optarg) >= sizeof(capture_msg->pcap_name))
-				rc = EINVAL;
-
-			strncpy(capture_msg->pcap_name, optarg,
-				sizeof(capture_msg->pcap_name));
+			settingsp->pcap = optarg;
 			break;
 		case OPT_CAPTURE_FRAME_NUMBER:
-			capture_msg->frame_nr = strtoull(optarg, NULL, 10);
+			settingsp->frame_nr = strtoull(optarg, NULL, 10);
 			break;
+			/*TODO make frame size configurable */
 		default:
 			show_usage(capture_start_options_get());
 			rc = -1;
@@ -223,6 +217,17 @@ static int prepare_capture_start_query(int argc, char **argv,
 	}
 
 	return rc;
+}
+
+static void capture_add_print(const Dabba__ThreadId * result,
+			      void *closure_data)
+{
+	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
+
+	assert(result);
+	assert(closure_data);
+
+	*status = 1;
 }
 
 static void display_capture_list_header(void)
@@ -262,28 +267,28 @@ static void capture_settings_list_print(const Dabba__CaptureSettingsList *
 
 int cmd_capture_start(int argc, const char **argv)
 {
-	struct dabba_ipc_msg msg;
-	int rc;
+	ProtobufCService *service;
+	protobuf_c_boolean is_done = 0;
+	Dabba__CaptureSettings capture_settings = DABBA__CAPTURE_SETTINGS__INIT;
+	Dabba__ThreadId dummy = DABBA__THREAD_ID__INIT;
 
 	assert(argc >= 0);
 	assert(argv);
 
-	memset(&msg, 0, sizeof(msg));
+	capture_settings.id = &dummy;
 
-	msg.msg_body.type = DABBA_CAPTURE_START;
-	msg.msg_body.op_type = OP_MODIFY;
-	msg.msg_body.method_type = MT_FILTERED;
+	prepare_capture_start_query(argc, (char **)argv, &capture_settings);
 
-	rc = prepare_capture_start_query(argc, (char **)argv,
-					 msg.msg_body.msg.capture);
+	/* TODO Make server name configurable */
+	service = dabba_rpc_client_connect(NULL);
 
-	if (rc)
-		return rc;
+	/* TODO Print create capture thread id ? */
+	dabba__dabba_service__capture_start(service, &capture_settings,
+					    capture_add_print, &is_done);
 
-	/* For now, just one capture request at a time */
-	msg.msg_body.elem_nr = 1;
+	dabba_rpc_call_is_done(&is_done);
 
-	return dabba_ipc_msg(&msg);
+	return 0;
 }
 
 /**
