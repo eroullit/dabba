@@ -236,7 +236,7 @@ message dummy
 
 message capture_settings
 {
-    required thread_id id = 1;
+    optional thread_id id = 1;
     optional string pcap = 2;
     optional string interface = 3;
     optional uint64 frame_nr = 4;
