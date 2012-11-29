@@ -105,7 +105,8 @@ static int dabbad_handle_filter_modify_msg(struct dabba_ipc_msg *msg)
 		rc = dabbad_interface_modify(msg);
 		break;
 	case DABBA_CAPTURE_START:
-		rc = dabbad_capture_start(msg);
+		rc = ENOSYS;
+		//rc = dabbad_capture_start(msg);
 		break;
 	case DABBA_CAPTURE_STOP:
 		rc = dabbad_capture_stop(msg);

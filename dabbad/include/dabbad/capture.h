@@ -26,6 +26,7 @@
 
 #include <dabbad/thread.h>
 #include <libdabba/packet_rx.h>
+#include <libdabba-rpc/dabba.pb-c.h>
 
 struct packet_capture_thread {
 	struct packet_rx rx;
@@ -34,9 +35,13 @@ struct packet_capture_thread {
 
 struct packet_thread *dabbad_capture_thread_data_get(const pthread_t thread_id);
 
-int dabbad_capture_start(struct dabba_ipc_msg *msg);
+//int dabbad_capture_start(struct dabba_ipc_msg *msg);
 int dabbad_capture_list(struct dabba_ipc_msg *msg);
 int dabbad_capture_stop(struct dabba_ipc_msg *msg);
+
+void dabbad_capture_start(Dabba__DabbaService_Service * service,
+			  const Dabba__CaptureSettings * capturep,
+			  Dabba__ThreadId_Closure closure, void *closure_data);
 
 void dabbad_capture_settings_get(Dabba__DabbaService_Service * service,
 				 const Dabba__ThreadIdList * id_listp,

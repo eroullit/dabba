@@ -67,31 +67,22 @@
  *      - The memory page order must be greater than zero
  */
 
-static int capture_msg_is_valid(struct dabba_ipc_msg *msg)
+static int capture_settings_are_valid(const Dabba__CaptureSettings * capturep)
 {
-	struct dabba_capture *capture_msg = msg->msg_body.msg.capture;
 
-	if (!msg)
-		return 0;
+	assert(capturep);
 
 	/* Names are empty */
-	if (strlen(capture_msg->dev_name) == 0)
+	if (!capturep->interface || strlen(capturep->interface) == 0)
 		return 0;
 
-	if (strlen(capture_msg->pcap_name) == 0)
+	if (!capturep->pcap || strlen(capturep->pcap) == 0)
 		return 0;
 
-	/* Names are too long / not terminated properly */
-	if (strlen(capture_msg->dev_name) >= sizeof(capture_msg->dev_name))
+	if (!packet_mmap_frame_size_is_valid(capturep->frame_size))
 		return 0;
 
-	if (strlen(capture_msg->pcap_name) >= sizeof(capture_msg->pcap_name))
-		return 0;
-
-	if (!packet_mmap_frame_size_is_valid(capture_msg->frame_size))
-		return 0;
-
-	if (!capture_msg->frame_nr)
+	if (!capturep->frame_nr)
 		return 0;
 
 	return 1;
@@ -117,6 +108,7 @@ static struct packet_capture_thread *dabbad_capture_thread_get(struct packet_thr
  * \warning This function requires the CAP_NET_RAW capability
  */
 
+#if 0
 int dabbad_capture_start(struct dabba_ipc_msg *msg)
 {
 	struct packet_capture_thread *pkt_capture;
@@ -162,6 +154,7 @@ int dabbad_capture_start(struct dabba_ipc_msg *msg)
 
 	return rc;
 }
+#endif
 
 /**
  * \brief List currently running capture thread
@@ -241,6 +234,61 @@ int dabbad_capture_stop(struct dabba_ipc_msg *msg)
 	}
 
 	return rc;
+}
+
+void dabbad_capture_start(Dabba__DabbaService_Service * service,
+			  const Dabba__CaptureSettings * capturep,
+			  Dabba__ThreadId_Closure closure, void *closure_data)
+{
+	Dabba__ThreadId id = DABBA__THREAD_ID__INIT;
+	Dabba__ThreadId *idp = NULL;
+	struct packet_capture_thread *pkt_capture;
+	int sock, rc;
+
+	assert(service);
+	assert(capturep);
+
+	if (!capture_settings_are_valid(capturep))
+		goto out;
+
+	sock = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
+
+	if (sock < 0)
+		goto out;
+
+	pkt_capture = calloc(1, sizeof(*pkt_capture));
+
+	if (!pkt_capture) {
+		free(pkt_capture);
+		close(sock);
+		goto out;
+	}
+
+	pkt_capture->rx.pcap_fd = pcap_create(capturep->pcap, LINKTYPE_EN10MB);
+
+	rc = packet_mmap_create(&pkt_capture->rx.pkt_mmap, capturep->interface,
+				sock, PACKET_MMAP_RX, capturep->frame_size,
+				capturep->frame_nr);
+
+	if (rc) {
+		free(pkt_capture);
+		close(sock);
+		goto out;
+	}
+
+	rc = dabbad_thread_start(&pkt_capture->thread, packet_rx, pkt_capture);
+
+	if (rc) {
+		packet_mmap_destroy(&pkt_capture->rx.pkt_mmap);
+		free(pkt_capture);
+		close(sock);
+	} else {
+		id.id = pkt_capture->thread.id;
+		idp = &id;
+	}
+
+ out:
+	closure(idp, closure_data);
 }
 
 void dabbad_capture_settings_get(Dabba__DabbaService_Service * service,
