@@ -300,7 +300,6 @@ void dabbad_capture_settings_get(Dabba__DabbaService_Service * service,
 	struct nl_sock *sock;
 	struct nl_cache *cache;
 	size_t a = 0;
-	char pcap_path[NAME_MAX], ifname[IFNAMSIZ];
 
 	assert(service);
 	assert(id_listp);
@@ -332,15 +331,22 @@ void dabbad_capture_settings_get(Dabba__DabbaService_Service * service,
 
 		capture_list.list[a]->id =
 		    malloc(sizeof(*capture_list.list[a]->id));
+		capture_list.list[a]->pcap =
+		    calloc(NAME_MAX, sizeof(*capture_list.list[a]->pcap));
+		capture_list.list[a]->interface =
+		    calloc(IFNAMSIZ, sizeof(*capture_list.list[a]->interface));
 
-		if (!capture_list.list[a]->id)
+		if (!capture_list.list[a]->id || !capture_list.list[a]->pcap
+		    || !capture_list.list[a]->interface)
 			goto out;
 
 		dabba__thread_id__init(capture_list.list[a]->id);
 	}
 
-	for (pkt_thread = dabbad_thread_type_first(CAPTURE_THREAD); pkt_thread;
-	     pkt_thread = dabbad_thread_type_next(pkt_thread, CAPTURE_THREAD)) {
+	for (a = 0, pkt_thread = dabbad_thread_type_first(CAPTURE_THREAD);
+	     pkt_thread;
+	     a++, pkt_thread =
+	     dabbad_thread_type_next(pkt_thread, CAPTURE_THREAD)) {
 		pkt_capture = dabbad_capture_thread_get(pkt_thread);
 
 		capture_list.list[a]->has_frame_nr =
@@ -352,13 +358,12 @@ void dabbad_capture_settings_get(Dabba__DabbaService_Service * service,
 		capture_list.list[a]->id->id =
 		    (uint64_t) pkt_capture->thread.id;
 
-		fd_to_path(pkt_capture->rx.pcap_fd, pcap_path,
-			   sizeof(pcap_path));
+		fd_to_path(pkt_capture->rx.pcap_fd, capture_list.list[a]->pcap,
+			   NAME_MAX * sizeof(*capture_list.list[a]->pcap));
 		rtnl_link_i2name(cache, pkt_capture->rx.pkt_mmap.ifindex,
-				 ifname, sizeof(ifname));
-
-		capture_list.list[a]->pcap = pcap_path;
-		capture_list.list[a]->interface = ifname;
+				 capture_list.list[a]->interface,
+				 IFNAMSIZ *
+				 sizeof(*capture_list.list[a]->interface));
 	}
 
 	capturep = &capture_list;
@@ -367,8 +372,11 @@ void dabbad_capture_settings_get(Dabba__DabbaService_Service * service,
 	closure(capturep, closure_data);
 
 	for (a = 0; a < capture_list.n_list; a++) {
-		if (capture_list.list[a])
+		if (capture_list.list[a]) {
 			free(capture_list.list[a]->id);
+			free(capture_list.list[a]->pcap);
+			free(capture_list.list[a]->interface);
+		}
 
 		free(capture_list.list[a]);
 	}
