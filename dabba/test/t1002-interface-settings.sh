@@ -38,7 +38,7 @@ sys_class_net_get()
 #"
 
 test_expect_success "Setup: Start dabbad" "
-    '$DABBAD_PATH'/dabbad --daemonize
+    '$DABBAD_PATH'/dabbad --daemonize --rpc
 "
 
 test_expect_success 'invoke dabba interface settings command with dabbad' "

@@ -26,7 +26,7 @@ test_description='Test dabba interface pause command'
 #"
 
 test_expect_success "Setup: Start dabbad" "
-    '$DABBAD_PATH'/dabbad --daemonize
+    '$DABBAD_PATH'/dabbad --daemonize --rpc
 "
 
 test_expect_success 'invoke dabba interface pause command with dabbad' "
