@@ -80,14 +80,12 @@ for i in `seq 0 $(($(number_of_interface_get)-1))`
 do
     test_expect_success PYTHON_YAML "Query interface status output" "
         dictkeys2values interfaces $i name < parsed > interface_name &&
-        dictkeys2values interfaces $i status < parsed > interface_status &&
-        dictkeys2values interfaces $i statistics < parsed > interface_statistics
+        dictkeys2values interfaces $i status < parsed > interface_status
     "
 
     test_expect_success PYTHON_YAML "Check interface #$(($i+1)) output" "
         grep -wq -f interface_name /proc/net/dev &&
-        test -n interface_status &&
-        test -n interface_statistics
+        test -n interface_status
     "
 done
 
