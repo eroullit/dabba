@@ -219,7 +219,7 @@ static int prepare_capture_start_query(int argc, char **argv,
 	return rc;
 }
 
-static void capture_add_print(const Dabba__Dummy * result, void *closure_data)
+static void capture_dummy_print(const Dabba__Dummy * result, void *closure_data)
 {
 	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
 
@@ -280,7 +280,7 @@ int cmd_capture_start(int argc, const char **argv)
 
 	/* TODO Print create capture thread id ? */
 	dabba__dabba_service__capture_start(service, &capture_settings,
-					    capture_add_print, &is_done);
+					    capture_dummy_print, &is_done);
 
 	dabba_rpc_call_is_done(&is_done);
 
@@ -326,18 +326,18 @@ static struct option *capture_stop_options_get(void)
 }
 
 static int prepare_capture_stop_query(int argc, char **argv,
-				      struct dabba_capture *capture_msg)
+				      Dabba__ThreadId * idp)
 {
 	int ret, rc = 0;
 
-	assert(capture_msg);
+	assert(idp);
 
 	while ((ret =
 		getopt_long_only(argc, argv, "", capture_stop_options_get(),
 				 NULL)) != EOF) {
 		switch (ret) {
 		case OPT_CAPTURE_ID:
-			capture_msg->id = strtoull(optarg, NULL, 10);
+			idp->id = strtoull(optarg, NULL, 10);
 			break;
 		default:
 			show_usage(capture_stop_options_get());
@@ -358,28 +358,25 @@ static int prepare_capture_stop_query(int argc, char **argv,
 
 int cmd_capture_stop(int argc, const char **argv)
 {
-	struct dabba_ipc_msg msg;
-	int rc;
+	ProtobufCService *service;
+	protobuf_c_boolean is_done = 0;
+	Dabba__ThreadId id = DABBA__THREAD_ID__INIT;
 
 	assert(argc >= 0);
 	assert(argv);
 
-	memset(&msg, 0, sizeof(msg));
+	prepare_capture_stop_query(argc, (char **)argv, &id);
 
-	msg.msg_body.type = DABBA_CAPTURE_STOP;
-	msg.msg_body.op_type = OP_MODIFY;
-	msg.msg_body.method_type = MT_FILTERED;
+	/* TODO Make server name configurable */
+	service = dabba_rpc_client_connect(NULL);
 
-	rc = prepare_capture_stop_query(argc, (char **)argv,
-					msg.msg_body.msg.capture);
+	/* TODO Print create capture thread id ? */
+	dabba__dabba_service__capture_stop(service, &id,
+					   capture_dummy_print, &is_done);
 
-	if (rc)
-		return rc;
+	dabba_rpc_call_is_done(&is_done);
 
-	/* For now, just one capture request at a time */
-	msg.msg_body.elem_nr = 1;
-
-	return dabba_ipc_msg(&msg);
+	return 0;
 }
 
 /**
