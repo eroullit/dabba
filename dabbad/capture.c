@@ -206,6 +206,7 @@ int dabbad_capture_list(struct dabba_ipc_msg *msg)
 	return 0;
 }
 
+#if 0
 /**
  * \brief Stop a running capture thread
  * \param[in,out] msg Capture thread message
@@ -234,6 +235,37 @@ int dabbad_capture_stop(struct dabba_ipc_msg *msg)
 	}
 
 	return rc;
+}
+#endif
+
+void dabbad_capture_stop(Dabba__DabbaService_Service * service,
+			 const Dabba__ThreadId * idp,
+			 Dabba__Dummy_Closure closure, void *closure_data)
+{
+	Dabba__Dummy dummy = DABBA__DUMMY__INIT;
+	struct packet_capture_thread *pkt_capture;
+	struct packet_thread *pkt_thread;
+	int rc;
+
+	assert(service);
+	assert(idp);
+
+	pkt_thread = dabbad_thread_data_get((pthread_t) idp->id);
+
+	if (!pkt_thread)
+		goto out;
+
+	rc = dabbad_thread_stop(pkt_thread);
+
+	if (!rc) {
+		pkt_capture = dabbad_capture_thread_get(pkt_thread);
+		close(pkt_capture->rx.pcap_fd);
+		packet_mmap_destroy(&pkt_capture->rx.pkt_mmap);
+		free(pkt_capture);
+	}
+
+ out:
+	closure(&dummy, closure_data);
 }
 
 void dabbad_capture_start(Dabba__DabbaService_Service * service,
