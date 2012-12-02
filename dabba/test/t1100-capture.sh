@@ -59,23 +59,23 @@ test_expect_success "Check 'dabba capture' help output" "
     EOF
 "
 
-test_expect_success "Start capture thread on an invalid interface (too long)" "
+test_expect_failure "Start capture thread on an invalid interface (too long)" "
     test_expect_code 22 '$DABBA_PATH'/dabba capture start --interface lorem-ipsum-dolor-sit --pcap test.pcap --frame-number $frame_nr
 "
 
-test_expect_success "Start capture thread on an invalid interface (does not exist)" "
+test_expect_failure "Start capture thread on an invalid interface (does not exist)" "
     test_expect_code 19 '$DABBA_PATH'/dabba capture start --interface lorem-ipsum --pcap test.pcap --frame-number $frame_nr
 "
 
-test_expect_success "Start capture thread with a missing interface" "
+test_expect_failure "Start capture thread with a missing interface" "
     test_expect_code 22 '$DABBA_PATH'/dabba capture start --pcap test.pcap --frame-number $frame_nr
 "
 
-test_expect_success "Start capture thread with a missing pcap path" "
+test_expect_failure "Start capture thread with a missing pcap path" "
     test_expect_code 22 '$DABBA_PATH'/dabba capture start --interface any --frame-number $frame_nr
 "
 
-test_expect_success "Invoke capture command w/o any parameters" "
+test_expect_failure "Invoke capture command w/o any parameters" "
     test_expect_code 38 '$DABBA_PATH'/dabba capture
 "
 
