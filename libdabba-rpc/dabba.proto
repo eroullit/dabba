@@ -264,4 +264,5 @@ service dabba_service
     rpc thread_id_get (dummy) returns (thread_id_list);
     rpc capture_settings_get (thread_id_list) returns (capture_settings_list);
     rpc capture_start (capture_settings) returns (dummy);
+    rpc capture_stop (thread_id) returns (dummy);
 }
