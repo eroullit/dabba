@@ -392,10 +392,9 @@ void dabbad_capture_settings_get(Dabba__DabbaService_Service * service,
 
 		fd_to_path(pkt_capture->rx.pcap_fd, capture_list.list[a]->pcap,
 			   NAME_MAX * sizeof(*capture_list.list[a]->pcap));
-		rtnl_link_i2name(cache, pkt_capture->rx.pkt_mmap.ifindex,
-				 capture_list.list[a]->interface,
-				 IFNAMSIZ *
-				 sizeof(*capture_list.list[a]->interface));
+
+		ifindex_to_devname(pkt_capture->rx.pkt_mmap.ifindex,
+				   capture_list.list[a]->interface, IFNAMSIZ);
 	}
 
 	capturep = &capture_list;
