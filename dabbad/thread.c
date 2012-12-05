@@ -383,13 +383,14 @@ void dabbad_thread_settings_get(Dabba__DabbaService_Service * service,
 		if (!settings_list.list[a])
 			goto out;
 
+		dabba__thread_settings__init(settings_list.list[a]);
+
 		settings_list.list[a]->id =
 		    malloc(sizeof(*settings_list.list[a]->id));
 
 		if (!settings_list.list[a]->id)
 			goto out;
 
-		dabba__thread_settings__init(settings_list.list[a]);
 		dabba__thread_id__init(settings_list.list[a]->id);
 	}
 
