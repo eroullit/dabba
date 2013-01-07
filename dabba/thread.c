@@ -451,7 +451,7 @@ static void thread_settings_list_print(const Dabba__ThreadSettingsList * result,
 	thread_settings_list_header_print();
 
 	for (a = 0; result && a < result->n_list; a++) {
-		printf("    - %" PRIu64 "\n", result->list[a]->id->id);
+		printf("    - id: %" PRIu64 "\n", result->list[a]->id->id);
 		printf("      policy: %i\n", result->list[a]->sched_policy);
 		printf("      priority: %i\n", result->list[a]->sched_priority);
 		/* TODO map priority/policy protobuf enums to string */
