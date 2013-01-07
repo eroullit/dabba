@@ -72,7 +72,7 @@ test_expect_success "Check 'dabba thread' help output" "
 "
 
 test_expect_success "Fetch running thread information" "
-    '$DABBA_PATH'/dabba thread list > result
+    '$DABBA_PATH'/dabba thread settings > result
 "
 
 test_expect_success PYTHON_YAML "Parse thread YAML output" "
@@ -126,7 +126,7 @@ do
         do
                 test_expect_success PYTHON_YAML "Modify capture thread scheduling policy ($policy:$priority)" "
                     '$DABBA_PATH'/dabba thread modify --sched-policy '$policy' --sched-prio '$priority' --id '$thread_id' &&
-                    '$DABBA_PATH'/dabba thread list > result
+                    '$DABBA_PATH'/dabba thread settings > result
                 "
 
                 test_expect_success PYTHON_YAML "Parse thread YAML output" "
@@ -153,7 +153,7 @@ do
         do
                 test_expect_success PYTHON_YAML "Do not modify capture thread out-of-range scheduling policy ($policy:$priority)" "
                     test_must_fail '$DABBA_PATH'/dabba thread modify --sched-policy '$policy' --sched-prio '$priority' --id '$thread_id' &&
-                    '$DABBA_PATH'/dabba thread list > result
+                    '$DABBA_PATH'/dabba thread settings > result
                 "
 
                 test_expect_success PYTHON_YAML "Parse thread YAML output" "
@@ -179,7 +179,7 @@ for cpu_affinity in 0 $default_cpu_affinity
 do
         test_expect_success PYTHON_YAML "Modify capture thread CPU affinity (run on CPU $cpu_affinity)" "
             '$DABBA_PATH'/dabba thread modify --cpu-affinity '$cpu_affinity' --id '$thread_id' &&
-            '$DABBA_PATH'/dabba thread list > result
+            '$DABBA_PATH'/dabba thread settings > result
         "
 
         test_expect_success PYTHON_YAML "Parse thread YAML output" "
@@ -198,7 +198,7 @@ done
 
 test_expect_success PYTHON_YAML "Stop capture thread using thread output" "
     '$DABBA_PATH'/dabba capture stop --id '$thread_id' &&
-    '$DABBA_PATH'/dabba thread list > after &&
+    '$DABBA_PATH'/dabba thread settings > after &&
     test_must_fail grep -wq '$thread_id' after
 "
 
