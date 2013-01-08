@@ -399,12 +399,14 @@ void dabbad_thread_settings_get(Dabba__DabbaService_Service * service,
 	for (pkt_thread = dabbad_thread_first(); pkt_thread;
 	     pkt_thread = dabbad_thread_next(pkt_thread)) {
 		settingsp->has_sched_policy = settingsp->has_sched_priority = 1;
+		settingsp->has_type = 1;
 		settingsp->id->id = (uint64_t) pkt_thread->id;
 		dabbad_thread_sched_param_get(pkt_thread,
 					      (int16_t *) &
 					      settingsp->sched_priority,
 					      (int16_t *) &
 					      settingsp->sched_policy);
+		settingsp->type = pkt_thread->type;
 		/* TODO prepare cpu set string */
 		settingsp++;
 	}
