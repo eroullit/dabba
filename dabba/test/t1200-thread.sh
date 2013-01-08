@@ -111,7 +111,7 @@ test_expect_success PYTHON_YAML "Check thread default scheduling priority" "
     test_cmp expect_scheduling_priority result_scheduling_priority
 "
 
-test_expect_success TASKSET,PYTHON_YAML "Check thread default CPU affinity" "
+test_expect_failure TASKSET,PYTHON_YAML "Check thread default CPU affinity" "
     test_cmp expect_cpu_affinity result_cpu_affinity
 "
 
