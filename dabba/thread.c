@@ -458,8 +458,8 @@ static void thread_settings_list_print(const Dabba__ThreadSettingsList * result,
 		       sched_policy_key_get(result->list[a]->sched_policy));
 		printf("      scheduling priority: %i\n",
 		       result->list[a]->sched_priority);
+		printf("      cpu affinity: %s\n", result->list[a]->cpu_set);
 		/* TODO map priority/policy protobuf enums to string */
-		/* TODO Add CPU set string output */
 	}
 
 	*status = 1;
