@@ -35,10 +35,6 @@ struct packet_capture_thread {
 
 struct packet_thread *dabbad_capture_thread_data_get(const pthread_t thread_id);
 
-//int dabbad_capture_start(struct dabba_ipc_msg *msg);
-int dabbad_capture_list(struct dabba_ipc_msg *msg);
-//int dabbad_capture_stop(struct dabba_ipc_msg *msg);
-
 void dabbad_capture_stop(Dabba__DabbaService_Service * service,
 			 const Dabba__ThreadId * idp,
 			 Dabba__Dummy_Closure closure, void *closure_data);

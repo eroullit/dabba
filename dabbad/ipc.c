@@ -60,9 +60,6 @@ static int dabbad_handle_bulk_get_msg(struct dabba_ipc_msg *msg)
 	case DABBA_INTERFACE_OFFLOAD:
 		rc = dabbad_interface_bulk_get(msg, interface_offload);
 		break;
-	case DABBA_CAPTURE_LIST:
-		rc = dabbad_capture_list(msg);
-		break;
 	case DABBA_THREAD_LIST:
 		rc = dabbad_thread_list(msg);
 		break;
@@ -103,14 +100,6 @@ static int dabbad_handle_filter_modify_msg(struct dabba_ipc_msg *msg)
 	switch (msg->msg_body.type) {
 	case DABBA_INTERFACE_MODIFY:
 		rc = dabbad_interface_modify(msg);
-		break;
-	case DABBA_CAPTURE_START:
-		rc = ENOSYS;
-		//rc = dabbad_capture_start(msg);
-		break;
-	case DABBA_CAPTURE_STOP:
-		rc = ENOSYS;
-		//rc = dabbad_capture_stop(msg);
 		break;
 	case DABBA_THREAD_MODIFY:
 		rc = dabbad_thread_modify(msg);
