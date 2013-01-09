@@ -87,8 +87,7 @@ test_expect_success PYTHON_YAML "Query thread YAML output" "
     dictkeys2values threads 0 id < parsed > result_id &&
     dictkeys2values threads 0 type < parsed > result_type &&
     dictkeys2values threads 0 'scheduling policy' < parsed > result_scheduling_policy &&
-    dictkeys2values threads 0 'scheduling priority' < parsed > result_scheduling_priority &&
-    dictkeys2values threads 0 'cpu affinity' < parsed > result_cpu_affinity
+    dictkeys2values threads 0 'scheduling priority' < parsed > result_scheduling_priority
 "
 
 test_expect_success PYTHON_YAML "Check thread number" "
