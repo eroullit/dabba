@@ -103,9 +103,9 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include <dabbad/ipc.h>
 #include <dabbad/rpc.h>
 #include <dabbad/help.h>
+#include <dabbad/dabbad.h>
 
 enum dabbad_opts {
 	OPT_DAEMONIZE,
@@ -175,7 +175,7 @@ static inline int dabbad_pidfile_create(void)
 
 int main(int argc, char **argv)
 {
-	int opt, opt_idx, qid;
+	int opt, opt_idx;
 	int daemonize = 0, rpc_enabled = 0;
 
 	assert(argc);
@@ -190,6 +190,7 @@ int main(int argc, char **argv)
 			break;
 		case OPT_RPC:
 			rpc_enabled = 1;
+			rpc_enabled = rpc_enabled;
 			break;
 		case OPT_VERSION:
 			print_version();
@@ -205,8 +206,6 @@ int main(int argc, char **argv)
 	}
 
 	assert(dabbad_pidfile_create());
-	dabbad_ipc_msg_destroy();
-	qid = dabbad_ipc_msg_create();
 
 	if (daemonize) {
 		if (daemon(-1, 0)) {
@@ -215,5 +214,5 @@ int main(int argc, char **argv)
 		}
 	}
 
-	return rpc_enabled ? dabbad_rpc_msg_poll() : dabbad_ipc_msg_poll(qid);
+	return dabbad_rpc_msg_poll();
 }
