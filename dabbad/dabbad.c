@@ -176,7 +176,7 @@ static inline int dabbad_pidfile_create(void)
 int main(int argc, char **argv)
 {
 	int opt, opt_idx;
-	int daemonize = 0, rpc_enabled = 0;
+	int daemonize = 0;
 
 	assert(argc);
 	assert(argv);
@@ -187,10 +187,6 @@ int main(int argc, char **argv)
 		switch (opt) {
 		case OPT_DAEMONIZE:
 			daemonize = 1;
-			break;
-		case OPT_RPC:
-			rpc_enabled = 1;
-			rpc_enabled = rpc_enabled;
 			break;
 		case OPT_VERSION:
 			print_version();
