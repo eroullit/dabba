@@ -55,7 +55,7 @@ check_thread_nr()
 default_cpu_affinity=$(get_default_cpu_affinity)
 
 test_expect_success "Setup: Start dabbad" "
-    '$DABBAD_PATH'/dabbad --daemonize --rpc
+    '$DABBAD_PATH'/dabbad --daemonize
 "
 
 test_expect_success "Setup: Start a basic capture on loopback" "

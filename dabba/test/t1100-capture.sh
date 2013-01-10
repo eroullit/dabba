@@ -47,7 +47,7 @@ frame_nr="16"
 ring_size="$(($frame_nr * 2048))" # 2kB are allocated for one ethernet frame
 
 test_expect_success "Setup: Start dabbad" "
-    '$DABBAD_PATH'/dabbad --daemonize --rpc
+    '$DABBAD_PATH'/dabbad --daemonize
 "
 
 test_expect_success "Check 'dabba capture' help output" "

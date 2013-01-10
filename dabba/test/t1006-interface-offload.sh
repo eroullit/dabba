@@ -26,7 +26,7 @@ test_description='Test dabba interface offload command'
 #"
 
 test_expect_success "Setup: Start dabbad" "
-    '$DABBAD_PATH'/dabbad --daemonize --rpc
+    '$DABBAD_PATH'/dabbad --daemonize
 "
 
 test_expect_success 'invoke dabba interface offload command with dabbad' "

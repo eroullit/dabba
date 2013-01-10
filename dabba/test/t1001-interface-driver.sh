@@ -26,7 +26,7 @@ test_description='Test dabba interface driver command'
 #"
 
 test_expect_success "Setup: Start dabbad" "
-    '$DABBAD_PATH'/dabbad --daemonize --rpc
+    '$DABBAD_PATH'/dabbad --daemonize
 "
 
 test_expect_success 'invoke dabba interface driver command with dabbad' "

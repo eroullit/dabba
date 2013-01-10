@@ -34,7 +34,7 @@ test_expect_success DUMMY_DEV "Setup: Remove all dummy interfaces" "
 "
 
 test_expect_success "Setup: Start dabbad" "
-    '$DABBAD_PATH'/dabbad --daemonize --rpc
+    '$DABBAD_PATH'/dabbad --daemonize
 "
 
 test_expect_success "Activate dummy interface" "
