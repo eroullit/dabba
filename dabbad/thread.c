@@ -249,47 +249,6 @@ int dabbad_thread_stop(struct packet_thread *pkt_thread)
 	return rc;
 }
 
-/**
- * \brief List currently running thread
- * \param[in,out] msg Thread message
- * \return 0 on success, else on failure.
- */
-
-int dabbad_thread_list(struct dabba_ipc_msg *msg)
-{
-	struct dabba_thread *thread_msg;
-	struct packet_thread *pkt_thread;
-	size_t a = 0, off = 0, thread_list_size;
-
-	thread_msg = msg->msg_body.msg.thread;
-	thread_list_size = ARRAY_SIZE(msg->msg_body.msg.thread);
-
-	for (pkt_thread = dabbad_thread_first(); pkt_thread;
-	     pkt_thread = dabbad_thread_next(pkt_thread)) {
-		if (off < msg->msg_body.offset) {
-			off++;
-			continue;
-		}
-
-		if (a >= thread_list_size)
-			break;
-
-		thread_msg[a].id = pkt_thread->id;
-		thread_msg[a].type = pkt_thread->type;
-		dabbad_thread_sched_param_get(pkt_thread,
-					      &thread_msg[a].sched_prio,
-					      &thread_msg[a].sched_policy);
-		dabbad_thread_sched_affinity_get(pkt_thread,
-						 &thread_msg[a].cpu);
-
-		a++;
-	}
-
-	msg->msg_body.elem_nr = a;
-
-	return 0;
-}
-
 void dabbad_thread_id_get(Dabba__DabbaService_Service * service,
 			  const Dabba__Dummy * dummy,
 			  Dabba__ThreadIdList_Closure closure,
@@ -424,90 +383,6 @@ void dabbad_thread_settings_get(Dabba__DabbaService_Service * service,
 	}
 
 	free(settings_list.list);
-}
-
-/**
- * \brief Modify a currently running thread
- * \param[in,out] msg Thread message
- * \return 0 on success, else on failure.
- */
-
-int dabbad_thread_modify(struct dabba_ipc_msg *msg)
-{
-	struct packet_thread *pkt_thread;
-	struct dabba_thread *thread_msg = msg->msg_body.msg.thread;
-	int rc = 0;
-	int16_t cur_sched_prio, cur_sched_policy;
-
-	pkt_thread = dabbad_thread_data_get(thread_msg->id);
-
-	if (!pkt_thread)
-		return EINVAL;
-
-	/* Get current scheduling parameters */
-	dabbad_thread_sched_param_get(pkt_thread, &cur_sched_prio,
-				      &cur_sched_policy);
-
-	/* Update the new values the user gave use */
-	if ((thread_msg->usage_flags & USE_SCHED_PRIO) == USE_SCHED_PRIO)
-		cur_sched_prio = thread_msg->sched_prio;
-
-	if ((thread_msg->usage_flags & USE_SCHED_POLICY) == USE_SCHED_POLICY)
-		cur_sched_policy = thread_msg->sched_policy;
-
-	/* Set the scheduling values if the user wanted to update one of them */
-	if ((thread_msg->usage_flags & USE_SCHED_PRIO) == USE_SCHED_PRIO
-	    || (thread_msg->usage_flags & USE_SCHED_POLICY) ==
-	    USE_SCHED_POLICY) {
-		rc = dabbad_thread_sched_param_set(pkt_thread, cur_sched_prio,
-						   cur_sched_policy);
-
-		if (rc)
-			return rc;
-	}
-
-	if ((thread_msg->usage_flags & USE_CPU_MASK) == USE_CPU_MASK) {
-		rc = dabbad_thread_sched_affinity_set(pkt_thread,
-						      &thread_msg->cpu);
-
-		if (rc)
-			return rc;
-	}
-
-	return 0;
-}
-
-/**
- * \brief Get a currently thread scheduling capabilities
- * \param[in,out] msg Thread message
- * \return Always return 0.
- */
-
-int dabbad_thread_cap_list(struct dabba_ipc_msg *msg)
-{
-	struct dabba_thread_cap *thread_cap_msg = msg->msg_body.msg.thread_cap;
-
-	if (msg->msg_body.offset < 3) {
-		thread_cap_msg[0].policy = SCHED_FIFO;
-		thread_cap_msg[0].prio_min = sched_get_priority_min(SCHED_FIFO);
-		thread_cap_msg[0].prio_max = sched_get_priority_max(SCHED_FIFO);
-
-		thread_cap_msg[1].policy = SCHED_RR;
-		thread_cap_msg[1].prio_min = sched_get_priority_min(SCHED_RR);
-		thread_cap_msg[1].prio_max = sched_get_priority_max(SCHED_RR);
-
-		thread_cap_msg[2].policy = SCHED_OTHER;
-		thread_cap_msg[2].prio_min =
-		    sched_get_priority_min(SCHED_OTHER);
-		thread_cap_msg[2].prio_max =
-		    sched_get_priority_max(SCHED_OTHER);
-
-		msg->msg_body.elem_nr = 3;
-	} else {
-		msg->msg_body.elem_nr = 0;
-	}
-
-	return 0;
 }
 
 void dabbad_thread_capabilities_get(Dabba__DabbaService_Service * service,
