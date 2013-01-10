@@ -28,28 +28,6 @@
 
 struct nl_cache;
 struct nl_sock;
-struct nl_object;
-
-void interface_list(struct nl_object *obj, void *arg);
-void interface_driver(struct nl_object *obj, void *arg);
-void interface_settings(struct nl_object *obj, void *arg);
-void interface_pause(struct nl_object *obj, void *arg);
-void interface_coalesce(struct nl_object *obj, void *arg);
-void interface_offload(struct nl_object *obj, void *arg);
-
-char *interface_list_name_get(struct dabba_ipc_msg *msg, const uint16_t index);
-
-int dabbad_interface_bulk_get(struct dabba_ipc_msg *msg,
-			      void (*msg_cb) (struct nl_object * obj,
-					      void *arg));
-
-int dabbad_interface_filter_get(struct dabba_ipc_msg *msg,
-				char *(*key_cb) (struct dabba_ipc_msg * msg,
-						 const uint16_t index),
-				void (*msg_cb) (struct nl_object * obj,
-						void *arg));
-
-int dabbad_interface_modify(struct dabba_ipc_msg *msg);
 
 struct nl_cache *link_cache_alloc(struct nl_sock **sock);
 void link_cache_destroy(struct nl_sock *sock, struct nl_cache *cache);

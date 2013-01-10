@@ -42,24 +42,6 @@ static int dabbad_handle_bulk_get_msg(struct dabba_ipc_msg *msg)
 	int rc;
 
 	switch (msg->msg_body.type) {
-	case DABBA_INTERFACE_LIST:
-		rc = dabbad_interface_bulk_get(msg, interface_list);
-		break;
-	case DABBA_INTERFACE_DRIVER:
-		rc = dabbad_interface_bulk_get(msg, interface_driver);
-		break;
-	case DABBA_INTERFACE_SETTINGS:
-		rc = dabbad_interface_bulk_get(msg, interface_settings);
-		break;
-	case DABBA_INTERFACE_PAUSE:
-		rc = dabbad_interface_bulk_get(msg, interface_pause);
-		break;
-	case DABBA_INTERFACE_COALESCE:
-		rc = dabbad_interface_bulk_get(msg, interface_coalesce);
-		break;
-	case DABBA_INTERFACE_OFFLOAD:
-		rc = dabbad_interface_bulk_get(msg, interface_offload);
-		break;
 	case DABBA_THREAD_LIST:
 		rc = dabbad_thread_list(msg);
 		break;
@@ -80,10 +62,6 @@ static int dabbad_handle_filter_get_msg(struct dabba_ipc_msg *msg)
 	int rc;
 
 	switch (msg->msg_body.type) {
-	case DABBA_INTERFACE_LIST:
-		rc = dabbad_interface_filter_get(msg, interface_list_name_get,
-						 interface_list);
-		break;
 	default:
 		rc = -1;
 		errno = ENOSYS;
@@ -98,9 +76,6 @@ static int dabbad_handle_filter_modify_msg(struct dabba_ipc_msg *msg)
 	int rc;
 
 	switch (msg->msg_body.type) {
-	case DABBA_INTERFACE_MODIFY:
-		rc = dabbad_interface_modify(msg);
-		break;
 	case DABBA_THREAD_MODIFY:
 		rc = dabbad_thread_modify(msg);
 		break;
