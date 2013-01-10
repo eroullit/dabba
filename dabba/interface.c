@@ -157,9 +157,9 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <assert.h>
 #include <errno.h>
 #include <getopt.h>
+#include <linux/ethtool.h>
 #include <libdabba/macros.h>
 #include <dabba/dabba.h>
-#include <dabba/ipc.h>
 #include <dabba/rpc.h>
 #include <dabba/interface-list.h>
 #include <dabba/interface-status.h>
@@ -194,89 +194,6 @@ const char *ethtool_port_str_get(const uint8_t port)
 	return port < sizeof(port_str) ? port_str[port] : "unknown";
 }
 
-static struct option *interface_modify_options_get(void)
-{
-	static struct option interface_modify_option[] = {
-		{"up", required_argument, NULL, OPT_INTERFACE_UP},
-		{"running", required_argument, NULL, OPT_INTERFACE_RUNNING},
-		{"promiscuous", required_argument, NULL, OPT_INTERFACE_PROMISC},
-		{"id", required_argument, NULL, OPT_INTERFACE_ID},
-		{NULL, 0, NULL, 0},
-	};
-
-	return interface_modify_option;
-}
-
-static int prepare_interface_modify_query(int argc, char **argv, struct dabba_interface_list
-					  *ifconf_msg)
-{
-	int ret, rc = 0;
-
-	assert(ifconf_msg);
-
-	ifconf_msg->up = UNSET;
-	ifconf_msg->running = UNSET;
-	ifconf_msg->promisc = UNSET;
-	ifconf_msg->loopback = UNSET;
-
-	while ((ret =
-		getopt_long_only(argc, argv, "", interface_modify_options_get(),
-				 NULL)) != EOF) {
-		switch (ret) {
-		case OPT_INTERFACE_UP:
-			ifconf_msg->up = dabba_tristate_parse(optarg);
-			break;
-		case OPT_INTERFACE_RUNNING:
-			ifconf_msg->running = dabba_tristate_parse(optarg);
-			break;
-		case OPT_INTERFACE_PROMISC:
-			ifconf_msg->promisc = dabba_tristate_parse(optarg);
-			break;
-		case OPT_INTERFACE_ID:
-			strncpy(ifconf_msg->name, optarg,
-				sizeof(ifconf_msg->name));
-			break;
-		default:
-			show_usage(interface_modify_options_get());
-			rc = -1;
-			break;
-		}
-	}
-
-	return rc;
-}
-
-/**
- * \brief Modify parameters of a supported interface
- * \param[in]           argc	        Argument counter
- * \param[in]           argv		Argument vector
- * \return 0 on success, else on failure.
- */
-
-int cmd_interface_modify(int argc, const char **argv)
-{
-	int rc;
-	struct dabba_ipc_msg msg;
-
-	assert(argc >= 0);
-	assert(argv);
-
-	memset(&msg, 0, sizeof(msg));
-
-	msg.msg_body.type = DABBA_INTERFACE_MODIFY;
-	msg.msg_body.op_type = OP_MODIFY;
-	msg.msg_body.method_type = MT_FILTERED;
-	msg.msg_body.elem_nr = 1;
-
-	rc = prepare_interface_modify_query(argc, (char **)argv,
-					    msg.msg_body.msg.interface_list);
-
-	if (rc)
-		return rc;
-
-	return dabba_ipc_msg(&msg);
-}
-
 /**
  * \brief Parse which interface sub-command.
  * \param[in]           argc	        Argument counter
@@ -302,7 +219,7 @@ int cmd_interface(int argc, const char **argv)
 		{"coalesce", cmd_interface_coalesce},
 		{"offload", cmd_interface_offload},
 		{"statistics", cmd_interface_statistics},
-		{"modify", cmd_interface_modify}
+		{"modify", NULL}
 	};
 
 	if (argc == 0 || cmd == NULL || !strcmp(cmd, "--help"))
