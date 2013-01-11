@@ -190,7 +190,6 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabbad/dabbad.h>
 #include <dabbad/thread.h>
 #include <dabba/dabba.h>
-#include <dabba/ipc.h>
 #include <dabba/rpc.h>
 #include <dabba/help.h>
 
@@ -272,150 +271,6 @@ const char *thread_key_get(const int type)
 	return a < max ? thread_name_mapping[a].key : "unknown";
 }
 
-/**
- * \brief Get the default used thread scheduling policy
- * \return \c SCHED_OTHER
- */
-
-int sched_policy_default_get(void)
-{
-	return SCHED_OTHER;
-}
-
-/**
- * \brief Get the default used thread scheduling priority
- * \return scheduling priority 0. Default value for \c SCHED_OTHER
- */
-
-int sched_prio_default_get(void)
-{
-	return 0;
-}
-
-/**
- * \brief Get the default used CPU affinity
- * \param[in]           mask		Output CPU set pointer
- * \return All set CPU set
- */
-
-void sched_cpu_affinty_default_get(cpu_set_t * mask)
-{
-	size_t a;
-
-	for (a = 0; a < CPU_SETSIZE; a++)
-		CPU_SET(a, mask);
-}
-
-static char *nexttoken(char *q, int sep)
-{
-	if (q)
-		q = strchr(q, sep);
-	if (q)
-		q++;
-	return q;
-}
-
-/**
- * \brief Parse a CPU number list to a CPU set.
- * \param[in]           str	        Input CPU list
- * \param[in]           mask		Output CPU set pointer
- * \return 0 on success, -EINVAL on failure.
- */
-
-static int str_to_cpu_affinity(char *str, cpu_set_t * mask)
-{
-	char *p, *q;
-
-	assert(str);
-	assert(mask);
-
-	q = str;
-
-	CPU_ZERO(mask);
-
-	while (p = q, q = nexttoken(q, ','), p) {
-		unsigned int a;	/* Beginning of range */
-		unsigned int b;	/* End of range */
-		unsigned int s;	/* Stride */
-		char *c1, *c2;
-
-		if (sscanf(p, "%u", &a) < 1)
-			return -EINVAL;
-
-		b = a;
-		s = 1;
-
-		c1 = nexttoken(p, '-');
-		c2 = nexttoken(p, ',');
-
-		if (c1 != NULL && (c2 == NULL || c1 < c2)) {
-			if (sscanf(c1, "%u", &b) < 1)
-				return -EINVAL;
-
-			c1 = nexttoken(c1, ':');
-
-			if (c1 != NULL && (c2 == NULL || c1 < c2))
-				if (sscanf(c1, "%u", &s) < 1)
-					return -EINVAL;
-		}
-
-		if (!(a <= b))
-			return -EINVAL;
-
-		while (a <= b) {
-			CPU_SET(a, mask);
-			a += s;
-		}
-	}
-
-	return 0;
-}
-
-static void display_thread_cpu_affinity(const cpu_set_t * const cpu)
-    __attribute__ ((unused));
-/**
- * \brief Print a CPU number list from a CPU set.
- * \param[in]           cpu	        Pointer to a CPU set
- */
-
-static void display_thread_cpu_affinity(const cpu_set_t * const cpu)
-{
-	int trail_sep = 0;
-	size_t i, j, run = 0;
-
-	assert(cpu);
-
-	for (i = 0; i < CPU_SETSIZE; i++)
-		if (CPU_ISSET(i, cpu)) {
-			for (j = i + 1; j < CPU_SETSIZE; j++) {
-				if (CPU_ISSET(j, cpu))
-					run++;
-				else
-					break;
-			}
-
-			/*
-			 * Add a trailing comma at new entries but the first
-			 * to get an cpu list like: 0,1-4,5,7
-			 */
-
-			if (trail_sep) {
-				printf(",");
-				trail_sep = 1;
-			}
-
-			if (!run)
-				printf("%zu", i);
-			else if (run == 1) {
-				printf("%zu,%zu", i, i + 1);
-				i++;
-			} else {
-				printf("%zu-%zu", i, i + run);
-				i += run;
-			}
-		}
-}
-
 static void thread_list_header_print(void)
 {
 	printf("---\n");
@@ -491,62 +346,6 @@ static void thread_capabilities_list_print(const Dabba__ThreadCapabilitiesList *
 	*status = 1;
 }
 
-static struct option *thread_modify_options_get(void)
-{
-	static struct option thread_modify_option[] = {
-		{"id", required_argument, NULL, OPT_THREAD_ID},
-		{"sched-prio", required_argument, NULL, OPT_THREAD_SCHED_PRIO},
-		{"sched-policy", required_argument, NULL,
-		 OPT_THREAD_SCHED_POLICY},
-		{"cpu-affinity", required_argument, NULL,
-		 OPT_THREAD_CPU_AFFINITY},
-		{NULL, 0, NULL, 0},
-	};
-
-	return thread_modify_option;
-}
-
-static int prepare_thread_modify_query(int argc, char **argv,
-				       struct dabba_thread *thread_msg)
-{
-	int ret, rc = 0;
-
-	assert(thread_msg);
-
-	thread_msg->sched_prio = sched_prio_default_get();
-	thread_msg->sched_policy = sched_policy_default_get();
-	sched_cpu_affinty_default_get(&thread_msg->cpu);
-
-	while ((ret =
-		getopt_long_only(argc, argv, "", thread_modify_options_get(),
-				 NULL)) != EOF) {
-		switch (ret) {
-		case OPT_THREAD_ID:
-			thread_msg->id = strtoull(optarg, NULL, 10);
-			break;
-		case OPT_THREAD_SCHED_PRIO:
-			thread_msg->sched_prio = strtol(optarg, NULL, 10);
-			thread_msg->usage_flags |= USE_SCHED_PRIO;
-			break;
-		case OPT_THREAD_SCHED_POLICY:
-			thread_msg->sched_policy =
-			    sched_policy_value_get(optarg);
-			thread_msg->usage_flags |= USE_SCHED_POLICY;
-			break;
-		case OPT_THREAD_CPU_AFFINITY:
-			str_to_cpu_affinity(optarg, &thread_msg->cpu);
-			thread_msg->usage_flags |= USE_CPU_MASK;
-			break;
-		default:
-			show_usage(thread_modify_options_get());
-			rc = -1;
-			break;
-		}
-	}
-
-	return rc;
-}
-
 /**
  * \brief Request the current list of running threads.
  * \param[in]           argc	        Argument counter
@@ -597,39 +396,6 @@ int cmd_thread_settings(int argc, const char **argv)
 }
 
 /**
- * \brief Prepare a command to modify scheduling paramters of a specific thread.
- * \param[in]           argc	        Argument counter
- * \param[in]           argv		Argument vector
- * \return 0 on success, else on failure.
- */
-
-int cmd_thread_modify(int argc, const char **argv)
-{
-	int rc;
-	struct dabba_ipc_msg msg;
-
-	assert(argc >= 0);
-	assert(argv);
-
-	memset(&msg, 0, sizeof(msg));
-
-	msg.msg_body.type = DABBA_THREAD_MODIFY;
-	msg.msg_body.op_type = OP_MODIFY;
-	msg.msg_body.method_type = MT_FILTERED;
-
-	rc = prepare_thread_modify_query(argc, (char **)argv,
-					 msg.msg_body.msg.thread);
-
-	if (rc)
-		return rc;
-
-	/* For now, just one thread request at a time */
-	msg.msg_body.elem_nr = 1;
-
-	return dabba_ipc_msg(&msg);
-}
-
-/**
  * \brief Prepare a command to list scheduling capabilities.
  * \param[in]           argc	        Argument counter
  * \param[in]           argv		Argument vector
@@ -673,7 +439,7 @@ int cmd_thread(int argc, const char **argv)
 	const char *cmd = argv[0];
 	size_t i;
 	static struct cmd_struct thread_commands[] = {
-		{"modify", cmd_thread_modify},
+		{"modify", NULL},
 		{"list", cmd_thread_list},
 		{"settings", cmd_thread_settings},
 		{"capabilities", cmd_thread_capabilities},
