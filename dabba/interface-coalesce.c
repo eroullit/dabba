@@ -34,7 +34,6 @@
 #include <errno.h>
 
 #include <dabbad/dabbad.h>
-#include <dabba/ipc.h>
 #include <dabba/rpc.h>
 #include <dabba/help.h>
 #include <dabba/macros.h>
