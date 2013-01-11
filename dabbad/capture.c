@@ -38,6 +38,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <assert.h>
+#include <limits.h>
 #include <sys/queue.h>
 #include <arpa/inet.h>
 #include <linux/if_ether.h>

@@ -34,8 +34,10 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <linux/ethtool.h>
 #include <netlink/cache.h>
 #include <netlink/route/link.h>
+#include <libdabba/interface.h>
 #include <dabbad/interface.h>
 #include <dabbad/interface-capabilities.h>
 
@@ -329,22 +331,22 @@ void dabbad_interface_capabilities_get(Dabba__DabbaService_Service * service,
 		free(capabilities_list.list[a]->supported_speed->ethernet);
 		free(capabilities_list.list[a]->supported_speed->fast_ethernet);
 		free(capabilities_list.list[a]->supported_speed->gbps_ethernet);
-		free(capabilities_list.list[a]->supported_speed->
-		     _10gbps_ethernet);
+		free(capabilities_list.list[a]->
+		     supported_speed->_10gbps_ethernet);
 		free(capabilities_list.list[a]->advertising_speed->ethernet);
-		free(capabilities_list.list[a]->advertising_speed->
-		     fast_ethernet);
-		free(capabilities_list.list[a]->advertising_speed->
-		     gbps_ethernet);
-		free(capabilities_list.list[a]->advertising_speed->
-		     _10gbps_ethernet);
+		free(capabilities_list.list[a]->
+		     advertising_speed->fast_ethernet);
+		free(capabilities_list.list[a]->
+		     advertising_speed->gbps_ethernet);
+		free(capabilities_list.list[a]->
+		     advertising_speed->_10gbps_ethernet);
 		free(capabilities_list.list[a]->lp_advertising_speed->ethernet);
-		free(capabilities_list.list[a]->lp_advertising_speed->
-		     fast_ethernet);
-		free(capabilities_list.list[a]->lp_advertising_speed->
-		     gbps_ethernet);
-		free(capabilities_list.list[a]->lp_advertising_speed->
-		     _10gbps_ethernet);
+		free(capabilities_list.list[a]->
+		     lp_advertising_speed->fast_ethernet);
+		free(capabilities_list.list[a]->
+		     lp_advertising_speed->gbps_ethernet);
+		free(capabilities_list.list[a]->
+		     lp_advertising_speed->_10gbps_ethernet);
 		free(capabilities_list.list[a]->supported_opt);
 		free(capabilities_list.list[a]->supported_speed);
 		free(capabilities_list.list[a]->advertising_opt);

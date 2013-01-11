@@ -36,6 +36,7 @@
 #include <errno.h>
 #include <netlink/cache.h>
 #include <netlink/route/link.h>
+#include <libdabba/interface.h>
 #include <dabbad/interface.h>
 #include <dabbad/interface-offload.h>
 
