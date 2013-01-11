@@ -152,7 +152,6 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <libdabba/packet_mmap.h>
 #include <dabba/dabba.h>
 #include <dabba/help.h>
-#include <dabba/ipc.h>
 #include <dabba/rpc.h>
 #include <dabba/thread.h>
 #include <dabbad/dabbad.h>
