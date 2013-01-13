@@ -225,10 +225,9 @@ int cmd_interface(int argc, const char **argv)
 	if (argc == 0 || cmd == NULL || !strcmp(cmd, "--help"))
 		cmd = "help";
 
-	for (i = 0; i < ARRAY_SIZE(interface_commands); i++) {
+	for (i = 0; i < ARRAY_SIZE(interface_commands); i++)
 		if (!strcmp(interface_commands[i].cmd, cmd))
 			return run_builtin(&interface_commands[i], argc, argv);
-	}
 
 	return ENOSYS;
 }

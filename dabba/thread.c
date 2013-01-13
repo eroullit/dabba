@@ -448,10 +448,9 @@ int cmd_thread(int argc, const char **argv)
 	if (argc == 0 || cmd == NULL || !strcmp(cmd, "--help"))
 		cmd = "help";
 
-	for (i = 0; i < ARRAY_SIZE(thread_commands); i++) {
+	for (i = 0; i < ARRAY_SIZE(thread_commands); i++)
 		if (!strcmp(thread_commands[i].cmd, cmd))
 			return run_builtin(&thread_commands[i], argc, argv);
-	}
 
 	return ENOSYS;
 }

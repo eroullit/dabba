@@ -402,10 +402,9 @@ int cmd_capture(int argc, const char **argv)
 	if (argc == 0 || cmd == NULL || !strcmp(cmd, "--help"))
 		cmd = "help";
 
-	for (i = 0; i < ARRAY_SIZE(capture_commands); i++) {
+	for (i = 0; i < ARRAY_SIZE(capture_commands); i++)
 		if (!strcmp(capture_commands[i].cmd, cmd))
 			return run_builtin(&capture_commands[i], argc, argv);
-	}
 
 	return ENOSYS;
 }
