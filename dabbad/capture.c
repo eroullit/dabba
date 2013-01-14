@@ -68,7 +68,7 @@
  *      - The memory page order must be greater than zero
  */
 
-static int capture_settings_are_valid(const Dabba__CaptureSettings * capturep)
+static int capture_settings_are_valid(const Dabba__Capture * capturep)
 {
 
 	assert(capturep);
@@ -133,7 +133,7 @@ void dabbad_capture_stop(Dabba__DabbaService_Service * service,
 }
 
 void dabbad_capture_start(Dabba__DabbaService_Service * service,
-			  const Dabba__CaptureSettings * capturep,
+			  const Dabba__Capture * capturep,
 			  Dabba__Dummy_Closure closure, void *closure_data)
 {
 	Dabba__Dummy dummy = DABBA__DUMMY__INIT;
@@ -183,14 +183,12 @@ void dabbad_capture_start(Dabba__DabbaService_Service * service,
 	closure(&dummy, closure_data);
 }
 
-void dabbad_capture_settings_get(Dabba__DabbaService_Service * service,
-				 const Dabba__ThreadIdList * id_listp,
-				 Dabba__CaptureSettingsList_Closure closure,
-				 void *closure_data)
+void dabbad_capture_get(Dabba__DabbaService_Service * service,
+			const Dabba__ThreadIdList * id_listp,
+			Dabba__CaptureList_Closure closure, void *closure_data)
 {
-	Dabba__CaptureSettingsList capture_list =
-	    DABBA__CAPTURE_SETTINGS_LIST__INIT;
-	Dabba__CaptureSettingsList *capturep = NULL;
+	Dabba__CaptureList capture_list = DABBA__CAPTURE_LIST__INIT;
+	Dabba__CaptureList *capturep = NULL;
 	struct packet_capture_thread *pkt_capture;
 	struct packet_thread *pkt_thread;
 	struct nl_sock *sock;
@@ -223,7 +221,7 @@ void dabbad_capture_settings_get(Dabba__DabbaService_Service * service,
 		if (!capture_list.list[a])
 			goto out;
 
-		dabba__capture_settings__init(capture_list.list[a]);
+		dabba__capture__init(capture_list.list[a]);
 
 		capture_list.list[a]->id =
 		    malloc(sizeof(*capture_list.list[a]->id));

@@ -40,12 +40,11 @@ void dabbad_capture_stop(Dabba__DabbaService_Service * service,
 			 Dabba__Dummy_Closure closure, void *closure_data);
 
 void dabbad_capture_start(Dabba__DabbaService_Service * service,
-			  const Dabba__CaptureSettings * capturep,
+			  const Dabba__Capture * capturep,
 			  Dabba__Dummy_Closure closure, void *closure_data);
 
-void dabbad_capture_settings_get(Dabba__DabbaService_Service * service,
-				 const Dabba__ThreadIdList * id_listp,
-				 Dabba__CaptureSettingsList_Closure closure,
-				 void *closure_data);
+void dabbad_capture_get(Dabba__DabbaService_Service * service,
+			const Dabba__ThreadIdList * id_listp,
+			Dabba__CaptureList_Closure closure, void *closure_data);
 
 #endif				/* CAPTURE_H */

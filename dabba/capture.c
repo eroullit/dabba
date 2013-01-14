@@ -182,7 +182,7 @@ static struct option *capture_start_options_get(void)
 }
 
 static int prepare_capture_start_query(int argc, char **argv,
-				       Dabba__CaptureSettings * settingsp)
+				       Dabba__Capture * settingsp)
 {
 	int ret, rc = 0;
 
@@ -234,10 +234,10 @@ static void display_capture_list_header(void)
 	printf("  captures:\n");
 }
 
-static void capture_settings_list_print(const Dabba__CaptureSettingsList *
-					result, void *closure_data)
+static void capture_list_print(const Dabba__CaptureList *
+			       result, void *closure_data)
 {
-	const Dabba__CaptureSettings *capture;
+	const Dabba__Capture *capture;
 	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
 	size_t a;
 
@@ -267,7 +267,7 @@ int cmd_capture_start(int argc, const char **argv)
 {
 	ProtobufCService *service;
 	protobuf_c_boolean is_done = 0;
-	Dabba__CaptureSettings capture_settings = DABBA__CAPTURE_SETTINGS__INIT;
+	Dabba__Capture capture_settings = DABBA__CAPTURE__INIT;
 
 	assert(argc >= 0);
 	assert(argv);
@@ -305,9 +305,8 @@ int cmd_capture_settings_list(int argc, const char **argv)
 	/* TODO Make server name configurable */
 	service = dabba_rpc_client_connect(NULL);
 
-	dabba__dabba_service__capture_settings_get(service, &id_list,
-						   capture_settings_list_print,
-						   &is_done);
+	dabba__dabba_service__capture_get(service, &id_list, capture_list_print,
+					  &is_done);
 
 	dabba_rpc_call_is_done(&is_done);
 
