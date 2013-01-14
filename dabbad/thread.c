@@ -306,15 +306,13 @@ void dabbad_thread_id_get(Dabba__DabbaService_Service * service,
 	free(id_list.list);
 }
 
-void dabbad_thread_settings_get(Dabba__DabbaService_Service * service,
-				const Dabba__ThreadIdList * id_listp,
-				Dabba__ThreadSettingsList_Closure closure,
-				void *closure_data)
+void dabbad_thread_get(Dabba__DabbaService_Service * service,
+		       const Dabba__ThreadIdList * id_listp,
+		       Dabba__ThreadList_Closure closure, void *closure_data)
 {
-	Dabba__ThreadSettingsList settings_list =
-	    DABBA__THREAD_SETTINGS_LIST__INIT;
-	Dabba__ThreadSettingsList *settings_listp = NULL;
-	Dabba__ThreadSettings *settingsp;
+	Dabba__ThreadList settings_list = DABBA__THREAD_LIST__INIT;
+	Dabba__ThreadList *settings_listp = NULL;
+	Dabba__Thread *settingsp;
 	struct packet_thread *pkt_thread;
 	size_t a = 0;
 
@@ -342,7 +340,7 @@ void dabbad_thread_settings_get(Dabba__DabbaService_Service * service,
 		if (!settings_list.list[a])
 			goto out;
 
-		dabba__thread_settings__init(settings_list.list[a]);
+		dabba__thread__init(settings_list.list[a]);
 
 		settings_list.list[a]->id =
 		    malloc(sizeof(*settings_list.list[a]->id));

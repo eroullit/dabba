@@ -204,7 +204,7 @@ message thread_id_list
     repeated thread_id list = 1;
 }
 
-message thread_settings
+message thread
 {
     required thread_id id = 1;
     optional string cpu_set = 2;
@@ -213,9 +213,9 @@ message thread_settings
     optional int32 sched_priority = 5;
 }
 
-message thread_settings_list
+message thread_list
 {
-    repeated thread_settings list = 1;
+    repeated thread list = 1;
 }
 
 message thread_capabilities
@@ -260,7 +260,7 @@ service dabba_service
     rpc interface_capabilities_get (interface_id_list) returns (interface_capabilities_list);
     rpc interface_statistics_get (interface_id_list) returns (interface_statistics_list);
     rpc interface_id_get (dummy) returns (interface_id_list);
-    rpc thread_settings_get (thread_id_list) returns (thread_settings_list);
+    rpc thread_get (thread_id_list) returns (thread_list);
     rpc thread_capabilities_get (dummy) returns (thread_capabilities_list);
     rpc thread_id_get (dummy) returns (thread_id_list);
     rpc capture_get (thread_id_list) returns (capture_list);

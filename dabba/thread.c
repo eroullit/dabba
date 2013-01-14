@@ -271,19 +271,19 @@ const char *thread_key_get(const int type)
 	return a < max ? thread_name_mapping[a].key : "unknown";
 }
 
-static void thread_list_header_print(void)
+static void thread_header_print(void)
 {
 	printf("---\n");
 	printf("  threads:\n");
 }
 
-static void thread_list_print(const Dabba__ThreadIdList * result,
-			      void *closure_data)
+static void thread_id_print(const Dabba__ThreadIdList * result,
+			    void *closure_data)
 {
 	size_t a;
 	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
 
-	thread_list_header_print();
+	thread_header_print();
 
 	for (a = 0; result && a < result->n_list; a++)
 		printf("    - %" PRIu64 "\n", result->list[a]->id);
@@ -291,19 +291,12 @@ static void thread_list_print(const Dabba__ThreadIdList * result,
 	*status = 1;
 }
 
-static void thread_settings_list_header_print(void)
-{
-	printf("---\n");
-	printf("  threads:\n");
-}
-
-static void thread_settings_list_print(const Dabba__ThreadSettingsList * result,
-				       void *closure_data)
+static void thread_print(const Dabba__ThreadList * result, void *closure_data)
 {
 	size_t a;
 	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
 
-	thread_settings_list_header_print();
+	thread_header_print();
 
 	for (a = 0; result && a < result->n_list; a++) {
 		printf("    - id: %" PRIu64 "\n", result->list[a]->id->id);
@@ -365,8 +358,8 @@ int cmd_thread_list(int argc, const char **argv)
 	/* TODO Make server name configurable */
 	service = dabba_rpc_client_connect(NULL);
 
-	dabba__dabba_service__thread_id_get(service, &dummy,
-					    thread_list_print, &is_done);
+	dabba__dabba_service__thread_id_get(service, &dummy, thread_id_print,
+					    &is_done);
 
 	dabba_rpc_call_is_done(&is_done);
 
@@ -386,9 +379,8 @@ int cmd_thread_settings(int argc, const char **argv)
 	/* TODO Make server name configurable */
 	service = dabba_rpc_client_connect(NULL);
 
-	dabba__dabba_service__thread_settings_get(service, &id_list,
-						  thread_settings_list_print,
-						  &is_done);
+	dabba__dabba_service__thread_get(service, &id_list,
+					 thread_print, &is_done);
 
 	dabba_rpc_call_is_done(&is_done);
 
