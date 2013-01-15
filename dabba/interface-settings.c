@@ -75,95 +75,19 @@ static void interface_settings_list_print(const Dabba__InterfaceSettingsList *
 	*status = 1;
 }
 
-static int prepare_interface_settings_query(int argc, char **argv,
-					    char **server_name,
-					    Dabba__InterfaceIdList * list)
-{
-	enum interface_settings_option {
-		OPT_SERVER_ID,
-		OPT_INTERFACE_ID,
-		OPT_HELP,
-	};
-	const struct option interface_settings_option[] = {
-		{"id", required_argument, NULL, OPT_INTERFACE_ID},
-		{"server", required_argument, NULL, OPT_SERVER_ID},
-		{NULL, 0, NULL, 0},
-	};
-	int ret, rc = 0;
-	Dabba__InterfaceId **idpp;
-
-	assert(list);
-
-	while ((ret =
-		getopt_long_only(argc, argv, "", interface_settings_option,
-				 NULL)) != EOF) {
-		switch (ret) {
-		case OPT_SERVER_ID:
-			*server_name = optarg;
-			break;
-		case OPT_INTERFACE_ID:
-			idpp =
-			    realloc(list->list,
-				    sizeof(*list->list) * (list->n_list + 1));
-
-			if (!idpp)
-				return ENOMEM;
-
-			list->list = idpp;
-			list->list[list->n_list] =
-			    malloc(sizeof(*list->list[list->n_list]));
-
-			if (!list->list[list->n_list])
-				return ENOMEM;
-
-			dabba__interface_id__init(list->list[list->n_list]);
-
-			list->list[list->n_list]->name = optarg;
-			list->n_list++;
-
-			break;
-		case OPT_HELP:
-		default:
-			show_usage(interface_settings_option);
-			rc = -1;
-			break;
-		}
-	}
-
-	return rc;
-}
-
-int cmd_interface_settings(int argc, const char **argv)
+int cmd_interface_settings_get(const char *const server_id,
+			       const Dabba__InterfaceIdList * id_list)
 {
 	ProtobufCService *service;
 	protobuf_c_boolean is_done = 0;
-	Dabba__InterfaceIdList id_list = DABBA__INTERFACE_ID_LIST__INIT;
-	char *server_name = NULL;
-	size_t a;
-	int rc;
 
-	assert(argc >= 0);
-	assert(argv);
+	service = dabba_rpc_client_connect(server_id);
 
-	rc = prepare_interface_settings_query(argc, (char **)argv, &server_name,
-					      &id_list);
-
-	if (rc)
-		goto out;
-
-	service = dabba_rpc_client_connect(server_name);
-
-	dabba__dabba_service__interface_settings_get(service, &id_list,
+	dabba__dabba_service__interface_settings_get(service, id_list,
 						     interface_settings_list_print,
 						     &is_done);
 
 	dabba_rpc_call_is_done(&is_done);
 
- out:
-	for (a = 0; a < id_list.n_list; a++)
-		free(id_list.list[a]);
-
-	free(id_list.list);
-
-	return rc;
+	return 0;
 }
