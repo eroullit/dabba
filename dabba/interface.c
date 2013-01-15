@@ -200,6 +200,7 @@ static int cmd_interface_get(int argc, const char **argv)
 	enum interface_option {
 		/* action */
 		OPT_INTERFACE_STATISTICS,
+		OPT_INTERFACE_STATUS,
 		/* option */
 		OPT_INTERFACE_ID,
 		OPT_SERVER_ID,
@@ -209,11 +210,13 @@ static int cmd_interface_get(int argc, const char **argv)
 	int (*const rpc_interface_get[]) (const char *const server_id,
 					  const Dabba__InterfaceIdList *
 					  id_list) = {
-	[OPT_INTERFACE_STATISTICS] = cmd_interface_statistics_get};
+	[OPT_INTERFACE_STATISTICS] = cmd_interface_statistics_get,
+		    [OPT_INTERFACE_STATUS] = cmd_interface_status_get};
 
 	const struct option interface_option[] = {
 		{"id", required_argument, NULL, OPT_INTERFACE_ID},
 		{"statistics", no_argument, NULL, OPT_INTERFACE_STATISTICS},
+		{"status", no_argument, NULL, OPT_INTERFACE_STATUS},
 		{"server", required_argument, NULL, OPT_SERVER_ID},
 		{NULL, 0, NULL, 0},
 	};
@@ -255,6 +258,7 @@ static int cmd_interface_get(int argc, const char **argv)
 
 			break;
 		case OPT_INTERFACE_STATISTICS:
+		case OPT_INTERFACE_STATUS:
 			action |= (1 << ret);
 			break;
 		case OPT_HELP:
