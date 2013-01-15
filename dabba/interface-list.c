@@ -58,17 +58,16 @@ static void interface_list_print(const Dabba__InterfaceIdList * result,
 	*status = 1;
 }
 
-int cmd_interface_list(int argc, const char **argv)
+int cmd_interface_list_get(const char *const server_id,
+			   const Dabba__InterfaceIdList * id_list)
 {
 	ProtobufCService *service;
 	protobuf_c_boolean is_done = 0;
 	Dabba__Dummy dummy = DABBA__DUMMY__INIT;
 
-	assert(argc >= 0);
-	assert(argv);
+	assert(id_list);
 
-	/* TODO Make server name configurable */
-	service = dabba_rpc_client_connect(NULL);
+	service = dabba_rpc_client_connect(server_id);
 
 	dabba__dabba_service__interface_id_get(service, &dummy,
 					       interface_list_print, &is_done);
