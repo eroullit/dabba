@@ -24,6 +24,7 @@
 #ifndef INTERFACE_STATISTICS_H
 #define	INTERFACE_STATISTICS_H
 
-int cmd_interface_statistics(int argc, const char **argv);
+int cmd_interface_statistics_get(const char *const server_id,
+				 const Dabba__InterfaceIdList * id_list);
 
 #endif				/* INTERFACE_STATISTICS_H */

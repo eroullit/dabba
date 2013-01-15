@@ -152,6 +152,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
 #include <assert.h>
@@ -194,6 +195,92 @@ const char *ethtool_port_str_get(const uint8_t port)
 	return port < sizeof(port_str) ? port_str[port] : "unknown";
 }
 
+static int cmd_interface_get(int argc, const char **argv)
+{
+	enum interface_option {
+		/* action */
+		OPT_INTERFACE_STATISTICS,
+		/* option */
+		OPT_INTERFACE_ID,
+		OPT_SERVER_ID,
+		OPT_HELP
+	};
+
+	int (*const rpc_interface_get[]) (const char *const server_id,
+					  const Dabba__InterfaceIdList *
+					  id_list) = {
+	[OPT_INTERFACE_STATISTICS] = cmd_interface_statistics_get};
+
+	const struct option interface_option[] = {
+		{"id", required_argument, NULL, OPT_INTERFACE_ID},
+		{"statistics", no_argument, NULL, OPT_INTERFACE_STATISTICS},
+		{"server", required_argument, NULL, OPT_SERVER_ID},
+		{NULL, 0, NULL, 0},
+	};
+
+	int ret, rc = 0, action = 0;
+	size_t a;
+	const char *server_id = NULL;
+	Dabba__InterfaceIdList id_list = DABBA__INTERFACE_ID_LIST__INIT;
+	Dabba__InterfaceId **idpp;
+
+	/* parse options and actions to run */
+	while ((ret =
+		getopt_long_only(argc, (char **)argv, "", interface_option,
+				 NULL)) != EOF) {
+		switch (ret) {
+		case OPT_SERVER_ID:
+			server_id = optarg;
+			break;
+		case OPT_INTERFACE_ID:
+			idpp =
+			    realloc(id_list.list,
+				    sizeof(*id_list.list) * (id_list.n_list +
+							     1));
+
+			if (!idpp)
+				return ENOMEM;
+
+			id_list.list = idpp;
+			id_list.list[id_list.n_list] =
+			    malloc(sizeof(*id_list.list[id_list.n_list]));
+
+			if (!id_list.list[id_list.n_list])
+				return ENOMEM;
+
+			dabba__interface_id__init(id_list.list[id_list.n_list]);
+
+			id_list.list[id_list.n_list]->name = optarg;
+			id_list.n_list++;
+
+			break;
+		case OPT_INTERFACE_STATISTICS:
+			action |= (1 << ret);
+			break;
+		case OPT_HELP:
+		default:
+			show_usage(interface_option);
+			rc = -1;
+			break;
+		}
+	}
+
+	/* run requested actions */
+	for (a = 0; a < ARRAY_SIZE(rpc_interface_get); a++)
+		if (action & (1 << a))
+			rc = rpc_interface_get[a] (server_id, &id_list);
+
+	/* cleanup */
+	for (a = 0; a < id_list.n_list; a++)
+		free(id_list.list[a]);
+
+	free(id_list.list);
+
+	/* Check error reporting */
+
+	return rc;
+}
+
 /**
  * \brief Parse which interface sub-command.
  * \param[in]           argc	        Argument counter
@@ -210,15 +297,7 @@ int cmd_interface(int argc, const char **argv)
 	const char *cmd = argv[0];
 	size_t i;
 	static struct cmd_struct interface_commands[] = {
-		{"status", cmd_interface_status},
-		{"list", cmd_interface_list},
-		{"driver", cmd_interface_driver},
-		{"settings", cmd_interface_settings},
-		{"capabilities", cmd_interface_capabilities},
-		{"pause", cmd_interface_pause},
-		{"coalesce", cmd_interface_coalesce},
-		{"offload", cmd_interface_offload},
-		{"statistics", cmd_interface_statistics},
+		{"get", cmd_interface_get},
 		{"modify", NULL}
 	};
 
