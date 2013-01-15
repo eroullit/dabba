@@ -24,6 +24,7 @@
 #ifndef INTERFACE_OFFLOAD_H
 #define	INTERFACE_OFFLOAD_H
 
-int cmd_interface_offload(int argc, const char **argv);
+int cmd_interface_offload_get(const char *const server_id,
+			      const Dabba__InterfaceIdList * id_list);
 
 #endif				/* INTERFACE_OFFLOAD_H */

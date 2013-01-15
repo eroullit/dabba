@@ -203,6 +203,7 @@ static int cmd_interface_get(int argc, const char **argv)
 		OPT_INTERFACE_STATUS,
 		OPT_INTERFACE_SETTINGS,
 		OPT_INTERFACE_PAUSE,
+		OPT_INTERFACE_OFFLOAD,
 		/* option */
 		OPT_INTERFACE_ID,
 		OPT_SERVER_ID,
@@ -215,7 +216,9 @@ static int cmd_interface_get(int argc, const char **argv)
 	[OPT_INTERFACE_STATISTICS] = cmd_interface_statistics_get,
 		    [OPT_INTERFACE_STATUS] = cmd_interface_status_get,
 		    [OPT_INTERFACE_PAUSE] = cmd_interface_pause_get,
-		    [OPT_INTERFACE_SETTINGS] = cmd_interface_settings_get};
+		    [OPT_INTERFACE_SETTINGS] =
+		    cmd_interface_settings_get,[OPT_INTERFACE_OFFLOAD] =
+		    cmd_interface_offload_get};
 
 	const struct option interface_option[] = {
 		{"id", required_argument, NULL, OPT_INTERFACE_ID},
@@ -223,6 +226,7 @@ static int cmd_interface_get(int argc, const char **argv)
 		{"status", no_argument, NULL, OPT_INTERFACE_STATUS},
 		{"settings", no_argument, NULL, OPT_INTERFACE_SETTINGS},
 		{"pause", no_argument, NULL, OPT_INTERFACE_PAUSE},
+		{"offload", no_argument, NULL, OPT_INTERFACE_OFFLOAD},
 		{"server", required_argument, NULL, OPT_SERVER_ID},
 		{NULL, 0, NULL, 0},
 	};
@@ -267,6 +271,7 @@ static int cmd_interface_get(int argc, const char **argv)
 		case OPT_INTERFACE_STATUS:
 		case OPT_INTERFACE_SETTINGS:
 		case OPT_INTERFACE_PAUSE:
+		case OPT_INTERFACE_OFFLOAD:
 			action |= (1 << ret);
 			break;
 		case OPT_HELP:
