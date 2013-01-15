@@ -30,7 +30,7 @@ test_expect_success "Setup: Start dabbad" "
 "
 
 test_expect_success 'invoke dabba interface driver command with dabbad' "
-    '$DABBA_PATH'/dabba interface driver get > result
+    '$DABBA_PATH'/dabba interface get --driver > result
 "
 
 test_expect_success PYTHON_YAML "Parse interface driver YAML output" "

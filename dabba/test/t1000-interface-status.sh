@@ -64,7 +64,7 @@ test_expect_success "Check 'dabba interface' help output" "
 "
 
 test_expect_success "invoke dabba interface status with dabbad" "
-    '$DABBA_PATH'/dabba interface status get > result &&
+    '$DABBA_PATH'/dabba interface get --status > result &&
     grep '\- name: ' result > name_result &&
     generate_yaml_status > expected &&
     sort -o expected_sorted expected &&

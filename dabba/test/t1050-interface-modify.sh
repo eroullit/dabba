@@ -42,7 +42,7 @@ test_expect_success "Activate dummy interface" "
 "
 
 test_expect_success DUMMY_DEV,PYTHON_YAML "Parse interface YAML output" "
-    '$DABBA_PATH'/dabba interface status get > result &&
+    '$DABBA_PATH'/dabba interface get --status > result &&
     yaml2dict result > parsed
 "
 

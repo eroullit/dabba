@@ -30,7 +30,7 @@ test_expect_success "Setup: Start dabbad" "
 "
 
 test_expect_success 'invoke dabba interface pause command with dabbad' "
-    '$DABBA_PATH'/dabba interface pause get > result
+    '$DABBA_PATH'/dabba interface get --pause > result
 "
 
 test_expect_success PYTHON_YAML "Parse interface pause YAML output" "
