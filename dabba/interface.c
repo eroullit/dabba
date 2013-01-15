@@ -206,6 +206,7 @@ static int cmd_interface_get(int argc, const char **argv)
 		OPT_INTERFACE_OFFLOAD,
 		OPT_INTERFACE_LIST,
 		OPT_INTERFACE_DRIVER,
+		OPT_INTERFACE_COALESCE,
 		/* option */
 		OPT_INTERFACE_ID,
 		OPT_SERVER_ID,
@@ -222,7 +223,8 @@ static int cmd_interface_get(int argc, const char **argv)
 		    cmd_interface_settings_get,[OPT_INTERFACE_OFFLOAD] =
 		    cmd_interface_offload_get,[OPT_INTERFACE_LIST] =
 		    cmd_interface_list_get,
-		    [OPT_INTERFACE_DRIVER] = cmd_interface_driver_get,};
+		    [OPT_INTERFACE_DRIVER] = cmd_interface_driver_get,
+		    [OPT_INTERFACE_COALESCE] = cmd_interface_coalesce_get};
 
 	const struct option interface_option[] = {
 		{"id", required_argument, NULL, OPT_INTERFACE_ID},
@@ -233,6 +235,7 @@ static int cmd_interface_get(int argc, const char **argv)
 		{"offload", no_argument, NULL, OPT_INTERFACE_OFFLOAD},
 		{"list", no_argument, NULL, OPT_INTERFACE_LIST},
 		{"driver", no_argument, NULL, OPT_INTERFACE_DRIVER},
+		{"coalesce", no_argument, NULL, OPT_INTERFACE_COALESCE},
 		{"server", required_argument, NULL, OPT_SERVER_ID},
 		{NULL, 0, NULL, 0},
 	};
@@ -280,6 +283,7 @@ static int cmd_interface_get(int argc, const char **argv)
 		case OPT_INTERFACE_OFFLOAD:
 		case OPT_INTERFACE_LIST:
 		case OPT_INTERFACE_DRIVER:
+		case OPT_INTERFACE_COALESCE:
 			action |= (1 << ret);
 			break;
 		case OPT_HELP:
