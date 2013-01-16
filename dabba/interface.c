@@ -242,6 +242,7 @@ static int cmd_interface_get(int argc, const char **argv)
 		{"coalesce", no_argument, NULL, OPT_INTERFACE_COALESCE},
 		{"capabilities", no_argument, NULL, OPT_INTERFACE_CAPABILITIES},
 		{"server", required_argument, NULL, OPT_SERVER_ID},
+		{"help", required_argument, NULL, OPT_HELP},
 		{NULL, 0, NULL, 0},
 	};
 

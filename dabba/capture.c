@@ -401,6 +401,7 @@ int cmd_capture_get(int argc, const char **argv)
 		{"list", no_argument, NULL, OPT_CAPTURE_LIST},
 		{"settings", no_argument, NULL, OPT_CAPTURE_SETTINGS},
 		{"server", required_argument, NULL, OPT_SERVER_ID},
+		{"help", no_argument, NULL, OPT_HELP},
 		{NULL, 0, NULL, 0},
 	};
 
