@@ -160,65 +160,9 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 
 #define DEFAULT_CAPTURE_FRAME_NUMBER 32
 
-enum capture_start_option {
-	OPT_CAPTURE_INTERFACE,
-	OPT_CAPTURE_PCAP,
-	OPT_CAPTURE_FRAME_NUMBER
-};
-
 enum capture_stop_option {
 	OPT_CAPTURE_ID
 };
-
-static struct option *capture_start_options_get(void)
-{
-	static struct option capture_start_option[] = {
-		{"interface", required_argument, NULL, OPT_CAPTURE_INTERFACE},
-		{"pcap", required_argument, NULL, OPT_CAPTURE_PCAP},
-		{"frame-number", required_argument, NULL,
-		 OPT_CAPTURE_FRAME_NUMBER},
-		{NULL, 0, NULL, 0},
-	};
-
-	return capture_start_option;
-}
-
-static int prepare_capture_start_query(int argc, char **argv,
-				       Dabba__Capture * settingsp)
-{
-	int ret, rc = 0;
-
-	assert(settingsp);
-
-	/* Assume conservative values for now */
-	settingsp->has_frame_nr = settingsp->has_frame_size = 1;
-	settingsp->frame_size = PACKET_MMAP_ETH_FRAME_LEN;
-	settingsp->frame_nr = DEFAULT_CAPTURE_FRAME_NUMBER;
-
-	while ((ret =
-		getopt_long_only(argc, argv, "", capture_start_options_get(),
-				 NULL)) != EOF) {
-		switch (ret) {
-		case OPT_CAPTURE_INTERFACE:
-			settingsp->interface = optarg;
-			break;
-
-		case OPT_CAPTURE_PCAP:
-			settingsp->pcap = optarg;
-			break;
-		case OPT_CAPTURE_FRAME_NUMBER:
-			settingsp->frame_nr = strtoull(optarg, NULL, 10);
-			break;
-			/*TODO make frame size configurable */
-		default:
-			show_usage(capture_start_options_get());
-			rc = -1;
-			break;
-		}
-	}
-
-	return rc;
-}
 
 static void capture_dummy_print(const Dabba__Dummy * result, void *closure_data)
 {
@@ -256,36 +200,6 @@ static void capture_list_print(const Dabba__CaptureList *
 	}
 
 	*status = 1;
-}
-
-/**
- * \brief Prepare a command to start a capture.
- * \param[in]           argc	        Argument counter
- * \param[in]           argv		Argument vector
- * \return 0 on success, else on failure.
- */
-
-int cmd_capture_start(int argc, const char **argv)
-{
-	ProtobufCService *service;
-	protobuf_c_boolean is_done = 0;
-	Dabba__Capture capture_settings = DABBA__CAPTURE__INIT;
-
-	assert(argc >= 0);
-	assert(argv);
-
-	prepare_capture_start_query(argc, (char **)argv, &capture_settings);
-
-	/* TODO Make server name configurable */
-	service = dabba_rpc_client_connect(NULL);
-
-	/* TODO Print create capture thread id ? */
-	dabba__dabba_service__capture_start(service, &capture_settings,
-					    capture_dummy_print, &is_done);
-
-	dabba_rpc_call_is_done(&is_done);
-
-	return 0;
 }
 
 /**
@@ -377,6 +291,89 @@ int cmd_capture_stop(int argc, const char **argv)
 	dabba_rpc_call_is_done(&is_done);
 
 	return 0;
+}
+
+int rpc_capture_start(const char *const server_id,
+		      const Dabba__Capture * capture)
+{
+	ProtobufCService *service;
+	protobuf_c_boolean is_done = 0;
+
+	service = dabba_rpc_client_connect(server_id);
+
+	/* TODO Print create capture thread id ? */
+	dabba__dabba_service__capture_start(service, capture,
+					    capture_dummy_print, &is_done);
+
+	dabba_rpc_call_is_done(&is_done);
+
+	return 0;
+}
+
+int cmd_capture_start(int argc, const char **argv)
+{
+	enum capture_start_option {
+		OPT_CAPTURE_INTERFACE,
+		OPT_CAPTURE_PCAP,
+		OPT_CAPTURE_FRAME_NUMBER,
+		OPT_CAPTURE_FRAME_SIZE,
+		OPT_SERVER_ID,
+		OPT_HELP
+	};
+
+	const char *server_id = NULL;
+	int ret, rc = 0;
+	Dabba__Capture capture = DABBA__CAPTURE__INIT;
+
+	static struct option capture_option[] = {
+		{"interface", required_argument, NULL, OPT_CAPTURE_INTERFACE},
+		{"pcap", required_argument, NULL, OPT_CAPTURE_PCAP},
+		{"frame-number", required_argument, NULL,
+		 OPT_CAPTURE_FRAME_NUMBER},
+		{"frame-size", required_argument, NULL, OPT_CAPTURE_FRAME_SIZE},
+		{"server", required_argument, NULL, OPT_SERVER_ID},
+		{"help", no_argument, NULL, OPT_HELP},
+		{NULL, 0, NULL, 0},
+	};
+
+	/* Assume conservative values for now */
+	capture.has_frame_nr = capture.has_frame_size = 1;
+	capture.frame_size = PACKET_MMAP_ETH_FRAME_LEN;
+	capture.frame_nr = DEFAULT_CAPTURE_FRAME_NUMBER;
+
+	/* parse capture options */
+	while ((ret =
+		getopt_long_only(argc, (char **)argv, "", capture_option,
+				 NULL)) != EOF) {
+		switch (ret) {
+		case OPT_CAPTURE_INTERFACE:
+			capture.interface = optarg;
+			break;
+		case OPT_CAPTURE_PCAP:
+			capture.pcap = optarg;
+			break;
+		case OPT_CAPTURE_FRAME_NUMBER:
+			capture.frame_nr = strtoull(optarg, NULL, 10);
+			break;
+		case OPT_CAPTURE_FRAME_SIZE:
+			capture.frame_size = strtoull(optarg, NULL, 10);
+			break;
+		case OPT_SERVER_ID:
+			server_id = optarg;
+			break;
+		case OPT_HELP:
+		default:
+			show_usage(capture_option);
+			rc = -1;
+			break;
+		}
+	}
+
+	/* Check error reporting */
+
+	rc = rpc_capture_start(server_id, &capture);
+
+	return rc;
 }
 
 int cmd_capture_get(int argc, const char **argv)
@@ -481,7 +478,8 @@ int cmd_capture(int argc, const char **argv)
 	const char *cmd = argv[0];
 	size_t i;
 	static struct cmd_struct capture_commands[] = {
-		{"get", cmd_capture_get}
+		{"start", cmd_capture_start},
+		{"get", cmd_capture_get},
 	};
 
 	if (argc == 0 || cmd == NULL || !strcmp(cmd, "--help"))
