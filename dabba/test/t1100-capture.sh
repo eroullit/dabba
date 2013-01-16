@@ -81,7 +81,7 @@ test_expect_failure "Invoke capture command w/o any parameters" "
 
 test_expect_success "Start capture thread with a default frame number" "
     '$DABBA_PATH'/dabba capture start --interface any --pcap test.pcap &&
-    '$DABBA_PATH'/dabba capture list > result
+    '$DABBA_PATH'/dabba capture get --settings > result
 "
 
 test_expect_success PYTHON_YAML "Parse capture YAML output" "
@@ -100,7 +100,7 @@ test_expect_success PYTHON_YAML "Check thread default capture frame number ($def
 
 test_expect_success PYTHON_YAML "Stop capture thread with a default frame number" "
     '$DABBA_PATH'/dabba capture stop --id '$(cat result_id)' &&
-    '$DABBA_PATH'/dabba capture list > after &&
+    '$DABBA_PATH'/dabba capture get --settings > after &&
     test_must_fail grep -wq -f result_id after
 "
 
@@ -108,7 +108,7 @@ for i in `seq 0 9`
 do
         test_expect_success "Start capture thread #$(($i+1)) on loopback" "
             '$DABBA_PATH'/dabba capture start --interface any --pcap test$i.pcap --frame-number $frame_nr &&
-            '$DABBA_PATH'/dabba capture list > result
+            '$DABBA_PATH'/dabba capture get --settings > result
         "
 
         test_expect_success PYTHON_YAML "Parse capture YAML output" "
@@ -160,7 +160,7 @@ do
 
         test_expect_success PYTHON_YAML "Stop capture thread #$(($i+1)) on loopback" "
             '$DABBA_PATH'/dabba capture stop --id '$(cat result_id)' &&
-            '$DABBA_PATH'/dabba capture list > after &&
+            '$DABBA_PATH'/dabba capture get --settings > after &&
             test_must_fail grep -wq -f result_id after
         "
 done
