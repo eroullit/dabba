@@ -300,6 +300,10 @@ static int cmd_interface_get(int argc, const char **argv)
 		}
 	}
 
+	/* list interfaces as default action */
+	if (!action)
+		action = 1 << OPT_INTERFACE_LIST;
+
 	/* run requested actions */
 	for (a = 0; a < ARRAY_SIZE(rpc_interface_get); a++)
 		if (action & (1 << a))
