@@ -229,70 +229,6 @@ int cmd_capture_settings_list(int argc, const char **argv)
 	return 0;
 }
 
-static struct option *capture_stop_options_get(void)
-{
-	static struct option capture_stop_option[] = {
-		{"id", required_argument, NULL, OPT_CAPTURE_ID},
-		{NULL, 0, NULL, 0},
-	};
-
-	return capture_stop_option;
-}
-
-static int prepare_capture_stop_query(int argc, char **argv,
-				      Dabba__ThreadId * idp)
-{
-	int ret, rc = 0;
-
-	assert(idp);
-
-	while ((ret =
-		getopt_long_only(argc, argv, "", capture_stop_options_get(),
-				 NULL)) != EOF) {
-		switch (ret) {
-		case OPT_CAPTURE_ID:
-			idp->id = strtoull(optarg, NULL, 10);
-			break;
-		default:
-			show_usage(capture_stop_options_get());
-			rc = -1;
-			break;
-		}
-	}
-
-	return rc;
-}
-
-/**
- * \brief Prepare a command to stop a active capture.
- * \param[in]           argc	        Argument counter
- * \param[in]           argv		Argument vector
- * \return 0 on success, else on failure.
- */
-
-int cmd_capture_stop(int argc, const char **argv)
-{
-	ProtobufCService *service;
-	protobuf_c_boolean is_done = 0;
-	Dabba__ThreadId id = DABBA__THREAD_ID__INIT;
-
-	assert(argc >= 0);
-	assert(argv);
-
-	prepare_capture_stop_query(argc, (char **)argv, &id);
-
-	/* TODO Make server name configurable */
-	service = dabba_rpc_client_connect(NULL);
-
-	/* TODO Print create capture thread id ? */
-	dabba__dabba_service__capture_stop(service, &id,
-					   capture_dummy_print, &is_done);
-
-	dabba_rpc_call_is_done(&is_done);
-
-	return 0;
-}
-
 int rpc_capture_start(const char *const server_id,
 		      const Dabba__Capture * capture)
 {
@@ -304,6 +240,21 @@ int rpc_capture_start(const char *const server_id,
 	/* TODO Print create capture thread id ? */
 	dabba__dabba_service__capture_start(service, capture,
 					    capture_dummy_print, &is_done);
+
+	dabba_rpc_call_is_done(&is_done);
+
+	return 0;
+}
+
+int rpc_capture_stop(const char *const server_id, const Dabba__ThreadId * id)
+{
+	ProtobufCService *service;
+	protobuf_c_boolean is_done = 0;
+
+	service = dabba_rpc_client_connect(server_id);
+
+	dabba__dabba_service__capture_stop(service, id,
+					   capture_dummy_print, &is_done);
 
 	dabba_rpc_call_is_done(&is_done);
 
@@ -372,6 +323,51 @@ int cmd_capture_start(int argc, const char **argv)
 	/* Check error reporting */
 
 	rc = rpc_capture_start(server_id, &capture);
+
+	return rc;
+}
+
+int cmd_capture_stop(int argc, const char **argv)
+{
+	enum capture_start_option {
+		OPT_CAPTURE_ID,
+		OPT_SERVER_ID,
+		OPT_HELP
+	};
+
+	const char *server_id = NULL;
+	int ret, rc = 0;
+	Dabba__ThreadId id = DABBA__THREAD_ID__INIT;
+
+	static struct option capture_option[] = {
+		{"id", required_argument, NULL, OPT_CAPTURE_ID},
+		{"server", required_argument, NULL, OPT_SERVER_ID},
+		{"help", no_argument, NULL, OPT_HELP},
+		{NULL, 0, NULL, 0},
+	};
+
+	/* parse capture options */
+	while ((ret =
+		getopt_long_only(argc, (char **)argv, "", capture_option,
+				 NULL)) != EOF) {
+		switch (ret) {
+		case OPT_CAPTURE_ID:
+			id.id = strtoull(optarg, NULL, 10);
+			break;
+		case OPT_SERVER_ID:
+			server_id = optarg;
+			break;
+		case OPT_HELP:
+		default:
+			show_usage(capture_option);
+			rc = -1;
+			break;
+		}
+	}
+
+	/* Check error reporting */
+
+	rc = rpc_capture_stop(server_id, &id);
 
 	return rc;
 }
@@ -479,6 +475,7 @@ int cmd_capture(int argc, const char **argv)
 	size_t i;
 	static struct cmd_struct capture_commands[] = {
 		{"start", cmd_capture_start},
+		{"stop", cmd_capture_stop},
 		{"get", cmd_capture_get},
 	};
 
