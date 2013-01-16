@@ -160,10 +160,6 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 
 #define DEFAULT_CAPTURE_FRAME_NUMBER 32
 
-enum capture_stop_option {
-	OPT_CAPTURE_ID
-};
-
 static void capture_dummy_print(const Dabba__Dummy * result, void *closure_data)
 {
 	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
@@ -172,61 +168,6 @@ static void capture_dummy_print(const Dabba__Dummy * result, void *closure_data)
 	assert(closure_data);
 
 	*status = 1;
-}
-
-static void display_capture_list_header(void)
-{
-	printf("---\n");
-	printf("  captures:\n");
-}
-
-static void capture_list_print(const Dabba__CaptureList *
-			       result, void *closure_data)
-{
-	const Dabba__Capture *capture;
-	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
-	size_t a;
-
-	display_capture_list_header();
-
-	for (a = 0; result && a < result->n_list; a++) {
-		capture = result->list[a];
-		printf("    - id: %" PRIu64 "\n", (uint64_t) capture->id->id);
-		printf("      packet mmap size: %" PRIu64 "\n",
-		       capture->frame_nr * capture->frame_size);
-		printf("      frame number: %" PRIu64 "\n", capture->frame_nr);
-		printf("      pcap: %s\n", capture->pcap);
-		printf("      interface: %s\n", capture->interface);
-	}
-
-	*status = 1;
-}
-
-/**
- * \brief Prepare a command to list current captures.
- * \param[in]           argc	        Argument counter
- * \param[in]           argv		Argument vector
- * \return 0 on success, else on failure.
- */
-
-int cmd_capture_settings_list(int argc, const char **argv)
-{
-	ProtobufCService *service;
-	protobuf_c_boolean is_done = 0;
-	Dabba__ThreadIdList id_list = DABBA__THREAD_ID_LIST__INIT;
-
-	assert(argc >= 0);
-	assert(argv);
-
-	/* TODO Make server name configurable */
-	service = dabba_rpc_client_connect(NULL);
-
-	dabba__dabba_service__capture_get(service, &id_list, capture_list_print,
-					  &is_done);
-
-	dabba_rpc_call_is_done(&is_done);
-
-	return 0;
 }
 
 int rpc_capture_start(const char *const server_id,
