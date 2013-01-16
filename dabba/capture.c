@@ -154,6 +154,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabba/help.h>
 #include <dabba/rpc.h>
 #include <dabba/thread.h>
+#include <dabba/capture-list.h>
 #include <dabbad/dabbad.h>
 
 #define DEFAULT_CAPTURE_FRAME_NUMBER 32
@@ -377,6 +378,87 @@ int cmd_capture_stop(int argc, const char **argv)
 	return 0;
 }
 
+int cmd_capture_get(int argc, const char **argv)
+{
+	enum capture_option {
+		/* action */
+		OPT_CAPTURE_LIST,
+		/* option */
+		OPT_CAPTURE_ID,
+		OPT_SERVER_ID,
+		OPT_HELP
+	};
+
+	int (*const rpc_capture_get[]) (const char *const server_id,
+					const Dabba__ThreadIdList * id_list) = {
+	[OPT_CAPTURE_LIST] = cmd_capture_list_get};
+
+	const struct option capture_option[] = {
+		{"id", required_argument, NULL, OPT_CAPTURE_ID},
+		{"list", no_argument, NULL, OPT_CAPTURE_LIST},
+		{"server", required_argument, NULL, OPT_SERVER_ID},
+		{NULL, 0, NULL, 0},
+	};
+
+	int ret, rc = 0, action = 0;
+	size_t a;
+	const char *server_id = NULL;
+	Dabba__ThreadIdList id_list = DABBA__THREAD_ID_LIST__INIT;
+	Dabba__ThreadId **idpp;
+
+	/* parse options and actions to run */
+	while ((ret =
+		getopt_long_only(argc, (char **)argv, "", capture_option,
+				 NULL)) != EOF) {
+		switch (ret) {
+		case OPT_SERVER_ID:
+			server_id = optarg;
+			break;
+		case OPT_CAPTURE_ID:
+			idpp =
+			    realloc(id_list.list,
+				    sizeof(*id_list.list) * (id_list.n_list +
+							     1));
+
+			if (!idpp)
+				return ENOMEM;
+
+			id_list.list = idpp;
+
+			dabba__thread_id__init(id_list.list[id_list.n_list]);
+
+			id_list.list[id_list.n_list]->id =
+			    strtoull(optarg, NULL, 10);
+			id_list.n_list++;
+
+			break;
+		case OPT_CAPTURE_LIST:
+			action |= (1 << ret);
+			break;
+		case OPT_HELP:
+		default:
+			show_usage(capture_option);
+			rc = -1;
+			break;
+		}
+	}
+
+	/* list captures as default action */
+	if (!action)
+		action = (1 << OPT_CAPTURE_LIST);
+
+	/* run requested actions */
+	for (a = 0; a < ARRAY_SIZE(rpc_capture_get); a++)
+		if (action & (1 << a))
+			rc = rpc_capture_get[a] (server_id, &id_list);
+
+	free(id_list.list);
+
+	/* Check error reporting */
+
+	return rc;
+}
+
 /**
  * \brief Parse which capture sub-command.
  * \param[in]           argc	        Argument counter
@@ -393,9 +475,7 @@ int cmd_capture(int argc, const char **argv)
 	const char *cmd = argv[0];
 	size_t i;
 	static struct cmd_struct capture_commands[] = {
-		{"list", cmd_capture_settings_list},
-		{"start", cmd_capture_start},
-		{"stop", cmd_capture_stop},
+		{"get", cmd_capture_get}
 	};
 
 	if (argc == 0 || cmd == NULL || !strcmp(cmd, "--help"))
