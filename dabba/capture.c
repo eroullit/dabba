@@ -155,6 +155,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabba/rpc.h>
 #include <dabba/thread.h>
 #include <dabba/capture-list.h>
+#include <dabba/capture-settings.h>
 #include <dabbad/dabbad.h>
 
 #define DEFAULT_CAPTURE_FRAME_NUMBER 32
@@ -383,6 +384,7 @@ int cmd_capture_get(int argc, const char **argv)
 	enum capture_option {
 		/* action */
 		OPT_CAPTURE_LIST,
+		OPT_CAPTURE_SETTINGS,
 		/* option */
 		OPT_CAPTURE_ID,
 		OPT_SERVER_ID,
@@ -391,11 +393,13 @@ int cmd_capture_get(int argc, const char **argv)
 
 	int (*const rpc_capture_get[]) (const char *const server_id,
 					const Dabba__ThreadIdList * id_list) = {
-	[OPT_CAPTURE_LIST] = cmd_capture_list_get};
+	[OPT_CAPTURE_LIST] = cmd_capture_list_get,
+		    [OPT_CAPTURE_SETTINGS] = cmd_capture_settings_get};
 
 	const struct option capture_option[] = {
 		{"id", required_argument, NULL, OPT_CAPTURE_ID},
 		{"list", no_argument, NULL, OPT_CAPTURE_LIST},
+		{"settings", no_argument, NULL, OPT_CAPTURE_SETTINGS},
 		{"server", required_argument, NULL, OPT_SERVER_ID},
 		{NULL, 0, NULL, 0},
 	};
@@ -433,6 +437,7 @@ int cmd_capture_get(int argc, const char **argv)
 
 			break;
 		case OPT_CAPTURE_LIST:
+		case OPT_CAPTURE_SETTINGS:
 			action |= (1 << ret);
 			break;
 		case OPT_HELP:
