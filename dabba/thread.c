@@ -196,7 +196,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabba/rpc.h>
 #include <dabba/help.h>
 
-static const char *sched_policy[] = {
+static const char sched_policy[][8] = {
 	[SCHED_OTHER] = "other",
 	[SCHED_FIFO] = "fifo",
 	[SCHED_RR] = "rr"
@@ -243,7 +243,7 @@ const char *sched_policy2str(const int policy)
 
 const char *thread_type2str(const int type)
 {
-	static const char *const thread_type[] = {
+	static const char thread_type[][8] = {
 		[CAPTURE_THREAD] = "capture"
 	};
 
