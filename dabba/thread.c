@@ -196,14 +196,10 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabba/rpc.h>
 #include <dabba/help.h>
 
-static struct sched_policy_name_mapping {
-	const char key[8];
-	int value;
-} sched_policy_mapping[] = {
-	{
-	.key = "rr",.value = SCHED_RR}, {
-	.key = "fifo",.value = SCHED_FIFO}, {
-	.key = "other",.value = SCHED_OTHER}
+static const char *sched_policy_mapping[] = {
+	[SCHED_OTHER] = "other",
+	[SCHED_FIFO] = "fifo",
+	[SCHED_RR] = "rr"
 };
 
 /**
@@ -214,15 +210,17 @@ static struct sched_policy_name_mapping {
 
 int sched_policy_value_get(const char *const policy_name)
 {
+	const size_t max = ARRAY_SIZE(sched_policy_mapping);
 	size_t a;
 
 	assert(policy_name);
 
-	for (a = 0; a < ARRAY_SIZE(sched_policy_mapping) - 1; a++)
-		if (!strcmp(policy_name, sched_policy_mapping[a].key))
+	for (a = 0; a < max; a++)
+		if (sched_policy_mapping[a]
+		    && !strcmp(policy_name, sched_policy_mapping[a]))
 			break;
 
-	return sched_policy_mapping[a].value;
+	return a < max ? a : SCHED_OTHER;
 }
 
 /**
@@ -231,15 +229,12 @@ int sched_policy_value_get(const char *const policy_name)
  * \return Related policy name
  */
 
-const char *sched_policy_key_get(const int policy_value)
+const char *sched_policy_key_get(const int policy)
 {
-	size_t a;
+	const int max = ARRAY_SIZE(sched_policy_mapping);
 
-	for (a = 0; a < ARRAY_SIZE(sched_policy_mapping) - 1; a++)
-		if (policy_value == sched_policy_mapping[a].value)
-			break;
-
-	return sched_policy_mapping[a].key;
+	return policy >= 0
+	    && policy < max ? sched_policy_mapping[policy] : "unknown";
 }
 
 /**
