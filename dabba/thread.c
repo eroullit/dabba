@@ -191,6 +191,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabbad/thread.h>
 #include <dabba/dabba.h>
 #include <dabba/thread-list.h>
+#include <dabba/thread-capabilities.h>
 #include <dabba/rpc.h>
 #include <dabba/help.h>
 
@@ -421,6 +422,7 @@ int cmd_thread_get(int argc, const char **argv)
 	enum capture_option {
 		/* action */
 		OPT_THREAD_LIST,
+		OPT_THREAD_CAPABILITIES,
 		/* option */
 		OPT_THREAD_ID,
 		OPT_SERVER_ID,
@@ -429,11 +431,13 @@ int cmd_thread_get(int argc, const char **argv)
 
 	int (*const rpc_thread_get[]) (const char *const server_id,
 				       const Dabba__ThreadIdList * id_list) = {
-	[OPT_THREAD_LIST] = cmd_thread_list_get,};
+	[OPT_THREAD_LIST] = cmd_thread_list_get,
+		    [OPT_THREAD_CAPABILITIES] = cmd_thread_capabilities_get};
 
 	const struct option thread_option[] = {
 		{"id", required_argument, NULL, OPT_THREAD_ID},
 		{"list", no_argument, NULL, OPT_THREAD_LIST},
+		{"capabilities", no_argument, NULL, OPT_THREAD_CAPABILITIES},
 		{"server", required_argument, NULL, OPT_SERVER_ID},
 		{"help", no_argument, NULL, OPT_HELP},
 		{NULL, 0, NULL, 0},
@@ -472,6 +476,7 @@ int cmd_thread_get(int argc, const char **argv)
 
 			break;
 		case OPT_THREAD_LIST:
+		case OPT_THREAD_CAPABILITIES:
 			action |= (1 << ret);
 			break;
 		case OPT_HELP:
