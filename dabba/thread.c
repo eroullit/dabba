@@ -190,6 +190,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabbad/dabbad.h>
 #include <dabbad/thread.h>
 #include <dabba/dabba.h>
+#include <dabba/thread-list.h>
 #include <dabba/rpc.h>
 #include <dabba/help.h>
 
@@ -415,6 +416,88 @@ int cmd_thread_capabilities(int argc, const char **argv)
 	return 0;
 }
 
+int cmd_thread_get(int argc, const char **argv)
+{
+	enum capture_option {
+		/* action */
+		OPT_THREAD_LIST,
+		/* option */
+		OPT_THREAD_ID,
+		OPT_SERVER_ID,
+		OPT_HELP
+	};
+
+	int (*const rpc_thread_get[]) (const char *const server_id,
+				       const Dabba__ThreadIdList * id_list) = {
+	[OPT_THREAD_LIST] = cmd_thread_list_get,};
+
+	const struct option thread_option[] = {
+		{"id", required_argument, NULL, OPT_THREAD_ID},
+		{"list", no_argument, NULL, OPT_THREAD_LIST},
+		{"server", required_argument, NULL, OPT_SERVER_ID},
+		{"help", no_argument, NULL, OPT_HELP},
+		{NULL, 0, NULL, 0},
+	};
+
+	int ret, rc = 0, action = 0;
+	size_t a;
+	const char *server_id = NULL;
+	Dabba__ThreadIdList id_list = DABBA__THREAD_ID_LIST__INIT;
+	Dabba__ThreadId **idpp;
+
+	/* parse options and actions to run */
+	while ((ret =
+		getopt_long_only(argc, (char **)argv, "", thread_option,
+				 NULL)) != EOF) {
+		switch (ret) {
+		case OPT_SERVER_ID:
+			server_id = optarg;
+			break;
+		case OPT_THREAD_ID:
+			idpp =
+			    realloc(id_list.list,
+				    sizeof(*id_list.list) * (id_list.n_list +
+							     1));
+
+			if (!idpp)
+				return ENOMEM;
+
+			id_list.list = idpp;
+
+			dabba__thread_id__init(id_list.list[id_list.n_list]);
+
+			id_list.list[id_list.n_list]->id =
+			    strtoull(optarg, NULL, 10);
+			id_list.n_list++;
+
+			break;
+		case OPT_THREAD_LIST:
+			action |= (1 << ret);
+			break;
+		case OPT_HELP:
+		default:
+			show_usage(thread_option);
+			rc = -1;
+			break;
+		}
+	}
+
+	/* list threads as default action */
+	if (!action)
+		action = (1 << OPT_THREAD_LIST);
+
+	/* run requested actions */
+	for (a = 0; a < ARRAY_SIZE(rpc_thread_get); a++)
+		if (action & (1 << a))
+			rc = rpc_thread_get[a] (server_id, &id_list);
+
+	free(id_list.list);
+
+	/* Check error reporting */
+
+	return rc;
+}
+
 /**
  * \brief Parse which thread sub-command.
  * \param[in]           argc	        Argument counter
@@ -431,10 +514,7 @@ int cmd_thread(int argc, const char **argv)
 	const char *cmd = argv[0];
 	size_t i;
 	static struct cmd_struct thread_commands[] = {
-		{"modify", NULL},
-		{"list", cmd_thread_list},
-		{"settings", cmd_thread_settings},
-		{"capabilities", cmd_thread_capabilities},
+		{"get", cmd_thread_get}
 	};
 
 	if (argc == 0 || cmd == NULL || !strcmp(cmd, "--help"))
