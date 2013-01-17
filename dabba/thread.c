@@ -196,13 +196,6 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabba/rpc.h>
 #include <dabba/help.h>
 
-enum thread_modify_option {
-	OPT_THREAD_ID,
-	OPT_THREAD_SCHED_PRIO,
-	OPT_THREAD_SCHED_POLICY,
-	OPT_THREAD_CPU_AFFINITY
-};
-
 static struct sched_policy_name_mapping {
 	const char key[8];
 	int value;
@@ -211,14 +204,6 @@ static struct sched_policy_name_mapping {
 	.key = "rr",.value = SCHED_RR}, {
 	.key = "fifo",.value = SCHED_FIFO}, {
 	.key = "other",.value = SCHED_OTHER}
-};
-
-static struct thread_name_mapping {
-	const char key[8];
-	int value;
-} thread_name_mapping[] = {
-	{
-	.key = "capture",.value = CAPTURE_THREAD}
 };
 
 /**
@@ -265,157 +250,15 @@ const char *sched_policy_key_get(const int policy_value)
 
 const char *thread_key_get(const int type)
 {
-	size_t a, max = ARRAY_SIZE(thread_name_mapping);
+	static const char *const thread_name_mapping[] = {
+		[CAPTURE_THREAD] = "capture"
+	};
 
-	for (a = 0; a < max; a++)
-		if (type == thread_name_mapping[a].value)
-			break;
+	int max = ARRAY_SIZE(thread_name_mapping);
 
-	return a < max ? thread_name_mapping[a].key : "unknown";
-}
-
-static void thread_header_print(void)
-{
-	printf("---\n");
-	printf("  threads:\n");
-}
-
-static void thread_id_print(const Dabba__ThreadIdList * result,
-			    void *closure_data)
-{
-	size_t a;
-	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
-
-	thread_header_print();
-
-	for (a = 0; result && a < result->n_list; a++)
-		printf("    - %" PRIu64 "\n", result->list[a]->id);
-
-	*status = 1;
-}
-
-static void thread_print(const Dabba__ThreadList * result, void *closure_data)
-{
-	size_t a;
-	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
-
-	thread_header_print();
-
-	for (a = 0; result && a < result->n_list; a++) {
-		printf("    - id: %" PRIu64 "\n", result->list[a]->id->id);
-		printf("      type: %s\n",
-		       thread_key_get(result->list[a]->type));
-		printf("      scheduling policy: %s\n",
-		       sched_policy_key_get(result->list[a]->sched_policy));
-		printf("      scheduling priority: %i\n",
-		       result->list[a]->sched_priority);
-		printf("      cpu affinity: %s\n", result->list[a]->cpu_set);
-		/* TODO map priority/policy protobuf enums to string */
-	}
-
-	*status = 1;
-}
-
-static void display_thread_capabilities_header(void)
-{
-	printf("---\n");
-	printf("  thread capabilities:\n");
-}
-
-static void thread_capabilities_list_print(const Dabba__ThreadCapabilitiesList *
-					   result, void *closure_data)
-{
-	const Dabba__ThreadCapabilities *cap;
-	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
-	size_t a;
-
-	display_thread_capabilities_header();
-
-	for (a = 0; a < result->n_list; a++) {
-		cap = result->list[a];
-		printf("    %s:\n", sched_policy_key_get(cap->policy));
-		printf("        scheduling priority:\n");
-		printf("            minimum: %i\n", cap->prio_min);
-		printf("            maximum: %i\n", cap->prio_max);
-	}
-
-	*status = 1;
-}
-
-/**
- * \brief Request the current list of running threads.
- * \param[in]           argc	        Argument counter
- * \param[in]           argv		Argument vector
- * \return 0 on success, else on failure.
- */
-
-int cmd_thread_list(int argc, const char **argv)
-{
-	ProtobufCService *service;
-	protobuf_c_boolean is_done = 0;
-	Dabba__Dummy dummy = DABBA__DUMMY__INIT;
-
-	assert(argc >= 0);
-	assert(argv);
-
-	/* TODO Make server name configurable */
-	service = dabba_rpc_client_connect(NULL);
-
-	dabba__dabba_service__thread_id_get(service, &dummy, thread_id_print,
-					    &is_done);
-
-	dabba_rpc_call_is_done(&is_done);
-
-	return 0;
-}
-
-int cmd_thread_settings(int argc, const char **argv)
-{
-	ProtobufCService *service;
-	protobuf_c_boolean is_done = 0;
-	Dabba__ThreadIdList id_list = DABBA__THREAD_ID_LIST__INIT;
-
-	assert(argc >= 0);
-	assert(argv);
-
-	/* TODO Allow thread id argument to filter output */
-	/* TODO Make server name configurable */
-	service = dabba_rpc_client_connect(NULL);
-
-	dabba__dabba_service__thread_get(service, &id_list,
-					 thread_print, &is_done);
-
-	dabba_rpc_call_is_done(&is_done);
-
-	return 0;
-}
-
-/**
- * \brief Prepare a command to list scheduling capabilities.
- * \param[in]           argc	        Argument counter
- * \param[in]           argv		Argument vector
- * \return 0 on success, else on failure.
- */
-
-int cmd_thread_capabilities(int argc, const char **argv)
-{
-	ProtobufCService *service;
-	protobuf_c_boolean is_done = 0;
-	Dabba__Dummy id_list = DABBA__DUMMY__INIT;
-
-	assert(argc >= 0);
-	assert(argv);
-
-	/* TODO Make server name configurable */
-	service = dabba_rpc_client_connect(NULL);
-
-	dabba__dabba_service__thread_capabilities_get(service, &id_list,
-						      thread_capabilities_list_print,
-						      &is_done);
-
-	dabba_rpc_call_is_done(&is_done);
-
-	return 0;
+	return (type >= 0 && type < max
+		&& thread_name_mapping[type]) ? thread_name_mapping[type] :
+	    "unknown";
 }
 
 int cmd_thread_get(int argc, const char **argv)
