@@ -192,6 +192,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabba/dabba.h>
 #include <dabba/thread-list.h>
 #include <dabba/thread-capabilities.h>
+#include <dabba/thread-settings.h>
 #include <dabba/rpc.h>
 #include <dabba/help.h>
 
@@ -423,6 +424,7 @@ int cmd_thread_get(int argc, const char **argv)
 		/* action */
 		OPT_THREAD_LIST,
 		OPT_THREAD_CAPABILITIES,
+		OPT_THREAD_SETTINGS,
 		/* option */
 		OPT_THREAD_ID,
 		OPT_SERVER_ID,
@@ -432,12 +434,15 @@ int cmd_thread_get(int argc, const char **argv)
 	int (*const rpc_thread_get[]) (const char *const server_id,
 				       const Dabba__ThreadIdList * id_list) = {
 	[OPT_THREAD_LIST] = cmd_thread_list_get,
-		    [OPT_THREAD_CAPABILITIES] = cmd_thread_capabilities_get};
+		    [OPT_THREAD_CAPABILITIES] =
+		    cmd_thread_capabilities_get,[OPT_THREAD_SETTINGS] =
+		    cmd_thread_settings_get};
 
 	const struct option thread_option[] = {
 		{"id", required_argument, NULL, OPT_THREAD_ID},
 		{"list", no_argument, NULL, OPT_THREAD_LIST},
 		{"capabilities", no_argument, NULL, OPT_THREAD_CAPABILITIES},
+		{"settings", no_argument, NULL, OPT_THREAD_SETTINGS},
 		{"server", required_argument, NULL, OPT_SERVER_ID},
 		{"help", no_argument, NULL, OPT_HELP},
 		{NULL, 0, NULL, 0},
@@ -477,6 +482,7 @@ int cmd_thread_get(int argc, const char **argv)
 			break;
 		case OPT_THREAD_LIST:
 		case OPT_THREAD_CAPABILITIES:
+		case OPT_THREAD_SETTINGS:
 			action |= (1 << ret);
 			break;
 		case OPT_HELP:
