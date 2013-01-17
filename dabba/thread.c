@@ -196,7 +196,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabba/rpc.h>
 #include <dabba/help.h>
 
-static const char *sched_policy_mapping[] = {
+static const char *sched_policy[] = {
 	[SCHED_OTHER] = "other",
 	[SCHED_FIFO] = "fifo",
 	[SCHED_RR] = "rr"
@@ -208,16 +208,15 @@ static const char *sched_policy_mapping[] = {
  * \return Related policy value
  */
 
-int sched_policy_value_get(const char *const policy_name)
+int str2sched_policy(const char *const policy_name)
 {
-	const size_t max = ARRAY_SIZE(sched_policy_mapping);
+	const size_t max = ARRAY_SIZE(sched_policy);
 	size_t a;
 
 	assert(policy_name);
 
 	for (a = 0; a < max; a++)
-		if (sched_policy_mapping[a]
-		    && !strcmp(policy_name, sched_policy_mapping[a]))
+		if (sched_policy[a] && !strcmp(policy_name, sched_policy[a]))
 			break;
 
 	return a < max ? a : SCHED_OTHER;
@@ -229,12 +228,11 @@ int sched_policy_value_get(const char *const policy_name)
  * \return Related policy name
  */
 
-const char *sched_policy_key_get(const int policy)
+const char *sched_policy2str(const int policy)
 {
-	const int max = ARRAY_SIZE(sched_policy_mapping);
+	const int max = ARRAY_SIZE(sched_policy);
 
-	return policy >= 0
-	    && policy < max ? sched_policy_mapping[policy] : "unknown";
+	return policy >= 0 && policy < max ? sched_policy[policy] : "unknown";
 }
 
 /**
@@ -243,17 +241,16 @@ const char *sched_policy_key_get(const int policy)
  * \return Thread name string
  */
 
-const char *thread_key_get(const int type)
+const char *thread_type2str(const int type)
 {
-	static const char *const thread_name_mapping[] = {
+	static const char *const thread_type[] = {
 		[CAPTURE_THREAD] = "capture"
 	};
 
-	int max = ARRAY_SIZE(thread_name_mapping);
+	int max = ARRAY_SIZE(thread_type);
 
 	return type >= 0 && type < max
-	    && thread_name_mapping[type] ? thread_name_mapping[type] :
-	    "unknown";
+	    && thread_type[type] ? thread_type[type] : "unknown";
 }
 
 int cmd_thread_get(int argc, const char **argv)

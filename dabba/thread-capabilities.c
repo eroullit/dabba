@@ -30,7 +30,7 @@
 #include <stdio.h>
 #include <dabba/rpc.h>
 
-const char *sched_policy_key_get(const int policy_value);
+const char *sched_policy2str(const int policy_value);
 
 static void thread_capabilities_header_print(void)
 {
@@ -49,7 +49,7 @@ static void thread_capabilities_print(const Dabba__ThreadCapabilitiesList *
 
 	for (a = 0; a < result->n_list; a++) {
 		cap = result->list[a];
-		printf("    %s:\n", sched_policy_key_get(cap->policy));
+		printf("    %s:\n", sched_policy2str(cap->policy));
 		printf("        scheduling priority:\n");
 		printf("            minimum: %i\n", cap->prio_min);
 		printf("            maximum: %i\n", cap->prio_max);

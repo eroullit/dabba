@@ -30,8 +30,8 @@
 #include <stdio.h>
 #include <dabba/rpc.h>
 
-const char *sched_policy_key_get(const int policy_value);
-const char *thread_key_get(const int type);
+const char *sched_policy2str(const int policy_value);
+const char *thread_type2str(const int type);
 
 static void thread_settings_header_print(void)
 {
@@ -50,9 +50,9 @@ static void thread_settings_print(const Dabba__ThreadList * result,
 	for (a = 0; result && a < result->n_list; a++) {
 		printf("    - id: %" PRIu64 "\n", result->list[a]->id->id);
 		printf("      type: %s\n",
-		       thread_key_get(result->list[a]->type));
+		       thread_type2str(result->list[a]->type));
 		printf("      scheduling policy: %s\n",
-		       sched_policy_key_get(result->list[a]->sched_policy));
+		       sched_policy2str(result->list[a]->sched_policy));
 		printf("      scheduling priority: %i\n",
 		       result->list[a]->sched_priority);
 		printf("      cpu affinity: %s\n", result->list[a]->cpu_set);
