@@ -24,7 +24,7 @@
 #ifndef THREAD_LIST_H
 #define	THREAD_LIST_H
 
-int cmd_thread_list_get(const char *const server_id,
+int rpc_thread_list_get(const char *const server_id,
 			const Dabba__ThreadIdList * id_list);
 
 #endif				/* THREAD_LIST_H */

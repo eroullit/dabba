@@ -62,7 +62,7 @@ static void thread_settings_print(const Dabba__ThreadList * result,
 	*status = 1;
 }
 
-int cmd_thread_settings_get(const char *const server_id,
+int rpc_thread_settings_get(const char *const server_id,
 			    const Dabba__ThreadIdList * id_list)
 {
 	ProtobufCService *service;

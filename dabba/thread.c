@@ -268,10 +268,10 @@ int cmd_thread_get(int argc, const char **argv)
 
 	int (*const rpc_thread_get[]) (const char *const server_id,
 				       const Dabba__ThreadIdList * id_list) = {
-	[OPT_THREAD_LIST] = cmd_thread_list_get,
+	[OPT_THREAD_LIST] = rpc_thread_list_get,
 		    [OPT_THREAD_CAPABILITIES] =
-		    cmd_thread_capabilities_get,[OPT_THREAD_SETTINGS] =
-		    cmd_thread_settings_get};
+		    rpc_thread_capabilities_get,[OPT_THREAD_SETTINGS] =
+		    rpc_thread_settings_get};
 
 	const struct option thread_option[] = {
 		{"id", required_argument, NULL, OPT_THREAD_ID},
@@ -324,7 +324,7 @@ int cmd_thread_get(int argc, const char **argv)
 		default:
 			show_usage(thread_option);
 			rc = -1;
-			break;
+			goto out;
 		}
 	}
 
@@ -336,7 +336,7 @@ int cmd_thread_get(int argc, const char **argv)
 	for (a = 0; a < ARRAY_SIZE(rpc_thread_get); a++)
 		if (action & (1 << a))
 			rc = rpc_thread_get[a] (server_id, &id_list);
-
+ out:
 	free(id_list.list);
 
 	/* Check error reporting */

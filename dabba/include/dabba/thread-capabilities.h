@@ -24,7 +24,7 @@
 #ifndef THREAD_CAPABILITIES_H
 #define	THREAD_CAPABILITIES_H
 
-int cmd_thread_capabilities_get(const char *const server_id,
+int rpc_thread_capabilities_get(const char *const server_id,
 				const Dabba__ThreadIdList * id_list);
 
 #endif				/* THREAD_CAPABILITIES_H */

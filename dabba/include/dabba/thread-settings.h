@@ -24,7 +24,7 @@
 #ifndef THREAD_SETTINGS_H
 #define	THREAD_SETTINGS_H
 
-int cmd_thread_settings_get(const char *const server_id,
+int rpc_thread_settings_get(const char *const server_id,
 			    const Dabba__ThreadIdList * id_list);
 
 #endif				/* THREAD_SETTINGS_H */

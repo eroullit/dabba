@@ -24,7 +24,7 @@
 #ifndef INTERFACE_LIST_H
 #define	INTERFACE_LIST_H
 
-int cmd_interface_list_get(const char *const server_id,
+int rpc_interface_list_get(const char *const server_id,
 			   const Dabba__InterfaceIdList * id_list);
 
 #endif				/* INTERFACE_LIST_H */

@@ -24,7 +24,7 @@
 #ifndef INTERFACE_COALESCE_H
 #define	INTERFACE_COALESCE_H
 
-int cmd_interface_coalesce_get(const char *const server_id,
+int rpc_interface_coalesce_get(const char *const server_id,
 			       const Dabba__InterfaceIdList * id_list);
 
 #endif				/* INTERFACE_COALESCE_H */

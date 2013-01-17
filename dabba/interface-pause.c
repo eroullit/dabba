@@ -67,7 +67,7 @@ static void interface_pause_list_print(const Dabba__InterfacePauseList *
 	*status = 1;
 }
 
-int cmd_interface_pause_get(const char *const server_id,
+int rpc_interface_pause_get(const char *const server_id,
 			    const Dabba__InterfaceIdList * id_list)
 {
 	ProtobufCService *service;

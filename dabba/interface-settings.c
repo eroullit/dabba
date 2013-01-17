@@ -75,7 +75,7 @@ static void interface_settings_list_print(const Dabba__InterfaceSettingsList *
 	*status = 1;
 }
 
-int cmd_interface_settings_get(const char *const server_id,
+int rpc_interface_settings_get(const char *const server_id,
 			       const Dabba__InterfaceIdList * id_list)
 {
 	ProtobufCService *service;

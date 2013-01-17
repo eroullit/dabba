@@ -58,7 +58,7 @@ static void capture_settings_print(const Dabba__CaptureList *
 	*status = 1;
 }
 
-int cmd_capture_settings_get(const char *const server_id,
+int rpc_capture_settings_get(const char *const server_id,
 			     const Dabba__ThreadIdList * id_list)
 {
 	ProtobufCService *service;

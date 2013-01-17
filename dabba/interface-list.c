@@ -58,7 +58,7 @@ static void interface_list_print(const Dabba__InterfaceIdList * result,
 	*status = 1;
 }
 
-int cmd_interface_list_get(const char *const server_id,
+int rpc_interface_list_get(const char *const server_id,
 			   const Dabba__InterfaceIdList * id_list)
 {
 	ProtobufCService *service;

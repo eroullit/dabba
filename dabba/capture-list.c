@@ -50,7 +50,7 @@ static void capture_list_print(const Dabba__CaptureList * result,
 	*status = 1;
 }
 
-int cmd_capture_list_get(const char *const server_id,
+int rpc_capture_list_get(const char *const server_id,
 			 const Dabba__ThreadIdList * id_list)
 {
 	ProtobufCService *service;

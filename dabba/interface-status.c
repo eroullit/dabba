@@ -70,7 +70,7 @@ static void interface_status_list_print(const Dabba__InterfaceStatusList *
 	*status = 1;
 }
 
-int cmd_interface_status_get(const char *const server_id,
+int rpc_interface_status_get(const char *const server_id,
 			     const Dabba__InterfaceIdList * id_list)
 {
 	ProtobufCService *service;

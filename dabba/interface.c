@@ -217,18 +217,18 @@ static int cmd_interface_get(int argc, const char **argv)
 	int (*const rpc_interface_get[]) (const char *const server_id,
 					  const Dabba__InterfaceIdList *
 					  id_list) = {
-	[OPT_INTERFACE_STATISTICS] = cmd_interface_statistics_get,
-		    [OPT_INTERFACE_STATUS] = cmd_interface_status_get,
-		    [OPT_INTERFACE_PAUSE] = cmd_interface_pause_get,
+	[OPT_INTERFACE_STATISTICS] = rpc_interface_statistics_get,
+		    [OPT_INTERFACE_STATUS] = rpc_interface_status_get,
+		    [OPT_INTERFACE_PAUSE] = rpc_interface_pause_get,
 		    [OPT_INTERFACE_SETTINGS] =
-		    cmd_interface_settings_get,[OPT_INTERFACE_OFFLOAD] =
-		    cmd_interface_offload_get,[OPT_INTERFACE_LIST] =
-		    cmd_interface_list_get,
-		    [OPT_INTERFACE_DRIVER] = cmd_interface_driver_get,
+		    rpc_interface_settings_get,[OPT_INTERFACE_OFFLOAD] =
+		    rpc_interface_offload_get,[OPT_INTERFACE_LIST] =
+		    rpc_interface_list_get,
+		    [OPT_INTERFACE_DRIVER] = rpc_interface_driver_get,
 		    [OPT_INTERFACE_COALESCE] =
-		    cmd_interface_coalesce_get,
+		    rpc_interface_coalesce_get,
 		    [OPT_INTERFACE_CAPABILITIES] =
-		    cmd_interface_capabilities_get};
+		    rpc_interface_capabilities_get};
 
 	const struct option interface_option[] = {
 		{"id", required_argument, NULL, OPT_INTERFACE_ID},

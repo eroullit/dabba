@@ -24,7 +24,7 @@
 #ifndef INTERFACE_CAPABILITIES_H
 #define	INTERFACE_CAPABILITIES_H
 
-int cmd_interface_capabilities_get(const char *const server_id,
+int rpc_interface_capabilities_get(const char *const server_id,
 				   const Dabba__InterfaceIdList * id_list);
 
 #endif				/* INTERFACE_CAPABILITIES_H */

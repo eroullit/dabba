@@ -58,7 +58,7 @@ static void thread_capabilities_print(const Dabba__ThreadCapabilitiesList *
 	*status = 1;
 }
 
-int cmd_thread_capabilities_get(const char *const server_id,
+int rpc_thread_capabilities_get(const char *const server_id,
 				const Dabba__ThreadIdList * id_list)
 {
 	ProtobufCService *service;

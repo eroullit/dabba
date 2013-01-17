@@ -320,8 +320,8 @@ int cmd_capture_get(int argc, const char **argv)
 
 	int (*const rpc_capture_get[]) (const char *const server_id,
 					const Dabba__ThreadIdList * id_list) = {
-	[OPT_CAPTURE_LIST] = cmd_capture_list_get,
-		    [OPT_CAPTURE_SETTINGS] = cmd_capture_settings_get};
+	[OPT_CAPTURE_LIST] = rpc_capture_list_get,
+		    [OPT_CAPTURE_SETTINGS] = rpc_capture_settings_get};
 
 	const struct option capture_option[] = {
 		{"id", required_argument, NULL, OPT_CAPTURE_ID},

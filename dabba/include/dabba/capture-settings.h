@@ -24,7 +24,7 @@
 #ifndef CAPTURE_SETTINGS_H
 #define	CAPTURE_SETTINGS_H
 
-int cmd_capture_settings_get(const char *const server_id,
+int rpc_capture_settings_get(const char *const server_id,
 			     const Dabba__ThreadIdList * id_settings);
 
 #endif				/* CAPTURE_SETTINGS_H */
