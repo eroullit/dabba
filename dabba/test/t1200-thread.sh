@@ -72,7 +72,7 @@ test_expect_success "Check 'dabba thread' help output" "
 "
 
 test_expect_success "Fetch running thread information" "
-    '$DABBA_PATH'/dabba thread settings > result
+    '$DABBA_PATH'/dabba thread get --settings > result
 "
 
 test_expect_success PYTHON_YAML "Parse thread YAML output" "
@@ -118,7 +118,7 @@ thread_id="$(dictkeys2values threads 0 id < parsed)"
 
 test_expect_success PYTHON_YAML "Stop capture thread using thread output" "
     '$DABBA_PATH'/dabba capture stop --id '$thread_id' &&
-    '$DABBA_PATH'/dabba thread settings > after &&
+    '$DABBA_PATH'/dabba thread get --settings > after &&
     test_must_fail grep -wq '$thread_id' after
 "
 

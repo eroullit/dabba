@@ -256,8 +256,8 @@ const char *thread_key_get(const int type)
 
 	int max = ARRAY_SIZE(thread_name_mapping);
 
-	return (type >= 0 && type < max
-		&& thread_name_mapping[type]) ? thread_name_mapping[type] :
+	return type >= 0 && type < max
+	    && thread_name_mapping[type] ? thread_name_mapping[type] :
 	    "unknown";
 }
 
