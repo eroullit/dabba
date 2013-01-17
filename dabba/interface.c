@@ -297,7 +297,7 @@ static int cmd_interface_get(int argc, const char **argv)
 		default:
 			show_usage(interface_option);
 			rc = -1;
-			break;
+			goto out;
 		}
 	}
 
@@ -310,6 +310,7 @@ static int cmd_interface_get(int argc, const char **argv)
 		if (action & (1 << a))
 			rc = rpc_interface_get[a] (server_id, &id_list);
 
+ out:
 	/* cleanup */
 	for (a = 0; a < id_list.n_list; a++)
 		free(id_list.list[a]);

@@ -214,7 +214,7 @@ int cmd_capture_start(int argc, const char **argv)
 	};
 
 	const char *server_id = NULL;
-	int ret, rc = 0;
+	int ret;
 	Dabba__Capture capture = DABBA__CAPTURE__INIT;
 
 	static struct option capture_option[] = {
@@ -256,16 +256,12 @@ int cmd_capture_start(int argc, const char **argv)
 		case OPT_HELP:
 		default:
 			show_usage(capture_option);
-			rc = -1;
-			break;
+			return -1;
 		}
 	}
 
 	/* Check error reporting */
-
-	rc = rpc_capture_start(server_id, &capture);
-
-	return rc;
+	return rpc_capture_start(server_id, &capture);
 }
 
 int cmd_capture_stop(int argc, const char **argv)
@@ -277,7 +273,7 @@ int cmd_capture_stop(int argc, const char **argv)
 	};
 
 	const char *server_id = NULL;
-	int ret, rc = 0;
+	int ret;
 	Dabba__ThreadId id = DABBA__THREAD_ID__INIT;
 
 	static struct option capture_option[] = {
@@ -301,16 +297,13 @@ int cmd_capture_stop(int argc, const char **argv)
 		case OPT_HELP:
 		default:
 			show_usage(capture_option);
-			rc = -1;
-			break;
+			return -1;
 		}
 	}
 
 	/* Check error reporting */
 
-	rc = rpc_capture_stop(server_id, &id);
-
-	return rc;
+	return rpc_capture_stop(server_id, &id);
 }
 
 int cmd_capture_get(int argc, const char **argv)
@@ -379,7 +372,7 @@ int cmd_capture_get(int argc, const char **argv)
 		default:
 			show_usage(capture_option);
 			rc = -1;
-			break;
+			goto out;
 		}
 	}
 
@@ -392,6 +385,7 @@ int cmd_capture_get(int argc, const char **argv)
 		if (action & (1 << a))
 			rc = rpc_capture_get[a] (server_id, &id_list);
 
+ out:
 	free(id_list.list);
 
 	/* Check error reporting */
