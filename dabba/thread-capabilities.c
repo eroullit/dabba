@@ -39,7 +39,7 @@ static void thread_capabilities_print(const Dabba__ThreadCapabilitiesList *
 	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
 	size_t a;
 
-	rpc_header_print("threads capabilities");
+	rpc_header_print("thread capabilities");
 
 	for (a = 0; a < result->n_list; a++) {
 		cap = result->list[a];
