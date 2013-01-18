@@ -209,7 +209,7 @@ int cmd_capture_start(int argc, const char **argv)
 
 	int ret;
 	Dabba__Capture capture = DABBA__CAPTURE__INIT;
-	const char *server_name = DABBA_DEFAULT_SERVER_NAME;
+	const char *server_name = DABBA_RPC_DEFAULT_SERVER_NAME;
 	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
 	ProtobufCService *service;
 
@@ -272,7 +272,7 @@ int cmd_capture_stop(int argc, const char **argv)
 
 	int ret;
 	Dabba__ThreadId id = DABBA__THREAD_ID__INIT;
-	const char *server_name = DABBA_DEFAULT_SERVER_NAME;
+	const char *server_name = DABBA_RPC_DEFAULT_SERVER_NAME;
 	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
 	ProtobufCService *service;
 
@@ -337,7 +337,7 @@ int cmd_capture_get(int argc, const char **argv)
 	size_t a;
 	Dabba__ThreadIdList id_list = DABBA__THREAD_ID_LIST__INIT;
 	Dabba__ThreadId **idpp;
-	const char *server_name = DABBA_DEFAULT_SERVER_NAME;
+	const char *server_name = DABBA_RPC_DEFAULT_SERVER_NAME;
 	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
 	ProtobufCService *service;
 

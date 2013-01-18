@@ -24,12 +24,7 @@
 #ifndef DABBA_RPC_H
 #define	DABBA_RPC_H
 
-#include <google/protobuf-c/protobuf-c-rpc.h>
-#include <libdabba-rpc/dabba.pb-c.h>
-
-#ifndef DABBA_DEFAULT_SERVER_NAME
-#define DABBA_DEFAULT_SERVER_NAME "localhost:55994"
-#endif				/* DABBA_DEFAULT_SERVER_NAME */
+#include <libdabba-rpc/rpc.h>
 
 ProtobufCService *dabba_rpc_client_connect(const char *const name,
 					   const ProtobufC_RPC_AddressType

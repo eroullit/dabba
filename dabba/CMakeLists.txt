@@ -5,6 +5,7 @@ INCLUDE(Pod2Man)
 
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/include)
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/libdabba/include)
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/libdabba-rpc/include)
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/dabbad/include)
 
 # FIXME Fix path when rpc headers are generated in the right include directory

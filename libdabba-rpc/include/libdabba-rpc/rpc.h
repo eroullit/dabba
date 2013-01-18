@@ -1,7 +1,7 @@
 /* __LICENSE_HEADER_BEGIN__ */
 
 /*
- * Copyright (C) 2012	Emmanuel Roullit <emmanuel.roullit@gmail.com>
+ * Copyright (C) 2013	Emmanuel Roullit <emmanuel.roullit@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,14 +21,23 @@
 
 /* __LICENSE_HEADER_END__ */
 
-#ifndef INTERFACE_STATISTICS_H
-#define	INTERFACE_STATISTICS_H
+#ifndef LIBDABBARPC_RPC_H
+#define	LIBDABBARPC_RPC_H
 
-#include <libdabba-rpc/rpc.h>
+#include <google/protobuf-c/protobuf-c-rpc.h>
+#include <libdabba-rpc/dabba.pb-c.h>
 
-void dabbad_interface_statistics_get(Dabba__DabbaService_Service * service,
-				     const Dabba__InterfaceIdList * id_list,
-				     Dabba__InterfaceStatisticsList_Closure
-				     closure, void *closure_data);
+#ifndef DABBA_RPC_DEFAULT_HOST_NAME
+#define DABBA_RPC_DEFAULT_HOST_NAME "localhost"
+#endif				/* DABBA_RPC_DEFAULT_HOST_NAME */
 
-#endif				/* INTERFACE_STATISTICS_H */
+/* 0xDABA = 55994 */
+#ifndef DABBA_RPC_DEFAULT_PORT
+#define DABBA_RPC_DEFAULT_PORT "55994"
+#endif				/* DABBA_RPC_DEFAULT_PORT */
+
+#ifndef DABBA_RPC_DEFAULT_SERVER_NAME
+#define DABBA_RPC_DEFAULT_SERVER_NAME DABBA_RPC_DEFAULT_HOST_NAME":"DABBA_RPC_DEFAULT_PORT
+#endif				/* DABBA_RPC_DEFAULT_SERVER_NAME */
+
+#endif				/* LIBDABBARPC_RPC_H */

@@ -24,7 +24,7 @@
 #ifndef INTERFACE_DRIVER_H
 #define	INTERFACE_DRIVER_H
 
-#include <libdabba-rpc/dabba.pb-c.h>
+#include <libdabba-rpc/rpc.h>
 
 void dabbad_interface_driver_get(Dabba__DabbaService_Service * service,
 				 const Dabba__InterfaceIdList * id_list,

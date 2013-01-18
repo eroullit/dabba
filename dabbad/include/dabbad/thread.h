@@ -28,7 +28,7 @@
 #include <sched.h>
 #include <pthread.h>
 #include <sys/queue.h>
-#include <libdabba-rpc/dabba.pb-c.h>
+#include <libdabba-rpc/rpc.h>
 
 enum packet_thread_type {
 	CAPTURE_THREAD

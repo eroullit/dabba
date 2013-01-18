@@ -24,7 +24,7 @@
 #ifndef INTERFACE_LIST_H
 #define	INTERFACE_LIST_H
 
-#include <libdabba-rpc/dabba.pb-c.h>
+#include <libdabba-rpc/rpc.h>
 
 void dabbad_interface_id_get(Dabba__DabbaService_Service * service,
 			     const Dabba__Dummy * dummy,

@@ -26,7 +26,7 @@
 
 #include <dabbad/thread.h>
 #include <libdabba/packet_rx.h>
-#include <libdabba-rpc/dabba.pb-c.h>
+#include <libdabba-rpc/rpc.h>
 
 struct packet_capture_thread {
 	struct packet_rx rx;

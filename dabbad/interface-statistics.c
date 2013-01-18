@@ -39,7 +39,7 @@
 #include <dabbad/interface.h>
 #include <dabbad/interface-statistics.h>
 
-#include "libdabba-rpc/dabba.pb-c.h"
+#include "libdabba-rpc/rpc.h"
 
 static void __interface_statistics_get(struct nl_object *obj, void *arg)
 {

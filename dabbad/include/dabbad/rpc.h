@@ -21,8 +21,8 @@
 
 /* __LICENSE_HEADER_END__ */
 
-#ifndef DABBA_RPC_H
-#define	DABBA_RPC_H
+#ifndef LIBDABBARPC_RPC_H
+#define	LIBDABBARPC_RPC_H
 
 int dabbad_rpc_msg_poll(void);
 

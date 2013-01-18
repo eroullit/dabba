@@ -24,7 +24,7 @@
 #ifndef INTERFACE_OFFLOAD_H
 #define	INTERFACE_OFFLOAD_H
 
-#include <libdabba-rpc/dabba.pb-c.h>
+#include <libdabba-rpc/rpc.h>
 
 void dabbad_interface_offload_get(Dabba__DabbaService_Service * service,
 				  const Dabba__InterfaceIdList * id_list,

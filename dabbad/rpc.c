@@ -28,7 +28,7 @@
 /* __LICENSE_HEADER_END__ */
 
 #include <google/protobuf-c/protobuf-c-rpc.h>
-#include <libdabba-rpc/dabba.pb-c.h>
+#include <libdabba-rpc/rpc.h>
 #include <dabbad/interface.h>
 #include <dabbad/interface-list.h>
 #include <dabbad/interface-status.h>
@@ -51,7 +51,8 @@ int dabbad_rpc_msg_poll(void)
 
 	/* 0xDABA = 55994 */
 	server =
-	    protobuf_c_rpc_server_new(PROTOBUF_C_RPC_ADDRESS_TCP, "55994",
+	    protobuf_c_rpc_server_new(PROTOBUF_C_RPC_ADDRESS_TCP,
+				      DABBA_RPC_DEFAULT_PORT,
 				      (ProtobufCService *) & dabba_service,
 				      NULL);
 

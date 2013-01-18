@@ -10,6 +10,7 @@ FILE(GLOB DABBAD_HDRS ${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/include/${PROJECT_NAME
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/include
                         ${CMAKE_SOURCE_DIR}/libdabba/include
 			${NL_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/libdabba-rpc/include)
 
 # FIXME Fix path when rpc headers are generated in the right include directory
 INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR})
