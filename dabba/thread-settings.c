@@ -33,19 +33,13 @@
 const char *sched_policy2str(const int policy_value);
 const char *thread_type2str(const int type);
 
-static void thread_settings_header_print(void)
-{
-	printf("---\n");
-	printf("  threads:\n");
-}
-
 static void thread_settings_print(const Dabba__ThreadList * result,
 				  void *closure_data)
 {
 	size_t a;
 	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
 
-	thread_settings_header_print();
+	rpc_header_print("threads");
 
 	for (a = 0; result && a < result->n_list; a++) {
 		printf("    - id: %" PRIu64 "\n", result->list[a]->id->id);

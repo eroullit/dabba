@@ -30,19 +30,13 @@
 #include <stdio.h>
 #include <dabba/rpc.h>
 
-static void thread_list_header_print(void)
-{
-	printf("---\n");
-	printf("  threads:\n");
-}
-
 static void thread_list_print(const Dabba__ThreadList * result,
 			      void *closure_data)
 {
 	size_t a;
 	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
 
-	thread_list_header_print();
+	rpc_header_print("threads");
 
 	for (a = 0; result && a < result->n_list; a++)
 		printf("    - %" PRIu64 "\n", result->list[a]->id->id);

@@ -30,12 +30,6 @@
 #include <stdio.h>
 #include <dabba/rpc.h>
 
-static void capture_settings_header_print(void)
-{
-	printf("---\n");
-	printf("  captures:\n");
-}
-
 static void capture_settings_print(const Dabba__CaptureList *
 				   result, void *closure_data)
 {
@@ -43,7 +37,7 @@ static void capture_settings_print(const Dabba__CaptureList *
 	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
 	size_t a;
 
-	capture_settings_header_print();
+	rpc_header_print("captures");
 
 	for (a = 0; result && a < result->n_list; a++) {
 		capture = result->list[a];

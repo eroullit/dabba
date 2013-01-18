@@ -30,19 +30,13 @@
 #include <stdio.h>
 #include <dabba/rpc.h>
 
-static void capture_list_header_print(void)
-{
-	printf("---\n");
-	printf("  captures:\n");
-}
-
 static void capture_list_print(const Dabba__CaptureList * result,
 			       void *closure_data)
 {
 	size_t a;
 	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
 
-	capture_list_header_print();
+	rpc_header_print("captures");
 
 	for (a = 0; result && a < result->n_list; a++)
 		printf("    - %" PRIu64 "\n", result->list[a]->id->id);

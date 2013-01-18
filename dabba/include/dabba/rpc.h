@@ -29,5 +29,6 @@
 
 ProtobufCService *dabba_rpc_client_connect(const char *server_name);
 void dabba_rpc_call_is_done(protobuf_c_boolean * is_done);
+void rpc_header_print(const char *const title);
 
 #endif				/* DABBA_RPC_H */

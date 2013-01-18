@@ -38,19 +38,13 @@
 #include <dabba/help.h>
 #include <dabba/macros.h>
 
-static void interface_list_header_print(void)
-{
-	printf("---\n");
-	printf("  interfaces:\n");
-}
-
 static void interface_list_print(const Dabba__InterfaceIdList * result,
 				 void *closure_data)
 {
 	size_t a;
 	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
 
-	interface_list_header_print();
+	rpc_header_print("interfaces");
 
 	for (a = 0; result && a < result->n_list; a++)
 		printf("    - %s\n", result->list[a]->name);

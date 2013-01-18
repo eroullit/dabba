@@ -32,12 +32,6 @@
 
 const char *sched_policy2str(const int policy_value);
 
-static void thread_capabilities_header_print(void)
-{
-	printf("---\n");
-	printf("  threads capabilities:\n");
-}
-
 static void thread_capabilities_print(const Dabba__ThreadCapabilitiesList *
 				      result, void *closure_data)
 {
@@ -45,7 +39,7 @@ static void thread_capabilities_print(const Dabba__ThreadCapabilitiesList *
 	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
 	size_t a;
 
-	thread_capabilities_header_print();
+	rpc_header_print("threads capabilities");
 
 	for (a = 0; a < result->n_list; a++) {
 		cap = result->list[a];
