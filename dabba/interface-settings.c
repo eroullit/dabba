@@ -75,13 +75,13 @@ static void interface_settings_list_print(const Dabba__InterfaceSettingsList *
 	*status = 1;
 }
 
-int rpc_interface_settings_get(const char *const server_id,
+int rpc_interface_settings_get(ProtobufCService * service,
 			       const Dabba__InterfaceIdList * id_list)
 {
-	ProtobufCService *service;
 	protobuf_c_boolean is_done = 0;
 
-	service = dabba_rpc_client_connect(server_id);
+	assert(service);
+	assert(id_list);
 
 	dabba__dabba_service__interface_settings_get(service, id_list,
 						     interface_settings_list_print,

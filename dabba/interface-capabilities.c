@@ -86,16 +86,16 @@ static void interface_capabilities_list_print(const
 		       "            10000: {half: false, full: %s}\n",
 		       print_tf(capabilitiesp->supported_speed->ethernet->half),
 		       print_tf(capabilitiesp->supported_speed->ethernet->full),
+		       print_tf(capabilitiesp->supported_speed->fast_ethernet->
+				half),
+		       print_tf(capabilitiesp->supported_speed->fast_ethernet->
+				full),
+		       print_tf(capabilitiesp->supported_speed->gbps_ethernet->
+				half),
+		       print_tf(capabilitiesp->supported_speed->gbps_ethernet->
+				full),
 		       print_tf(capabilitiesp->supported_speed->
-				fast_ethernet->half),
-		       print_tf(capabilitiesp->supported_speed->
-				fast_ethernet->full),
-		       print_tf(capabilitiesp->supported_speed->
-				gbps_ethernet->half),
-		       print_tf(capabilitiesp->supported_speed->
-				gbps_ethernet->full),
-		       print_tf(capabilitiesp->
-				supported_speed->_10gbps_ethernet->full));
+				_10gbps_ethernet->full));
 		printf("        advertised:\n");
 		printf("          autoneg: %s\n",
 		       print_tf(capabilitiesp->advertising_opt->autoneg));
@@ -106,20 +106,20 @@ static void interface_capabilities_list_print(const
 		       "            100:   {half: %s, full: %s}\n"
 		       "            1000:  {half: %s, full: %s}\n"
 		       "            10000: {half: false, full: %s}\n",
+		       print_tf(capabilitiesp->advertising_speed->ethernet->
+				half),
+		       print_tf(capabilitiesp->advertising_speed->ethernet->
+				full),
 		       print_tf(capabilitiesp->advertising_speed->
-				ethernet->half),
+				fast_ethernet->half),
 		       print_tf(capabilitiesp->advertising_speed->
-				ethernet->full),
-		       print_tf(capabilitiesp->
-				advertising_speed->fast_ethernet->half),
-		       print_tf(capabilitiesp->
-				advertising_speed->fast_ethernet->full),
-		       print_tf(capabilitiesp->
-				advertising_speed->gbps_ethernet->half),
-		       print_tf(capabilitiesp->
-				advertising_speed->gbps_ethernet->full),
-		       print_tf(capabilitiesp->
-				advertising_speed->_10gbps_ethernet->full));
+				fast_ethernet->full),
+		       print_tf(capabilitiesp->advertising_speed->
+				gbps_ethernet->half),
+		       print_tf(capabilitiesp->advertising_speed->
+				gbps_ethernet->full),
+		       print_tf(capabilitiesp->advertising_speed->
+				_10gbps_ethernet->full));
 		printf("        link-partner advertised:\n");
 		printf("          autoneg: %s\n",
 		       print_tf(capabilitiesp->lp_advertising_opt->autoneg));
@@ -130,32 +130,32 @@ static void interface_capabilities_list_print(const
 		       "            100:   {half: %s, full: %s}\n"
 		       "            1000:  {half: %s, full: %s}\n"
 		       "            10000: {half: false, full: %s}\n",
+		       print_tf(capabilitiesp->lp_advertising_speed->ethernet->
+				half),
+		       print_tf(capabilitiesp->lp_advertising_speed->ethernet->
+				full),
 		       print_tf(capabilitiesp->lp_advertising_speed->
-				ethernet->half),
+				fast_ethernet->half),
 		       print_tf(capabilitiesp->lp_advertising_speed->
-				ethernet->full),
-		       print_tf(capabilitiesp->
-				lp_advertising_speed->fast_ethernet->half),
-		       print_tf(capabilitiesp->
-				lp_advertising_speed->fast_ethernet->full),
-		       print_tf(capabilitiesp->
-				lp_advertising_speed->gbps_ethernet->half),
-		       print_tf(capabilitiesp->
-				lp_advertising_speed->gbps_ethernet->full),
-		       print_tf(capabilitiesp->
-				lp_advertising_speed->_10gbps_ethernet->full));
+				fast_ethernet->full),
+		       print_tf(capabilitiesp->lp_advertising_speed->
+				gbps_ethernet->half),
+		       print_tf(capabilitiesp->lp_advertising_speed->
+				gbps_ethernet->full),
+		       print_tf(capabilitiesp->lp_advertising_speed->
+				_10gbps_ethernet->full));
 	}
 
 	*status = 1;
 }
 
-int rpc_interface_capabilities_get(const char *const server_id,
+int rpc_interface_capabilities_get(ProtobufCService * service,
 				   const Dabba__InterfaceIdList * id_list)
 {
-	ProtobufCService *service;
 	protobuf_c_boolean is_done = 0;
 
-	service = dabba_rpc_client_connect(server_id);
+	assert(service);
+	assert(id_list);
 
 	dabba__dabba_service__interface_capabilities_get(service, id_list,
 							 interface_capabilities_list_print,

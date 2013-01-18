@@ -56,15 +56,13 @@ static void thread_settings_print(const Dabba__ThreadList * result,
 	*status = 1;
 }
 
-int rpc_thread_settings_get(const char *const server_id,
+int rpc_thread_settings_get(ProtobufCService * service,
 			    const Dabba__ThreadIdList * id_list)
 {
-	ProtobufCService *service;
 	protobuf_c_boolean is_done = 0;
 
+	assert(service);
 	assert(id_list);
-
-	service = dabba_rpc_client_connect(server_id);
 
 	dabba__dabba_service__thread_get(service, id_list,
 					 thread_settings_print, &is_done);

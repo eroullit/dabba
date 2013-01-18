@@ -24,7 +24,7 @@
 #ifndef THREAD_LIST_H
 #define	THREAD_LIST_H
 
-int rpc_thread_list_get(const char *const server_id,
+int rpc_thread_list_get(ProtobufCService * service,
 			const Dabba__ThreadIdList * id_list);
 
 #endif				/* THREAD_LIST_H */

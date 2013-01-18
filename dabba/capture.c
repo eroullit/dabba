@@ -170,13 +170,10 @@ static void capture_dummy_print(const Dabba__Dummy * result, void *closure_data)
 	*status = 1;
 }
 
-int rpc_capture_start(const char *const server_id,
+int rpc_capture_start(ProtobufCService * service,
 		      const Dabba__Capture * capture)
 {
-	ProtobufCService *service;
 	protobuf_c_boolean is_done = 0;
-
-	service = dabba_rpc_client_connect(server_id);
 
 	/* TODO Print create capture thread id ? */
 	dabba__dabba_service__capture_start(service, capture,
@@ -187,12 +184,9 @@ int rpc_capture_start(const char *const server_id,
 	return 0;
 }
 
-int rpc_capture_stop(const char *const server_id, const Dabba__ThreadId * id)
+int rpc_capture_stop(ProtobufCService * service, const Dabba__ThreadId * id)
 {
-	ProtobufCService *service;
 	protobuf_c_boolean is_done = 0;
-
-	service = dabba_rpc_client_connect(server_id);
 
 	dabba__dabba_service__capture_stop(service, id,
 					   capture_dummy_print, &is_done);
@@ -213,9 +207,11 @@ int cmd_capture_start(int argc, const char **argv)
 		OPT_HELP
 	};
 
-	const char *server_id = NULL;
 	int ret;
 	Dabba__Capture capture = DABBA__CAPTURE__INIT;
+	const char *server_name = DABBA_DEFAULT_SERVER_NAME;
+	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
+	ProtobufCService *service;
 
 	static struct option capture_option[] = {
 		{"interface", required_argument, NULL, OPT_CAPTURE_INTERFACE},
@@ -251,7 +247,7 @@ int cmd_capture_start(int argc, const char **argv)
 			capture.frame_size = strtoull(optarg, NULL, 10);
 			break;
 		case OPT_SERVER_ID:
-			server_id = optarg;
+			server_name = optarg;
 			break;
 		case OPT_HELP:
 		default:
@@ -260,8 +256,10 @@ int cmd_capture_start(int argc, const char **argv)
 		}
 	}
 
+	service = dabba_rpc_client_connect(server_name, server_type);
+
 	/* Check error reporting */
-	return rpc_capture_start(server_id, &capture);
+	return rpc_capture_start(service, &capture);
 }
 
 int cmd_capture_stop(int argc, const char **argv)
@@ -272,9 +270,11 @@ int cmd_capture_stop(int argc, const char **argv)
 		OPT_HELP
 	};
 
-	const char *server_id = NULL;
 	int ret;
 	Dabba__ThreadId id = DABBA__THREAD_ID__INIT;
+	const char *server_name = DABBA_DEFAULT_SERVER_NAME;
+	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
+	ProtobufCService *service;
 
 	static struct option capture_option[] = {
 		{"id", required_argument, NULL, OPT_CAPTURE_ID},
@@ -292,7 +292,7 @@ int cmd_capture_stop(int argc, const char **argv)
 			id.id = strtoull(optarg, NULL, 10);
 			break;
 		case OPT_SERVER_ID:
-			server_id = optarg;
+			server_name = optarg;
 			break;
 		case OPT_HELP:
 		default:
@@ -301,9 +301,10 @@ int cmd_capture_stop(int argc, const char **argv)
 		}
 	}
 
-	/* Check error reporting */
+	service = dabba_rpc_client_connect(server_name, server_type);
 
-	return rpc_capture_stop(server_id, &id);
+	/* Check error reporting */
+	return rpc_capture_stop(service, &id);
 }
 
 int cmd_capture_get(int argc, const char **argv)
@@ -318,7 +319,7 @@ int cmd_capture_get(int argc, const char **argv)
 		OPT_HELP
 	};
 
-	int (*const rpc_capture_get[]) (const char *const server_id,
+	int (*const rpc_capture_get[]) (ProtobufCService * service,
 					const Dabba__ThreadIdList * id_list) = {
 	[OPT_CAPTURE_LIST] = rpc_capture_list_get,
 		    [OPT_CAPTURE_SETTINGS] = rpc_capture_settings_get};
@@ -334,9 +335,11 @@ int cmd_capture_get(int argc, const char **argv)
 
 	int ret, rc = 0, action = 0;
 	size_t a;
-	const char *server_id = NULL;
 	Dabba__ThreadIdList id_list = DABBA__THREAD_ID_LIST__INIT;
 	Dabba__ThreadId **idpp;
+	const char *server_name = DABBA_DEFAULT_SERVER_NAME;
+	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
+	ProtobufCService *service;
 
 	/* parse options and actions to run */
 	while ((ret =
@@ -344,7 +347,7 @@ int cmd_capture_get(int argc, const char **argv)
 				 NULL)) != EOF) {
 		switch (ret) {
 		case OPT_SERVER_ID:
-			server_id = optarg;
+			server_name = optarg;
 			break;
 		case OPT_CAPTURE_ID:
 			idpp =
@@ -376,6 +379,8 @@ int cmd_capture_get(int argc, const char **argv)
 		}
 	}
 
+	service = dabba_rpc_client_connect(server_name, server_type);
+
 	/* list captures as default action */
 	if (!action)
 		action = (1 << OPT_CAPTURE_LIST);
@@ -383,7 +388,7 @@ int cmd_capture_get(int argc, const char **argv)
 	/* run requested actions */
 	for (a = 0; a < ARRAY_SIZE(rpc_capture_get); a++)
 		if (action & (1 << a))
-			rc = rpc_capture_get[a] (server_id, &id_list);
+			rc = rpc_capture_get[a] (service, &id_list);
 
  out:
 	free(id_list.list);

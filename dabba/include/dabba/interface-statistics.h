@@ -24,7 +24,7 @@
 #ifndef INTERFACE_STATISTICS_H
 #define	INTERFACE_STATISTICS_H
 
-int rpc_interface_statistics_get(const char *const server_id,
+int rpc_interface_statistics_get(ProtobufCService * service,
 				 const Dabba__InterfaceIdList * id_list);
 
 #endif				/* INTERFACE_STATISTICS_H */

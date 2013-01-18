@@ -24,7 +24,7 @@
 #ifndef CAPTURE_LIST_H
 #define	CAPTURE_LIST_H
 
-int rpc_capture_list_get(const char *const server_id,
+int rpc_capture_list_get(ProtobufCService * service,
 			 const Dabba__ThreadIdList * id_list);
 
 #endif				/* CAPTURE_LIST_H */

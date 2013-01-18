@@ -266,7 +266,7 @@ int cmd_thread_get(int argc, const char **argv)
 		OPT_HELP
 	};
 
-	int (*const rpc_thread_get[]) (const char *const server_id,
+	int (*const rpc_thread_get[]) (ProtobufCService * service,
 				       const Dabba__ThreadIdList * id_list) = {
 	[OPT_THREAD_LIST] = rpc_thread_list_get,
 		    [OPT_THREAD_CAPABILITIES] =
@@ -285,9 +285,11 @@ int cmd_thread_get(int argc, const char **argv)
 
 	int ret, rc = 0, action = 0;
 	size_t a;
-	const char *server_id = NULL;
 	Dabba__ThreadIdList id_list = DABBA__THREAD_ID_LIST__INIT;
 	Dabba__ThreadId **idpp;
+	const char *server_name = DABBA_DEFAULT_SERVER_NAME;
+	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
+	ProtobufCService *service;
 
 	/* parse options and actions to run */
 	while ((ret =
@@ -295,7 +297,7 @@ int cmd_thread_get(int argc, const char **argv)
 				 NULL)) != EOF) {
 		switch (ret) {
 		case OPT_SERVER_ID:
-			server_id = optarg;
+			server_name = optarg;
 			break;
 		case OPT_THREAD_ID:
 			idpp =
@@ -328,6 +330,8 @@ int cmd_thread_get(int argc, const char **argv)
 		}
 	}
 
+	service = dabba_rpc_client_connect(server_name, server_type);
+
 	/* list threads as default action */
 	if (!action)
 		action = (1 << OPT_THREAD_LIST);
@@ -335,7 +339,7 @@ int cmd_thread_get(int argc, const char **argv)
 	/* run requested actions */
 	for (a = 0; a < ARRAY_SIZE(rpc_thread_get); a++)
 		if (action & (1 << a))
-			rc = rpc_thread_get[a] (server_id, &id_list);
+			rc = rpc_thread_get[a] (service, &id_list);
  out:
 	free(id_list.list);
 

@@ -214,7 +214,7 @@ static int cmd_interface_get(int argc, const char **argv)
 		OPT_HELP
 	};
 
-	int (*const rpc_interface_get[]) (const char *const server_id,
+	int (*const rpc_interface_get[]) (ProtobufCService * service,
 					  const Dabba__InterfaceIdList *
 					  id_list) = {
 	[OPT_INTERFACE_STATISTICS] = rpc_interface_statistics_get,
@@ -248,7 +248,9 @@ static int cmd_interface_get(int argc, const char **argv)
 
 	int ret, rc = 0, action = 0;
 	size_t a;
-	const char *server_id = NULL;
+	const char *server_name = DABBA_DEFAULT_SERVER_NAME;
+	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
+	ProtobufCService *service;
 	Dabba__InterfaceIdList id_list = DABBA__INTERFACE_ID_LIST__INIT;
 	Dabba__InterfaceId **idpp;
 
@@ -258,7 +260,7 @@ static int cmd_interface_get(int argc, const char **argv)
 				 NULL)) != EOF) {
 		switch (ret) {
 		case OPT_SERVER_ID:
-			server_id = optarg;
+			server_name = optarg;
 			break;
 		case OPT_INTERFACE_ID:
 			idpp =
@@ -301,6 +303,8 @@ static int cmd_interface_get(int argc, const char **argv)
 		}
 	}
 
+	service = dabba_rpc_client_connect(server_name, server_type);
+
 	/* list interfaces as default action */
 	if (!action)
 		action = 1 << OPT_INTERFACE_LIST;
@@ -308,7 +312,7 @@ static int cmd_interface_get(int argc, const char **argv)
 	/* run requested actions */
 	for (a = 0; a < ARRAY_SIZE(rpc_interface_get); a++)
 		if (action & (1 << a))
-			rc = rpc_interface_get[a] (server_id, &id_list);
+			rc = rpc_interface_get[a] (service, &id_list);
 
  out:
 	/* cleanup */

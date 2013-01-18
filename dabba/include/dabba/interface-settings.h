@@ -24,7 +24,7 @@
 #ifndef INTERFACE_SETTINGS_H
 #define	INTERFACE_SETTINGS_H
 
-int rpc_interface_settings_get(const char *const server_id,
+int rpc_interface_settings_get(ProtobufCService * service,
 			       const Dabba__InterfaceIdList * id_list);
 
 #endif				/* INTERFACE_SETTINGS_H */

@@ -44,15 +44,13 @@ static void capture_list_print(const Dabba__CaptureList * result,
 	*status = 1;
 }
 
-int rpc_capture_list_get(const char *const server_id,
+int rpc_capture_list_get(ProtobufCService * service,
 			 const Dabba__ThreadIdList * id_list)
 {
-	ProtobufCService *service;
 	protobuf_c_boolean is_done = 0;
 
+	assert(service);
 	assert(id_list);
-
-	service = dabba_rpc_client_connect(server_id);
 
 	dabba__dabba_service__capture_get(service, id_list, capture_list_print,
 					  &is_done);

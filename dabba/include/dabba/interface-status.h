@@ -24,7 +24,7 @@
 #ifndef INTERFACE_STATUS_H
 #define	INTERFACE_STATUS_H
 
-int rpc_interface_status_get(const char *const server_id,
+int rpc_interface_status_get(ProtobufCService * service,
 			     const Dabba__InterfaceIdList * id_list);
 
 #endif				/* INTERFACE_STATUS_H */

@@ -27,7 +27,13 @@
 #include <google/protobuf-c/protobuf-c-rpc.h>
 #include <libdabba-rpc/dabba.pb-c.h>
 
-ProtobufCService *dabba_rpc_client_connect(const char *server_name);
+#ifndef DABBA_DEFAULT_SERVER_NAME
+#define DABBA_DEFAULT_SERVER_NAME "localhost:55994"
+#endif				/* DABBA_DEFAULT_SERVER_NAME */
+
+ProtobufCService *dabba_rpc_client_connect(const char *const name,
+					   const ProtobufC_RPC_AddressType
+					   type);
 void dabba_rpc_call_is_done(protobuf_c_boolean * is_done);
 void rpc_header_print(const char *const title);
 

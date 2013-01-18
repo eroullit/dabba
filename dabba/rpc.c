@@ -30,16 +30,18 @@
 #include <stdio.h>
 #include <dabba/rpc.h>
 
-ProtobufCService *dabba_rpc_client_connect(const char *server_name)
+ProtobufCService *dabba_rpc_client_connect(const char *const name,
+					   const ProtobufC_RPC_AddressType type)
 {
 	ProtobufCService *service;
 	ProtobufC_RPC_Client *client;
 
-	if (!server_name)
-		server_name = "localhost:55994";
+	assert(name);
+	assert(type == PROTOBUF_C_RPC_ADDRESS_LOCAL
+	       || type == PROTOBUF_C_RPC_ADDRESS_TCP);
 
 	service =
-	    protobuf_c_rpc_client_new(PROTOBUF_C_RPC_ADDRESS_TCP, server_name,
+	    protobuf_c_rpc_client_new(type, name,
 				      &dabba__dabba_service__descriptor, NULL);
 
 	client = (ProtobufC_RPC_Client *) service;

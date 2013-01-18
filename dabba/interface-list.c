@@ -52,16 +52,14 @@ static void interface_list_print(const Dabba__InterfaceIdList * result,
 	*status = 1;
 }
 
-int rpc_interface_list_get(const char *const server_id,
+int rpc_interface_list_get(ProtobufCService * service,
 			   const Dabba__InterfaceIdList * id_list)
 {
-	ProtobufCService *service;
 	protobuf_c_boolean is_done = 0;
 	Dabba__Dummy dummy = DABBA__DUMMY__INIT;
 
+	assert(service);
 	assert(id_list);
-
-	service = dabba_rpc_client_connect(server_id);
 
 	dabba__dabba_service__interface_id_get(service, &dummy,
 					       interface_list_print, &is_done);
