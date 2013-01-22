@@ -45,16 +45,18 @@
 static Dabba__DabbaService_Service dabba_service =
 DABBA__DABBA_SERVICE__INIT(dabbad_);
 
-int dabbad_rpc_msg_poll(void)
+int dabbad_rpc_msg_poll(const char *const name,
+			const ProtobufC_RPC_AddressType type)
 {
 	ProtobufC_RPC_Server *server;
 
-	/* 0xDABA = 55994 */
-	server =
-	    protobuf_c_rpc_server_new(PROTOBUF_C_RPC_ADDRESS_TCP,
-				      DABBA_RPC_DEFAULT_PORT,
-				      (ProtobufCService *) & dabba_service,
-				      NULL);
+	assert(name);
+	assert(type == PROTOBUF_C_RPC_ADDRESS_LOCAL
+	       || type == PROTOBUF_C_RPC_ADDRESS_TCP);
+
+	server = protobuf_c_rpc_server_new(type, name,
+					   (ProtobufCService *) & dabba_service,
+					   NULL);
 
 	for (;;)
 		protobuf_c_dispatch_run(protobuf_c_dispatch_default());

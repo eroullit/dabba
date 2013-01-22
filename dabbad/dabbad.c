@@ -109,7 +109,8 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 
 enum dabbad_opts {
 	OPT_DAEMONIZE,
-	OPT_RPC,
+	OPT_TCP,
+	OPT_LOCAL,
 	OPT_VERSION,
 	OPT_HELP
 };
@@ -123,7 +124,8 @@ const struct option *dabbad_options_get(void)
 {
 	static const struct option dabbad_long_options[] = {
 		{"daemonize", no_argument, NULL, OPT_DAEMONIZE},
-		{"rpc", no_argument, NULL, OPT_RPC},
+		{"tcp", required_argument, NULL, OPT_TCP},
+		{"local", required_argument, NULL, OPT_LOCAL},
 		{"version", no_argument, NULL, OPT_VERSION},
 		{"help", no_argument, NULL, OPT_HELP},
 		{NULL, 0, NULL, 0}
@@ -177,6 +179,8 @@ int main(int argc, char **argv)
 {
 	int opt, opt_idx;
 	int daemonize = 0;
+	const char *server_id = DABBA_RPC_DEFAULT_PORT;
+	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
 
 	assert(argc);
 	assert(argv);
@@ -191,6 +195,14 @@ int main(int argc, char **argv)
 		case OPT_VERSION:
 			print_version();
 			return EXIT_SUCCESS;
+			break;
+		case OPT_TCP:
+		case OPT_LOCAL:
+			server_id = optarg;
+			if (opt == OPT_TCP)
+				server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
+			else if (opt == OPT_LOCAL)
+				server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 			break;
 		case OPT_HELP:
 		default:
@@ -210,5 +222,5 @@ int main(int argc, char **argv)
 		}
 	}
 
-	return dabbad_rpc_msg_poll();
+	return dabbad_rpc_msg_poll(server_id, server_type);
 }

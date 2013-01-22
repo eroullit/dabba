@@ -21,9 +21,12 @@
 
 /* __LICENSE_HEADER_END__ */
 
-#ifndef LIBDABBARPC_RPC_H
-#define	LIBDABBARPC_RPC_H
+#ifndef DABBAD_RPC_H
+#define	DABBAD_RPC_H
 
-int dabbad_rpc_msg_poll(void);
+#include <libdabba-rpc/rpc.h>
 
-#endif				/* RPC_H */
+int dabbad_rpc_msg_poll(const char *const name,
+			const ProtobufC_RPC_AddressType type);
+
+#endif				/* DABBAD_RPC_H */
