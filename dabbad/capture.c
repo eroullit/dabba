@@ -49,7 +49,6 @@
 #include <libdabba/interface.h>
 #include <libdabba/packet_rx.h>
 #include <libdabba/pcap.h>
-#include <dabbad/dabbad.h>
 #include <dabbad/interface.h>
 #include <dabbad/capture.h>
 #include <dabbad/misc.h>

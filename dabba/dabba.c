@@ -93,7 +93,6 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <sys/stat.h>
 
 #include <libdabba/macros.h>
-#include <dabbad/dabbad.h>
 #include <dabba/dabba.h>
 #include <dabba/help.h>
 #include <dabba/thread.h>

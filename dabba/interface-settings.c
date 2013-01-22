@@ -32,7 +32,6 @@
 #include <getopt.h>
 #include <errno.h>
 #include <assert.h>
-#include <dabbad/dabbad.h>
 #include <dabba/macros.h>
 #include <dabba/rpc.h>
 #include <dabba/help.h>

@@ -24,8 +24,6 @@
 #ifndef INTERFACE_H
 #define	INTERFACE_H
 
-#include <dabbad/dabbad.h>
-
 struct nl_cache;
 struct nl_sock;
 

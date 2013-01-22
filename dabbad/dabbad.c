@@ -105,7 +105,6 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 
 #include <dabbad/rpc.h>
 #include <dabbad/help.h>
-#include <dabbad/dabbad.h>
 
 /**
  * \brief Dabbad entry point

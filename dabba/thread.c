@@ -187,7 +187,6 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <sys/resource.h>
 
 #include <libdabba/macros.h>
-#include <dabbad/dabbad.h>
 #include <dabbad/thread.h>
 #include <dabba/dabba.h>
 #include <dabba/thread-list.h>

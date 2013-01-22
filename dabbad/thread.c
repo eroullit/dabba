@@ -36,7 +36,6 @@
 #include <errno.h>
 #include <assert.h>
 
-#include <dabbad/dabbad.h>
 #include <dabbad/thread.h>
 #include <libdabba/macros.h>
 
