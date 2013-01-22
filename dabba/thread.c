@@ -263,6 +263,7 @@ int cmd_thread_get(int argc, const char **argv)
 		/* option */
 		OPT_THREAD_ID,
 		OPT_TCP_SERVER_ID,
+		OPT_LOCAL_SERVER_ID,
 		OPT_HELP
 	};
 
@@ -279,6 +280,7 @@ int cmd_thread_get(int argc, const char **argv)
 		{"capabilities", no_argument, NULL, OPT_THREAD_CAPABILITIES},
 		{"settings", no_argument, NULL, OPT_THREAD_SETTINGS},
 		{"tcp-server", required_argument, NULL, OPT_TCP_SERVER_ID},
+		{"local-server", required_argument, NULL, OPT_LOCAL_SERVER_ID},
 		{"help", no_argument, NULL, OPT_HELP},
 		{NULL, 0, NULL, 0},
 	};
@@ -297,7 +299,12 @@ int cmd_thread_get(int argc, const char **argv)
 				 NULL)) != EOF) {
 		switch (ret) {
 		case OPT_TCP_SERVER_ID:
+		case OPT_LOCAL_SERVER_ID:
 			server_name = optarg;
+			if (ret == OPT_TCP_SERVER_ID)
+				server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
+			else if (ret == OPT_LOCAL_SERVER_ID)
+				server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 			break;
 		case OPT_THREAD_ID:
 			idpp =

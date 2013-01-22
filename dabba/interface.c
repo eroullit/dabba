@@ -211,6 +211,7 @@ static int cmd_interface_get(int argc, const char **argv)
 		/* option */
 		OPT_INTERFACE_ID,
 		OPT_TCP_SERVER_ID,
+		OPT_LOCAL_SERVER_ID,
 		OPT_HELP
 	};
 
@@ -242,6 +243,7 @@ static int cmd_interface_get(int argc, const char **argv)
 		{"coalesce", no_argument, NULL, OPT_INTERFACE_COALESCE},
 		{"capabilities", no_argument, NULL, OPT_INTERFACE_CAPABILITIES},
 		{"tcp-server", required_argument, NULL, OPT_TCP_SERVER_ID},
+		{"local-server", required_argument, NULL, OPT_LOCAL_SERVER_ID},
 		{"help", required_argument, NULL, OPT_HELP},
 		{NULL, 0, NULL, 0},
 	};
@@ -260,7 +262,12 @@ static int cmd_interface_get(int argc, const char **argv)
 				 NULL)) != EOF) {
 		switch (ret) {
 		case OPT_TCP_SERVER_ID:
+		case OPT_LOCAL_SERVER_ID:
 			server_name = optarg;
+			if (ret == OPT_TCP_SERVER_ID)
+				server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
+			else if (ret == OPT_LOCAL_SERVER_ID)
+				server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 			break;
 		case OPT_INTERFACE_ID:
 			idpp =

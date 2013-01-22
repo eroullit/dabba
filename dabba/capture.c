@@ -316,6 +316,7 @@ int cmd_capture_get(int argc, const char **argv)
 		/* option */
 		OPT_CAPTURE_ID,
 		OPT_TCP_SERVER_ID,
+		OPT_LOCAL_SERVER_ID,
 		OPT_HELP
 	};
 
@@ -329,6 +330,7 @@ int cmd_capture_get(int argc, const char **argv)
 		{"list", no_argument, NULL, OPT_CAPTURE_LIST},
 		{"settings", no_argument, NULL, OPT_CAPTURE_SETTINGS},
 		{"tcp-server", required_argument, NULL, OPT_TCP_SERVER_ID},
+		{"local-server", required_argument, NULL, OPT_LOCAL_SERVER_ID},
 		{"help", no_argument, NULL, OPT_HELP},
 		{NULL, 0, NULL, 0},
 	};
@@ -347,7 +349,12 @@ int cmd_capture_get(int argc, const char **argv)
 				 NULL)) != EOF) {
 		switch (ret) {
 		case OPT_TCP_SERVER_ID:
+		case OPT_LOCAL_SERVER_ID:
 			server_name = optarg;
+			if (ret == OPT_TCP_SERVER_ID)
+				server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
+			else if (ret == OPT_LOCAL_SERVER_ID)
+				server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 			break;
 		case OPT_CAPTURE_ID:
 			idpp =
