@@ -107,33 +107,6 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabbad/help.h>
 #include <dabbad/dabbad.h>
 
-enum dabbad_opts {
-	OPT_DAEMONIZE,
-	OPT_TCP,
-	OPT_LOCAL,
-	OPT_VERSION,
-	OPT_HELP
-};
-
-/**
- * \brief Dabbad options getter
- * \return Dabbad option data structure
- */
-
-const struct option *dabbad_options_get(void)
-{
-	static const struct option dabbad_long_options[] = {
-		{"daemonize", no_argument, NULL, OPT_DAEMONIZE},
-		{"tcp", required_argument, NULL, OPT_TCP},
-		{"local", required_argument, NULL, OPT_LOCAL},
-		{"version", no_argument, NULL, OPT_VERSION},
-		{"help", no_argument, NULL, OPT_HELP},
-		{NULL, 0, NULL, 0}
-	};
-
-	return (dabbad_long_options);
-}
-
 /**
  * \internal
  * \brief Create dabbad pidfile
@@ -177,6 +150,23 @@ static inline int dabbad_pidfile_create(void)
 
 int main(int argc, char **argv)
 {
+	enum dabbad_opts {
+		OPT_DAEMONIZE,
+		OPT_TCP,
+		OPT_LOCAL,
+		OPT_VERSION,
+		OPT_HELP
+	};
+
+	static const struct option dabbad_long_options[] = {
+		{"daemonize", no_argument, NULL, OPT_DAEMONIZE},
+		{"tcp", required_argument, NULL, OPT_TCP},
+		{"local", required_argument, NULL, OPT_LOCAL},
+		{"version", no_argument, NULL, OPT_VERSION},
+		{"help", no_argument, NULL, OPT_HELP},
+		{NULL, 0, NULL, 0}
+	};
+
 	int opt, opt_idx;
 	int daemonize = 0;
 	const char *server_id = DABBA_RPC_DEFAULT_PORT;
@@ -186,7 +176,7 @@ int main(int argc, char **argv)
 	assert(argv);
 
 	while ((opt =
-		getopt_long_only(argc, argv, "", dabbad_options_get(),
+		getopt_long_only(argc, argv, "", dabbad_long_options,
 				 &opt_idx)) != EOF) {
 		switch (opt) {
 		case OPT_DAEMONIZE:
@@ -206,7 +196,7 @@ int main(int argc, char **argv)
 			break;
 		case OPT_HELP:
 		default:
-			show_usage(dabbad_options_get());
+			show_usage(dabbad_long_options);
 			return EXIT_SUCCESS;
 			break;
 
