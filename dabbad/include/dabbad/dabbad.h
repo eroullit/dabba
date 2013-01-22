@@ -30,12 +30,4 @@
 #ifndef DABBAD_H
 #define	DABBAD_H
 
-/**
- * \brief Dabbad pid file path
- */
-
-#ifndef DABBAD_PID_FILE
-#define DABBAD_PID_FILE "/tmp/dabba.pid"
-#endif				/* DABBAD_PID_FILE */
-
 #endif				/* DABBAD_H */

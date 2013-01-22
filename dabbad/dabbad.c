@@ -108,36 +108,6 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabbad/dabbad.h>
 
 /**
- * \internal
- * \brief Create dabbad pidfile
- * \return 0 on success, else on failure.
- *
- * This function creates start time a file containing dabbad process id.
- */
-
-static inline int dabbad_pidfile_create(void)
-{
-	int rc = EIO;
-	int pidfd = -1;
-	char pidstr[8] = { 0 };
-	ssize_t pidstrlen = 0;
-
-	pidfd = creat(DABBAD_PID_FILE, 0600);
-
-	if (pidfd < 0)
-		return errno;
-
-	pidstrlen = snprintf(pidstr, sizeof(pidstr), "%i\n", getpid());
-
-	if (write(pidfd, pidstr, pidstrlen) != pidstrlen) {
-		rc = EIO;
-	}
-
-	close(pidfd);
-	return rc;
-}
-
-/**
  * \brief Dabbad entry point
  * \param[in]       argc	        Argument counter
  * \param[in]       argv	        Argument vector
@@ -202,8 +172,6 @@ int main(int argc, char **argv)
 
 		}
 	}
-
-	assert(dabbad_pidfile_create());
 
 	if (daemonize) {
 		if (daemon(-1, 0)) {
