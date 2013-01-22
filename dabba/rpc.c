@@ -63,5 +63,5 @@ void rpc_header_print(const char *const title)
 {
 	assert(title);
 
-	printf("---\n%s:\n", title);
+	printf("---\n  %s:\n", title);
 }
