@@ -210,7 +210,7 @@ static int cmd_interface_get(int argc, const char **argv)
 		OPT_INTERFACE_CAPABILITIES,
 		/* option */
 		OPT_INTERFACE_ID,
-		OPT_SERVER_ID,
+		OPT_TCP_SERVER_ID,
 		OPT_HELP
 	};
 
@@ -241,7 +241,7 @@ static int cmd_interface_get(int argc, const char **argv)
 		{"driver", no_argument, NULL, OPT_INTERFACE_DRIVER},
 		{"coalesce", no_argument, NULL, OPT_INTERFACE_COALESCE},
 		{"capabilities", no_argument, NULL, OPT_INTERFACE_CAPABILITIES},
-		{"server", required_argument, NULL, OPT_SERVER_ID},
+		{"tcp-server", required_argument, NULL, OPT_TCP_SERVER_ID},
 		{"help", required_argument, NULL, OPT_HELP},
 		{NULL, 0, NULL, 0},
 	};
@@ -259,7 +259,7 @@ static int cmd_interface_get(int argc, const char **argv)
 		getopt_long_only(argc, (char **)argv, "", interface_option,
 				 NULL)) != EOF) {
 		switch (ret) {
-		case OPT_SERVER_ID:
+		case OPT_TCP_SERVER_ID:
 			server_name = optarg;
 			break;
 		case OPT_INTERFACE_ID:

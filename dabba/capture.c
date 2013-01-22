@@ -315,7 +315,7 @@ int cmd_capture_get(int argc, const char **argv)
 		OPT_CAPTURE_SETTINGS,
 		/* option */
 		OPT_CAPTURE_ID,
-		OPT_SERVER_ID,
+		OPT_TCP_SERVER_ID,
 		OPT_HELP
 	};
 
@@ -328,7 +328,7 @@ int cmd_capture_get(int argc, const char **argv)
 		{"id", required_argument, NULL, OPT_CAPTURE_ID},
 		{"list", no_argument, NULL, OPT_CAPTURE_LIST},
 		{"settings", no_argument, NULL, OPT_CAPTURE_SETTINGS},
-		{"server", required_argument, NULL, OPT_SERVER_ID},
+		{"tcp-server", required_argument, NULL, OPT_TCP_SERVER_ID},
 		{"help", no_argument, NULL, OPT_HELP},
 		{NULL, 0, NULL, 0},
 	};
@@ -346,7 +346,7 @@ int cmd_capture_get(int argc, const char **argv)
 		getopt_long_only(argc, (char **)argv, "", capture_option,
 				 NULL)) != EOF) {
 		switch (ret) {
-		case OPT_SERVER_ID:
+		case OPT_TCP_SERVER_ID:
 			server_name = optarg;
 			break;
 		case OPT_CAPTURE_ID:

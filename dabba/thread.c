@@ -262,7 +262,7 @@ int cmd_thread_get(int argc, const char **argv)
 		OPT_THREAD_SETTINGS,
 		/* option */
 		OPT_THREAD_ID,
-		OPT_SERVER_ID,
+		OPT_TCP_SERVER_ID,
 		OPT_HELP
 	};
 
@@ -278,7 +278,7 @@ int cmd_thread_get(int argc, const char **argv)
 		{"list", no_argument, NULL, OPT_THREAD_LIST},
 		{"capabilities", no_argument, NULL, OPT_THREAD_CAPABILITIES},
 		{"settings", no_argument, NULL, OPT_THREAD_SETTINGS},
-		{"server", required_argument, NULL, OPT_SERVER_ID},
+		{"tcp-server", required_argument, NULL, OPT_TCP_SERVER_ID},
 		{"help", no_argument, NULL, OPT_HELP},
 		{NULL, 0, NULL, 0},
 	};
@@ -296,7 +296,7 @@ int cmd_thread_get(int argc, const char **argv)
 		getopt_long_only(argc, (char **)argv, "", thread_option,
 				 NULL)) != EOF) {
 		switch (ret) {
-		case OPT_SERVER_ID:
+		case OPT_TCP_SERVER_ID:
 			server_name = optarg;
 			break;
 		case OPT_THREAD_ID:
