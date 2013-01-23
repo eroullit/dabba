@@ -27,6 +27,8 @@
 
 /* __LICENSE_HEADER_END__ */
 
+#include <errno.h>
+
 #include <google/protobuf-c/protobuf-c-rpc.h>
 #include <libdabba-rpc/rpc.h>
 #include <dabbad/interface.h>
@@ -57,6 +59,9 @@ int dabbad_rpc_msg_poll(const char *const name,
 	server = protobuf_c_rpc_server_new(type, name,
 					   (ProtobufCService *) & dabba_service,
 					   NULL);
+
+	if (!server)
+		return EINVAL;
 
 	for (;;)
 		protobuf_c_dispatch_run(protobuf_c_dispatch_default());
