@@ -28,11 +28,14 @@
 /* __LICENSE_HEADER_END__ */
 
 #include <stdio.h>
+#include <unistd.h>
 #include <dabba/rpc.h>
 
 ProtobufCService *dabba_rpc_client_connect(const char *const name,
 					   const ProtobufC_RPC_AddressType type)
 {
+	/* The first failure triggers a instantaneous retry, we want 10 retry */
+	size_t a, nretry = 11;
 	ProtobufCService *service;
 	ProtobufC_RPC_Client *client;
 
@@ -49,10 +52,13 @@ ProtobufCService *dabba_rpc_client_connect(const char *const name,
 
 	client = (ProtobufC_RPC_Client *) service;
 
-	while (!protobuf_c_rpc_client_is_connected(client))
+	protobuf_c_rpc_client_set_autoreconnect_period(client, 1000);
+
+	for (a = 0; a < nretry && !protobuf_c_rpc_client_is_connected(client);
+	     a++)
 		protobuf_c_dispatch_run(protobuf_c_dispatch_default());
 
-	return service;
+	return a < nretry ? service : NULL;
 }
 
 void dabba_rpc_call_is_done(protobuf_c_boolean * is_done)
