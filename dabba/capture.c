@@ -202,7 +202,8 @@ int cmd_capture_start(int argc, const char **argv)
 		OPT_CAPTURE_PCAP,
 		OPT_CAPTURE_FRAME_NUMBER,
 		OPT_CAPTURE_FRAME_SIZE,
-		OPT_SERVER_ID,
+		OPT_TCP_SERVER_ID,
+		OPT_LOCAL_SERVER_ID,
 		OPT_HELP
 	};
 
@@ -218,7 +219,8 @@ int cmd_capture_start(int argc, const char **argv)
 		{"frame-number", required_argument, NULL,
 		 OPT_CAPTURE_FRAME_NUMBER},
 		{"frame-size", required_argument, NULL, OPT_CAPTURE_FRAME_SIZE},
-		{"server", required_argument, NULL, OPT_SERVER_ID},
+		{"tcp-server", required_argument, NULL, OPT_TCP_SERVER_ID},
+		{"local-server", required_argument, NULL, OPT_LOCAL_SERVER_ID},
 		{"help", no_argument, NULL, OPT_HELP},
 		{NULL, 0, NULL, 0},
 	};
@@ -245,8 +247,13 @@ int cmd_capture_start(int argc, const char **argv)
 		case OPT_CAPTURE_FRAME_SIZE:
 			capture.frame_size = strtoull(optarg, NULL, 10);
 			break;
-		case OPT_SERVER_ID:
+		case OPT_TCP_SERVER_ID:
+		case OPT_LOCAL_SERVER_ID:
 			server_name = optarg;
+			if (ret == OPT_TCP_SERVER_ID)
+				server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
+			else if (ret == OPT_LOCAL_SERVER_ID)
+				server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 			break;
 		case OPT_HELP:
 		default:
@@ -265,7 +272,8 @@ int cmd_capture_stop(int argc, const char **argv)
 {
 	enum capture_start_option {
 		OPT_CAPTURE_ID,
-		OPT_SERVER_ID,
+		OPT_TCP_SERVER_ID,
+		OPT_LOCAL_SERVER_ID,
 		OPT_HELP
 	};
 
@@ -277,7 +285,8 @@ int cmd_capture_stop(int argc, const char **argv)
 
 	static struct option capture_option[] = {
 		{"id", required_argument, NULL, OPT_CAPTURE_ID},
-		{"server", required_argument, NULL, OPT_SERVER_ID},
+		{"tcp-server", required_argument, NULL, OPT_TCP_SERVER_ID},
+		{"local-server", required_argument, NULL, OPT_LOCAL_SERVER_ID},
 		{"help", no_argument, NULL, OPT_HELP},
 		{NULL, 0, NULL, 0},
 	};
@@ -290,8 +299,13 @@ int cmd_capture_stop(int argc, const char **argv)
 		case OPT_CAPTURE_ID:
 			id.id = strtoull(optarg, NULL, 10);
 			break;
-		case OPT_SERVER_ID:
+		case OPT_TCP_SERVER_ID:
+		case OPT_LOCAL_SERVER_ID:
 			server_name = optarg;
+			if (ret == OPT_TCP_SERVER_ID)
+				server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
+			else if (ret == OPT_LOCAL_SERVER_ID)
+				server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 			break;
 		case OPT_HELP:
 		default:
