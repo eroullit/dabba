@@ -312,6 +312,9 @@ static int cmd_interface_get(int argc, const char **argv)
 
 	service = dabba_rpc_client_connect(server_name, server_type);
 
+	if (!service)
+		return EINVAL;
+
 	/* list interfaces as default action */
 	if (!action)
 		action = 1 << OPT_INTERFACE_LIST;

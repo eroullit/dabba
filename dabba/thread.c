@@ -338,6 +338,9 @@ int cmd_thread_get(int argc, const char **argv)
 
 	service = dabba_rpc_client_connect(server_name, server_type);
 
+	if (!service)
+		return EINVAL;
+
 	/* list threads as default action */
 	if (!action)
 		action = (1 << OPT_THREAD_LIST);

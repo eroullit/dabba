@@ -265,7 +265,7 @@ int cmd_capture_start(int argc, const char **argv)
 	service = dabba_rpc_client_connect(server_name, server_type);
 
 	/* Check error reporting */
-	return rpc_capture_start(service, &capture);
+	return service ? rpc_capture_start(service, &capture) : EINVAL;
 }
 
 int cmd_capture_stop(int argc, const char **argv)
@@ -317,7 +317,7 @@ int cmd_capture_stop(int argc, const char **argv)
 	service = dabba_rpc_client_connect(server_name, server_type);
 
 	/* Check error reporting */
-	return rpc_capture_stop(service, &id);
+	return service ? rpc_capture_stop(service, &id) : EINVAL;
 }
 
 int cmd_capture_get(int argc, const char **argv)
@@ -400,6 +400,9 @@ int cmd_capture_get(int argc, const char **argv)
 	}
 
 	service = dabba_rpc_client_connect(server_name, server_type);
+
+	if (!service)
+		return EINVAL;
 
 	/* list captures as default action */
 	if (!action)

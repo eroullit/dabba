@@ -44,6 +44,9 @@ ProtobufCService *dabba_rpc_client_connect(const char *const name,
 	    protobuf_c_rpc_client_new(type, name,
 				      &dabba__dabba_service__descriptor, NULL);
 
+	if (!service)
+		return NULL;
+
 	client = (ProtobufC_RPC_Client *) service;
 
 	while (!protobuf_c_rpc_client_is_connected(client))
