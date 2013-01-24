@@ -210,8 +210,8 @@ static int cmd_interface_get(int argc, const char **argv)
 		OPT_INTERFACE_CAPABILITIES,
 		/* option */
 		OPT_INTERFACE_ID,
-		OPT_TCP_SERVER_ID,
-		OPT_LOCAL_SERVER_ID,
+		OPT_TCP,
+		OPT_LOCAL,
 		OPT_HELP
 	};
 
@@ -242,15 +242,15 @@ static int cmd_interface_get(int argc, const char **argv)
 		{"driver", no_argument, NULL, OPT_INTERFACE_DRIVER},
 		{"coalesce", no_argument, NULL, OPT_INTERFACE_COALESCE},
 		{"capabilities", no_argument, NULL, OPT_INTERFACE_CAPABILITIES},
-		{"tcp-server", required_argument, NULL, OPT_TCP_SERVER_ID},
-		{"local-server", required_argument, NULL, OPT_LOCAL_SERVER_ID},
+		{"tcp", optional_argument, NULL, OPT_TCP},
+		{"local", optional_argument, NULL, OPT_LOCAL},
 		{"help", required_argument, NULL, OPT_HELP},
 		{NULL, 0, NULL, 0},
 	};
 
 	int ret, rc = 0, action = 0;
 	size_t a;
-	const char *server_name = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
 	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 	ProtobufCService *service;
 	Dabba__InterfaceIdList id_list = DABBA__INTERFACE_ID_LIST__INIT;
@@ -261,13 +261,19 @@ static int cmd_interface_get(int argc, const char **argv)
 		getopt_long_only(argc, (char **)argv, "", interface_option,
 				 NULL)) != EOF) {
 		switch (ret) {
-		case OPT_TCP_SERVER_ID:
-		case OPT_LOCAL_SERVER_ID:
-			server_name = optarg;
-			if (ret == OPT_TCP_SERVER_ID)
-				server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
-			else if (ret == OPT_LOCAL_SERVER_ID)
-				server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+		case OPT_TCP:
+			server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
+			server_id = DABBA_RPC_DEFAULT_TCP_SERVER_NAME;
+
+			if (optarg)
+				server_id = optarg;
+			break;
+		case OPT_LOCAL:
+			server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+			server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+
+			if (optarg)
+				server_id = optarg;
 			break;
 		case OPT_INTERFACE_ID:
 			idpp =
@@ -310,7 +316,7 @@ static int cmd_interface_get(int argc, const char **argv)
 		}
 	}
 
-	service = dabba_rpc_client_connect(server_name, server_type);
+	service = dabba_rpc_client_connect(server_id, server_type);
 
 	if (!service)
 		return EINVAL;

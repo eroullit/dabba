@@ -202,14 +202,14 @@ int cmd_capture_start(int argc, const char **argv)
 		OPT_CAPTURE_PCAP,
 		OPT_CAPTURE_FRAME_NUMBER,
 		OPT_CAPTURE_FRAME_SIZE,
-		OPT_TCP_SERVER_ID,
-		OPT_LOCAL_SERVER_ID,
+		OPT_TCP,
+		OPT_LOCAL,
 		OPT_HELP
 	};
 
 	int ret;
 	Dabba__Capture capture = DABBA__CAPTURE__INIT;
-	const char *server_name = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
 	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 	ProtobufCService *service;
 
@@ -219,8 +219,8 @@ int cmd_capture_start(int argc, const char **argv)
 		{"frame-number", required_argument, NULL,
 		 OPT_CAPTURE_FRAME_NUMBER},
 		{"frame-size", required_argument, NULL, OPT_CAPTURE_FRAME_SIZE},
-		{"tcp-server", required_argument, NULL, OPT_TCP_SERVER_ID},
-		{"local-server", required_argument, NULL, OPT_LOCAL_SERVER_ID},
+		{"tcp", optional_argument, NULL, OPT_TCP},
+		{"local", optional_argument, NULL, OPT_LOCAL},
 		{"help", no_argument, NULL, OPT_HELP},
 		{NULL, 0, NULL, 0},
 	};
@@ -235,6 +235,20 @@ int cmd_capture_start(int argc, const char **argv)
 		getopt_long_only(argc, (char **)argv, "", capture_option,
 				 NULL)) != EOF) {
 		switch (ret) {
+		case OPT_TCP:
+			server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
+			server_id = DABBA_RPC_DEFAULT_TCP_SERVER_NAME;
+
+			if (optarg)
+				server_id = optarg;
+			break;
+		case OPT_LOCAL:
+			server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+			server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+
+			if (optarg)
+				server_id = optarg;
+			break;
 		case OPT_CAPTURE_INTERFACE:
 			capture.interface = optarg;
 			break;
@@ -247,14 +261,6 @@ int cmd_capture_start(int argc, const char **argv)
 		case OPT_CAPTURE_FRAME_SIZE:
 			capture.frame_size = strtoull(optarg, NULL, 10);
 			break;
-		case OPT_TCP_SERVER_ID:
-		case OPT_LOCAL_SERVER_ID:
-			server_name = optarg;
-			if (ret == OPT_TCP_SERVER_ID)
-				server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
-			else if (ret == OPT_LOCAL_SERVER_ID)
-				server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
-			break;
 		case OPT_HELP:
 		default:
 			show_usage(capture_option);
@@ -262,7 +268,7 @@ int cmd_capture_start(int argc, const char **argv)
 		}
 	}
 
-	service = dabba_rpc_client_connect(server_name, server_type);
+	service = dabba_rpc_client_connect(server_id, server_type);
 
 	/* Check error reporting */
 	return service ? rpc_capture_start(service, &capture) : EINVAL;
@@ -272,21 +278,21 @@ int cmd_capture_stop(int argc, const char **argv)
 {
 	enum capture_start_option {
 		OPT_CAPTURE_ID,
-		OPT_TCP_SERVER_ID,
-		OPT_LOCAL_SERVER_ID,
+		OPT_TCP,
+		OPT_LOCAL,
 		OPT_HELP
 	};
 
 	int ret;
 	Dabba__ThreadId id = DABBA__THREAD_ID__INIT;
-	const char *server_name = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
 	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 	ProtobufCService *service;
 
 	static struct option capture_option[] = {
 		{"id", required_argument, NULL, OPT_CAPTURE_ID},
-		{"tcp-server", required_argument, NULL, OPT_TCP_SERVER_ID},
-		{"local-server", required_argument, NULL, OPT_LOCAL_SERVER_ID},
+		{"tcp", optional_argument, NULL, OPT_TCP},
+		{"local", optional_argument, NULL, OPT_LOCAL},
 		{"help", no_argument, NULL, OPT_HELP},
 		{NULL, 0, NULL, 0},
 	};
@@ -296,16 +302,22 @@ int cmd_capture_stop(int argc, const char **argv)
 		getopt_long_only(argc, (char **)argv, "", capture_option,
 				 NULL)) != EOF) {
 		switch (ret) {
+		case OPT_TCP:
+			server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
+			server_id = DABBA_RPC_DEFAULT_TCP_SERVER_NAME;
+
+			if (optarg)
+				server_id = optarg;
+			break;
+		case OPT_LOCAL:
+			server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+			server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+
+			if (optarg)
+				server_id = optarg;
+			break;
 		case OPT_CAPTURE_ID:
 			id.id = strtoull(optarg, NULL, 10);
-			break;
-		case OPT_TCP_SERVER_ID:
-		case OPT_LOCAL_SERVER_ID:
-			server_name = optarg;
-			if (ret == OPT_TCP_SERVER_ID)
-				server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
-			else if (ret == OPT_LOCAL_SERVER_ID)
-				server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 			break;
 		case OPT_HELP:
 		default:
@@ -314,7 +326,7 @@ int cmd_capture_stop(int argc, const char **argv)
 		}
 	}
 
-	service = dabba_rpc_client_connect(server_name, server_type);
+	service = dabba_rpc_client_connect(server_id, server_type);
 
 	/* Check error reporting */
 	return service ? rpc_capture_stop(service, &id) : EINVAL;
@@ -328,8 +340,8 @@ int cmd_capture_get(int argc, const char **argv)
 		OPT_CAPTURE_SETTINGS,
 		/* option */
 		OPT_CAPTURE_ID,
-		OPT_TCP_SERVER_ID,
-		OPT_LOCAL_SERVER_ID,
+		OPT_TCP,
+		OPT_LOCAL,
 		OPT_HELP
 	};
 
@@ -342,8 +354,8 @@ int cmd_capture_get(int argc, const char **argv)
 		{"id", required_argument, NULL, OPT_CAPTURE_ID},
 		{"list", no_argument, NULL, OPT_CAPTURE_LIST},
 		{"settings", no_argument, NULL, OPT_CAPTURE_SETTINGS},
-		{"tcp-server", required_argument, NULL, OPT_TCP_SERVER_ID},
-		{"local-server", required_argument, NULL, OPT_LOCAL_SERVER_ID},
+		{"tcp", optional_argument, NULL, OPT_TCP},
+		{"local", optional_argument, NULL, OPT_LOCAL},
 		{"help", no_argument, NULL, OPT_HELP},
 		{NULL, 0, NULL, 0},
 	};
@@ -352,7 +364,7 @@ int cmd_capture_get(int argc, const char **argv)
 	size_t a;
 	Dabba__ThreadIdList id_list = DABBA__THREAD_ID_LIST__INIT;
 	Dabba__ThreadId **idpp;
-	const char *server_name = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
 	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 	ProtobufCService *service;
 
@@ -361,13 +373,19 @@ int cmd_capture_get(int argc, const char **argv)
 		getopt_long_only(argc, (char **)argv, "", capture_option,
 				 NULL)) != EOF) {
 		switch (ret) {
-		case OPT_TCP_SERVER_ID:
-		case OPT_LOCAL_SERVER_ID:
-			server_name = optarg;
-			if (ret == OPT_TCP_SERVER_ID)
-				server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
-			else if (ret == OPT_LOCAL_SERVER_ID)
-				server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+		case OPT_TCP:
+			server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
+			server_id = DABBA_RPC_DEFAULT_TCP_SERVER_NAME;
+
+			if (optarg)
+				server_id = optarg;
+			break;
+		case OPT_LOCAL:
+			server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+			server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+
+			if (optarg)
+				server_id = optarg;
 			break;
 		case OPT_CAPTURE_ID:
 			idpp =
@@ -399,7 +417,7 @@ int cmd_capture_get(int argc, const char **argv)
 		}
 	}
 
-	service = dabba_rpc_client_connect(server_name, server_type);
+	service = dabba_rpc_client_connect(server_id, server_type);
 
 	if (!service)
 		return EINVAL;
