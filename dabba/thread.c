@@ -288,8 +288,8 @@ int cmd_thread_get(int argc, const char **argv)
 	size_t a;
 	Dabba__ThreadIdList id_list = DABBA__THREAD_ID_LIST__INIT;
 	Dabba__ThreadId **idpp;
-	const char *server_name = DABBA_RPC_DEFAULT_SERVER_NAME;
-	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
+	const char *server_name = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 	ProtobufCService *service;
 
 	/* parse options and actions to run */

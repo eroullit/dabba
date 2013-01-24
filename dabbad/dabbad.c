@@ -138,8 +138,8 @@ int main(int argc, char **argv)
 
 	int opt, opt_idx;
 	int daemonize = 0;
-	const char *server_id = DABBA_RPC_DEFAULT_PORT;
-	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
+	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 
 	assert(argc);
 	assert(argv);
