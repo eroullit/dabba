@@ -129,8 +129,8 @@ int main(int argc, char **argv)
 
 	static const struct option dabbad_long_options[] = {
 		{"daemonize", no_argument, NULL, OPT_DAEMONIZE},
-		{"tcp", required_argument, NULL, OPT_TCP},
-		{"local", required_argument, NULL, OPT_LOCAL},
+		{"tcp", optional_argument, NULL, OPT_TCP},
+		{"local", optional_argument, NULL, OPT_LOCAL},
 		{"version", no_argument, NULL, OPT_VERSION},
 		{"help", no_argument, NULL, OPT_HELP},
 		{NULL, 0, NULL, 0}
@@ -156,12 +156,18 @@ int main(int argc, char **argv)
 			return EXIT_SUCCESS;
 			break;
 		case OPT_TCP:
+			server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
+			server_id = DABBA_RPC_DEFAULT_TCP_SERVER_NAME;
+
+			if (optarg)
+				server_id = optarg;
+			break;
 		case OPT_LOCAL:
-			server_id = optarg;
-			if (opt == OPT_TCP)
-				server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
-			else if (opt == OPT_LOCAL)
-				server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+			server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+			server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+
+			if (optarg)
+				server_id = optarg;
 			break;
 		case OPT_HELP:
 		default:
