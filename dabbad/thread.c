@@ -33,6 +33,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <errno.h>
 #include <assert.h>
 
@@ -194,6 +195,60 @@ int dabbad_thread_sched_affinity_get(struct packet_thread *pkt_thread,
 }
 
 /**
+ * \brief Print a CPU number list from a CPU set.
+ * \param[in]           cpu	        Pointer to a CPU set
+ * \param[out]          str	        Pointer to a string to fill
+ * \param[in]           len	        Length of the string buffer
+ */
+
+static int cpu_affinity2str(const cpu_set_t * const mask, char *str,
+			    const size_t len)
+{
+	int trail_sep = 0;
+	size_t i, j, run = 0, off = 0;
+
+	assert(mask);
+	assert(str);
+
+	for (i = 0; i < CPU_SETSIZE; i++)
+		if (CPU_ISSET(i, mask)) {
+			for (j = i + 1; j < CPU_SETSIZE; j++) {
+				if (CPU_ISSET(j, mask))
+					run++;
+				else
+					break;
+			}
+
+			/*
+			 * Add a trailing comma at new entries but the first
+			 * to get an cpu list like: 0,1-4,5,7
+			 */
+
+			if (trail_sep) {
+				printf(",");
+				off += snprintf(&str[off], len - off, ",");
+				trail_sep = 1;
+			}
+
+			if (!run)
+				off += snprintf(&str[off], len - off, "%zu", i);
+			else if (run == 1) {
+				off +=
+				    snprintf(&str[off], len - off, "%zu,%zu", i,
+					     i + 1);
+				i++;
+			} else {
+				off +=
+				    snprintf(&str[off], len - off, "%zu-%zu", i,
+					     i + run);
+				i += run;
+			}
+		}
+
+	return 0;
+}
+
+/**
  * \brief Start a new thread
  * \param[in] pkt_thread thread information
  * \param[in] func function to start as a thread
@@ -313,7 +368,8 @@ void dabbad_thread_get(Dabba__DabbaService_Service * service,
 	Dabba__ThreadList *settings_listp = NULL;
 	Dabba__Thread *settingsp;
 	struct packet_thread *pkt_thread;
-	size_t a = 0;
+	size_t a = 0, cs_len = 128;
+	cpu_set_t run_on;
 
 	assert(service);
 	assert(id_listp);
@@ -343,8 +399,11 @@ void dabbad_thread_get(Dabba__DabbaService_Service * service,
 
 		settings_list.list[a]->id =
 		    malloc(sizeof(*settings_list.list[a]->id));
+		settings_list.list[a]->cpu_set =
+		    calloc(cs_len, sizeof(*settings_list.list[a]->cpu_set));
 
-		if (!settings_list.list[a]->id)
+		if (!settings_list.list[a]->id
+		    || !settings_list.list[a]->cpu_set)
 			goto out;
 
 		dabba__thread_id__init(settings_list.list[a]->id);
@@ -362,8 +421,9 @@ void dabbad_thread_get(Dabba__DabbaService_Service * service,
 					      settingsp->sched_priority,
 					      (int16_t *) &
 					      settingsp->sched_policy);
+		dabbad_thread_sched_affinity_get(pkt_thread, &run_on);
+		cpu_affinity2str(&run_on, settingsp->cpu_set, cs_len);
 		settingsp->type = pkt_thread->type;
-		/* TODO prepare cpu set string */
 		settingsp++;
 	}
 
@@ -373,8 +433,10 @@ void dabbad_thread_get(Dabba__DabbaService_Service * service,
 	closure(settings_listp, closure_data);
 
 	for (a = 0; a < settings_list.n_list; a++) {
-		if (settings_list.list[a])
+		if (settings_list.list[a]) {
 			free(settings_list.list[a]->id);
+			free(settings_list.list[a]->cpu_set);
+		}
 
 		free(settings_list.list[a]);
 	}
