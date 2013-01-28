@@ -148,15 +148,16 @@ int dabbad_thread_sched_param_set(struct packet_thread *pkt_thread,
 int dabbad_thread_sched_param_get(struct packet_thread *pkt_thread,
 				  int16_t * sched_prio, int16_t * sched_policy)
 {
-	int rc;
+	int rc, policy;
 	struct sched_param sp = { 0 };
 
 	assert(pkt_thread);
 	assert(sched_prio);
 	assert(sched_policy);
 
-	rc = pthread_getschedparam(pkt_thread->id, (int *)sched_policy, &sp);
+	rc = pthread_getschedparam(pkt_thread->id, &policy, &sp);
 
+	*sched_policy = policy;
 	*sched_prio = sp.sched_priority;
 
 	return rc;
