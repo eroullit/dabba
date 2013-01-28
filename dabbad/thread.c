@@ -364,6 +364,42 @@ int dabbad_thread_stop(struct packet_thread *pkt_thread)
 	return rc;
 }
 
+void dabbad_thread_modify(Dabba__DabbaService_Service * service,
+			  const Dabba__Thread * thread,
+			  Dabba__Dummy_Closure closure, void *closure_data)
+{
+	Dabba__Dummy dummy = DABBA__DUMMY__INIT;
+	struct packet_thread *pkt_thread;
+	int16_t sched_policy, sched_prio;
+	cpu_set_t run_on;
+
+	assert(service);
+	assert(thread);
+
+	pkt_thread = dabbad_thread_data_get(thread->id->id);
+
+	if (pkt_thread) {
+		dabbad_thread_sched_param_get(pkt_thread, &sched_prio,
+					      &sched_policy);
+		dabbad_thread_sched_affinity_get(pkt_thread, &run_on);
+
+		if (thread->has_sched_policy)
+			sched_policy = thread->sched_policy;
+
+		if (thread->has_sched_priority)
+			sched_prio = thread->sched_priority;
+
+		if (thread->cpu_set)
+			str2cpu_affinity(thread->cpu_set, &run_on);
+
+		dabbad_thread_sched_param_set(pkt_thread, sched_prio,
+					      sched_policy);
+		dabbad_thread_sched_affinity_set(pkt_thread, &run_on);
+	}
+
+	closure(&dummy, closure_data);
+}
+
 void dabbad_thread_id_get(Dabba__DabbaService_Service * service,
 			  const Dabba__Dummy * dummy,
 			  Dabba__ThreadIdList_Closure closure,

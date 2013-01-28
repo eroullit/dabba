@@ -56,6 +56,16 @@ static void thread_settings_print(const Dabba__ThreadList * result,
 	*status = 1;
 }
 
+static void thread_dummy_print(const Dabba__Dummy * result, void *closure_data)
+{
+	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
+
+	assert(result);
+	assert(closure_data);
+
+	*status = 1;
+}
+
 int rpc_thread_settings_get(ProtobufCService * service,
 			    const Dabba__ThreadIdList * id_list)
 {
@@ -66,6 +76,22 @@ int rpc_thread_settings_get(ProtobufCService * service,
 
 	dabba__dabba_service__thread_get(service, id_list,
 					 thread_settings_print, &is_done);
+
+	dabba_rpc_call_is_done(&is_done);
+
+	return 0;
+}
+
+int rpc_thread_settings_modify(ProtobufCService * service,
+			       const Dabba__Thread * thread)
+{
+	protobuf_c_boolean is_done = 0;
+
+	assert(service);
+	assert(thread);
+
+	dabba__dabba_service__thread_modify(service, thread, thread_dummy_print,
+					    &is_done);
 
 	dabba_rpc_call_is_done(&is_done);
 

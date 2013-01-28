@@ -26,5 +26,7 @@
 
 int rpc_thread_settings_get(ProtobufCService * service,
 			    const Dabba__ThreadIdList * id_list);
+int rpc_thread_settings_modify(ProtobufCService * service,
+			       const Dabba__Thread * thread);
 
 #endif				/* THREAD_SETTINGS_H */

@@ -254,7 +254,7 @@ const char *thread_type2str(const int type)
 
 int cmd_thread_get(int argc, const char **argv)
 {
-	enum capture_option {
+	enum thread_option {
 		/* action */
 		OPT_THREAD_LIST,
 		OPT_THREAD_CAPABILITIES,
@@ -363,6 +363,100 @@ int cmd_thread_get(int argc, const char **argv)
 	return rc;
 }
 
+int cmd_thread_modify(int argc, const char **argv)
+{
+	enum thread_option {
+		/* action */
+		OPT_THREAD_SETTINGS,
+		/* option */
+		OPT_THREAD_SCHED_PRIORITY,
+		OPT_THREAD_SCHED_POLICY,
+		OPT_THREAD_CPU_AFFINITY,
+		OPT_THREAD_ID,
+		OPT_TCP,
+		OPT_LOCAL,
+		OPT_HELP
+	};
+
+	const struct option thread_option[] = {
+		{"id", required_argument, NULL, OPT_THREAD_ID},
+		{"settings", no_argument, NULL, OPT_THREAD_SETTINGS},
+		{"sched-prio", required_argument, NULL,
+		 OPT_THREAD_SCHED_PRIORITY},
+		{"sched-policy", required_argument, NULL,
+		 OPT_THREAD_SCHED_POLICY},
+		{"cpu-affinity", required_argument, NULL,
+		 OPT_THREAD_CPU_AFFINITY},
+		{"tcp", optional_argument, NULL, OPT_TCP},
+		{"local", optional_argument, NULL, OPT_LOCAL},
+		{"help", no_argument, NULL, OPT_HELP},
+		{NULL, 0, NULL, 0},
+	};
+
+	int ret, rc = 0;
+	Dabba__Thread thread = DABBA__THREAD__INIT;
+	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+	ProtobufCService *service;
+
+	/* parse options and actions to run */
+	while ((ret =
+		getopt_long_only(argc, (char **)argv, "", thread_option,
+				 NULL)) != EOF) {
+		switch (ret) {
+		case OPT_TCP:
+			server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
+			server_id = DABBA_RPC_DEFAULT_TCP_SERVER_NAME;
+
+			if (optarg)
+				server_id = optarg;
+			break;
+		case OPT_LOCAL:
+			server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+			server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+
+			if (optarg)
+				server_id = optarg;
+			break;
+		case OPT_THREAD_ID:
+			thread.id = malloc(sizeof(*thread.id));
+			if (!thread.id)
+				return ENOMEM;
+
+			dabba__thread_id__init(thread.id);
+			thread.id->id = strtoull(optarg, NULL, 10);
+			break;
+		case OPT_THREAD_SCHED_POLICY:
+			thread.has_sched_policy = 1;
+			thread.sched_policy = str2sched_policy(optarg);
+			break;
+		case OPT_THREAD_SCHED_PRIORITY:
+			thread.has_sched_priority = 1;
+			thread.sched_priority = strtol(optarg, NULL, 10);
+			break;
+		case OPT_THREAD_CPU_AFFINITY:
+			thread.cpu_set = optarg;
+			break;
+		case OPT_HELP:
+		default:
+			show_usage(thread_option);
+			rc = -1;
+			goto out;
+		}
+	}
+
+	service = dabba_rpc_client_connect(server_id, server_type);
+
+	if (!service)
+		return EINVAL;
+
+	rpc_thread_settings_modify(service, &thread);
+ out:
+	free(thread.id);
+	return rc;
+
+}
+
 /**
  * \brief Parse which thread sub-command.
  * \param[in]           argc	        Argument counter
@@ -379,7 +473,8 @@ int cmd_thread(int argc, const char **argv)
 	const char *cmd = argv[0];
 	size_t i;
 	static struct cmd_struct thread_commands[] = {
-		{"get", cmd_thread_get}
+		{"get", cmd_thread_get},
+		{"modify", cmd_thread_modify}
 	};
 
 	if (argc == 0 || cmd == NULL || !strcmp(cmd, "--help"))

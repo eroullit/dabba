@@ -63,6 +63,10 @@ int dabbad_thread_start(struct packet_thread *pkt_thread,
 			void *(*func) (void *arg), void *arg);
 int dabbad_thread_stop(struct packet_thread *pkt_thread);
 
+void dabbad_thread_modify(Dabba__DabbaService_Service * service,
+			  const Dabba__Thread * thread,
+			  Dabba__Dummy_Closure closure, void *closure_data);
+
 void dabbad_thread_id_get(Dabba__DabbaService_Service * service,
 			  const Dabba__Dummy * dummy,
 			  Dabba__ThreadIdList_Closure closure,
