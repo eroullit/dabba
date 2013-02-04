@@ -318,10 +318,10 @@ static int cmd_interface_get(int argc, const char **argv)
 
 	service = dabba_rpc_client_connect(server_id, server_type);
 
-	if (!service)
-		return EINVAL;
-
-	rc = rpc_get(service, &id_list);
+	if (service)
+		rc = rpc_get(service, &id_list);
+	else
+		rc = EINVAL;
 
  out:
 	/* cleanup */
@@ -366,11 +366,6 @@ static int cmd_interface_modify(int argc, const char **argv)
 	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 	ProtobufCService *service;
 	Dabba__InterfaceStatus status = DABBA__INTERFACE_STATUS__INIT;
-
-	service = dabba_rpc_client_connect(server_id, server_type);
-
-	if (!service)
-		return EINVAL;
 
 	while ((ret =
 		getopt_long_only(argc, (char **)argv, "", interface_option,
@@ -424,7 +419,12 @@ static int cmd_interface_modify(int argc, const char **argv)
 		}
 	}
 
-	rpc_interface_status_modify(service, &status);
+	service = dabba_rpc_client_connect(server_id, server_type);
+
+	if (service)
+		rc = rpc_interface_status_modify(service, &status);
+	else
+		rc = EINVAL;
  out:
 	free(status.id);
 	return rc;
