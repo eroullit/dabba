@@ -252,6 +252,7 @@ message capture_list
 service dabba_service
 {
     rpc interface_status_get (interface_id_list) returns (interface_status_list);
+    rpc interface_status_modify (interface_status) returns (dummy);
     rpc interface_driver_get (interface_id_list) returns (interface_driver_list);
     rpc interface_pause_get (interface_id_list) returns (interface_pause_list);
     rpc interface_offload_get (interface_id_list) returns (interface_offload_list);

@@ -342,6 +342,95 @@ static int cmd_interface_get(int argc, const char **argv)
 	return rc;
 }
 
+static int cmd_interface_modify(int argc, const char **argv)
+{
+	enum interface_option {
+		/* action */
+		OPT_INTERFACE_STATUS,
+		/* option */
+		OPT_INTERFACE_PROMISCUOUS,
+		OPT_INTERFACE_ID,
+		OPT_TCP,
+		OPT_LOCAL,
+		OPT_HELP
+	};
+
+	const struct option interface_option[] = {
+		{"id", required_argument, NULL, OPT_INTERFACE_ID},
+		{"status", no_argument, NULL, OPT_INTERFACE_STATUS},
+		{"promiscuous", required_argument, NULL,
+		 OPT_INTERFACE_PROMISCUOUS},
+		{"tcp", optional_argument, NULL, OPT_TCP},
+		{"local", optional_argument, NULL, OPT_LOCAL},
+		{"help", required_argument, NULL, OPT_HELP},
+		{NULL, 0, NULL, 0},
+	};
+
+	int ret, rc = 0;
+	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+	ProtobufCService *service;
+	Dabba__InterfaceStatus status = DABBA__INTERFACE_STATUS__INIT;
+
+	service = dabba_rpc_client_connect(server_id, server_type);
+
+	if (!service)
+		return EINVAL;
+
+	while ((ret =
+		getopt_long_only(argc, (char **)argv, "", interface_option,
+				 NULL)) != EOF) {
+		switch (ret) {
+		case OPT_TCP:
+			server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
+			server_id = DABBA_RPC_DEFAULT_TCP_SERVER_NAME;
+
+			if (optarg)
+				server_id = optarg;
+			break;
+		case OPT_LOCAL:
+			server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+			server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+
+			if (optarg)
+				server_id = optarg;
+			break;
+		case OPT_INTERFACE_ID:
+			status.id = malloc(sizeof(*status.id));
+
+			if (!status.id)
+				return ENOMEM;
+
+			dabba__interface_id__init(status.id);
+			status.id->name = optarg;
+			break;
+
+		case OPT_INTERFACE_PROMISCUOUS:
+			if (!strcasecmp(optarg, "false"))
+				status.promiscous = 0;
+			else if (!strcasecmp(optarg, "true"))
+				status.promiscous = 1;
+			else {
+				rc = EINVAL;
+				goto out;
+			}
+
+			status.has_promiscous = 1;
+			break;
+		case OPT_HELP:
+		default:
+			show_usage(interface_option);
+			rc = -1;
+			goto out;
+		}
+	}
+
+	rpc_interface_status_modify(service, &status);
+ out:
+	free(status.id);
+	return rc;
+}
+
 /**
  * \brief Parse which interface sub-command.
  * \param[in]           argc	        Argument counter
@@ -359,7 +448,7 @@ int cmd_interface(int argc, const char **argv)
 	size_t i;
 	static struct cmd_struct interface_commands[] = {
 		{"get", cmd_interface_get},
-		{"modify", NULL}
+		{"modify", cmd_interface_modify}
 	};
 
 	if (argc == 0 || cmd == NULL || !strcmp(cmd, "--help"))

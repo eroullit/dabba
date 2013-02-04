@@ -69,6 +69,17 @@ static void interface_status_list_print(const Dabba__InterfaceStatusList *
 	*status = 1;
 }
 
+static void interface_status_dummy_print(const Dabba__Dummy * result,
+					 void *closure_data)
+{
+	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
+
+	assert(result);
+	assert(closure_data);
+
+	*status = 1;
+}
+
 int rpc_interface_status_get(ProtobufCService * service,
 			     const Dabba__InterfaceIdList * id_list)
 {
@@ -80,6 +91,23 @@ int rpc_interface_status_get(ProtobufCService * service,
 	dabba__dabba_service__interface_status_get(service, id_list,
 						   interface_status_list_print,
 						   &is_done);
+
+	dabba_rpc_call_is_done(&is_done);
+
+	return 0;
+}
+
+int rpc_interface_status_modify(ProtobufCService * service,
+				const Dabba__InterfaceStatus * statusp)
+{
+	protobuf_c_boolean is_done = 0;
+
+	assert(service);
+	assert(statusp);
+
+	dabba__dabba_service__interface_status_modify(service, statusp,
+						      interface_status_dummy_print,
+						      &is_done);
 
 	dabba_rpc_call_is_done(&is_done);
 
