@@ -243,31 +243,27 @@ static int cmd_interface_get(int argc, const char **argv)
 
 	int ret, rc = 0;
 	size_t a;
-	const char *cmd;
+	const char *cmd = argv[0];
 	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
 	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 	ProtobufCService *service;
 	Dabba__InterfaceIdList id_list = DABBA__INTERFACE_ID_LIST__INIT;
 	Dabba__InterfaceId **idpp;
 	int (*rpc_get) (ProtobufCService * service,
-			const Dabba__InterfaceIdList *
-			id_list) = rpc_interface_list_get;
+			const Dabba__InterfaceIdList * id_list) = NULL;
 
 	if (argc || argv[0]) {
-		cmd = argv[0];
-
 		/* Parse get action to run */
 		for (a = 0; a < ARRAY_SIZE(interface_commands); a++)
 			if (!strcmp(interface_commands[a].cmd, cmd)) {
 				rpc_get = interface_commands[a].rpc;
 				break;
 			}
-	}
+	} else
+		rpc_get = rpc_interface_status_get;
 
-	if (!rpc_get) {
-		rc = EINVAL;
-		goto out;
-	}
+	if (!rpc_get)
+		return ENOSYS;
 
 	/* parse action options */
 	while ((ret =
