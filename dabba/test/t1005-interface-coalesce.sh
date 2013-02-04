@@ -30,7 +30,7 @@ test_expect_success "Setup: Start dabbad" "
 "
 
 test_expect_success 'invoke dabba interface coalesce command with dabbad' "
-    '$DABBA_PATH'/dabba interface get --coalesce > result
+    '$DABBA_PATH'/dabba interface get coalesce > result
 "
 
 test_expect_success PYTHON_YAML "Parse interface coalesce YAML output" "

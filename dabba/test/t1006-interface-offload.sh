@@ -30,7 +30,7 @@ test_expect_success "Setup: Start dabbad" "
 "
 
 test_expect_success 'invoke dabba interface offload command with dabbad' "
-    '$DABBA_PATH'/dabba interface get --offload > result
+    '$DABBA_PATH'/dabba interface get offload > result
 "
 
 test_expect_success PYTHON_YAML "Parse interface offload YAML output" "
