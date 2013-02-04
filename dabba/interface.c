@@ -216,48 +216,58 @@ static int cmd_interface_get(int argc, const char **argv)
 		OPT_HELP
 	};
 
-	int (*const rpc_interface_get[]) (ProtobufCService * service,
-					  const Dabba__InterfaceIdList *
-					  id_list) = {
-	[OPT_INTERFACE_STATISTICS] = rpc_interface_statistics_get,
-		    [OPT_INTERFACE_STATUS] = rpc_interface_status_get,
-		    [OPT_INTERFACE_PAUSE] = rpc_interface_pause_get,
-		    [OPT_INTERFACE_SETTINGS] =
-		    rpc_interface_settings_get,[OPT_INTERFACE_OFFLOAD] =
-		    rpc_interface_offload_get,[OPT_INTERFACE_LIST] =
-		    rpc_interface_list_get,
-		    [OPT_INTERFACE_DRIVER] = rpc_interface_driver_get,
-		    [OPT_INTERFACE_COALESCE] =
-		    rpc_interface_coalesce_get,
-		    [OPT_INTERFACE_CAPABILITIES] =
-		    rpc_interface_capabilities_get};
+	static const struct rpc_struct {
+		const char *const cmd;
+		int (*const rpc) (ProtobufCService * service,
+				  const Dabba__InterfaceIdList * id_list);
+	} interface_commands[] = {
+		{
+		"statistics", rpc_interface_statistics_get}, {
+		"status", rpc_interface_status_get}, {
+		"settings", rpc_interface_settings_get}, {
+		"pause", rpc_interface_pause_get}, {
+		"offload", rpc_interface_offload_get}, {
+		"list", rpc_interface_list_get}, {
+		"driver", rpc_interface_driver_get}, {
+		"coalesce", rpc_interface_coalesce_get}, {
+		"capabilites", rpc_interface_capabilities_get}
+	};
 
 	const struct option interface_option[] = {
 		{"id", required_argument, NULL, OPT_INTERFACE_ID},
-		{"statistics", no_argument, NULL, OPT_INTERFACE_STATISTICS},
-		{"status", no_argument, NULL, OPT_INTERFACE_STATUS},
-		{"settings", no_argument, NULL, OPT_INTERFACE_SETTINGS},
-		{"pause", no_argument, NULL, OPT_INTERFACE_PAUSE},
-		{"offload", no_argument, NULL, OPT_INTERFACE_OFFLOAD},
-		{"list", no_argument, NULL, OPT_INTERFACE_LIST},
-		{"driver", no_argument, NULL, OPT_INTERFACE_DRIVER},
-		{"coalesce", no_argument, NULL, OPT_INTERFACE_COALESCE},
-		{"capabilities", no_argument, NULL, OPT_INTERFACE_CAPABILITIES},
 		{"tcp", optional_argument, NULL, OPT_TCP},
 		{"local", optional_argument, NULL, OPT_LOCAL},
 		{"help", required_argument, NULL, OPT_HELP},
 		{NULL, 0, NULL, 0},
 	};
 
-	int ret, rc = 0, action = 0;
+	int ret, rc = 0;
 	size_t a;
+	const char *cmd;
 	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
 	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 	ProtobufCService *service;
 	Dabba__InterfaceIdList id_list = DABBA__INTERFACE_ID_LIST__INIT;
 	Dabba__InterfaceId **idpp;
+	int (*rpc_get) (ProtobufCService * service,
+			const Dabba__InterfaceIdList *
+			id_list) = rpc_interface_list_get;
 
-	/* parse options and actions to run */
+	if (argc || argv[0]) {
+		cmd = argv[0];
+
+		/* Parse get action to run */
+		for (a = 0; a < ARRAY_SIZE(interface_commands); a++)
+			if (!strcmp(interface_commands[a].cmd, cmd))
+				rpc_get = interface_commands[a].rpc;
+	}
+
+	if (!rpc_get) {
+		rc = EINVAL;
+		goto out;
+	}
+
+	/* parse action options */
 	while ((ret =
 		getopt_long_only(argc, (char **)argv, "", interface_option,
 				 NULL)) != EOF) {
@@ -298,17 +308,6 @@ static int cmd_interface_get(int argc, const char **argv)
 			id_list.n_list++;
 
 			break;
-		case OPT_INTERFACE_STATISTICS:
-		case OPT_INTERFACE_STATUS:
-		case OPT_INTERFACE_SETTINGS:
-		case OPT_INTERFACE_PAUSE:
-		case OPT_INTERFACE_OFFLOAD:
-		case OPT_INTERFACE_LIST:
-		case OPT_INTERFACE_DRIVER:
-		case OPT_INTERFACE_COALESCE:
-		case OPT_INTERFACE_CAPABILITIES:
-			action |= (1 << ret);
-			break;
 		case OPT_HELP:
 		default:
 			show_usage(interface_option);
@@ -322,14 +321,7 @@ static int cmd_interface_get(int argc, const char **argv)
 	if (!service)
 		return EINVAL;
 
-	/* list interfaces as default action */
-	if (!action)
-		action = 1 << OPT_INTERFACE_LIST;
-
-	/* run requested actions */
-	for (a = 0; a < ARRAY_SIZE(rpc_interface_get); a++)
-		if (action & (1 << a))
-			rc = rpc_interface_get[a] (service, &id_list);
+	rc = rpc_get(service, &id_list);
 
  out:
 	/* cleanup */
@@ -461,9 +453,15 @@ int cmd_interface(int argc, const char **argv)
 	if (argc == 0 || cmd == NULL || !strcmp(cmd, "--help"))
 		cmd = "help";
 
-	for (i = 0; i < ARRAY_SIZE(interface_commands); i++)
-		if (!strcmp(interface_commands[i].cmd, cmd))
-			return run_builtin(&interface_commands[i], argc, argv);
+	for (i = 0; i < ARRAY_SIZE(interface_commands); i++) {
+		if (strcmp(interface_commands[i].cmd, cmd))
+			continue;
+
+		argv++;
+		argc--;
+
+		return run_builtin(&interface_commands[i], argc, argv);
+	}
 
 	return ENOSYS;
 }
