@@ -361,6 +361,8 @@ static int cmd_interface_modify(int argc, const char **argv)
 		{"status", no_argument, NULL, OPT_INTERFACE_STATUS},
 		{"promiscuous", required_argument, NULL,
 		 OPT_INTERFACE_PROMISCUOUS},
+		{"up", required_argument, NULL,
+		 OPT_INTERFACE_UP},
 		{"tcp", optional_argument, NULL, OPT_TCP},
 		{"local", optional_argument, NULL, OPT_LOCAL},
 		{"help", required_argument, NULL, OPT_HELP},
@@ -413,6 +415,14 @@ static int cmd_interface_modify(int argc, const char **argv)
 				goto out;
 
 			status.has_promiscous = 1;
+			break;
+		case OPT_INTERFACE_UP:
+			rc = str2bool(optarg, &status.up);
+
+			if (rc)
+				goto out;
+
+			status.has_up = 1;
 			break;
 		case OPT_HELP:
 		default:
