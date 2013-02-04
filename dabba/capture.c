@@ -159,16 +159,6 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 
 #define DEFAULT_CAPTURE_FRAME_NUMBER 32
 
-static void capture_dummy_print(const Dabba__Dummy * result, void *closure_data)
-{
-	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
-
-	assert(result);
-	assert(closure_data);
-
-	*status = 1;
-}
-
 int rpc_capture_start(ProtobufCService * service,
 		      const Dabba__Capture * capture)
 {
@@ -176,7 +166,7 @@ int rpc_capture_start(ProtobufCService * service,
 
 	/* TODO Print create capture thread id ? */
 	dabba__dabba_service__capture_start(service, capture,
-					    capture_dummy_print, &is_done);
+					    rpc_dummy_print, &is_done);
 
 	dabba_rpc_call_is_done(&is_done);
 
@@ -188,7 +178,7 @@ int rpc_capture_stop(ProtobufCService * service, const Dabba__ThreadId * id)
 	protobuf_c_boolean is_done = 0;
 
 	dabba__dabba_service__capture_stop(service, id,
-					   capture_dummy_print, &is_done);
+					   rpc_dummy_print, &is_done);
 
 	dabba_rpc_call_is_done(&is_done);
 
