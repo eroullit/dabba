@@ -258,8 +258,10 @@ static int cmd_interface_get(int argc, const char **argv)
 
 		/* Parse get action to run */
 		for (a = 0; a < ARRAY_SIZE(interface_commands); a++)
-			if (!strcmp(interface_commands[a].cmd, cmd))
+			if (!strcmp(interface_commands[a].cmd, cmd)) {
 				rpc_get = interface_commands[a].rpc;
+				break;
+			}
 	}
 
 	if (!rpc_get) {
