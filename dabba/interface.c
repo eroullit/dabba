@@ -230,7 +230,7 @@ static int cmd_interface_get(int argc, const char **argv)
 		"list", rpc_interface_list_get}, {
 		"driver", rpc_interface_driver_get}, {
 		"coalesce", rpc_interface_coalesce_get}, {
-		"capabilites", rpc_interface_capabilities_get}
+		"capabilities", rpc_interface_capabilities_get}
 	};
 
 	const struct option interface_option[] = {
