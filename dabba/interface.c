@@ -161,6 +161,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <linux/ethtool.h>
 #include <libdabba/macros.h>
 #include <dabba/dabba.h>
+#include <dabba/cli.h>
 #include <dabba/rpc.h>
 #include <dabba/interface-list.h>
 #include <dabba/interface-status.h>
@@ -406,14 +407,10 @@ static int cmd_interface_modify(int argc, const char **argv)
 			break;
 
 		case OPT_INTERFACE_PROMISCUOUS:
-			if (!strcasecmp(optarg, "false"))
-				status.promiscous = 0;
-			else if (!strcasecmp(optarg, "true"))
-				status.promiscous = 1;
-			else {
-				rc = EINVAL;
+			rc = str2bool(optarg, &status.promiscous);
+
+			if (rc)
 				goto out;
-			}
 
 			status.has_promiscous = 1;
 			break;
