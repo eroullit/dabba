@@ -27,7 +27,6 @@
 int rpc_interface_status_get(ProtobufCService * service,
 			     const Dabba__InterfaceIdList * id_list);
 
-int rpc_interface_status_modify(ProtobufCService * service,
-				const Dabba__InterfaceStatus * statusp);
+int cmd_interface_status_modify(int argc, const char **argv);
 
 #endif				/* INTERFACE_STATUS_H */

@@ -337,97 +337,26 @@ static int cmd_interface_get(int argc, const char **argv)
 
 static int cmd_interface_modify(int argc, const char **argv)
 {
-	enum interface_option {
-		/* action */
-		OPT_INTERFACE_STATUS,
-		/* option */
-		OPT_INTERFACE_PROMISCUOUS,
-		OPT_INTERFACE_ID,
-		OPT_TCP,
-		OPT_LOCAL,
-		OPT_HELP
+	const char *cmd = argv[0];
+	size_t i;
+	static struct cmd_struct interface_modify_commands[] = {
+		{"status", cmd_interface_status_modify}
 	};
 
-	const struct option interface_option[] = {
-		{"id", required_argument, NULL, OPT_INTERFACE_ID},
-		{"status", no_argument, NULL, OPT_INTERFACE_STATUS},
-		{"promiscuous", required_argument, NULL,
-		 OPT_INTERFACE_PROMISCUOUS},
-		{"up", required_argument, NULL,
-		 OPT_INTERFACE_UP},
-		{"tcp", optional_argument, NULL, OPT_TCP},
-		{"local", optional_argument, NULL, OPT_LOCAL},
-		{"help", required_argument, NULL, OPT_HELP},
-		{NULL, 0, NULL, 0},
-	};
+	if (argc == 0 || cmd == NULL || !strcmp(cmd, "--help"))
+		cmd = "help";
 
-	int ret, rc = 0;
-	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
-	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
-	ProtobufCService *service;
-	Dabba__InterfaceStatus status = DABBA__INTERFACE_STATUS__INIT;
+	for (i = 0; i < ARRAY_SIZE(interface_modify_commands); i++) {
+		if (strcmp(interface_modify_commands[i].cmd, cmd))
+			continue;
 
-	while ((ret =
-		getopt_long_only(argc, (char **)argv, "", interface_option,
-				 NULL)) != EOF) {
-		switch (ret) {
-		case OPT_TCP:
-			server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
-			server_id = DABBA_RPC_DEFAULT_TCP_SERVER_NAME;
+		argv++;
+		argc--;
 
-			if (optarg)
-				server_id = optarg;
-			break;
-		case OPT_LOCAL:
-			server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
-			server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
-
-			if (optarg)
-				server_id = optarg;
-			break;
-		case OPT_INTERFACE_ID:
-			status.id = malloc(sizeof(*status.id));
-
-			if (!status.id)
-				return ENOMEM;
-
-			dabba__interface_id__init(status.id);
-			status.id->name = optarg;
-			break;
-
-		case OPT_INTERFACE_PROMISCUOUS:
-			rc = str2bool(optarg, &status.promiscous);
-
-			if (rc)
-				goto out;
-
-			status.has_promiscous = 1;
-			break;
-		case OPT_INTERFACE_UP:
-			rc = str2bool(optarg, &status.up);
-
-			if (rc)
-				goto out;
-
-			status.has_up = 1;
-			break;
-		case OPT_HELP:
-		default:
-			show_usage(interface_option);
-			rc = -1;
-			goto out;
-		}
+		return run_builtin(&interface_modify_commands[i], argc, argv);
 	}
 
-	service = dabba_rpc_client_connect(server_id, server_type);
-
-	if (service)
-		rc = rpc_interface_status_modify(service, &status);
-	else
-		rc = EINVAL;
- out:
-	free(status.id);
-	return rc;
+	return ENOSYS;
 }
 
 /**

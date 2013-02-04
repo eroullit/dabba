@@ -34,6 +34,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <dabba/macros.h>
+#include <dabba/cli.h>
 #include <dabba/rpc.h>
 #include <dabba/help.h>
 
@@ -101,4 +102,97 @@ int rpc_interface_status_modify(ProtobufCService * service,
 	dabba_rpc_call_is_done(&is_done);
 
 	return 0;
+}
+
+int cmd_interface_status_modify(int argc, const char **argv)
+{
+	enum interface_option {
+		/* option */
+		OPT_INTERFACE_PROMISCUOUS,
+		OPT_INTERFACE_UP,
+		OPT_INTERFACE_ID,
+		OPT_TCP,
+		OPT_LOCAL,
+		OPT_HELP
+	};
+
+	const struct option interface_option[] = {
+		{"id", required_argument, NULL, OPT_INTERFACE_ID},
+		{"promiscuous", required_argument, NULL,
+		 OPT_INTERFACE_PROMISCUOUS},
+		{"up", required_argument, NULL,
+		 OPT_INTERFACE_UP},
+		{"tcp", optional_argument, NULL, OPT_TCP},
+		{"local", optional_argument, NULL, OPT_LOCAL},
+		{"help", required_argument, NULL, OPT_HELP},
+		{NULL, 0, NULL, 0},
+	};
+
+	int ret, rc = 0;
+	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+	ProtobufCService *service;
+	Dabba__InterfaceStatus status = DABBA__INTERFACE_STATUS__INIT;
+
+	while ((ret =
+		getopt_long_only(argc, (char **)argv, "", interface_option,
+				 NULL)) != EOF) {
+		switch (ret) {
+		case OPT_TCP:
+			server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
+			server_id = DABBA_RPC_DEFAULT_TCP_SERVER_NAME;
+
+			if (optarg)
+				server_id = optarg;
+			break;
+		case OPT_LOCAL:
+			server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+			server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+
+			if (optarg)
+				server_id = optarg;
+			break;
+		case OPT_INTERFACE_ID:
+			status.id = malloc(sizeof(*status.id));
+
+			if (!status.id)
+				return ENOMEM;
+
+			dabba__interface_id__init(status.id);
+			status.id->name = optarg;
+			break;
+
+		case OPT_INTERFACE_PROMISCUOUS:
+			rc = str2bool(optarg, &status.promiscous);
+
+			if (rc)
+				goto out;
+
+			status.has_promiscous = 1;
+			break;
+		case OPT_INTERFACE_UP:
+			rc = str2bool(optarg, &status.up);
+
+			if (rc)
+				goto out;
+
+			status.has_up = 1;
+			break;
+		case OPT_HELP:
+		default:
+			show_usage(interface_option);
+			rc = -1;
+			goto out;
+		}
+	}
+
+	service = dabba_rpc_client_connect(server_id, server_type);
+
+	if (service)
+		rc = rpc_interface_status_modify(service, &status);
+	else
+		rc = EINVAL;
+ out:
+	free(status.id);
+	return rc;
 }
