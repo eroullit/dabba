@@ -171,13 +171,6 @@ void dabbad_interface_status_modify(Dabba__DabbaService_Service * service,
 			rtnl_link_unset_flags(change, IFF_UP);
 	}
 
-	if (statusp->has_running) {
-		if (statusp->running)
-			rtnl_link_set_flags(change, IFF_RUNNING);
-		else
-			rtnl_link_unset_flags(change, IFF_RUNNING);
-	}
-
 	rtnl_link_change(sock, link, change, 0);
 	rtnl_link_put(link);
  out:
