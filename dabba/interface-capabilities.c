@@ -38,7 +38,7 @@
 #include <dabba/help.h>
 #include <dabba/macros.h>
 
-extern const char *ethtool_port_str_get(const uint8_t port);
+extern const char *port2str(const uint8_t port);
 
 static void display_interface_capabilities_header(void)
 {
@@ -63,16 +63,15 @@ static void interface_capabilities_list_print(const
 		printf("    - name: %s\n", capabilitiesp->id->name);
 		printf("      capabilities:\n");
 		printf("        port: {%s: %s, %s: %s, %s: %s, %s: %s, %s: %s",
-		       ethtool_port_str_get(PORT_TP),
+		       port2str(PORT_TP),
 		       print_tf(capabilitiesp->tp),
-		       ethtool_port_str_get(PORT_AUI),
+		       port2str(PORT_AUI),
 		       print_tf(capabilitiesp->aui),
-		       ethtool_port_str_get(PORT_MII),
+		       port2str(PORT_MII),
 		       print_tf(capabilitiesp->mii),
-		       ethtool_port_str_get(PORT_FIBRE),
+		       port2str(PORT_FIBRE),
 		       print_tf(capabilitiesp->fibre),
-		       ethtool_port_str_get(PORT_BNC),
-		       print_tf(capabilitiesp->bnc));
+		       port2str(PORT_BNC), print_tf(capabilitiesp->bnc));
 		printf("}\n");
 		printf("        supported:\n");
 		printf("          autoneg: %s\n",
@@ -86,16 +85,16 @@ static void interface_capabilities_list_print(const
 		       "            10000: {half: false, full: %s}\n",
 		       print_tf(capabilitiesp->supported_speed->ethernet->half),
 		       print_tf(capabilitiesp->supported_speed->ethernet->full),
-		       print_tf(capabilitiesp->supported_speed->fast_ethernet->
-				half),
-		       print_tf(capabilitiesp->supported_speed->fast_ethernet->
-				full),
-		       print_tf(capabilitiesp->supported_speed->gbps_ethernet->
-				half),
-		       print_tf(capabilitiesp->supported_speed->gbps_ethernet->
-				full),
 		       print_tf(capabilitiesp->supported_speed->
-				_10gbps_ethernet->full));
+				fast_ethernet->half),
+		       print_tf(capabilitiesp->supported_speed->
+				fast_ethernet->full),
+		       print_tf(capabilitiesp->supported_speed->
+				gbps_ethernet->half),
+		       print_tf(capabilitiesp->supported_speed->
+				gbps_ethernet->full),
+		       print_tf(capabilitiesp->
+				supported_speed->_10gbps_ethernet->full));
 		printf("        advertised:\n");
 		printf("          autoneg: %s\n",
 		       print_tf(capabilitiesp->advertising_opt->autoneg));
@@ -106,20 +105,20 @@ static void interface_capabilities_list_print(const
 		       "            100:   {half: %s, full: %s}\n"
 		       "            1000:  {half: %s, full: %s}\n"
 		       "            10000: {half: false, full: %s}\n",
-		       print_tf(capabilitiesp->advertising_speed->ethernet->
-				half),
-		       print_tf(capabilitiesp->advertising_speed->ethernet->
-				full),
 		       print_tf(capabilitiesp->advertising_speed->
-				fast_ethernet->half),
+				ethernet->half),
 		       print_tf(capabilitiesp->advertising_speed->
-				fast_ethernet->full),
-		       print_tf(capabilitiesp->advertising_speed->
-				gbps_ethernet->half),
-		       print_tf(capabilitiesp->advertising_speed->
-				gbps_ethernet->full),
-		       print_tf(capabilitiesp->advertising_speed->
-				_10gbps_ethernet->full));
+				ethernet->full),
+		       print_tf(capabilitiesp->
+				advertising_speed->fast_ethernet->half),
+		       print_tf(capabilitiesp->
+				advertising_speed->fast_ethernet->full),
+		       print_tf(capabilitiesp->
+				advertising_speed->gbps_ethernet->half),
+		       print_tf(capabilitiesp->
+				advertising_speed->gbps_ethernet->full),
+		       print_tf(capabilitiesp->
+				advertising_speed->_10gbps_ethernet->full));
 		printf("        link-partner advertised:\n");
 		printf("          autoneg: %s\n",
 		       print_tf(capabilitiesp->lp_advertising_opt->autoneg));
@@ -130,20 +129,20 @@ static void interface_capabilities_list_print(const
 		       "            100:   {half: %s, full: %s}\n"
 		       "            1000:  {half: %s, full: %s}\n"
 		       "            10000: {half: false, full: %s}\n",
-		       print_tf(capabilitiesp->lp_advertising_speed->ethernet->
-				half),
-		       print_tf(capabilitiesp->lp_advertising_speed->ethernet->
-				full),
 		       print_tf(capabilitiesp->lp_advertising_speed->
-				fast_ethernet->half),
+				ethernet->half),
 		       print_tf(capabilitiesp->lp_advertising_speed->
-				fast_ethernet->full),
-		       print_tf(capabilitiesp->lp_advertising_speed->
-				gbps_ethernet->half),
-		       print_tf(capabilitiesp->lp_advertising_speed->
-				gbps_ethernet->full),
-		       print_tf(capabilitiesp->lp_advertising_speed->
-				_10gbps_ethernet->full));
+				ethernet->full),
+		       print_tf(capabilitiesp->
+				lp_advertising_speed->fast_ethernet->half),
+		       print_tf(capabilitiesp->
+				lp_advertising_speed->fast_ethernet->full),
+		       print_tf(capabilitiesp->
+				lp_advertising_speed->gbps_ethernet->half),
+		       print_tf(capabilitiesp->
+				lp_advertising_speed->gbps_ethernet->full),
+		       print_tf(capabilitiesp->
+				lp_advertising_speed->_10gbps_ethernet->full));
 	}
 
 	*status = 1;

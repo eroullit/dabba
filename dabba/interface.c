@@ -182,7 +182,7 @@ enum interface_modify_option {
 	OPT_INTERFACE_ID,
 };
 
-const char *ethtool_port_str_get(const uint8_t port)
+const char *port2str(const uint8_t port)
 {
 	static const char *const port_str[] = {
 		[PORT_TP] = "tp",

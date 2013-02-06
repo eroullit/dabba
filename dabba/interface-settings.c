@@ -36,7 +36,7 @@
 #include <dabba/rpc.h>
 #include <dabba/help.h>
 
-extern const char *ethtool_port_str_get(const uint8_t port);
+extern const char *port2str(const uint8_t port);
 
 static void display_interface_settings_header(void)
 {
@@ -65,8 +65,7 @@ static void interface_settings_list_print(const Dabba__InterfaceSettingsList *
 		printf("        autoneg: %s\n", print_tf(settingsp->autoneg));
 		printf("        mtu: %u\n", settingsp->mtu);
 		printf("        tx qlen: %u\n", settingsp->tx_qlen);
-		printf("        port: %s\n",
-		       ethtool_port_str_get(settingsp->port));
+		printf("        port: %s\n", port2str(settingsp->port));
 		printf("        max rx packet: %u\n", settingsp->maxrxpkt);
 		printf("        max tx packet: %u\n", settingsp->maxtxpkt);
 	}
