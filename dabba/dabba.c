@@ -99,7 +99,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabba/interface.h>
 #include <dabba/capture.h>
 
-int run_builtin(struct cmd_struct *p, int argc, const char **argv)
+static int run_builtin(const struct cmd_struct *p, int argc, const char **argv)
 {
 	int status;
 	struct stat st;
@@ -134,6 +134,28 @@ int run_builtin(struct cmd_struct *p, int argc, const char **argv)
 	}
 
 	return 0;
+}
+
+int cmd_run_builtin(const struct cmd_struct *cmd, const size_t cmd_len,
+		    int argc, const char **argv)
+{
+	const char *cmd_str = argv[0];
+	size_t a;
+
+	if (argc == 0 || cmd_str == NULL || !strcmp(cmd_str, "--help"))
+		cmd_str = "help";
+
+	for (a = 0; a < cmd_len; a++) {
+		if (strcmp(cmd[a].cmd, cmd_str))
+			continue;
+
+		argv++;
+		argc--;
+
+		return run_builtin(&cmd[a], argc, argv);
+	}
+
+	return ENOSYS;
 }
 
 static int handle_internal_command(int argc, const char **argv)

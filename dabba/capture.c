@@ -442,20 +442,12 @@ int cmd_capture_get(int argc, const char **argv)
 
 int cmd_capture(int argc, const char **argv)
 {
-	const char *cmd = argv[0];
-	size_t i;
 	static struct cmd_struct capture_commands[] = {
 		{"start", cmd_capture_start},
 		{"stop", cmd_capture_stop},
 		{"get", cmd_capture_get},
 	};
 
-	if (argc == 0 || cmd == NULL || !strcmp(cmd, "--help"))
-		cmd = "help";
-
-	for (i = 0; i < ARRAY_SIZE(capture_commands); i++)
-		if (!strcmp(capture_commands[i].cmd, cmd))
-			return run_builtin(&capture_commands[i], argc, argv);
-
-	return ENOSYS;
+	return cmd_run_builtin(capture_commands, ARRAY_SIZE(capture_commands),
+			       argc, argv);
 }

@@ -470,19 +470,11 @@ int cmd_thread_modify(int argc, const char **argv)
 
 int cmd_thread(int argc, const char **argv)
 {
-	const char *cmd = argv[0];
-	size_t i;
 	static struct cmd_struct thread_commands[] = {
 		{"get", cmd_thread_get},
 		{"modify", cmd_thread_modify}
 	};
 
-	if (argc == 0 || cmd == NULL || !strcmp(cmd, "--help"))
-		cmd = "help";
-
-	for (i = 0; i < ARRAY_SIZE(thread_commands); i++)
-		if (!strcmp(thread_commands[i].cmd, cmd))
-			return run_builtin(&thread_commands[i], argc, argv);
-
-	return ENOSYS;
+	return cmd_run_builtin(thread_commands, ARRAY_SIZE(thread_commands),
+			       argc, argv);
 }

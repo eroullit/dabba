@@ -335,26 +335,13 @@ static int cmd_interface_get(int argc, const char **argv)
 
 static int cmd_interface_modify(int argc, const char **argv)
 {
-	const char *cmd = argv[0];
-	size_t i;
 	static struct cmd_struct interface_modify_commands[] = {
 		{"status", cmd_interface_status_modify}
 	};
 
-	if (argc == 0 || cmd == NULL || !strcmp(cmd, "--help"))
-		cmd = "help";
-
-	for (i = 0; i < ARRAY_SIZE(interface_modify_commands); i++) {
-		if (strcmp(interface_modify_commands[i].cmd, cmd))
-			continue;
-
-		argv++;
-		argc--;
-
-		return run_builtin(&interface_modify_commands[i], argc, argv);
-	}
-
-	return ENOSYS;
+	return cmd_run_builtin(interface_modify_commands,
+			       ARRAY_SIZE(interface_modify_commands), argc,
+			       argv);
 }
 
 /**
@@ -370,25 +357,11 @@ static int cmd_interface_modify(int argc, const char **argv)
 
 int cmd_interface(int argc, const char **argv)
 {
-	const char *cmd = argv[0];
-	size_t i;
 	static struct cmd_struct interface_commands[] = {
 		{"get", cmd_interface_get},
 		{"modify", cmd_interface_modify}
 	};
 
-	if (argc == 0 || cmd == NULL || !strcmp(cmd, "--help"))
-		cmd = "help";
-
-	for (i = 0; i < ARRAY_SIZE(interface_commands); i++) {
-		if (strcmp(interface_commands[i].cmd, cmd))
-			continue;
-
-		argv++;
-		argc--;
-
-		return run_builtin(&interface_commands[i], argc, argv);
-	}
-
-	return ENOSYS;
+	return cmd_run_builtin(interface_commands,
+			       ARRAY_SIZE(interface_commands), argc, argv);
 }
