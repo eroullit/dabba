@@ -401,63 +401,6 @@ void dabbad_thread_modify(Dabba__DabbaService_Service * service,
 	closure(&dummy, closure_data);
 }
 
-void dabbad_thread_id_get(Dabba__DabbaService_Service * service,
-			  const Dabba__Dummy * dummy,
-			  Dabba__ThreadIdList_Closure closure,
-			  void *closure_data)
-{
-	Dabba__ThreadIdList id_list = DABBA__THREAD_ID_LIST__INIT;
-	Dabba__ThreadIdList *id_listp = NULL;
-	Dabba__ThreadId *idp;
-	struct packet_thread *pkt_thread;
-	size_t a = 0;
-
-	assert(service);
-	assert(dummy);
-
-	for (pkt_thread = dabbad_thread_first(); pkt_thread;
-	     pkt_thread = dabbad_thread_next(pkt_thread)) {
-		a++;
-	}
-
-	if (a == 0)
-		goto out;
-
-	id_list.list = calloc(a, sizeof(*id_list.list));
-
-	if (!id_list.list)
-		goto out;
-
-	id_list.n_list = a;
-
-	for (a = 0; a < id_list.n_list; a++) {
-		id_list.list[a] = malloc(sizeof(*id_list.list[a]));
-
-		if (!id_list.list[a])
-			goto out;
-
-		dabba__thread_id__init(id_list.list[a]);
-	}
-
-	idp = *id_list.list;
-
-	for (pkt_thread = dabbad_thread_first(); pkt_thread;
-	     pkt_thread = dabbad_thread_next(pkt_thread)) {
-		idp->id = (uint64_t) pkt_thread->id;
-		idp++;
-	}
-
-	id_listp = &id_list;
-
- out:
-	closure(id_listp, closure_data);
-
-	for (a = 0; a < id_list.n_list; a++)
-		free(id_list.list[a]);
-
-	free(id_list.list);
-}
-
 void dabbad_thread_get(Dabba__DabbaService_Service * service,
 		       const Dabba__ThreadIdList * id_listp,
 		       Dabba__ThreadList_Closure closure, void *closure_data)

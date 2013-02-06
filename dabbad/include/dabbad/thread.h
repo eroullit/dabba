@@ -67,11 +67,6 @@ void dabbad_thread_modify(Dabba__DabbaService_Service * service,
 			  const Dabba__Thread * thread,
 			  Dabba__Dummy_Closure closure, void *closure_data);
 
-void dabbad_thread_id_get(Dabba__DabbaService_Service * service,
-			  const Dabba__Dummy * dummy,
-			  Dabba__ThreadIdList_Closure closure,
-			  void *closure_data);
-
 void dabbad_thread_get(Dabba__DabbaService_Service * service,
 		       const Dabba__ThreadIdList * id_listp,
 		       Dabba__ThreadList_Closure closure, void *closure_data);
