@@ -323,7 +323,8 @@ static int cmd_interface_get(int argc, const char **argv)
 static int cmd_interface_modify(int argc, const char **argv)
 {
 	static struct cmd_struct cmd[] = {
-		{"status", cmd_interface_status_modify}
+		{"status", cmd_interface_status_modify},
+		{"pause", cmd_interface_pause_modify},
 	};
 
 	return cmd_run_builtin(cmd, ARRAY_SIZE(cmd), argc, argv);

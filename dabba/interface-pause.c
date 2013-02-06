@@ -34,6 +34,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <dabba/macros.h>
+#include <dabba/cli.h>
 #include <dabba/rpc.h>
 #include <dabba/help.h>
 
@@ -81,4 +82,125 @@ int rpc_interface_pause_get(ProtobufCService * service,
 	dabba_rpc_call_is_done(&is_done);
 
 	return 0;
+}
+
+int rpc_interface_pause_modify(ProtobufCService * service,
+			       const Dabba__InterfacePause * pausep)
+{
+	protobuf_c_boolean is_done = 0;
+
+	assert(service);
+	assert(pausep);
+
+	dabba__dabba_service__interface_pause_modify(service, pausep,
+						     rpc_dummy_print, &is_done);
+
+	dabba_rpc_call_is_done(&is_done);
+
+	return 0;
+}
+
+int cmd_interface_pause_modify(int argc, const char **argv)
+{
+	enum interface_option {
+		/* option */
+		OPT_INTERFACE_RX_PAUSE,
+		OPT_INTERFACE_TX_PAUSE,
+		OPT_INTERFACE_AUTONEG,
+		OPT_INTERFACE_ID,
+		OPT_TCP,
+		OPT_LOCAL,
+		OPT_HELP
+	};
+
+	const struct option interface_option[] = {
+		{"id", required_argument, NULL, OPT_INTERFACE_ID},
+		{"rx-pause", required_argument, NULL, OPT_INTERFACE_RX_PAUSE},
+		{"tx-pause", required_argument, NULL, OPT_INTERFACE_TX_PAUSE},
+		{"autoneg", required_argument, NULL, OPT_INTERFACE_AUTONEG},
+		{"tcp", optional_argument, NULL, OPT_TCP},
+		{"local", optional_argument, NULL, OPT_LOCAL},
+		{"help", required_argument, NULL, OPT_HELP},
+		{NULL, 0, NULL, 0},
+	};
+
+	int ret, rc = 0;
+	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+	ProtobufCService *service;
+	Dabba__InterfacePause status = DABBA__INTERFACE_PAUSE__INIT;
+
+	/* HACK: getopt*() start to parse options at argv[1] */
+	argc++;
+	argv--;
+
+	while ((ret =
+		getopt_long_only(argc, (char **)argv, "", interface_option,
+				 NULL)) != EOF) {
+		switch (ret) {
+		case OPT_TCP:
+			server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
+			server_id = DABBA_RPC_DEFAULT_TCP_SERVER_NAME;
+
+			if (optarg)
+				server_id = optarg;
+			break;
+		case OPT_LOCAL:
+			server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+			server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+
+			if (optarg)
+				server_id = optarg;
+			break;
+		case OPT_INTERFACE_ID:
+			status.id = malloc(sizeof(*status.id));
+
+			if (!status.id)
+				return ENOMEM;
+
+			dabba__interface_id__init(status.id);
+			status.id->name = optarg;
+			break;
+
+		case OPT_INTERFACE_RX_PAUSE:
+			rc = str2bool(optarg, &status.rx_pause);
+
+			if (rc)
+				goto out;
+
+			status.has_rx_pause = 1;
+			break;
+		case OPT_INTERFACE_TX_PAUSE:
+			rc = str2bool(optarg, &status.tx_pause);
+
+			if (rc)
+				goto out;
+
+			status.has_tx_pause = 1;
+			break;
+		case OPT_INTERFACE_AUTONEG:
+			rc = str2bool(optarg, &status.autoneg);
+
+			if (rc)
+				goto out;
+
+			status.has_autoneg = 1;
+			break;
+		case OPT_HELP:
+		default:
+			show_usage(interface_option);
+			rc = -1;
+			goto out;
+		}
+	}
+
+	service = dabba_rpc_client_connect(server_id, server_type);
+
+	if (service)
+		rc = rpc_interface_pause_modify(service, &status);
+	else
+		rc = EINVAL;
+ out:
+	free(status.id);
+	return rc;
 }
