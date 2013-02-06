@@ -189,7 +189,6 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <libdabba/macros.h>
 #include <dabbad/thread.h>
 #include <dabba/dabba.h>
-#include <dabba/thread-list.h>
 #include <dabba/thread-capabilities.h>
 #include <dabba/thread-settings.h>
 #include <dabba/rpc.h>
@@ -269,7 +268,6 @@ int cmd_thread_get(int argc, const char **argv)
 	} thread_commands[] = {
 		{
 		"settings", rpc_thread_settings_get}, {
-		"list", rpc_thread_list_get}, {
 		"capabilities", rpc_thread_capabilities_get}
 	};
 
