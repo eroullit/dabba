@@ -199,16 +199,6 @@ const char *port2str(const uint8_t port)
 static int cmd_interface_get(int argc, const char **argv)
 {
 	enum interface_option {
-		/* action */
-		OPT_INTERFACE_STATISTICS,
-		OPT_INTERFACE_STATUS,
-		OPT_INTERFACE_SETTINGS,
-		OPT_INTERFACE_PAUSE,
-		OPT_INTERFACE_OFFLOAD,
-		OPT_INTERFACE_LIST,
-		OPT_INTERFACE_DRIVER,
-		OPT_INTERFACE_COALESCE,
-		OPT_INTERFACE_CAPABILITIES,
 		/* option */
 		OPT_INTERFACE_ID,
 		OPT_TCP,
