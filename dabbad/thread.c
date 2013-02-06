@@ -226,7 +226,6 @@ static int cpu_affinity2str(const cpu_set_t * const mask, char *str,
 			 */
 
 			if (trail_sep) {
-				printf(",");
 				off += snprintf(&str[off], len - off, ",");
 				trail_sep = 1;
 			}
