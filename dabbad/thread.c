@@ -225,23 +225,24 @@ static int cpu_affinity2str(const cpu_set_t * const mask, char *str,
 			 * to get an cpu list like: 0,1-4,5,7
 			 */
 
-			if (trail_sep) {
+			if (trail_sep)
 				off += snprintf(&str[off], len - off, ",");
-				trail_sep = 1;
-			}
 
-			if (!run)
+			if (!run) {
 				off += snprintf(&str[off], len - off, "%zu", i);
-			else if (run == 1) {
+				trail_sep = 1;
+			} else if (run == 1) {
 				off +=
 				    snprintf(&str[off], len - off, "%zu,%zu", i,
 					     i + 1);
+				trail_sep = 1;
 				i++;
 			} else {
 				off +=
 				    snprintf(&str[off], len - off, "%zu-%zu", i,
 					     i + run);
 				i += run;
+				trail_sep = 1;
 			}
 		}
 
