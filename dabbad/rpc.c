@@ -32,7 +32,6 @@
 #include <google/protobuf-c/protobuf-c-rpc.h>
 #include <libdabba-rpc/rpc.h>
 #include <dabbad/interface.h>
-#include <dabbad/interface-list.h>
 #include <dabbad/interface-status.h>
 #include <dabbad/interface-driver.h>
 #include <dabbad/interface-pause.h>
