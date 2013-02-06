@@ -163,7 +163,6 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabba/dabba.h>
 #include <dabba/cli.h>
 #include <dabba/rpc.h>
-#include <dabba/interface-list.h>
 #include <dabba/interface-status.h>
 #include <dabba/interface-settings.h>
 #include <dabba/interface-driver.h>
@@ -217,7 +216,6 @@ static int cmd_interface_get(int argc, const char **argv)
 		"settings", rpc_interface_settings_get}, {
 		"pause", rpc_interface_pause_get}, {
 		"offload", rpc_interface_offload_get}, {
-		"list", rpc_interface_list_get}, {
 		"driver", rpc_interface_driver_get}, {
 		"coalesce", rpc_interface_coalesce_get}, {
 		"capabilities", rpc_interface_capabilities_get}
