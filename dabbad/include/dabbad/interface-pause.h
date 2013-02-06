@@ -31,4 +31,9 @@ void dabbad_interface_pause_get(Dabba__DabbaService_Service * service,
 				Dabba__InterfacePauseList_Closure
 				closure, void *closure_data);
 
+void dabbad_interface_pause_modify(Dabba__DabbaService_Service * service,
+				   const Dabba__InterfacePause * pause,
+				   Dabba__Dummy_Closure
+				   closure, void *closure_data);
+
 #endif				/* INTERFACE_PAUSE_H */

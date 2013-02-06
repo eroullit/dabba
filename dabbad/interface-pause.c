@@ -128,3 +128,32 @@ void dabbad_interface_pause_get(Dabba__DabbaService_Service * service,
 	nl_object_free(OBJ_CAST(link));
 	link_cache_destroy(sock, cache);
 }
+
+void dabbad_interface_pause_modify(Dabba__DabbaService_Service * service,
+				   const Dabba__InterfacePause * pause,
+				   Dabba__Dummy_Closure
+				   closure, void *closure_data)
+{
+	const Dabba__Dummy dummy = DABBA__DUMMY__INIT;
+	struct ethtool_pauseparam p;
+
+	assert(service);
+	assert(closure_data);
+
+	if (dev_pause_get(pause->id->name, &p))
+		goto out;
+
+	if (pause->has_rx_pause)
+		p.rx_pause = pause->rx_pause;
+
+	if (pause->has_tx_pause)
+		p.rx_pause = pause->tx_pause;
+
+	if (pause->has_autoneg)
+		p.rx_pause = pause->has_autoneg;
+
+	dev_pause_set(pause->id->name, &p);
+
+ out:
+	closure(&dummy, closure_data);
+}
