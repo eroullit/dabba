@@ -371,8 +371,7 @@ int cmd_capture_get(int argc, const char **argv)
 				rpc_get = capture_commands[a].rpc;
 				break;
 			}
-	} else
-		rpc_get = rpc_capture_settings_get;
+	}
 
 	if (!rpc_get)
 		return ENOSYS;

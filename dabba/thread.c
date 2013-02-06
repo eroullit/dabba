@@ -299,8 +299,7 @@ int cmd_thread_get(int argc, const char **argv)
 				rpc_get = thread_commands[a].rpc;
 				break;
 			}
-	} else
-		rpc_get = rpc_thread_settings_get;
+	}
 
 	if (!rpc_get)
 		return ENOSYS;

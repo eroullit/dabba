@@ -259,8 +259,7 @@ static int cmd_interface_get(int argc, const char **argv)
 				rpc_get = interface_commands[a].rpc;
 				break;
 			}
-	} else
-		rpc_get = rpc_interface_status_get;
+	}
 
 	if (!rpc_get)
 		return ENOSYS;
