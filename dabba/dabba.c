@@ -158,10 +158,7 @@ int cmd_run_builtin(const struct cmd_struct *cmd, const size_t cmd_len,
 		if (strcmp(cmd[a].cmd, cmd_str))
 			continue;
 
-		argv++;
-		argc--;
-
-		return run_builtin(&cmd[a], argc, argv);
+		return run_builtin(&cmd[a], --argc, ++argv);
 	}
 
 	help_unknown_cmd(cmd_str);
@@ -179,8 +176,5 @@ int main(int argc, const char **argv)
 		{"help", cmd_help}
 	};
 
-	argc--;
-	argv++;
-
-	return cmd_run_builtin(commands, ARRAY_SIZE(commands), argc, argv);
+	return cmd_run_builtin(commands, ARRAY_SIZE(commands), --argc, ++argv);
 }
