@@ -277,6 +277,28 @@ int dev_pause_get(const char *const dev, struct ethtool_pauseparam *pause)
 }
 
 /**
+ * \brief Set the interface pause settings
+ * \param[in]       dev	        interface name
+ * \param[in]      pause	pointer to the interface pause settings
+ * \return 0 on success, -1 if the interface pause settings could not be set.
+ */
+
+int dev_pause_set(const char *const dev, struct ethtool_pauseparam *pause)
+{
+	struct ifreq ifr;
+
+	assert(dev);
+	assert(pause);
+
+	memset(&ifr, 0, sizeof(ifr));
+	strlcpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name));
+	pause->cmd = ETHTOOL_SPAUSEPARAM;
+	ifr.ifr_data = (caddr_t) pause;
+
+	return dev_kernel_request(&ifr, SIOCETHTOOL);
+}
+
+/**
  * \brief Get the interface coalesce settings
  * \param[in]       dev	        interface name
  * \param[out]      coalesce	pointer to the interface coalesce settings

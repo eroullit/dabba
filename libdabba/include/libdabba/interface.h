@@ -53,6 +53,7 @@ int dev_flags_set(const char *const dev, const short flags);
 int dev_driver_get(const char *const dev, struct ethtool_drvinfo *driver);
 int dev_settings_get(const char *const dev, struct ethtool_cmd *settings);
 int dev_pause_get(const char *const dev, struct ethtool_pauseparam *pause);
+int dev_pause_set(const char *const dev, struct ethtool_pauseparam *pause);
 int dev_coalesce_get(const char *const dev, struct ethtool_coalesce *coalesce);
 int dev_rx_csum_offload_get(const char *const dev, uint32_t * rx_csum);
 int dev_tx_csum_offload_get(const char *const dev, uint32_t * tx_csum);
