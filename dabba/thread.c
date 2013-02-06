@@ -255,10 +255,6 @@ const char *thread_type2str(const int type)
 int cmd_thread_get(int argc, const char **argv)
 {
 	enum thread_option {
-		/* action */
-		OPT_THREAD_LIST,
-		OPT_THREAD_CAPABILITIES,
-		OPT_THREAD_SETTINGS,
 		/* option */
 		OPT_THREAD_ID,
 		OPT_TCP,
@@ -266,31 +262,48 @@ int cmd_thread_get(int argc, const char **argv)
 		OPT_HELP
 	};
 
-	int (*const rpc_thread_get[]) (ProtobufCService * service,
-				       const Dabba__ThreadIdList * id_list) = {
-	[OPT_THREAD_LIST] = rpc_thread_list_get,
-		    [OPT_THREAD_CAPABILITIES] =
-		    rpc_thread_capabilities_get,[OPT_THREAD_SETTINGS] =
-		    rpc_thread_settings_get};
+	static const struct rpc_struct {
+		const char *const cmd;
+		int (*const rpc) (ProtobufCService * service,
+				  const Dabba__ThreadIdList * id_list);
+	} thread_commands[] = {
+		{
+		"settings", rpc_thread_settings_get}, {
+		"list", rpc_thread_list_get}, {
+		"capabilities", rpc_thread_capabilities_get}
+	};
 
 	const struct option thread_option[] = {
 		{"id", required_argument, NULL, OPT_THREAD_ID},
-		{"list", no_argument, NULL, OPT_THREAD_LIST},
-		{"capabilities", no_argument, NULL, OPT_THREAD_CAPABILITIES},
-		{"settings", no_argument, NULL, OPT_THREAD_SETTINGS},
 		{"tcp", optional_argument, NULL, OPT_TCP},
 		{"local", optional_argument, NULL, OPT_LOCAL},
 		{"help", no_argument, NULL, OPT_HELP},
 		{NULL, 0, NULL, 0},
 	};
 
-	int ret, rc = 0, action = 0;
+	int ret, rc = 0;
 	size_t a;
+	const char *cmd = argv[0];
 	Dabba__ThreadIdList id_list = DABBA__THREAD_ID_LIST__INIT;
 	Dabba__ThreadId **idpp;
 	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
 	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 	ProtobufCService *service;
+	int (*rpc_get) (ProtobufCService * service,
+			const Dabba__ThreadIdList * id_list) = NULL;
+
+	if (argc || argv[0]) {
+		/* Parse get action to run */
+		for (a = 0; a < ARRAY_SIZE(thread_commands); a++)
+			if (!strcmp(thread_commands[a].cmd, cmd)) {
+				rpc_get = thread_commands[a].rpc;
+				break;
+			}
+	} else
+		rpc_get = rpc_thread_settings_get;
+
+	if (!rpc_get)
+		return ENOSYS;
 
 	/* parse options and actions to run */
 	while ((ret =
@@ -329,11 +342,6 @@ int cmd_thread_get(int argc, const char **argv)
 			id_list.n_list++;
 
 			break;
-		case OPT_THREAD_LIST:
-		case OPT_THREAD_CAPABILITIES:
-		case OPT_THREAD_SETTINGS:
-			action |= (1 << ret);
-			break;
 		case OPT_HELP:
 		default:
 			show_usage(thread_option);
@@ -344,17 +352,11 @@ int cmd_thread_get(int argc, const char **argv)
 
 	service = dabba_rpc_client_connect(server_id, server_type);
 
-	if (!service)
-		return EINVAL;
+	if (service)
+		rc = rpc_get(service, &id_list);
+	else
+		rc = EINVAL;
 
-	/* list threads as default action */
-	if (!action)
-		action = (1 << OPT_THREAD_LIST);
-
-	/* run requested actions */
-	for (a = 0; a < ARRAY_SIZE(rpc_thread_get); a++)
-		if (action & (1 << a))
-			rc = rpc_thread_get[a] (service, &id_list);
  out:
 	free(id_list.list);
 
