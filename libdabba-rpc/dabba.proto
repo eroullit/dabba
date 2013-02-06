@@ -42,9 +42,9 @@ message interface_driver_list
 message interface_pause
 {
     required interface_id id = 1;
-    optional uint32 autoneg = 2;
-    optional uint32 rx_pause = 3;
-    optional uint32 tx_pause = 4;
+    optional bool autoneg = 2;
+    optional bool rx_pause = 3;
+    optional bool tx_pause = 4;
 }
 
 message interface_pause_list
