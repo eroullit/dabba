@@ -400,6 +400,10 @@ int cmd_thread_modify(int argc, const char **argv)
 	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 	ProtobufCService *service;
 
+	/* HACK: getopt*() start to parse options at argv[1] */
+	argc++;
+	argv--;
+
 	/* parse options and actions to run */
 	while ((ret =
 		getopt_long_only(argc, (char **)argv, "", thread_option,

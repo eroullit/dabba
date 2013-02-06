@@ -220,6 +220,10 @@ int cmd_capture_start(int argc, const char **argv)
 	capture.frame_size = PACKET_MMAP_ETH_FRAME_LEN;
 	capture.frame_nr = DEFAULT_CAPTURE_FRAME_NUMBER;
 
+	/* HACK: getopt*() start to parse options at argv[1] */
+	argc++;
+	argv--;
+
 	/* parse capture options */
 	while ((ret =
 		getopt_long_only(argc, (char **)argv, "", capture_option,
@@ -286,6 +290,10 @@ int cmd_capture_stop(int argc, const char **argv)
 		{"help", no_argument, NULL, OPT_HELP},
 		{NULL, 0, NULL, 0},
 	};
+
+	/* HACK: getopt*() start to parse options at argv[1] */
+	argc++;
+	argv--;
 
 	/* parse capture options */
 	while ((ret =
