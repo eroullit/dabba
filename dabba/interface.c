@@ -335,13 +335,11 @@ static int cmd_interface_get(int argc, const char **argv)
 
 static int cmd_interface_modify(int argc, const char **argv)
 {
-	static struct cmd_struct interface_modify_commands[] = {
+	static struct cmd_struct cmd[] = {
 		{"status", cmd_interface_status_modify}
 	};
 
-	return cmd_run_builtin(interface_modify_commands,
-			       ARRAY_SIZE(interface_modify_commands), argc,
-			       argv);
+	return cmd_run_builtin(cmd, ARRAY_SIZE(cmd), argc, argv);
 }
 
 /**
@@ -357,11 +355,10 @@ static int cmd_interface_modify(int argc, const char **argv)
 
 int cmd_interface(int argc, const char **argv)
 {
-	static struct cmd_struct interface_commands[] = {
+	static const struct cmd_struct cmd[] = {
 		{"get", cmd_interface_get},
 		{"modify", cmd_interface_modify}
 	};
 
-	return cmd_run_builtin(interface_commands,
-			       ARRAY_SIZE(interface_commands), argc, argv);
+	return cmd_run_builtin(cmd, ARRAY_SIZE(cmd), argc, argv);
 }

@@ -470,11 +470,10 @@ int cmd_thread_modify(int argc, const char **argv)
 
 int cmd_thread(int argc, const char **argv)
 {
-	static struct cmd_struct thread_commands[] = {
+	static const struct cmd_struct cmd[] = {
 		{"get", cmd_thread_get},
 		{"modify", cmd_thread_modify}
 	};
 
-	return cmd_run_builtin(thread_commands, ARRAY_SIZE(thread_commands),
-			       argc, argv);
+	return cmd_run_builtin(cmd, ARRAY_SIZE(cmd), argc, argv);
 }

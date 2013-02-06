@@ -442,12 +442,11 @@ int cmd_capture_get(int argc, const char **argv)
 
 int cmd_capture(int argc, const char **argv)
 {
-	static struct cmd_struct capture_commands[] = {
+	static const struct cmd_struct cmd[] = {
 		{"start", cmd_capture_start},
 		{"stop", cmd_capture_stop},
 		{"get", cmd_capture_get},
 	};
 
-	return cmd_run_builtin(capture_commands, ARRAY_SIZE(capture_commands),
-			       argc, argv);
+	return cmd_run_builtin(cmd, ARRAY_SIZE(cmd), argc, argv);
 }

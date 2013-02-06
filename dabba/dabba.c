@@ -145,6 +145,15 @@ int cmd_run_builtin(const struct cmd_struct *cmd, const size_t cmd_len,
 	if (argc == 0 || cmd_str == NULL || !strcmp(cmd_str, "--help"))
 		cmd_str = "help";
 
+	if (!strcmp(cmd_str, "--version"))
+		cmd_str = "version";
+
+	/* Turn "dabba cmd --help" into "dabba help cmd" */
+	if (argc > 1 && !strcmp(argv[1], "--help")) {
+		argv[1] = argv[0];
+		argv[0] = cmd_str = "help";
+	}
+
 	for (a = 0; a < cmd_len; a++) {
 		if (strcmp(cmd[a].cmd, cmd_str))
 			continue;
@@ -155,14 +164,14 @@ int cmd_run_builtin(const struct cmd_struct *cmd, const size_t cmd_len,
 		return run_builtin(&cmd[a], argc, argv);
 	}
 
+	help_unknown_cmd(cmd_str);
+
 	return ENOSYS;
 }
 
-static int handle_internal_command(int argc, const char **argv)
+int main(int argc, const char **argv)
 {
-	size_t i;
-	const char *cmd = argv[0];
-	static struct cmd_struct commands[] = {
+	static const struct cmd_struct commands[] = {
 		{"interface", cmd_interface},
 		{"thread", cmd_thread},
 		{"capture", cmd_capture},
@@ -170,41 +179,8 @@ static int handle_internal_command(int argc, const char **argv)
 		{"help", cmd_help}
 	};
 
-	if (argc == 0 || cmd == NULL || !strcmp(cmd, "--help"))
-		cmd = "help";
-
-	if (argc == 0 || cmd == NULL || !strcmp(cmd, "--version"))
-		cmd = "version";
-
-	/* Turn "dabba cmd --help" into "dabba help cmd" */
-	if (argc > 1 && !strcmp(argv[1], "--help")) {
-		argv[1] = argv[0];
-		argv[0] = cmd = "help";
-	}
-
-	for (i = 0; i < ARRAY_SIZE(commands); i++) {
-		struct cmd_struct *p = commands + i;
-		if (strcmp(p->cmd, cmd))
-			continue;
-
-		argc--;
-		argv++;
-
-		return (run_builtin(p, argc, argv));
-	}
-
-	help_unknown_cmd(cmd);
-
-	return ENOSYS;
-}
-
-int main(int argc, const char **argv)
-{
-	assert(argc);
-	assert(argv);
-
 	argc--;
 	argv++;
 
-	return (handle_internal_command(argc, argv));
+	return cmd_run_builtin(commands, ARRAY_SIZE(commands), argc, argv);
 }
