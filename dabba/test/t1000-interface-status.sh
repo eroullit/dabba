@@ -46,7 +46,7 @@ test_expect_success DUMMY_DEV "Setup: Remove all dummy interfaces" "
     test_might_fail flush_dummy_interface
 "
 
-test_expect_success "Activate dummy interface" "
+test_expect_success DUMMY_DEV "Activate dummy interface" "
     create_dummy_interface 10
 "
 
@@ -89,7 +89,7 @@ do
     "
 done
 
-test_expect_success "Activate dummy interface" "
+test_expect_success DUMMY_DEV "Activate dummy interface" "
     create_dummy_interface 1
 "
 
