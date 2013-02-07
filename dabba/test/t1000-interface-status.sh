@@ -89,10 +89,6 @@ do
     "
 done
 
-test_expect_success DUMMY_DEV "Activate dummy interface" "
-    create_dummy_interface 1
-"
-
 test_expect_success DUMMY_DEV "Cleanup: Remove all dummy interfaces" "
     flush_dummy_interface
 "
