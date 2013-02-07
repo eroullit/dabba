@@ -27,13 +27,6 @@ get_capture_thread_nr()
     "$PYTHON_PATH" -c "import yaml; y = yaml.load(open('$result_file')); print len(y['captures']);"
 }
 
-get_capture_thread_id()
-{
-    local thread_nr=$1
-    local result_file=$2
-    "$PYTHON_PATH" -c "import yaml; y = yaml.load(open('$result_file')); print y['captures'][$thread_nr]['id'];"
-}
-
 check_capture_thread_nr()
 {
     local expected_thread_nr=$1
