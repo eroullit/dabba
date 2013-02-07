@@ -134,6 +134,10 @@ int cmd_interface_status_modify(int argc, const char **argv)
 	ProtobufCService *service;
 	Dabba__InterfaceStatus status = DABBA__INTERFACE_STATUS__INIT;
 
+	/* HACK: getopt*() start to parse options at argv[1] */
+	argc++;
+	argv--;
+
 	while ((ret =
 		getopt_long_only(argc, (char **)argv, "", interface_option,
 				 NULL)) != EOF) {
