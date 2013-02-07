@@ -50,6 +50,12 @@ dictkeys2values()
     "$PYTHON_PATH" "$SHARNESS_TEST_DIRECTORY"/dictkeys2values.py "$@"
 }
 
+yaml_number_of_interface_get()
+{
+    local result_file=$1
+    "$PYTHON_PATH" -c "import yaml; y = yaml.load(open('$result_file')); print len(y['interfaces']);"
+}
+
 number_of_interface_get()
 {
     sed '1,2d' /proc/net/dev | wc -l | cut -f 1 -d ' '

@@ -23,12 +23,6 @@ test_description='Test dabba interface driver command'
 
 dev_nr=$(number_of_interface_get)
 
-get_dev_nr()
-{
-    local result_file=$1
-    "$PYTHON_PATH" -c "import yaml; y = yaml.load(open('$result_file')); print len(y['interfaces']);"
-}
-
 #test_expect_success 'invoke dabba interface driver command w/o dabbad' "
 #    test_must_fail $DABBA_PATH/dabba driver list
 #"
@@ -47,7 +41,7 @@ test_expect_success PYTHON_YAML "Parse interface driver YAML output" "
 
 test_expect_success PYTHON_YAML "Check interface driver output length" "
     echo $dev_nr > expected_dev_nr &&
-    echo $(get_dev_nr parsed) > result_dev_nr &&
+    echo $(yaml_number_of_interface_get parsed) > result_dev_nr &&
     test_cmp expected_dev_nr result_dev_nr
 "
 

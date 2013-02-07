@@ -21,6 +21,8 @@ test_description='Test dabba interface pause command'
 
 . ./dabba-test-lib.sh
 
+dev_nr=$(number_of_interface_get)
+
 #test_expect_success 'invoke dabba interface pause command w/o dabbad' "
 #    test_must_fail $DABBA_PATH/dabba pause list
 #"
@@ -36,6 +38,22 @@ test_expect_success 'invoke dabba interface pause command with dabbad' "
 test_expect_success PYTHON_YAML "Parse interface pause YAML output" "
     yaml2dict result > parsed
 "
+
+test_expect_success PYTHON_YAML "Check interface pause output length" "
+    echo $dev_nr > expected_dev_nr &&
+    echo $(yaml_number_of_interface_get parsed) > result_dev_nr &&
+    test_cmp expected_dev_nr result_dev_nr
+"
+
+for i in `seq 0 $(($dev_nr-1))`
+do
+    test_expect_success PYTHON_YAML "Check interface pause output key presence on device #$i" "
+        dictkeys2values interfaces $i name < parsed &&
+        dictkeys2values interfaces $i pause autoneg < parsed &&
+        dictkeys2values interfaces $i pause rx < parsed &&
+        dictkeys2values interfaces $i pause tx < parsed
+    "
+done
 
 test_expect_success "Cleanup: Stop dabbad" "
     killall dabbad
