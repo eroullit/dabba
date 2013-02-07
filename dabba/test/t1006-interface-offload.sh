@@ -21,6 +21,8 @@ test_description='Test dabba interface offload command'
 
 . ./dabba-test-lib.sh
 
+dev_nr=$(number_of_interface_get)
+
 #test_expect_success 'invoke dabba interface offload command w/o dabbad' "
 #    test_must_fail $DABBA_PATH/dabba offload list
 #"
@@ -36,6 +38,21 @@ test_expect_success 'invoke dabba interface offload command with dabbad' "
 test_expect_success PYTHON_YAML "Parse interface offload YAML output" "
     yaml2dict result > parsed
 "
+
+for i in `seq 0 $(($dev_nr-1))`
+do
+    test_expect_success PYTHON_YAML "Check interface offload output key presence on device #$i" "
+        dictkeys2values interfaces $i name < parsed &&
+        dictkeys2values interfaces $i offload 'rx checksum' < parsed &&
+        dictkeys2values interfaces $i offload 'tx checksum' < parsed &&
+        dictkeys2values interfaces $i offload 'scatter gather' < parsed &&
+        dictkeys2values interfaces $i offload 'tcp segment' < parsed &&
+        dictkeys2values interfaces $i offload 'udp fragment' < parsed &&
+        dictkeys2values interfaces $i offload 'generic segmentation' < parsed &&
+        dictkeys2values interfaces $i offload 'generic receive' < parsed &&
+        dictkeys2values interfaces $i offload 'rx hashing' < parsed
+    "
+done
 
 test_expect_success "Cleanup: Stop dabbad" "
     killall dabbad
