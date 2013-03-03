@@ -1,5 +1,5 @@
 /**
- * \file nic.c
+ * \file interface.c
  * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2011
  * \date 2011
  */
