@@ -137,3 +137,63 @@ void dabbad_interface_settings_get(Dabba__DabbaService_Service * service,
 	nl_object_free(OBJ_CAST(link));
 	link_cache_destroy(sock, cache);
 }
+
+void dabbad_interface_settings_modify(Dabba__DabbaService_Service * service,
+				      const Dabba__InterfaceSettings *
+				      settingsp, Dabba__Dummy_Closure closure,
+				      void *closure_data)
+{
+	Dabba__Dummy dummy = DABBA__DUMMY__INIT;
+	struct nl_sock *sock = NULL;
+	struct nl_cache *cache;
+	struct rtnl_link *link, *change;
+	struct ethtool_cmd eth_set;
+
+	assert(service);
+	assert(closure_data);
+
+	cache = link_cache_alloc(&sock);
+	change = rtnl_link_alloc();
+
+	if (!cache || !change)
+		goto out;
+
+	link = rtnl_link_get_by_name(cache, settingsp->id->name);
+
+	if (!link)
+		goto out;
+
+	dev_settings_get(settingsp->id->name, &eth_set);
+
+	if (settingsp->has_speed)
+		ethtool_cmd_speed_set(&eth_set, settingsp->speed);
+
+	if (settingsp->has_duplex)
+		eth_set.duplex = settingsp->duplex;
+
+	if (settingsp->has_autoneg)
+		eth_set.autoneg = settingsp->autoneg;
+
+	if (settingsp->has_mtu)
+		rtnl_link_set_mtu(change, settingsp->mtu);
+
+	if (settingsp->has_tx_qlen)
+		rtnl_link_set_txqlen(change, settingsp->tx_qlen);
+
+	if (settingsp->has_port)
+		eth_set.port = settingsp->port;
+
+	if (settingsp->has_maxrxpkt)
+		eth_set.maxrxpkt = settingsp->maxrxpkt;
+
+	if (settingsp->has_maxtxpkt)
+		eth_set.maxtxpkt = settingsp->maxtxpkt;
+
+	dev_settings_set(settingsp->id->name, &eth_set);
+	rtnl_link_change(sock, link, change, 0);
+	rtnl_link_put(link);
+ out:
+	closure(&dummy, closure_data);
+	nl_object_free(OBJ_CAST(change));
+	link_cache_destroy(sock, cache);
+}
