@@ -258,6 +258,7 @@ service dabba_service
     rpc interface_pause_modify (interface_pause) returns (dummy);
     rpc interface_offload_get (interface_id_list) returns (interface_offload_list);
     rpc interface_settings_get (interface_id_list) returns (interface_settings_list);
+    rpc interface_settings_modify (interface_settings) returns (dummy);
     rpc interface_coalesce_get (interface_id_list) returns (interface_coalesce_list);
     rpc interface_capabilities_get (interface_id_list) returns (interface_capabilities_list);
     rpc interface_statistics_get (interface_id_list) returns (interface_statistics_list);
