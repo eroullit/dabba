@@ -34,6 +34,7 @@
 #include <assert.h>
 #include <dabba/macros.h>
 #include <dabba/rpc.h>
+#include <dabba/cli.h>
 #include <dabba/help.h>
 
 extern const char *port2str(const uint8_t port);
@@ -88,4 +89,149 @@ int rpc_interface_settings_get(ProtobufCService * service,
 	dabba_rpc_call_is_done(&is_done);
 
 	return 0;
+}
+
+static int rpc_interface_settings_modify(ProtobufCService * service,
+					 const Dabba__InterfaceSettings *
+					 settingsp)
+{
+	protobuf_c_boolean is_done = 0;
+
+	assert(service);
+	assert(settingsp);
+
+	dabba__dabba_service__interface_settings_modify(service, settingsp,
+							rpc_dummy_print,
+							&is_done);
+
+	dabba_rpc_call_is_done(&is_done);
+
+	return 0;
+}
+
+int cmd_interface_settings_modify(int argc, const char **argv)
+{
+	enum interface_option {
+		/* option */
+		OPT_INTERFACE_SPEED,
+		OPT_INTERFACE_DUPLEX,
+		OPT_INTERFACE_AUTONEG,
+		OPT_INTERFACE_MTU,
+		OPT_INTERFACE_TXQLEN,
+		OPT_INTERFACE_PORT,
+		OPT_INTERFACE_MAX_RXPKT,
+		OPT_INTERFACE_MAX_TXPKT,
+		OPT_INTERFACE_ID,
+		OPT_TCP,
+		OPT_LOCAL,
+		OPT_HELP
+	};
+
+	const struct option interface_option[] = {
+		{"speed", required_argument, NULL, OPT_INTERFACE_SPEED},
+		{"duplex", required_argument, NULL, OPT_INTERFACE_DUPLEX},
+		{"autoneg", required_argument, NULL, OPT_INTERFACE_AUTONEG},
+		{"mtu", required_argument, NULL, OPT_INTERFACE_MTU},
+		{"txqlen", required_argument, NULL, OPT_INTERFACE_TXQLEN},
+		{"id", required_argument, NULL, OPT_INTERFACE_ID},
+		{"tcp", optional_argument, NULL, OPT_TCP},
+		{"local", optional_argument, NULL, OPT_LOCAL},
+		{"help", required_argument, NULL, OPT_HELP},
+		{NULL, 0, NULL, 0},
+	};
+
+	int ret, rc = 0;
+	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+	ProtobufCService *service;
+	Dabba__InterfaceSettings settings = DABBA__INTERFACE_SETTINGS__INIT;
+
+	/* HACK: getopt*() start to parse options at argv[1] */
+	argc++;
+	argv--;
+
+	while ((ret =
+		getopt_long_only(argc, (char **)argv, "", interface_option,
+				 NULL)) != EOF) {
+		switch (ret) {
+		case OPT_INTERFACE_SPEED:
+			rc = str2speed(optarg, &settings.speed);
+
+			if (rc)
+				goto out;
+
+			settings.has_speed = 1;
+			break;
+		case OPT_INTERFACE_DUPLEX:
+			rc = str2duplex(optarg, &settings.duplex);
+
+			if (rc)
+				goto out;
+
+			settings.has_duplex = 1;
+			break;
+		case OPT_INTERFACE_AUTONEG:
+			rc = str2bool(optarg, &settings.autoneg);
+
+			if (rc)
+				goto out;
+
+			settings.has_autoneg = 1;
+			break;
+		case OPT_INTERFACE_MTU:
+			settings.mtu = strtoul(optarg, NULL, 10);
+			settings.has_mtu = 1;
+			break;
+		case OPT_INTERFACE_TXQLEN:
+			settings.tx_qlen = strtoul(optarg, NULL, 10);
+			settings.has_tx_qlen = 1;
+			break;
+		case OPT_INTERFACE_MAX_RXPKT:
+			settings.maxrxpkt = strtoul(optarg, NULL, 10);
+			settings.has_maxrxpkt = 1;
+			break;
+		case OPT_INTERFACE_MAX_TXPKT:
+			settings.maxtxpkt = strtoul(optarg, NULL, 10);
+			settings.has_maxtxpkt = 1;
+			break;
+		case OPT_TCP:
+			server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
+			server_id = DABBA_RPC_DEFAULT_TCP_SERVER_NAME;
+
+			if (optarg)
+				server_id = optarg;
+			break;
+		case OPT_LOCAL:
+			server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+			server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+
+			if (optarg)
+				server_id = optarg;
+			break;
+		case OPT_INTERFACE_ID:
+			settings.id = malloc(sizeof(*settings.id));
+
+			if (!settings.id)
+				return ENOMEM;
+
+			dabba__interface_id__init(settings.id);
+			settings.id->name = optarg;
+			break;
+		case OPT_HELP:
+		default:
+			show_usage(interface_option);
+			rc = -1;
+			goto out;
+		}
+	}
+
+	service = dabba_rpc_client_connect(server_id, server_type);
+
+	if (service)
+		rc = rpc_interface_settings_modify(service, &settings);
+	else
+		rc = EINVAL;
+ out:
+	free(settings.id);
+	return rc;
 }
