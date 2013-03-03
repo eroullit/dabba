@@ -254,6 +254,28 @@ int dev_settings_get(const char *const dev, struct ethtool_cmd *settings)
 }
 
 /**
+ * \brief Set the interface hardware settings
+ * \param[in]       dev	        interface name
+ * \param[in]      settings	pointer to the interface hardware settings
+ * \return 0 on success, -1 if the interface hardware settings could not be set.
+ */
+
+int dev_settings_set(const char *const dev, struct ethtool_cmd *settings)
+{
+	struct ifreq ifr;
+
+	assert(dev);
+	assert(settings);
+
+	memset(&ifr, 0, sizeof(ifr));
+	strlcpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name));
+	settings->cmd = ETHTOOL_SSET;
+	ifr.ifr_data = (caddr_t) settings;
+
+	return dev_kernel_request(&ifr, SIOCETHTOOL);
+}
+
+/**
  * \brief Get the interface pause settings
  * \param[in]       dev	        interface name
  * \param[out]      pause	pointer to the interface pause settings
