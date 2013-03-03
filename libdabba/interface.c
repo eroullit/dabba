@@ -344,6 +344,28 @@ int dev_coalesce_get(const char *const dev, struct ethtool_coalesce *coalesce)
 }
 
 /**
+ * \brief Get the interface coalesce settings
+ * \param[in]       dev	        interface name
+ * \param[in]      coalesce	pointer to the interface coalesce settings
+ * \return 0 on success, -1 if the interface coalesce settings could not be set.
+ */
+
+int dev_coalesce_set(const char *const dev, struct ethtool_coalesce *coalesce)
+{
+	struct ifreq ifr;
+
+	assert(dev);
+	assert(coalesce);
+
+	memset(&ifr, 0, sizeof(ifr));
+	strlcpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name));
+	coalesce->cmd = ETHTOOL_SCOALESCE;
+	ifr.ifr_data = (caddr_t) coalesce;
+
+	return dev_kernel_request(&ifr, SIOCETHTOOL);
+}
+
+/**
  * \brief Get the interface receive checksum offload status
  * \param[in]       dev	        interface name
  * \param[out]      rx_csum	pointer to the receive checksum offload status
