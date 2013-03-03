@@ -31,4 +31,9 @@ void dabbad_interface_coalesce_get(Dabba__DabbaService_Service * service,
 				   Dabba__InterfaceCoalesceList_Closure
 				   closure, void *closure_data);
 
+void dabbad_interface_coalesce_modify(Dabba__DabbaService_Service * service,
+				      const Dabba__InterfaceCoalesce *
+				      coalescep, Dabba__Dummy_Closure closure,
+				      void *closure_data);
+
 #endif				/* INTERFACE_COALESCE_H */

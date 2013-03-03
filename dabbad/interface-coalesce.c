@@ -176,3 +176,156 @@ void dabbad_interface_coalesce_get(Dabba__DabbaService_Service * service,
 	nl_object_free(OBJ_CAST(link));
 	link_cache_destroy(sock, cache);
 }
+
+void dabbad_interface_coalesce_modify(Dabba__DabbaService_Service * service,
+				      const Dabba__InterfaceCoalesce *
+				      coalescep, Dabba__Dummy_Closure closure,
+				      void *closure_data)
+{
+	Dabba__Dummy dummy = DABBA__DUMMY__INIT;
+	struct ethtool_coalesce eth_coalesce;
+	int apply = 0;
+
+	assert(service);
+	assert(closure_data);
+
+	dev_coalesce_get(coalescep->id->name, &eth_coalesce);
+
+	if (coalescep->has_pkt_rate_high) {
+		eth_coalesce.pkt_rate_high = coalescep->pkt_rate_high;
+		apply = 1;
+	}
+
+	if (coalescep->has_pkt_rate_low) {
+		eth_coalesce.pkt_rate_low = coalescep->pkt_rate_low;
+		apply = 1;
+	}
+
+	if (coalescep->has_pkt_rate_low) {
+		eth_coalesce.pkt_rate_low = coalescep->pkt_rate_low;
+		apply = 1;
+	}
+
+	if (coalescep->has_rate_sample_interval) {
+		eth_coalesce.rate_sample_interval =
+		    coalescep->rate_sample_interval;
+		apply = 1;
+	}
+
+	if (coalescep->has_stats_block_coalesce_usecs) {
+		eth_coalesce.stats_block_coalesce_usecs =
+		    coalescep->stats_block_coalesce_usecs;
+		apply = 1;
+	}
+
+	if (coalescep->has_use_adaptive_rx_coalesce) {
+		eth_coalesce.use_adaptive_rx_coalesce =
+		    coalescep->use_adaptive_rx_coalesce;
+		apply = 1;
+	}
+
+	if (coalescep->has_rx_coalesce_usecs) {
+		eth_coalesce.rx_coalesce_usecs = coalescep->rx_coalesce_usecs;
+		apply = 1;
+	}
+
+	if (coalescep->has_rx_coalesce_usecs_irq) {
+		eth_coalesce.rx_coalesce_usecs_irq =
+		    coalescep->rx_coalesce_usecs_irq;
+		apply = 1;
+	}
+
+	if (coalescep->has_rx_coalesce_usecs_high) {
+		eth_coalesce.rx_coalesce_usecs_high =
+		    coalescep->rx_coalesce_usecs_high;
+		apply = 1;
+	}
+
+	if (coalescep->has_rx_coalesce_usecs_low) {
+		eth_coalesce.rx_coalesce_usecs_low =
+		    coalescep->rx_coalesce_usecs_low;
+		apply = 1;
+	}
+
+	if (coalescep->has_rx_max_coalesced_frames) {
+		eth_coalesce.rx_max_coalesced_frames =
+		    coalescep->rx_max_coalesced_frames;
+		apply = 1;
+	}
+
+	if (coalescep->has_rx_max_coalesced_frames_irq) {
+		eth_coalesce.rx_max_coalesced_frames_irq =
+		    coalescep->rx_max_coalesced_frames_irq;
+		apply = 1;
+	}
+
+	if (coalescep->has_rx_max_coalesced_frames_high) {
+		eth_coalesce.rx_max_coalesced_frames_high =
+		    coalescep->rx_max_coalesced_frames_high;
+		apply = 1;
+	}
+
+	if (coalescep->has_rx_max_coalesced_frames_low) {
+		eth_coalesce.rx_max_coalesced_frames_low =
+		    coalescep->rx_max_coalesced_frames_low;
+		apply = 1;
+	}
+
+	if (coalescep->has_use_adaptive_tx_coalesce) {
+		eth_coalesce.use_adaptive_tx_coalesce =
+		    coalescep->use_adaptive_tx_coalesce;
+		apply = 1;
+	}
+
+	if (coalescep->has_tx_coalesce_usecs) {
+		eth_coalesce.tx_coalesce_usecs = coalescep->tx_coalesce_usecs;
+		apply = 1;
+	}
+
+	if (coalescep->has_tx_coalesce_usecs_irq) {
+		eth_coalesce.tx_coalesce_usecs_irq =
+		    coalescep->tx_coalesce_usecs_irq;
+		apply = 1;
+	}
+
+	if (coalescep->has_tx_coalesce_usecs_high) {
+		eth_coalesce.tx_coalesce_usecs_high =
+		    coalescep->tx_coalesce_usecs_high;
+		apply = 1;
+	}
+
+	if (coalescep->has_tx_coalesce_usecs_low) {
+		eth_coalesce.tx_coalesce_usecs_low =
+		    coalescep->tx_coalesce_usecs_low;
+		apply = 1;
+	}
+
+	if (coalescep->has_tx_max_coalesced_frames) {
+		eth_coalesce.tx_max_coalesced_frames =
+		    coalescep->tx_max_coalesced_frames;
+		apply = 1;
+	}
+
+	if (coalescep->has_tx_max_coalesced_frames_irq) {
+		eth_coalesce.tx_max_coalesced_frames_irq =
+		    coalescep->tx_max_coalesced_frames_irq;
+		apply = 1;
+	}
+
+	if (coalescep->has_tx_max_coalesced_frames_high) {
+		eth_coalesce.tx_max_coalesced_frames_high =
+		    coalescep->tx_max_coalesced_frames_high;
+		apply = 1;
+	}
+
+	if (coalescep->has_tx_max_coalesced_frames_low) {
+		eth_coalesce.tx_max_coalesced_frames_low =
+		    coalescep->tx_max_coalesced_frames_low;
+		apply = 1;
+	}
+
+	if (apply)
+		dev_coalesce_set(coalescep->id->name, &eth_coalesce);
+
+	closure(&dummy, closure_data);
+}
