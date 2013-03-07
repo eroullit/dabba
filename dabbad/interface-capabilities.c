@@ -331,22 +331,22 @@ void dabbad_interface_capabilities_get(Dabba__DabbaService_Service * service,
 		free(capabilities_list.list[a]->supported_speed->ethernet);
 		free(capabilities_list.list[a]->supported_speed->fast_ethernet);
 		free(capabilities_list.list[a]->supported_speed->gbps_ethernet);
-		free(capabilities_list.list[a]->
-		     supported_speed->_10gbps_ethernet);
+		free(capabilities_list.list[a]->supported_speed->
+		     _10gbps_ethernet);
 		free(capabilities_list.list[a]->advertising_speed->ethernet);
-		free(capabilities_list.list[a]->
-		     advertising_speed->fast_ethernet);
-		free(capabilities_list.list[a]->
-		     advertising_speed->gbps_ethernet);
-		free(capabilities_list.list[a]->
-		     advertising_speed->_10gbps_ethernet);
+		free(capabilities_list.list[a]->advertising_speed->
+		     fast_ethernet);
+		free(capabilities_list.list[a]->advertising_speed->
+		     gbps_ethernet);
+		free(capabilities_list.list[a]->advertising_speed->
+		     _10gbps_ethernet);
 		free(capabilities_list.list[a]->lp_advertising_speed->ethernet);
-		free(capabilities_list.list[a]->
-		     lp_advertising_speed->fast_ethernet);
-		free(capabilities_list.list[a]->
-		     lp_advertising_speed->gbps_ethernet);
-		free(capabilities_list.list[a]->
-		     lp_advertising_speed->_10gbps_ethernet);
+		free(capabilities_list.list[a]->lp_advertising_speed->
+		     fast_ethernet);
+		free(capabilities_list.list[a]->lp_advertising_speed->
+		     gbps_ethernet);
+		free(capabilities_list.list[a]->lp_advertising_speed->
+		     _10gbps_ethernet);
 		free(capabilities_list.list[a]->supported_opt);
 		free(capabilities_list.list[a]->supported_speed);
 		free(capabilities_list.list[a]->advertising_opt);
@@ -500,27 +500,47 @@ void dabbad_interface_capabilities_modify(Dabba__DabbaService_Service * service,
 	dev_settings_get(capabilitiesp->id->name, &eth_set);
 
 	if (capabilitiesp->has_aui) {
-		eth_set.port |= PORT_AUI;
+		if (capabilitiesp->aui)
+			eth_set.port |= PORT_AUI;
+		else
+			eth_set.port &= ~PORT_AUI;
+
 		apply = 1;
 	}
 
 	if (capabilitiesp->has_bnc) {
-		eth_set.port |= PORT_BNC;
+		if (capabilitiesp->bnc)
+			eth_set.port |= PORT_BNC;
+		else
+			eth_set.port &= ~PORT_BNC;
+
 		apply = 1;
 	}
 
 	if (capabilitiesp->has_fibre) {
-		eth_set.port |= PORT_FIBRE;
+		if (capabilitiesp->fibre)
+			eth_set.port |= PORT_FIBRE;
+		else
+			eth_set.port &= ~PORT_FIBRE;
+
 		apply = 1;
 	}
 
 	if (capabilitiesp->has_mii) {
-		eth_set.port |= PORT_MII;
+		if (capabilitiesp->mii)
+			eth_set.port |= PORT_MII;
+		else
+			eth_set.port &= ~PORT_MII;
+
 		apply = 1;
 	}
 
 	if (capabilitiesp->has_tp) {
-		eth_set.port |= PORT_TP;
+		if (capabilitiesp->tp)
+			eth_set.port |= PORT_TP;
+		else
+			eth_set.port &= ~PORT_TP;
+
 		apply = 1;
 	}
 
@@ -541,8 +561,8 @@ void dabbad_interface_capabilities_modify(Dabba__DabbaService_Service * service,
 
 	if (capabilitiesp->lp_advertising_opt)
 		interface_advertising_option_set(&eth_set.lp_advertising,
-						 capabilitiesp->
-						 lp_advertising_opt, &apply);
+						 capabilitiesp->lp_advertising_opt,
+						 &apply);
 
 	if (apply)
 		dev_settings_set(capabilitiesp->id->name, &eth_set);
