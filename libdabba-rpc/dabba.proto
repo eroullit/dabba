@@ -96,7 +96,7 @@ message interface_coalesce
     optional uint32 pkt_rate_low = 3;
     optional uint32 rate_sample_interval = 4;
     optional uint32 stats_block_coalesce_usecs = 5;
-    optional uint32 use_adaptive_rx_coalesce = 6;
+    optional bool use_adaptive_rx_coalesce = 6;
     optional uint32 rx_coalesce_usecs = 7;
     optional uint32 rx_coalesce_usecs_irq = 8;
     optional uint32 rx_coalesce_usecs_high = 9;
@@ -105,7 +105,7 @@ message interface_coalesce
     optional uint32 rx_max_coalesced_frames_irq = 12;
     optional uint32 rx_max_coalesced_frames_high = 13;
     optional uint32 rx_max_coalesced_frames_low = 14;
-    optional uint32 use_adaptive_tx_coalesce = 15;
+    optional bool use_adaptive_tx_coalesce = 15;
     optional uint32 tx_coalesce_usecs = 16;
     optional uint32 tx_coalesce_usecs_irq = 17;
     optional uint32 tx_coalesce_usecs_high = 18;

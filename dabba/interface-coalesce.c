@@ -34,6 +34,7 @@
 #include <errno.h>
 
 #include <dabba/rpc.h>
+#include <dabba/cli.h>
 #include <dabba/help.h>
 #include <dabba/macros.h>
 
@@ -138,9 +139,27 @@ int rpc_interface_coalesce_modify(ProtobufCService * service,
 int cmd_interface_coalesce_modify(int argc, const char **argv)
 {
 	enum interface_option {
+		OPT_ADAPTIVE_RX,
+		OPT_ADAPTIVE_TX,
+		OPT_RX_USECS,
+		OPT_RX_USECS_IRQ,
+		OPT_RX_USECS_LOW,
+		OPT_RX_USECS_HIGH,
+		OPT_RX_FRAMES,
+		OPT_RX_FRAMES_IRQ,
+		OPT_RX_FRAMES_LOW,
+		OPT_RX_FRAMES_HIGH,
+		OPT_TX_USECS,
+		OPT_TX_USECS_IRQ,
+		OPT_TX_USECS_LOW,
+		OPT_TX_USECS_HIGH,
+		OPT_TX_FRAMES,
+		OPT_TX_FRAMES_IRQ,
+		OPT_TX_FRAMES_LOW,
+		OPT_TX_FRAMES_HIGH,
 		OPT_PACKET_RATE_HIGH,
 		OPT_PACKET_RATE_LOW,
-		OPT_RATE_SAMPLE_INTERVAL,
+		OPT_SAMPLE_INTERVAL,
 		OPT_STATS_BLOCK,
 		OPT_INTERFACE_ID,
 		OPT_TCP,
@@ -149,13 +168,30 @@ int cmd_interface_coalesce_modify(int argc, const char **argv)
 	};
 
 	const struct option interface_option[] = {
-		{"packet-rate-high", required_argument, NULL,
+		{"adaptive-rx", required_argument, NULL, OPT_ADAPTIVE_RX},
+		{"adaptive-tx", required_argument, NULL, OPT_ADAPTIVE_TX},
+		{"rx-usecs", required_argument, NULL, OPT_RX_USECS},
+		{"rx-usecs-irq", required_argument, NULL, OPT_RX_USECS_IRQ},
+		{"rx-usecs-low", required_argument, NULL, OPT_RX_USECS_LOW},
+		{"rx-usecs-high", required_argument, NULL, OPT_RX_USECS_HIGH},
+		{"rx-frames", required_argument, NULL, OPT_RX_FRAMES},
+		{"rx-frames-irq", required_argument, NULL, OPT_RX_FRAMES_IRQ},
+		{"rx-frames-low", required_argument, NULL, OPT_RX_FRAMES_LOW},
+		{"rx-frames-high", required_argument, NULL, OPT_RX_FRAMES_HIGH},
+		{"tx-usecs", required_argument, NULL, OPT_TX_USECS},
+		{"tx-usecs-irq", required_argument, NULL, OPT_TX_USECS_IRQ},
+		{"tx-usecs-low", required_argument, NULL, OPT_TX_USECS_LOW},
+		{"tx-usecs-high", required_argument, NULL, OPT_TX_USECS_HIGH},
+		{"tx-frames", required_argument, NULL, OPT_TX_FRAMES},
+		{"tx-frames-irq", required_argument, NULL, OPT_TX_FRAMES_IRQ},
+		{"tx-frames-low", required_argument, NULL, OPT_TX_FRAMES_LOW},
+		{"tx-frames-high", required_argument, NULL, OPT_TX_FRAMES_HIGH},
+		{"pkt-rate-low", required_argument, NULL, OPT_PACKET_RATE_LOW},
+		{"pkt-rate-high", required_argument, NULL,
 		 OPT_PACKET_RATE_HIGH},
-		{"packet-rate-low", required_argument, NULL,
-		 OPT_PACKET_RATE_LOW},
-		{"packet-rate-interval", required_argument, NULL,
-		 OPT_RATE_SAMPLE_INTERVAL},
-		{"stats-block", required_argument, NULL, OPT_STATS_BLOCK},
+		{"stats-block-usecs", required_argument, NULL, OPT_STATS_BLOCK},
+		{"sample-interval", required_argument, NULL,
+		 OPT_SAMPLE_INTERVAL},
 		{"id", required_argument, NULL, OPT_INTERFACE_ID},
 		{"tcp", optional_argument, NULL, OPT_TCP},
 		{"local", optional_argument, NULL, OPT_LOCAL},
@@ -177,6 +213,102 @@ int cmd_interface_coalesce_modify(int argc, const char **argv)
 		getopt_long_only(argc, (char **)argv, "", interface_option,
 				 NULL)) != EOF) {
 		switch (ret) {
+		case OPT_ADAPTIVE_RX:
+			rc = str2bool(optarg,
+				      &coalesce.use_adaptive_rx_coalesce);
+
+			if (rc)
+				goto out;
+
+			coalesce.has_use_adaptive_rx_coalesce = 1;
+			break;
+		case OPT_ADAPTIVE_TX:
+			rc = str2bool(optarg,
+				      &coalesce.use_adaptive_tx_coalesce);
+
+			if (rc)
+				goto out;
+
+			coalesce.has_use_adaptive_tx_coalesce = 1;
+			break;
+		case OPT_RX_USECS:
+			coalesce.rx_coalesce_usecs = strtoul(optarg, NULL, 10);
+			coalesce.has_rx_coalesce_usecs = 1;
+			break;
+		case OPT_RX_USECS_IRQ:
+			coalesce.rx_coalesce_usecs_irq =
+			    strtoul(optarg, NULL, 10);
+			coalesce.has_rx_coalesce_usecs_irq = 1;
+			break;
+		case OPT_RX_USECS_HIGH:
+			coalesce.rx_coalesce_usecs_high =
+			    strtoul(optarg, NULL, 10);
+			coalesce.has_rx_coalesce_usecs_high = 1;
+			break;
+		case OPT_RX_USECS_LOW:
+			coalesce.rx_coalesce_usecs_low =
+			    strtoul(optarg, NULL, 10);
+			coalesce.has_rx_coalesce_usecs_low = 1;
+			break;
+		case OPT_RX_FRAMES:
+			coalesce.rx_max_coalesced_frames =
+			    strtoul(optarg, NULL, 10);
+			coalesce.has_rx_max_coalesced_frames = 1;
+			break;
+		case OPT_RX_FRAMES_IRQ:
+			coalesce.rx_max_coalesced_frames_irq =
+			    strtoul(optarg, NULL, 10);
+			coalesce.has_rx_max_coalesced_frames_irq = 1;
+			break;
+		case OPT_RX_FRAMES_HIGH:
+			coalesce.rx_max_coalesced_frames_high =
+			    strtoul(optarg, NULL, 10);
+			coalesce.has_rx_max_coalesced_frames_high = 1;
+			break;
+		case OPT_RX_FRAMES_LOW:
+			coalesce.rx_max_coalesced_frames_low =
+			    strtoul(optarg, NULL, 10);
+			coalesce.has_rx_max_coalesced_frames_low = 1;
+			break;
+		case OPT_TX_USECS:
+			coalesce.tx_coalesce_usecs = strtoul(optarg, NULL, 10);
+			coalesce.has_tx_coalesce_usecs = 1;
+			break;
+		case OPT_TX_USECS_IRQ:
+			coalesce.tx_coalesce_usecs_irq =
+			    strtoul(optarg, NULL, 10);
+			coalesce.has_tx_coalesce_usecs_irq = 1;
+			break;
+		case OPT_TX_USECS_HIGH:
+			coalesce.tx_coalesce_usecs_high =
+			    strtoul(optarg, NULL, 10);
+			coalesce.has_tx_coalesce_usecs_high = 1;
+			break;
+		case OPT_TX_USECS_LOW:
+			coalesce.tx_coalesce_usecs_low =
+			    strtoul(optarg, NULL, 10);
+			coalesce.has_tx_coalesce_usecs_low = 1;
+			break;
+		case OPT_TX_FRAMES:
+			coalesce.tx_max_coalesced_frames =
+			    strtoul(optarg, NULL, 10);
+			coalesce.has_tx_max_coalesced_frames = 1;
+			break;
+		case OPT_TX_FRAMES_IRQ:
+			coalesce.tx_max_coalesced_frames_irq =
+			    strtoul(optarg, NULL, 10);
+			coalesce.has_tx_max_coalesced_frames_irq = 1;
+			break;
+		case OPT_TX_FRAMES_HIGH:
+			coalesce.tx_max_coalesced_frames_high =
+			    strtoul(optarg, NULL, 10);
+			coalesce.has_tx_max_coalesced_frames_high = 1;
+			break;
+		case OPT_TX_FRAMES_LOW:
+			coalesce.tx_max_coalesced_frames_low =
+			    strtoul(optarg, NULL, 10);
+			coalesce.has_tx_max_coalesced_frames_low = 1;
+			break;
 		case OPT_PACKET_RATE_HIGH:
 			coalesce.pkt_rate_high = strtoul(optarg, NULL, 10);
 			coalesce.has_pkt_rate_high = 1;
@@ -185,7 +317,7 @@ int cmd_interface_coalesce_modify(int argc, const char **argv)
 			coalesce.pkt_rate_low = strtoul(optarg, NULL, 10);
 			coalesce.has_pkt_rate_low = 1;
 			break;
-		case OPT_RATE_SAMPLE_INTERVAL:
+		case OPT_SAMPLE_INTERVAL:
 			coalesce.rate_sample_interval =
 			    strtoul(optarg, NULL, 10);
 			coalesce.has_rate_sample_interval = 1;
