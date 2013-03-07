@@ -117,3 +117,20 @@ int rpc_interface_coalesce_get(ProtobufCService * service,
 
 	return 0;
 }
+
+int rpc_interface_coalesce_modify(ProtobufCService * service,
+				  const Dabba__InterfaceCoalesce * coalescep)
+{
+	protobuf_c_boolean is_done = 0;
+
+	assert(service);
+	assert(coalescep);
+
+	dabba__dabba_service__interface_coalesce_modify(service, coalescep,
+							rpc_dummy_print,
+							&is_done);
+
+	dabba_rpc_call_is_done(&is_done);
+
+	return 0;
+}
