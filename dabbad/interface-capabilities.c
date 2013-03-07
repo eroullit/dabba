@@ -360,3 +360,197 @@ void dabbad_interface_capabilities_get(Dabba__DabbaService_Service * service,
 	nl_object_free(OBJ_CAST(link));
 	link_cache_destroy(sock, cache);
 }
+
+static void interface_advertising_option_set(uint32_t * const adv_opt,
+					     const
+					     Dabba__InterfaceOptionCapabilites *
+					     caps, int *const apply)
+{
+	assert(adv_opt);
+	assert(caps);
+	assert(apply);
+
+	if (caps->has_autoneg) {
+		if (caps->autoneg)
+			*adv_opt |= ADVERTISED_Autoneg;
+		else
+			*adv_opt &= ~ADVERTISED_Autoneg;
+
+		*apply = 1;
+	}
+
+	if (caps->has_pause) {
+		if (caps->pause)
+			*adv_opt |= ADVERTISED_Pause;
+		else
+			*adv_opt &= ~ADVERTISED_Pause;
+
+		*apply = 1;
+	}
+}
+
+static void interface_speed_option_set(uint32_t * const adv_speed,
+				       const Dabba__InterfaceSpeedCapabilites *
+				       speed, int *const apply)
+{
+	assert(adv_speed);
+	assert(speed);
+	assert(apply);
+
+	if (speed->ethernet) {
+		if (speed->ethernet->has_half) {
+			if (speed->ethernet->half)
+				*adv_speed |= ADVERTISED_10baseT_Half;
+			else
+				*adv_speed &= ~ADVERTISED_10baseT_Half;
+
+			*apply = 1;
+		}
+
+		if (speed->ethernet->has_full) {
+			if (speed->ethernet->full)
+				*adv_speed |= ADVERTISED_10baseT_Full;
+			else
+				*adv_speed &= ~ADVERTISED_10baseT_Full;
+
+			*apply = 1;
+		}
+	}
+
+	if (speed->fast_ethernet) {
+		if (speed->fast_ethernet->has_half) {
+			if (speed->fast_ethernet->half)
+				*adv_speed |= ADVERTISED_100baseT_Half;
+			else
+				*adv_speed &= ~ADVERTISED_100baseT_Half;
+
+			*apply = 1;
+		}
+
+		if (speed->fast_ethernet->has_full) {
+			if (speed->fast_ethernet->full)
+				*adv_speed |= ADVERTISED_100baseT_Full;
+			else
+				*adv_speed &= ~ADVERTISED_100baseT_Full;
+
+			*apply = 1;
+		}
+	}
+
+	if (speed->gbps_ethernet) {
+		if (speed->gbps_ethernet->has_half) {
+			if (speed->gbps_ethernet->half)
+				*adv_speed |= ADVERTISED_1000baseT_Half;
+			else
+				*adv_speed &= ~ADVERTISED_1000baseT_Half;
+
+			*apply = 1;
+		}
+
+		if (speed->gbps_ethernet->has_full) {
+			if (speed->gbps_ethernet->full)
+				*adv_speed |= ADVERTISED_1000baseT_Full;
+			else
+				*adv_speed &= ~ADVERTISED_1000baseT_Full;
+
+			*apply = 1;
+		}
+	}
+
+	if (speed->_10gbps_ethernet) {
+		/* 10Gbps speed cannot advertise half-duplex */
+		if (speed->_10gbps_ethernet->has_full) {
+			if (speed->_10gbps_ethernet->full)
+				*adv_speed |= ADVERTISED_10000baseT_Full;
+			else
+				*adv_speed &= ~ADVERTISED_10000baseT_Full;
+
+			*apply = 1;
+		}
+	}
+}
+
+void dabbad_interface_capabilities_modify(Dabba__DabbaService_Service * service,
+					  const Dabba__InterfaceCapabilities *
+					  capabilitiesp,
+					  Dabba__Dummy_Closure closure,
+					  void *closure_data)
+{
+	Dabba__Dummy dummy = DABBA__DUMMY__INIT;
+	struct nl_sock *sock = NULL;
+	struct nl_cache *cache;
+	struct rtnl_link *link, *change;
+	struct ethtool_cmd eth_set;
+	int apply = 0;
+
+	assert(service);
+	assert(closure_data);
+
+	cache = link_cache_alloc(&sock);
+	change = rtnl_link_alloc();
+
+	if (!cache || !change)
+		goto out;
+
+	link = rtnl_link_get_by_name(cache, capabilitiesp->id->name);
+
+	if (!link)
+		goto out;
+
+	dev_settings_get(capabilitiesp->id->name, &eth_set);
+
+	if (capabilitiesp->has_aui) {
+		eth_set.port |= PORT_AUI;
+		apply = 1;
+	}
+
+	if (capabilitiesp->has_bnc) {
+		eth_set.port |= PORT_BNC;
+		apply = 1;
+	}
+
+	if (capabilitiesp->has_fibre) {
+		eth_set.port |= PORT_FIBRE;
+		apply = 1;
+	}
+
+	if (capabilitiesp->has_mii) {
+		eth_set.port |= PORT_MII;
+		apply = 1;
+	}
+
+	if (capabilitiesp->has_tp) {
+		eth_set.port |= PORT_TP;
+		apply = 1;
+	}
+
+	if (capabilitiesp->advertising_speed)
+		interface_speed_option_set(&eth_set.advertising,
+					   capabilitiesp->advertising_speed,
+					   &apply);
+
+	if (capabilitiesp->lp_advertising_speed)
+		interface_speed_option_set(&eth_set.lp_advertising,
+					   capabilitiesp->lp_advertising_speed,
+					   &apply);
+
+	if (capabilitiesp->advertising_opt)
+		interface_advertising_option_set(&eth_set.advertising,
+						 capabilitiesp->advertising_opt,
+						 &apply);
+
+	if (capabilitiesp->lp_advertising_opt)
+		interface_advertising_option_set(&eth_set.lp_advertising,
+						 capabilitiesp->
+						 lp_advertising_opt, &apply);
+
+	if (apply)
+		dev_settings_set(capabilitiesp->id->name, &eth_set);
+
+	rtnl_link_change(sock, link, change, 0);
+	rtnl_link_put(link);
+ out:
+	closure(&dummy, closure_data);
+	nl_object_free(OBJ_CAST(change));
+	link_cache_destroy(sock, cache);
+}
