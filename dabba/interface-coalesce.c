@@ -134,3 +134,100 @@ int rpc_interface_coalesce_modify(ProtobufCService * service,
 
 	return 0;
 }
+
+int cmd_interface_coalesce_modify(int argc, const char **argv)
+{
+	enum interface_option {
+		OPT_PACKET_RATE_HIGH,
+		OPT_PACKET_RATE_LOW,
+		OPT_RATE_SAMPLE_INTERVAL,
+		OPT_STATS_BLOCK,
+		OPT_INTERFACE_ID,
+		OPT_TCP,
+		OPT_LOCAL,
+		OPT_HELP
+	};
+
+	const struct option interface_option[] = {
+		{"packet-rate-high", required_argument, NULL,
+		 OPT_PACKET_RATE_HIGH},
+		{"packet-rate-low", required_argument, NULL,
+		 OPT_PACKET_RATE_LOW},
+		{"packet-rate-interval", required_argument, NULL,
+		 OPT_RATE_SAMPLE_INTERVAL},
+		{"stats-block", required_argument, NULL, OPT_STATS_BLOCK},
+		{"id", required_argument, NULL, OPT_INTERFACE_ID},
+		{"tcp", optional_argument, NULL, OPT_TCP},
+		{"local", optional_argument, NULL, OPT_LOCAL},
+		{"help", required_argument, NULL, OPT_HELP},
+		{NULL, 0, NULL, 0},
+	};
+
+	int ret, rc = 0;
+	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+	ProtobufCService *service;
+	Dabba__InterfaceCoalesce coalesce = DABBA__INTERFACE_COALESCE__INIT;
+
+	/* HACK: getopt*() start to parse options at argv[1] */
+	argc++;
+	argv--;
+
+	while ((ret =
+		getopt_long_only(argc, (char **)argv, "", interface_option,
+				 NULL)) != EOF) {
+		switch (ret) {
+		case OPT_PACKET_RATE_HIGH:
+			coalesce.pkt_rate_high = strtoul(optarg, NULL, 10);
+			coalesce.has_pkt_rate_high = 1;
+			break;
+		case OPT_PACKET_RATE_LOW:
+			coalesce.pkt_rate_low = strtoul(optarg, NULL, 10);
+			coalesce.has_pkt_rate_low = 1;
+			break;
+		case OPT_RATE_SAMPLE_INTERVAL:
+			coalesce.rate_sample_interval =
+			    strtoul(optarg, NULL, 10);
+			coalesce.has_rate_sample_interval = 1;
+			break;
+		case OPT_TCP:
+			server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
+			server_id = DABBA_RPC_DEFAULT_TCP_SERVER_NAME;
+
+			if (optarg)
+				server_id = optarg;
+			break;
+		case OPT_LOCAL:
+			server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+			server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+
+			if (optarg)
+				server_id = optarg;
+			break;
+		case OPT_INTERFACE_ID:
+			coalesce.id = malloc(sizeof(*coalesce.id));
+
+			if (!coalesce.id)
+				return ENOMEM;
+
+			dabba__interface_id__init(coalesce.id);
+			coalesce.id->name = optarg;
+			break;
+		case OPT_HELP:
+		default:
+			show_usage(interface_option);
+			rc = -1;
+			goto out;
+		}
+	}
+
+	service = dabba_rpc_client_connect(server_id, server_type);
+
+	if (service)
+		rc = rpc_interface_coalesce_modify(service, &coalesce);
+	else
+		rc = EINVAL;
+ out:
+	free(coalesce.id);
+	return rc;
+}

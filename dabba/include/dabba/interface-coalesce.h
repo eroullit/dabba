@@ -27,7 +27,6 @@
 int rpc_interface_coalesce_get(ProtobufCService * service,
 			       const Dabba__InterfaceIdList * id_list);
 
-int rpc_interface_coalesce_modify(ProtobufCService * service,
-				  const Dabba__InterfaceCoalesce * coalescep);
+int cmd_interface_coalesce_modify(int argc, const char **argv);
 
 #endif				/* INTERFACE_COALESCE_H */
