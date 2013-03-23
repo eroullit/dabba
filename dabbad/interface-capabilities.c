@@ -331,22 +331,22 @@ void dabbad_interface_capabilities_get(Dabba__DabbaService_Service * service,
 		free(capabilities_list.list[a]->supported_speed->ethernet);
 		free(capabilities_list.list[a]->supported_speed->fast_ethernet);
 		free(capabilities_list.list[a]->supported_speed->gbps_ethernet);
-		free(capabilities_list.list[a]->supported_speed->
-		     _10gbps_ethernet);
+		free(capabilities_list.list[a]->
+		     supported_speed->_10gbps_ethernet);
 		free(capabilities_list.list[a]->advertising_speed->ethernet);
-		free(capabilities_list.list[a]->advertising_speed->
-		     fast_ethernet);
-		free(capabilities_list.list[a]->advertising_speed->
-		     gbps_ethernet);
-		free(capabilities_list.list[a]->advertising_speed->
-		     _10gbps_ethernet);
+		free(capabilities_list.list[a]->
+		     advertising_speed->fast_ethernet);
+		free(capabilities_list.list[a]->
+		     advertising_speed->gbps_ethernet);
+		free(capabilities_list.list[a]->
+		     advertising_speed->_10gbps_ethernet);
 		free(capabilities_list.list[a]->lp_advertising_speed->ethernet);
-		free(capabilities_list.list[a]->lp_advertising_speed->
-		     fast_ethernet);
-		free(capabilities_list.list[a]->lp_advertising_speed->
-		     gbps_ethernet);
-		free(capabilities_list.list[a]->lp_advertising_speed->
-		     _10gbps_ethernet);
+		free(capabilities_list.list[a]->
+		     lp_advertising_speed->fast_ethernet);
+		free(capabilities_list.list[a]->
+		     lp_advertising_speed->gbps_ethernet);
+		free(capabilities_list.list[a]->
+		     lp_advertising_speed->_10gbps_ethernet);
 		free(capabilities_list.list[a]->supported_opt);
 		free(capabilities_list.list[a]->supported_speed);
 		free(capabilities_list.list[a]->advertising_opt);
@@ -549,19 +549,9 @@ void dabbad_interface_capabilities_modify(Dabba__DabbaService_Service * service,
 					   capabilitiesp->advertising_speed,
 					   &apply);
 
-	if (capabilitiesp->lp_advertising_speed)
-		interface_speed_option_set(&eth_set.lp_advertising,
-					   capabilitiesp->lp_advertising_speed,
-					   &apply);
-
 	if (capabilitiesp->advertising_opt)
 		interface_advertising_option_set(&eth_set.advertising,
 						 capabilitiesp->advertising_opt,
-						 &apply);
-
-	if (capabilitiesp->lp_advertising_opt)
-		interface_advertising_option_set(&eth_set.lp_advertising,
-						 capabilitiesp->lp_advertising_opt,
 						 &apply);
 
 	if (apply)
