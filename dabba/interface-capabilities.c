@@ -86,16 +86,16 @@ static void interface_capabilities_list_print(const
 		       "            10000: {half: false, full: %s}\n",
 		       print_tf(capabilitiesp->supported_speed->ethernet->half),
 		       print_tf(capabilitiesp->supported_speed->ethernet->full),
+		       print_tf(capabilitiesp->supported_speed->fast_ethernet->
+				half),
+		       print_tf(capabilitiesp->supported_speed->fast_ethernet->
+				full),
+		       print_tf(capabilitiesp->supported_speed->gbps_ethernet->
+				half),
+		       print_tf(capabilitiesp->supported_speed->gbps_ethernet->
+				full),
 		       print_tf(capabilitiesp->supported_speed->
-				fast_ethernet->half),
-		       print_tf(capabilitiesp->supported_speed->
-				fast_ethernet->full),
-		       print_tf(capabilitiesp->supported_speed->
-				gbps_ethernet->half),
-		       print_tf(capabilitiesp->supported_speed->
-				gbps_ethernet->full),
-		       print_tf(capabilitiesp->
-				supported_speed->_10gbps_ethernet->full));
+				_10gbps_ethernet->full));
 		printf("        advertised:\n");
 		printf("          autoneg: %s\n",
 		       print_tf(capabilitiesp->advertising_opt->autoneg));
@@ -106,20 +106,20 @@ static void interface_capabilities_list_print(const
 		       "            100:   {half: %s, full: %s}\n"
 		       "            1000:  {half: %s, full: %s}\n"
 		       "            10000: {half: false, full: %s}\n",
+		       print_tf(capabilitiesp->advertising_speed->ethernet->
+				half),
+		       print_tf(capabilitiesp->advertising_speed->ethernet->
+				full),
 		       print_tf(capabilitiesp->advertising_speed->
-				ethernet->half),
+				fast_ethernet->half),
 		       print_tf(capabilitiesp->advertising_speed->
-				ethernet->full),
-		       print_tf(capabilitiesp->
-				advertising_speed->fast_ethernet->half),
-		       print_tf(capabilitiesp->
-				advertising_speed->fast_ethernet->full),
-		       print_tf(capabilitiesp->
-				advertising_speed->gbps_ethernet->half),
-		       print_tf(capabilitiesp->
-				advertising_speed->gbps_ethernet->full),
-		       print_tf(capabilitiesp->
-				advertising_speed->_10gbps_ethernet->full));
+				fast_ethernet->full),
+		       print_tf(capabilitiesp->advertising_speed->
+				gbps_ethernet->half),
+		       print_tf(capabilitiesp->advertising_speed->
+				gbps_ethernet->full),
+		       print_tf(capabilitiesp->advertising_speed->
+				_10gbps_ethernet->full));
 		printf("        link-partner advertised:\n");
 		printf("          autoneg: %s\n",
 		       print_tf(capabilitiesp->lp_advertising_opt->autoneg));
@@ -130,20 +130,20 @@ static void interface_capabilities_list_print(const
 		       "            100:   {half: %s, full: %s}\n"
 		       "            1000:  {half: %s, full: %s}\n"
 		       "            10000: {half: false, full: %s}\n",
+		       print_tf(capabilitiesp->lp_advertising_speed->ethernet->
+				half),
+		       print_tf(capabilitiesp->lp_advertising_speed->ethernet->
+				full),
 		       print_tf(capabilitiesp->lp_advertising_speed->
-				ethernet->half),
+				fast_ethernet->half),
 		       print_tf(capabilitiesp->lp_advertising_speed->
-				ethernet->full),
-		       print_tf(capabilitiesp->
-				lp_advertising_speed->fast_ethernet->half),
-		       print_tf(capabilitiesp->
-				lp_advertising_speed->fast_ethernet->full),
-		       print_tf(capabilitiesp->
-				lp_advertising_speed->gbps_ethernet->half),
-		       print_tf(capabilitiesp->
-				lp_advertising_speed->gbps_ethernet->full),
-		       print_tf(capabilitiesp->
-				lp_advertising_speed->_10gbps_ethernet->full));
+				fast_ethernet->full),
+		       print_tf(capabilitiesp->lp_advertising_speed->
+				gbps_ethernet->half),
+		       print_tf(capabilitiesp->lp_advertising_speed->
+				gbps_ethernet->full),
+		       print_tf(capabilitiesp->lp_advertising_speed->
+				_10gbps_ethernet->full));
 	}
 
 	*status = 1;
@@ -199,7 +199,6 @@ int cmd_interface_capabilities_modify(int argc, const char **argv)
 		OPT_PORT_FULL_DUPLEX,
 		OPT_PORT_AUTONEG,
 		OPT_PORT_PAUSE,
-		OPT_LINK_PARTNER,
 		OPT_INTERFACE_ID,
 		OPT_TCP,
 		OPT_LOCAL,
@@ -217,7 +216,6 @@ int cmd_interface_capabilities_modify(int argc, const char **argv)
 		{"full-duplex", required_argument, NULL, OPT_PORT_FULL_DUPLEX},
 		{"autoneg", required_argument, NULL, OPT_PORT_AUTONEG},
 		{"pause", required_argument, NULL, OPT_PORT_PAUSE},
-		{"link-partner", no_argument, NULL, OPT_LINK_PARTNER},
 		{"id", required_argument, NULL, OPT_INTERFACE_ID},
 		{"tcp", optional_argument, NULL, OPT_TCP},
 		{"local", optional_argument, NULL, OPT_LOCAL},
@@ -225,7 +223,7 @@ int cmd_interface_capabilities_modify(int argc, const char **argv)
 		{NULL, 0, NULL, 0},
 	};
 
-	int ret, rc = 0, link_partner = 0;
+	int ret, rc = 0;
 	uint32_t speed = 0;
 	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
 	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
@@ -325,12 +323,6 @@ int cmd_interface_capabilities_modify(int argc, const char **argv)
 				goto out;
 
 			opt_cap.has_pause = 1;
-			break;
-		case OPT_LINK_PARTNER:
-			rc = str2bool(optarg, &link_partner);
-
-			if (rc)
-				goto out;
 			break;
 		case OPT_TCP:
 			server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
