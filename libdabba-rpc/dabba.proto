@@ -230,6 +230,10 @@ message thread_capabilities_list
     repeated thread_capabilities list = 1;
 }
 
+message error_code
+{
+    required int32 code = 1;
+}
 message dummy
 {
     optional int32 unused = 1;
@@ -268,6 +272,6 @@ service dabba_service
     rpc thread_capabilities_get (dummy) returns (thread_capabilities_list);
     rpc thread_modify (thread) returns (dummy);
     rpc capture_get (thread_id_list) returns (capture_list);
-    rpc capture_start (capture) returns (dummy);
+    rpc capture_start (capture) returns (error_code);
     rpc capture_stop (thread_id) returns (dummy);
 }
