@@ -198,6 +198,7 @@ int cmd_capture_start(int argc, const char **argv)
 
 	int ret;
 	Dabba__Capture capture = DABBA__CAPTURE__INIT;
+	Dabba__ErrorCode err = DABBA__ERROR_CODE__INIT;
 	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
 	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 	ProtobufCService *service;
@@ -218,6 +219,7 @@ int cmd_capture_start(int argc, const char **argv)
 	capture.has_frame_nr = capture.has_frame_size = 1;
 	capture.frame_size = PACKET_MMAP_ETH_FRAME_LEN;
 	capture.frame_nr = DEFAULT_CAPTURE_FRAME_NUMBER;
+	capture.status = &err;
 
 	/* HACK: getopt*() start to parse options at argv[1] */
 	argc++;

@@ -75,6 +75,11 @@ void rpc_header_print(const char *const title)
 	printf("---\n  %s:\n", title);
 }
 
+void __rpc_error_code_print(const int error_code)
+{
+	printf("# error code: %i\n", error_code);
+}
+
 void rpc_dummy_print(const Dabba__Dummy * result, void *closure_data)
 {
 	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
@@ -93,7 +98,7 @@ void rpc_error_code_print(const Dabba__ErrorCode const *result,
 	assert(result);
 	assert(closure_data);
 
-	printf("# error code: %i\n", result->code);
+	__rpc_error_code_print(result->code);
 
 	*status = 1;
 }

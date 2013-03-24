@@ -138,7 +138,6 @@ void dabbad_capture_start(Dabba__DabbaService_Service * service,
 			  const Dabba__Capture * capturep,
 			  Dabba__ErrorCode_Closure closure, void *closure_data)
 {
-	Dabba__ErrorCode err = DABBA__ERROR_CODE__INIT;
 	struct packet_capture_thread *pkt_capture;
 	int sock, rc;
 
@@ -187,8 +186,8 @@ void dabbad_capture_start(Dabba__DabbaService_Service * service,
 	}
 
  out:
-	err.code = rc;
-	closure(&err, closure_data);
+	capturep->status->code = rc;
+	closure(capturep->status, closure_data);
 }
 
 void dabbad_capture_get(Dabba__DabbaService_Service * service,
@@ -233,16 +232,21 @@ void dabbad_capture_get(Dabba__DabbaService_Service * service,
 
 		capture_list.list[a]->id =
 		    malloc(sizeof(*capture_list.list[a]->id));
+		capture_list.list[a]->status =
+		    malloc(sizeof(*capture_list.list[a]->status));
+
 		capture_list.list[a]->pcap =
 		    calloc(NAME_MAX, sizeof(*capture_list.list[a]->pcap));
 		capture_list.list[a]->interface =
 		    calloc(IFNAMSIZ, sizeof(*capture_list.list[a]->interface));
 
-		if (!capture_list.list[a]->id || !capture_list.list[a]->pcap
+		if (!capture_list.list[a]->id || !capture_list.list[a]->status
+		    || !capture_list.list[a]->pcap
 		    || !capture_list.list[a]->interface)
 			goto out;
 
 		dabba__thread_id__init(capture_list.list[a]->id);
+		dabba__error_code__init(capture_list.list[a]->status);
 	}
 
 	for (a = 0, pkt_thread = dabbad_thread_type_first(CAPTURE_THREAD);
@@ -260,6 +264,9 @@ void dabbad_capture_get(Dabba__DabbaService_Service * service,
 		capture_list.list[a]->id->id =
 		    (uint64_t) pkt_capture->thread.id;
 
+		/* TODO report capture health: disk full, link down etc... */
+		capture_list.list[a]->status->code = 0;
+
 		fd_to_path(pkt_capture->rx.pcap_fd, capture_list.list[a]->pcap,
 			   NAME_MAX * sizeof(*capture_list.list[a]->pcap));
 
@@ -275,6 +282,7 @@ void dabbad_capture_get(Dabba__DabbaService_Service * service,
 	for (a = 0; a < capture_list.n_list; a++) {
 		if (capture_list.list[a]) {
 			free(capture_list.list[a]->id);
+			free(capture_list.list[a]->status);
 			free(capture_list.list[a]->pcap);
 			free(capture_list.list[a]->interface);
 		}

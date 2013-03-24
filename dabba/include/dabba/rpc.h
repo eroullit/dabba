@@ -30,6 +30,7 @@ ProtobufCService *dabba_rpc_client_connect(const char *const name,
 					   const ProtobufC_RPC_AddressType
 					   type);
 void dabba_rpc_call_is_done(protobuf_c_boolean * is_done);
+void __rpc_error_code_print(const int error_code);
 void rpc_header_print(const char *const title);
 void rpc_dummy_print(const Dabba__Dummy * result, void *closure_data);
 void rpc_error_code_print(const Dabba__ErrorCode const *result,
