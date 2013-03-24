@@ -154,7 +154,6 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabba/help.h>
 #include <dabba/rpc.h>
 #include <dabba/thread.h>
-#include <dabba/capture-list.h>
 #include <dabba/capture-settings.h>
 
 #define DEFAULT_CAPTURE_FRAME_NUMBER 32
