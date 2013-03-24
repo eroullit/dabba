@@ -177,7 +177,7 @@ int rpc_capture_stop(ProtobufCService * service, const Dabba__ThreadId * id)
 	protobuf_c_boolean is_done = 0;
 
 	dabba__dabba_service__capture_stop(service, id,
-					   rpc_dummy_print, &is_done);
+					   rpc_error_code_print, &is_done);
 
 	dabba_rpc_call_is_done(&is_done);
 

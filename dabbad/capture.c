@@ -103,9 +103,9 @@ static struct packet_capture_thread *dabbad_capture_thread_get(struct packet_thr
 
 void dabbad_capture_stop(Dabba__DabbaService_Service * service,
 			 const Dabba__ThreadId * idp,
-			 Dabba__Dummy_Closure closure, void *closure_data)
+			 Dabba__ErrorCode_Closure closure, void *closure_data)
 {
-	Dabba__Dummy dummy = DABBA__DUMMY__INIT;
+	Dabba__ErrorCode err = DABBA__ERROR_CODE__INIT;
 	struct packet_capture_thread *pkt_capture;
 	struct packet_thread *pkt_thread;
 	int rc;
@@ -115,8 +115,10 @@ void dabbad_capture_stop(Dabba__DabbaService_Service * service,
 
 	pkt_thread = dabbad_thread_data_get((pthread_t) idp->id);
 
-	if (!pkt_thread)
+	if (!pkt_thread) {
+		rc = EINVAL;
 		goto out;
+	}
 
 	rc = dabbad_thread_stop(pkt_thread);
 
@@ -128,7 +130,8 @@ void dabbad_capture_stop(Dabba__DabbaService_Service * service,
 	}
 
  out:
-	closure(&dummy, closure_data);
+	err.code = rc;
+	closure(&err, closure_data);
 }
 
 void dabbad_capture_start(Dabba__DabbaService_Service * service,
