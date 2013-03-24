@@ -41,6 +41,7 @@ static void capture_settings_print(const Dabba__CaptureList *
 
 	for (a = 0; result && a < result->n_list; a++) {
 		capture = result->list[a];
+		printf("    ");
 		__rpc_error_code_print(capture->status->code);
 		printf("    - id: %" PRIu64 "\n", (uint64_t) capture->id->id);
 		printf("      packet mmap size: %" PRIu64 "\n",
