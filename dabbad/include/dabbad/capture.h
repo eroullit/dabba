@@ -41,7 +41,7 @@ void dabbad_capture_stop(Dabba__DabbaService_Service * service,
 
 void dabbad_capture_start(Dabba__DabbaService_Service * service,
 			  const Dabba__Capture * capturep,
-			  Dabba__Dummy_Closure closure, void *closure_data);
+			  Dabba__ErrorCode_Closure closure, void *closure_data);
 
 void dabbad_capture_get(Dabba__DabbaService_Service * service,
 			const Dabba__ThreadIdList * id_listp,

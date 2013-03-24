@@ -84,3 +84,16 @@ void rpc_dummy_print(const Dabba__Dummy * result, void *closure_data)
 
 	*status = 1;
 }
+
+void rpc_error_code_print(const Dabba__ErrorCode const *result,
+			  void *closure_data)
+{
+	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
+
+	assert(result);
+	assert(closure_data);
+
+	printf("# error code: %i\n", result->code);
+
+	*status = 1;
+}

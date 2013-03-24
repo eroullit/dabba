@@ -165,7 +165,7 @@ int rpc_capture_start(ProtobufCService * service,
 
 	/* TODO Print create capture thread id ? */
 	dabba__dabba_service__capture_start(service, capture,
-					    rpc_dummy_print, &is_done);
+					    rpc_error_code_print, &is_done);
 
 	dabba_rpc_call_is_done(&is_done);
 

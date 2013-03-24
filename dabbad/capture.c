@@ -133,28 +133,33 @@ void dabbad_capture_stop(Dabba__DabbaService_Service * service,
 
 void dabbad_capture_start(Dabba__DabbaService_Service * service,
 			  const Dabba__Capture * capturep,
-			  Dabba__Dummy_Closure closure, void *closure_data)
+			  Dabba__ErrorCode_Closure closure, void *closure_data)
 {
-	Dabba__Dummy dummy = DABBA__DUMMY__INIT;
+	Dabba__ErrorCode err = DABBA__ERROR_CODE__INIT;
 	struct packet_capture_thread *pkt_capture;
 	int sock, rc;
 
 	assert(service);
 	assert(capturep);
 
-	if (!capture_settings_are_valid(capturep))
+	if (!capture_settings_are_valid(capturep)) {
+		rc = EINVAL;
 		goto out;
+	}
 
 	sock = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
 
-	if (sock < 0)
+	if (sock < 0) {
+		rc = errno;
 		goto out;
+	}
 
 	pkt_capture = calloc(1, sizeof(*pkt_capture));
 
 	if (!pkt_capture) {
 		free(pkt_capture);
 		close(sock);
+		rc = ENOMEM;
 		goto out;
 	}
 
@@ -179,7 +184,8 @@ void dabbad_capture_start(Dabba__DabbaService_Service * service,
 	}
 
  out:
-	closure(&dummy, closure_data);
+	err.code = rc;
+	closure(&err, closure_data);
 }
 
 void dabbad_capture_get(Dabba__DabbaService_Service * service,
