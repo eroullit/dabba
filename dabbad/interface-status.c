@@ -135,13 +135,14 @@ void dabbad_interface_status_get(Dabba__DabbaService_Service * service,
 
 void dabbad_interface_status_modify(Dabba__DabbaService_Service * service,
 				    const Dabba__InterfaceStatus * statusp,
-				    Dabba__Dummy_Closure closure,
+				    Dabba__ErrorCode_Closure closure,
 				    void *closure_data)
 {
-	Dabba__Dummy dummy = DABBA__DUMMY__INIT;
+	Dabba__ErrorCode err = DABBA__ERROR_CODE__INIT;
 	struct nl_sock *sock = NULL;
 	struct nl_cache *cache;
 	struct rtnl_link *link, *change;
+	int rc;
 
 	assert(service);
 	assert(closure_data);
@@ -154,8 +155,10 @@ void dabbad_interface_status_modify(Dabba__DabbaService_Service * service,
 
 	link = rtnl_link_get_by_name(cache, statusp->id->name);
 
-	if (!link)
+	if (!link) {
+		rc = ENODEV;
 		goto out;
+	}
 
 	if (statusp->has_promiscous) {
 		if (statusp->promiscous)
@@ -171,10 +174,11 @@ void dabbad_interface_status_modify(Dabba__DabbaService_Service * service,
 			rtnl_link_unset_flags(change, IFF_UP);
 	}
 
-	rtnl_link_change(sock, link, change, 0);
+	rc = rtnl_link_change(sock, link, change, 0);
 	rtnl_link_put(link);
  out:
-	closure(&dummy, closure_data);
+	err.code = rc;
+	closure(&err, closure_data);
 	nl_object_free(OBJ_CAST(change));
 	link_cache_destroy(sock, cache);
 }

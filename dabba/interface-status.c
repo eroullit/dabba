@@ -96,7 +96,7 @@ int rpc_interface_status_modify(ProtobufCService * service,
 	assert(statusp);
 
 	dabba__dabba_service__interface_status_modify(service, statusp,
-						      rpc_dummy_print,
+						      rpc_error_code_print,
 						      &is_done);
 
 	dabba_rpc_call_is_done(&is_done);
