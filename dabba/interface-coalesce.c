@@ -195,7 +195,7 @@ int cmd_interface_coalesce_modify(int argc, const char **argv)
 		{"id", required_argument, NULL, OPT_INTERFACE_ID},
 		{"tcp", optional_argument, NULL, OPT_TCP},
 		{"local", optional_argument, NULL, OPT_LOCAL},
-		{"help", required_argument, NULL, OPT_HELP},
+		{"help", no_argument, NULL, OPT_HELP},
 		{NULL, 0, NULL, 0},
 	};
 
