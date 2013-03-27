@@ -12,12 +12,13 @@ message interface_id_list
 
 message interface_status
 {
-    required interface_id id = 1;
-    optional bool up = 2;
-    optional bool running = 3;
-    optional bool promiscous = 4;
-    optional bool loopback = 5;
-    optional bool connectivity = 6;
+    required error_code status = 1;
+    required interface_id id = 2;
+    optional bool up = 3;
+    optional bool running = 4;
+    optional bool promiscous = 5;
+    optional bool loopback = 6;
+    optional bool connectivity = 7;
 }
 
 message interface_status_list
