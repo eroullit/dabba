@@ -65,13 +65,17 @@ static void __interface_status_get(struct nl_object *obj, void *arg)
 	dabba__interface_status__init(statusp);
 
 	statusp->id = malloc(sizeof(*statusp->id));
+	statusp->status = malloc(sizeof(*statusp->status));
 
-	if (!statusp->id) {
+	if (!statusp->id || !statusp->status) {
+		free(statusp->status);
+		free(statusp->id);
 		free(statusp);
 		return;
 	}
 
 	dabba__interface_id__init(statusp->id);
+	dabba__error_code__init(statusp->status);
 
 	statusp->has_connectivity = statusp->has_loopback = statusp->has_up = 1;
 	statusp->has_promiscous = statusp->has_running = 1;
@@ -79,7 +83,10 @@ static void __interface_status_get(struct nl_object *obj, void *arg)
 	statusp->id->name = rtnl_link_get_name(link);
 	flags = rtnl_link_get_flags(link);
 
-	dev_link_get(statusp->id->name, (uint32_t *) & statusp->connectivity);
+	statusp->status->code =
+	    dev_link_get(statusp->id->name,
+			 (uint32_t *) & statusp->connectivity);
+
 	statusp->loopback = (flags & IFF_LOOPBACK) == IFF_LOOPBACK;
 	statusp->up = (flags & IFF_UP) == IFF_UP;
 	statusp->running = (flags & IFF_RUNNING) == IFF_RUNNING;
@@ -150,8 +157,10 @@ void dabbad_interface_status_modify(Dabba__DabbaService_Service * service,
 	cache = link_cache_alloc(&sock);
 	change = rtnl_link_alloc();
 
-	if (!cache || !change)
+	if (!cache || !change) {
+		rc = ENOMEM;
 		goto out;
+	}
 
 	link = rtnl_link_get_by_name(cache, statusp->id->name);
 

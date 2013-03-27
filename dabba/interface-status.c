@@ -57,6 +57,8 @@ static void interface_status_list_print(const Dabba__InterfaceStatusList *
 
 	for (a = 0; result && a < result->n_list; a++) {
 		statusp = result->list[a];
+		printf("    ");
+		__rpc_error_code_print(statusp->status->code);
 		printf("    - name: %s\n", statusp->id->name);
 		printf("      status: {");
 		printf("connectivity: %s, ", print_tf(statusp->connectivity));
@@ -133,6 +135,7 @@ int cmd_interface_status_modify(int argc, const char **argv)
 	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 	ProtobufCService *service;
 	Dabba__InterfaceStatus status = DABBA__INTERFACE_STATUS__INIT;
+	Dabba__ErrorCode err = DABBA__ERROR_CODE__INIT;
 
 	/* HACK: getopt*() start to parse options at argv[1] */
 	argc++;
@@ -189,6 +192,8 @@ int cmd_interface_status_modify(int argc, const char **argv)
 			goto out;
 		}
 	}
+
+	status.status = &err;
 
 	service = dabba_rpc_client_connect(server_id, server_type);
 
