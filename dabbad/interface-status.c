@@ -64,7 +64,7 @@ static void __interface_status_get(struct nl_object *obj, void *arg)
 
 	dabba__interface_status__init(statusp);
 
-	statusp->id = malloc(sizeof(*statusp));
+	statusp->id = malloc(sizeof(*statusp->id));
 
 	if (!statusp->id) {
 		free(statusp);
