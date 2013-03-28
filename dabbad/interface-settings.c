@@ -66,13 +66,17 @@ static void __interface_settings_get(struct nl_object *obj, void *arg)
 	dabba__interface_settings__init(settingsp);
 
 	settingsp->id = malloc(sizeof(*settingsp->id));
+	settingsp->status = malloc(sizeof(*settingsp->status));
 
-	if (!settingsp->id) {
+	if (!settingsp->id || !settingsp->status) {
+		free(settingsp->id);
+		free(settingsp->status);
 		free(settingsp);
 		return;
 	}
 
 	dabba__interface_id__init(settingsp->id);
+	dabba__error_code__init(settingsp->status);
 
 	settingsp->id->name = rtnl_link_get_name(link);
 	settingsp->has_speed = settingsp->has_duplex = 1;
@@ -80,7 +84,8 @@ static void __interface_settings_get(struct nl_object *obj, void *arg)
 	settingsp->has_tx_qlen = settingsp->has_port = 1;
 	settingsp->has_maxrxpkt = settingsp->has_maxtxpkt = 1;
 
-	dev_settings_get(settingsp->id->name, &settings);
+	settingsp->status->code =
+	    dev_settings_get(settingsp->id->name, &settings);
 	settingsp->mtu = rtnl_link_get_mtu(link);
 	settingsp->tx_qlen = rtnl_link_get_txqlen(link);
 
@@ -130,6 +135,7 @@ void dabbad_interface_settings_get(Dabba__DabbaService_Service * service,
  out:
 	closure(pause_listp, closure_data);
 	for (a = 0; a < pause_list.n_list; a++) {
+		free(pause_list.list[a]->status);
 		free(pause_list.list[a]->id);
 		free(pause_list.list[a]);
 	}
@@ -140,15 +146,15 @@ void dabbad_interface_settings_get(Dabba__DabbaService_Service * service,
 
 void dabbad_interface_settings_modify(Dabba__DabbaService_Service * service,
 				      const Dabba__InterfaceSettings *
-				      settingsp, Dabba__Dummy_Closure closure,
+				      settingsp,
+				      Dabba__ErrorCode_Closure closure,
 				      void *closure_data)
 {
-	Dabba__Dummy dummy = DABBA__DUMMY__INIT;
 	struct nl_sock *sock = NULL;
 	struct nl_cache *cache;
 	struct rtnl_link *link, *change;
 	struct ethtool_cmd eth_set;
-	int apply = 0;
+	int apply = 0, rc;
 
 	assert(service);
 	assert(closure_data);
@@ -161,10 +167,12 @@ void dabbad_interface_settings_modify(Dabba__DabbaService_Service * service,
 
 	link = rtnl_link_get_by_name(cache, settingsp->id->name);
 
-	if (!link)
+	if (!link) {
+		rc = ENODEV;
 		goto out;
+	}
 
-	dev_settings_get(settingsp->id->name, &eth_set);
+	rc = dev_settings_get(settingsp->id->name, &eth_set);
 
 	if (settingsp->has_speed) {
 		ethtool_cmd_speed_set(&eth_set, settingsp->speed);
@@ -209,10 +217,11 @@ void dabbad_interface_settings_modify(Dabba__DabbaService_Service * service,
 	if (apply)
 		dev_settings_set(settingsp->id->name, &eth_set);
 
-	rtnl_link_change(sock, link, change, 0);
+	rc = rtnl_link_change(sock, link, change, 0);
 	rtnl_link_put(link);
  out:
-	closure(&dummy, closure_data);
+	settingsp->status->code = rc;
+	closure(settingsp->status, closure_data);
 	nl_object_free(OBJ_CAST(change));
 	link_cache_destroy(sock, cache);
 }

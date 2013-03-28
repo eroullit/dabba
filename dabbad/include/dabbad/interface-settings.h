@@ -33,7 +33,8 @@ void dabbad_interface_settings_get(Dabba__DabbaService_Service * service,
 
 void dabbad_interface_settings_modify(Dabba__DabbaService_Service * service,
 				      const Dabba__InterfaceSettings *
-				      settingsp, Dabba__Dummy_Closure closure,
+				      settingsp,
+				      Dabba__ErrorCode_Closure closure,
 				      void *closure_data);
 
 #endif				/* INTERFACE_SETTINGS_H */
