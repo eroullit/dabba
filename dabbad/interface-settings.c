@@ -162,8 +162,10 @@ void dabbad_interface_settings_modify(Dabba__DabbaService_Service * service,
 	cache = link_cache_alloc(&sock);
 	change = rtnl_link_alloc();
 
-	if (!cache || !change)
+	if (!cache || !change) {
+		rc = ENOMEM;
 		goto out;
+	}
 
 	link = rtnl_link_get_by_name(cache, settingsp->id->name);
 
