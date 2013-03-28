@@ -58,6 +58,8 @@ static void interface_settings_list_print(const Dabba__InterfaceSettingsList *
 
 	for (a = 0; result && a < result->n_list; a++) {
 		settingsp = result->list[a];
+		printf("    ");
+		__rpc_error_code_print(settingsp->status->code);
 		printf("    - name: %s\n", settingsp->id->name);
 		printf("      settings:\n");
 		printf("        speed: %u\n", settingsp->speed);
@@ -101,7 +103,7 @@ static int rpc_interface_settings_modify(ProtobufCService * service,
 	assert(settingsp);
 
 	dabba__dabba_service__interface_settings_modify(service, settingsp,
-							rpc_dummy_print,
+							rpc_error_code_print,
 							&is_done);
 
 	dabba_rpc_call_is_done(&is_done);
@@ -145,6 +147,7 @@ int cmd_interface_settings_modify(int argc, const char **argv)
 	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 	ProtobufCService *service;
 	Dabba__InterfaceSettings settings = DABBA__INTERFACE_SETTINGS__INIT;
+	Dabba__ErrorCode err = DABBA__ERROR_CODE__INIT;
 
 	/* HACK: getopt*() start to parse options at argv[1] */
 	argc++;
@@ -224,6 +227,8 @@ int cmd_interface_settings_modify(int argc, const char **argv)
 			goto out;
 		}
 	}
+
+	settings.status = &err;
 
 	service = dabba_rpc_client_connect(server_id, server_type);
 
