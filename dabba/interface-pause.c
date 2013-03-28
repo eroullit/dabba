@@ -93,7 +93,8 @@ int rpc_interface_pause_modify(ProtobufCService * service,
 	assert(pausep);
 
 	dabba__dabba_service__interface_pause_modify(service, pausep,
-						     rpc_dummy_print, &is_done);
+						     rpc_error_code_print,
+						     &is_done);
 
 	dabba_rpc_call_is_done(&is_done);
 
@@ -129,6 +130,7 @@ int cmd_interface_pause_modify(int argc, const char **argv)
 	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 	ProtobufCService *service;
 	Dabba__InterfacePause status = DABBA__INTERFACE_PAUSE__INIT;
+	Dabba__ErrorCode err = DABBA__ERROR_CODE__INIT;
 
 	/* HACK: getopt*() start to parse options at argv[1] */
 	argc++;
@@ -193,6 +195,8 @@ int cmd_interface_pause_modify(int argc, const char **argv)
 			goto out;
 		}
 	}
+
+	status.status = &err;
 
 	service = dabba_rpc_client_connect(server_id, server_type);
 
