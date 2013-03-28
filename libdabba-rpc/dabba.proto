@@ -42,10 +42,11 @@ message interface_driver_list
 
 message interface_pause
 {
-    required interface_id id = 1;
-    optional bool autoneg = 2;
-    optional bool rx_pause = 3;
-    optional bool tx_pause = 4;
+    required error_code status = 1;
+    required interface_id id = 2;
+    optional bool autoneg = 3;
+    optional bool rx_pause = 4;
+    optional bool tx_pause = 5;
 }
 
 message interface_pause_list
