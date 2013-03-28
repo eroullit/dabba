@@ -125,6 +125,7 @@ void dabbad_interface_pause_get(Dabba__DabbaService_Service * service,
  out:
 	closure(pause_listp, closure_data);
 	for (a = 0; a < pause_list.n_list; a++) {
+		free(pause_list.list[a]->status);
 		free(pause_list.list[a]->id);
 		free(pause_list.list[a]);
 	}

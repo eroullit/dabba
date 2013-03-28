@@ -132,6 +132,7 @@ void dabbad_interface_status_get(Dabba__DabbaService_Service * service,
  out:
 	closure(status_listp, closure_data);
 	for (a = 0; a < status_list.n_list; a++) {
+		free(status_list.list[a]->status);
 		free(status_list.list[a]->id);
 		free(status_list.list[a]);
 	}
