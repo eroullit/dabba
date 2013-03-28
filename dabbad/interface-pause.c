@@ -64,17 +64,21 @@ static void __interface_pause_get(struct nl_object *obj, void *arg)
 
 	dabba__interface_pause__init(pausep);
 
-	pausep->id = malloc(sizeof(*pausep));
+	pausep->id = malloc(sizeof(*pausep->id));
+	pausep->status = malloc(sizeof(*pausep->status));
 
-	if (!pausep->id) {
+	if (!pausep->id || !pausep->status) {
+		free(pausep->id);
+		free(pausep->status);
 		free(pausep);
 		return;
 	}
 
 	dabba__interface_id__init(pausep->id);
+	dabba__error_code__init(pausep->status);
 
 	pausep->id->name = rtnl_link_get_name(link);
-	dev_pause_get(pausep->id->name, &pause);
+	pausep->status->code = dev_pause_get(pausep->id->name, &pause);
 
 	pausep->has_autoneg = pausep->has_rx_pause = pausep->has_tx_pause = 1;
 	pausep->autoneg = pause.autoneg;
@@ -131,16 +135,18 @@ void dabbad_interface_pause_get(Dabba__DabbaService_Service * service,
 
 void dabbad_interface_pause_modify(Dabba__DabbaService_Service * service,
 				   const Dabba__InterfacePause * pause,
-				   Dabba__Dummy_Closure
+				   Dabba__ErrorCode_Closure
 				   closure, void *closure_data)
 {
-	const Dabba__Dummy dummy = DABBA__DUMMY__INIT;
 	struct ethtool_pauseparam p;
+	int rc;
 
 	assert(service);
 	assert(closure_data);
 
-	if (dev_pause_get(pause->id->name, &p))
+	rc = dev_pause_get(pause->id->name, &p);
+
+	if (rc)
 		goto out;
 
 	if (pause->has_rx_pause)
@@ -152,8 +158,9 @@ void dabbad_interface_pause_modify(Dabba__DabbaService_Service * service,
 	if (pause->has_autoneg)
 		p.rx_pause = pause->has_autoneg;
 
-	dev_pause_set(pause->id->name, &p);
+	rc = dev_pause_set(pause->id->name, &p);
 
  out:
-	closure(&dummy, closure_data);
+	pause->status->code = rc;
+	closure(pause->status, closure_data);
 }
