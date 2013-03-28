@@ -64,7 +64,7 @@ static void __interface_statistics_get(struct nl_object *obj, void *arg)
 
 	dabba__interface_statistics__init(statisticsp);
 
-	statisticsp->id = malloc(sizeof(*statisticsp));
+	statisticsp->id = malloc(sizeof(*statisticsp->id));
 
 	if (!statisticsp->id) {
 		free(statisticsp);

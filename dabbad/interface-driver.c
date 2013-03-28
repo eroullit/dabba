@@ -63,7 +63,7 @@ static void __interface_driver_get(struct nl_object *obj, void *arg)
 
 	dabba__interface_driver__init(driverp);
 
-	driverp->id = malloc(sizeof(*driverp));
+	driverp->id = malloc(sizeof(*driverp->id));
 
 	if (!driverp->id) {
 		free(driverp);

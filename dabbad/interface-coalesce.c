@@ -65,7 +65,7 @@ static void __interface_coalesce_get(struct nl_object *obj, void *arg)
 
 	dabba__interface_coalesce__init(coalescep);
 
-	coalescep->id = malloc(sizeof(*coalescep));
+	coalescep->id = malloc(sizeof(*coalescep->id));
 
 	if (!coalescep->id) {
 		free(coalescep);

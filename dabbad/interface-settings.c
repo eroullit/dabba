@@ -65,7 +65,7 @@ static void __interface_settings_get(struct nl_object *obj, void *arg)
 
 	dabba__interface_settings__init(settingsp);
 
-	settingsp->id = malloc(sizeof(*settingsp));
+	settingsp->id = malloc(sizeof(*settingsp->id));
 
 	if (!settingsp->id) {
 		free(settingsp);

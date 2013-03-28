@@ -62,7 +62,7 @@ static void __interface_offload_get(struct nl_object *obj, void *arg)
 
 	dabba__interface_offload__init(offloadp);
 
-	offloadp->id = malloc(sizeof(*offloadp));
+	offloadp->id = malloc(sizeof(*offloadp->id));
 
 	if (!offloadp->id) {
 		free(offloadp);

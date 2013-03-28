@@ -65,7 +65,7 @@ static void __interface_capabilities_get(struct nl_object *obj, void *arg)
 
 	dabba__interface_capabilities__init(capabilitiesp);
 
-	capabilitiesp->id = malloc(sizeof(*capabilitiesp));
+	capabilitiesp->id = malloc(sizeof(*capabilitiesp->id));
 	capabilitiesp->supported_opt =
 	    malloc(sizeof(*capabilitiesp->supported_opt));
 	capabilitiesp->supported_speed =
@@ -331,22 +331,22 @@ void dabbad_interface_capabilities_get(Dabba__DabbaService_Service * service,
 		free(capabilities_list.list[a]->supported_speed->ethernet);
 		free(capabilities_list.list[a]->supported_speed->fast_ethernet);
 		free(capabilities_list.list[a]->supported_speed->gbps_ethernet);
-		free(capabilities_list.list[a]->
-		     supported_speed->_10gbps_ethernet);
+		free(capabilities_list.list[a]->supported_speed->
+		     _10gbps_ethernet);
 		free(capabilities_list.list[a]->advertising_speed->ethernet);
-		free(capabilities_list.list[a]->
-		     advertising_speed->fast_ethernet);
-		free(capabilities_list.list[a]->
-		     advertising_speed->gbps_ethernet);
-		free(capabilities_list.list[a]->
-		     advertising_speed->_10gbps_ethernet);
+		free(capabilities_list.list[a]->advertising_speed->
+		     fast_ethernet);
+		free(capabilities_list.list[a]->advertising_speed->
+		     gbps_ethernet);
+		free(capabilities_list.list[a]->advertising_speed->
+		     _10gbps_ethernet);
 		free(capabilities_list.list[a]->lp_advertising_speed->ethernet);
-		free(capabilities_list.list[a]->
-		     lp_advertising_speed->fast_ethernet);
-		free(capabilities_list.list[a]->
-		     lp_advertising_speed->gbps_ethernet);
-		free(capabilities_list.list[a]->
-		     lp_advertising_speed->_10gbps_ethernet);
+		free(capabilities_list.list[a]->lp_advertising_speed->
+		     fast_ethernet);
+		free(capabilities_list.list[a]->lp_advertising_speed->
+		     gbps_ethernet);
+		free(capabilities_list.list[a]->lp_advertising_speed->
+		     _10gbps_ethernet);
 		free(capabilities_list.list[a]->supported_opt);
 		free(capabilities_list.list[a]->supported_speed);
 		free(capabilities_list.list[a]->advertising_opt);
