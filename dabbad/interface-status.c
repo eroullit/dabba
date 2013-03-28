@@ -146,7 +146,6 @@ void dabbad_interface_status_modify(Dabba__DabbaService_Service * service,
 				    Dabba__ErrorCode_Closure closure,
 				    void *closure_data)
 {
-	Dabba__ErrorCode err = DABBA__ERROR_CODE__INIT;
 	struct nl_sock *sock = NULL;
 	struct nl_cache *cache;
 	struct rtnl_link *link, *change;
@@ -187,8 +186,8 @@ void dabbad_interface_status_modify(Dabba__DabbaService_Service * service,
 	rc = rtnl_link_change(sock, link, change, 0);
 	rtnl_link_put(link);
  out:
-	err.code = rc;
-	closure(&err, closure_data);
+	statusp->status->code = rc;
+	closure(statusp->status, closure_data);
 	nl_object_free(OBJ_CAST(change));
 	link_cache_destroy(sock, cache);
 }
