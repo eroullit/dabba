@@ -75,15 +75,16 @@ message interface_offload_list
 
 message interface_settings
 {
-    required interface_id id = 1;
-    optional uint32 speed = 2;
-    optional bool duplex = 3;
-    optional bool autoneg = 4;
-    optional uint32 mtu = 5;
-    optional uint32 tx_qlen = 6;
-    optional uint32 port = 7;
-    optional uint32 maxrxpkt = 8;
-    optional uint32 maxtxpkt = 9;
+    required error_code status = 1;
+    required interface_id id = 2;
+    optional uint32 speed = 3;
+    optional bool duplex = 4;
+    optional bool autoneg = 5;
+    optional uint32 mtu = 6;
+    optional uint32 tx_qlen = 7;
+    optional uint32 port = 8;
+    optional uint32 maxrxpkt = 9;
+    optional uint32 maxtxpkt = 10;
 }
 
 message interface_settings_list
