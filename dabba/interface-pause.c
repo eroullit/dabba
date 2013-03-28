@@ -131,7 +131,7 @@ int cmd_interface_pause_modify(int argc, const char **argv)
 	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
 	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 	ProtobufCService *service;
-	Dabba__InterfacePause status = DABBA__INTERFACE_PAUSE__INIT;
+	Dabba__InterfacePause pause = DABBA__INTERFACE_PAUSE__INIT;
 	Dabba__ErrorCode err = DABBA__ERROR_CODE__INIT;
 
 	/* HACK: getopt*() start to parse options at argv[1] */
@@ -157,38 +157,38 @@ int cmd_interface_pause_modify(int argc, const char **argv)
 				server_id = optarg;
 			break;
 		case OPT_INTERFACE_ID:
-			status.id = malloc(sizeof(*status.id));
+			pause.id = malloc(sizeof(*pause.id));
 
-			if (!status.id)
+			if (!pause.id)
 				return ENOMEM;
 
-			dabba__interface_id__init(status.id);
-			status.id->name = optarg;
+			dabba__interface_id__init(pause.id);
+			pause.id->name = optarg;
 			break;
 
 		case OPT_INTERFACE_RX_PAUSE:
-			rc = str2bool(optarg, &status.rx_pause);
+			rc = str2bool(optarg, &pause.rx_pause);
 
 			if (rc)
 				goto out;
 
-			status.has_rx_pause = 1;
+			pause.has_rx_pause = 1;
 			break;
 		case OPT_INTERFACE_TX_PAUSE:
-			rc = str2bool(optarg, &status.tx_pause);
+			rc = str2bool(optarg, &pause.tx_pause);
 
 			if (rc)
 				goto out;
 
-			status.has_tx_pause = 1;
+			pause.has_tx_pause = 1;
 			break;
 		case OPT_INTERFACE_AUTONEG:
-			rc = str2bool(optarg, &status.autoneg);
+			rc = str2bool(optarg, &pause.autoneg);
 
 			if (rc)
 				goto out;
 
-			status.has_autoneg = 1;
+			pause.has_autoneg = 1;
 			break;
 		case OPT_HELP:
 		default:
@@ -198,15 +198,15 @@ int cmd_interface_pause_modify(int argc, const char **argv)
 		}
 	}
 
-	status.status = &err;
+	pause.status = &err;
 
 	service = dabba_rpc_client_connect(server_id, server_type);
 
 	if (service)
-		rc = rpc_interface_pause_modify(service, &status);
+		rc = rpc_interface_pause_modify(service, &pause);
 	else
 		rc = EINVAL;
  out:
-	free(status.id);
+	free(pause.id);
 	return rc;
 }
