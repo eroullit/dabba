@@ -66,6 +66,7 @@ static void __interface_capabilities_get(struct nl_object *obj, void *arg)
 	dabba__interface_capabilities__init(capabilitiesp);
 
 	capabilitiesp->id = malloc(sizeof(*capabilitiesp->id));
+	capabilitiesp->status = malloc(sizeof(*capabilitiesp->status));
 	capabilitiesp->supported_opt =
 	    malloc(sizeof(*capabilitiesp->supported_opt));
 	capabilitiesp->supported_speed =
@@ -79,13 +80,14 @@ static void __interface_capabilities_get(struct nl_object *obj, void *arg)
 	capabilitiesp->lp_advertising_speed =
 	    malloc(sizeof(*capabilitiesp->lp_advertising_speed));
 
-	if (!capabilitiesp->id || !capabilitiesp->supported_opt
-	    || !capabilitiesp->supported_speed
+	if (!capabilitiesp->id || !capabilitiesp->id
+	    || !capabilitiesp->supported_opt || !capabilitiesp->supported_speed
 	    || !capabilitiesp->advertising_opt
 	    || !capabilitiesp->advertising_speed
 	    || !capabilitiesp->lp_advertising_opt
 	    || !capabilitiesp->lp_advertising_speed) {
 		free(capabilitiesp->id);
+		free(capabilitiesp->status);
 		free(capabilitiesp->supported_opt);
 		free(capabilitiesp->supported_speed);
 		free(capabilitiesp->advertising_opt);
@@ -97,6 +99,7 @@ static void __interface_capabilities_get(struct nl_object *obj, void *arg)
 	}
 
 	dabba__interface_id__init(capabilitiesp->id);
+	dabba__error_code__init(capabilitiesp->status);
 	dabba__interface_speed_capabilites__init
 	    (capabilitiesp->supported_speed);
 	dabba__interface_option_capabilites__init(capabilitiesp->supported_opt);
@@ -160,6 +163,7 @@ static void __interface_capabilities_get(struct nl_object *obj, void *arg)
 		free(capabilitiesp->lp_advertising_speed->gbps_ethernet);
 		free(capabilitiesp->lp_advertising_speed->_10gbps_ethernet);
 		free(capabilitiesp->id);
+		free(capabilitiesp->status);
 		free(capabilitiesp->supported_opt);
 		free(capabilitiesp->supported_speed);
 		free(capabilitiesp->advertising_opt);
@@ -195,7 +199,8 @@ static void __interface_capabilities_get(struct nl_object *obj, void *arg)
 	    (capabilitiesp->lp_advertising_speed->_10gbps_ethernet);
 
 	capabilitiesp->id->name = rtnl_link_get_name(link);
-	dev_settings_get(capabilitiesp->id->name, &capabilities);
+	capabilitiesp->status->code =
+	    dev_settings_get(capabilitiesp->id->name, &capabilities);
 
 	capabilitiesp->has_aui = capabilitiesp->has_bnc =
 	    capabilitiesp->has_fibre = capabilitiesp->has_mii =
@@ -331,28 +336,29 @@ void dabbad_interface_capabilities_get(Dabba__DabbaService_Service * service,
 		free(capabilities_list.list[a]->supported_speed->ethernet);
 		free(capabilities_list.list[a]->supported_speed->fast_ethernet);
 		free(capabilities_list.list[a]->supported_speed->gbps_ethernet);
-		free(capabilities_list.list[a]->supported_speed->
-		     _10gbps_ethernet);
+		free(capabilities_list.list[a]->
+		     supported_speed->_10gbps_ethernet);
 		free(capabilities_list.list[a]->advertising_speed->ethernet);
-		free(capabilities_list.list[a]->advertising_speed->
-		     fast_ethernet);
-		free(capabilities_list.list[a]->advertising_speed->
-		     gbps_ethernet);
-		free(capabilities_list.list[a]->advertising_speed->
-		     _10gbps_ethernet);
+		free(capabilities_list.list[a]->
+		     advertising_speed->fast_ethernet);
+		free(capabilities_list.list[a]->
+		     advertising_speed->gbps_ethernet);
+		free(capabilities_list.list[a]->
+		     advertising_speed->_10gbps_ethernet);
 		free(capabilities_list.list[a]->lp_advertising_speed->ethernet);
-		free(capabilities_list.list[a]->lp_advertising_speed->
-		     fast_ethernet);
-		free(capabilities_list.list[a]->lp_advertising_speed->
-		     gbps_ethernet);
-		free(capabilities_list.list[a]->lp_advertising_speed->
-		     _10gbps_ethernet);
+		free(capabilities_list.list[a]->
+		     lp_advertising_speed->fast_ethernet);
+		free(capabilities_list.list[a]->
+		     lp_advertising_speed->gbps_ethernet);
+		free(capabilities_list.list[a]->
+		     lp_advertising_speed->_10gbps_ethernet);
 		free(capabilities_list.list[a]->supported_opt);
 		free(capabilities_list.list[a]->supported_speed);
 		free(capabilities_list.list[a]->advertising_opt);
 		free(capabilities_list.list[a]->advertising_speed);
 		free(capabilities_list.list[a]->lp_advertising_opt);
 		free(capabilities_list.list[a]->lp_advertising_speed);
+		free(capabilities_list.list[a]->status);
 		free(capabilities_list.list[a]->id);
 		free(capabilities_list.list[a]);
 	}
@@ -473,15 +479,14 @@ static void interface_speed_option_set(uint32_t * const adv_speed,
 void dabbad_interface_capabilities_modify(Dabba__DabbaService_Service * service,
 					  const Dabba__InterfaceCapabilities *
 					  capabilitiesp,
-					  Dabba__Dummy_Closure closure,
+					  Dabba__ErrorCode_Closure closure,
 					  void *closure_data)
 {
-	Dabba__Dummy dummy = DABBA__DUMMY__INIT;
 	struct nl_sock *sock = NULL;
 	struct nl_cache *cache;
 	struct rtnl_link *link, *change;
 	struct ethtool_cmd eth_set;
-	int apply = 0;
+	int apply = 0, rc = 0;
 
 	assert(service);
 	assert(closure_data);
@@ -497,7 +502,10 @@ void dabbad_interface_capabilities_modify(Dabba__DabbaService_Service * service,
 	if (!link)
 		goto out;
 
-	dev_settings_get(capabilitiesp->id->name, &eth_set);
+	rc = dev_settings_get(capabilitiesp->id->name, &eth_set);
+
+	if (rc)
+		goto out;
 
 	if (capabilitiesp->has_aui) {
 		if (capabilitiesp->aui)
@@ -555,12 +563,13 @@ void dabbad_interface_capabilities_modify(Dabba__DabbaService_Service * service,
 						 &apply);
 
 	if (apply)
-		dev_settings_set(capabilitiesp->id->name, &eth_set);
+		rc = dev_settings_set(capabilitiesp->id->name, &eth_set);
 
 	rtnl_link_change(sock, link, change, 0);
 	rtnl_link_put(link);
  out:
-	closure(&dummy, closure_data);
+	capabilitiesp->status->code = rc;
+	closure(capabilitiesp->status, closure_data);
 	nl_object_free(OBJ_CAST(change));
 	link_cache_destroy(sock, cache);
 }
