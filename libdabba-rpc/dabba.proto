@@ -148,7 +148,8 @@ message interface_speed_capabilites
 
 message interface_capabilities
 {
-    required interface_id id = 1;
+    required error_code status = 1;
+    required interface_id id = 2;
     optional bool tp = 3;
     optional bool aui = 4;
     optional bool mii = 5;
