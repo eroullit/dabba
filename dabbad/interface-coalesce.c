@@ -66,15 +66,21 @@ static void __interface_coalesce_get(struct nl_object *obj, void *arg)
 	dabba__interface_coalesce__init(coalescep);
 
 	coalescep->id = malloc(sizeof(*coalescep->id));
+	coalescep->status = malloc(sizeof(*coalescep->status));
 
-	if (!coalescep->id) {
+	if (!coalescep->id || !coalescep->status) {
+		free(coalescep->status);
+		free(coalescep->id);
 		free(coalescep);
 		return;
 	}
 
 	dabba__interface_id__init(coalescep->id);
+	dabba__error_code__init(coalescep->status);
+
 	coalescep->id->name = rtnl_link_get_name(link);
-	dev_coalesce_get(coalescep->id->name, &coalesce);
+	coalescep->status->code =
+	    dev_coalesce_get(coalescep->id->name, &coalesce);
 
 	coalescep->has_pkt_rate_high = coalescep->has_pkt_rate_low =
 	    coalescep->has_rate_sample_interval =
@@ -169,6 +175,7 @@ void dabbad_interface_coalesce_get(Dabba__DabbaService_Service * service,
  out:
 	closure(coalesce_listp, closure_data);
 	for (a = 0; a < coalesce_list.n_list; a++) {
+		free(coalesce_list.list[a]->status);
 		free(coalesce_list.list[a]->id);
 		free(coalesce_list.list[a]);
 	}
@@ -179,17 +186,20 @@ void dabbad_interface_coalesce_get(Dabba__DabbaService_Service * service,
 
 void dabbad_interface_coalesce_modify(Dabba__DabbaService_Service * service,
 				      const Dabba__InterfaceCoalesce *
-				      coalescep, Dabba__Dummy_Closure closure,
+				      coalescep,
+				      Dabba__ErrorCode_Closure closure,
 				      void *closure_data)
 {
-	Dabba__Dummy dummy = DABBA__DUMMY__INIT;
 	struct ethtool_coalesce eth_coalesce;
-	int apply = 0;
+	int apply = 0, rc;
 
 	assert(service);
 	assert(closure_data);
 
-	dev_coalesce_get(coalescep->id->name, &eth_coalesce);
+	rc = dev_coalesce_get(coalescep->id->name, &eth_coalesce);
+
+	if (rc)
+		goto out;
 
 	if (coalescep->has_pkt_rate_high) {
 		eth_coalesce.pkt_rate_high = coalescep->pkt_rate_high;
@@ -325,7 +335,9 @@ void dabbad_interface_coalesce_modify(Dabba__DabbaService_Service * service,
 	}
 
 	if (apply)
-		dev_coalesce_set(coalescep->id->name, &eth_coalesce);
+		rc = dev_coalesce_set(coalescep->id->name, &eth_coalesce);
 
-	closure(&dummy, closure_data);
+ out:
+	coalescep->status->code = rc;
+	closure(coalescep->status, closure_data);
 }
