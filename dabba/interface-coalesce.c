@@ -57,6 +57,8 @@ static void interface_coalesce_list_print(const Dabba__InterfaceCoalesceList *
 
 	for (a = 0; result && a < result->n_list; a++) {
 		coalescep = result->list[a];
+		printf("    ");
+		__rpc_error_code_print(coalescep->status->code);
 		printf("    - name: %s\n", coalescep->id->name);
 		printf("      coalesce:\n");
 		printf("        packet rate high: %u\n",
@@ -128,7 +130,7 @@ int rpc_interface_coalesce_modify(ProtobufCService * service,
 	assert(coalescep);
 
 	dabba__dabba_service__interface_coalesce_modify(service, coalescep,
-							rpc_dummy_print,
+							rpc_error_code_print,
 							&is_done);
 
 	dabba_rpc_call_is_done(&is_done);
@@ -204,6 +206,7 @@ int cmd_interface_coalesce_modify(int argc, const char **argv)
 	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 	ProtobufCService *service;
 	Dabba__InterfaceCoalesce coalesce = DABBA__INTERFACE_COALESCE__INIT;
+	Dabba__ErrorCode err = DABBA__ERROR_CODE__INIT;
 
 	/* HACK: getopt*() start to parse options at argv[1] */
 	argc++;
@@ -352,6 +355,8 @@ int cmd_interface_coalesce_modify(int argc, const char **argv)
 			goto out;
 		}
 	}
+
+	coalesce.status = &err;
 
 	service = dabba_rpc_client_connect(server_id, server_type);
 
