@@ -94,29 +94,30 @@ message interface_settings_list
 
 message interface_coalesce
 {
-    required interface_id id = 1;
-    optional uint32 pkt_rate_high = 2;
-    optional uint32 pkt_rate_low = 3;
-    optional uint32 rate_sample_interval = 4;
-    optional uint32 stats_block_coalesce_usecs = 5;
-    optional bool use_adaptive_rx_coalesce = 6;
-    optional uint32 rx_coalesce_usecs = 7;
-    optional uint32 rx_coalesce_usecs_irq = 8;
-    optional uint32 rx_coalesce_usecs_high = 9;
-    optional uint32 rx_coalesce_usecs_low = 10;
-    optional uint32 rx_max_coalesced_frames = 11;
-    optional uint32 rx_max_coalesced_frames_irq = 12;
-    optional uint32 rx_max_coalesced_frames_high = 13;
-    optional uint32 rx_max_coalesced_frames_low = 14;
-    optional bool use_adaptive_tx_coalesce = 15;
-    optional uint32 tx_coalesce_usecs = 16;
-    optional uint32 tx_coalesce_usecs_irq = 17;
-    optional uint32 tx_coalesce_usecs_high = 18;
-    optional uint32 tx_coalesce_usecs_low = 19;
-    optional uint32 tx_max_coalesced_frames = 20;
-    optional uint32 tx_max_coalesced_frames_irq = 21;
-    optional uint32 tx_max_coalesced_frames_high = 22;
-    optional uint32 tx_max_coalesced_frames_low = 23;
+    required error_code status = 1;
+    required interface_id id = 2;
+    optional uint32 pkt_rate_high = 3;
+    optional uint32 pkt_rate_low = 4;
+    optional uint32 rate_sample_interval = 5;
+    optional uint32 stats_block_coalesce_usecs = 6;
+    optional bool use_adaptive_rx_coalesce = 7;
+    optional uint32 rx_coalesce_usecs = 8;
+    optional uint32 rx_coalesce_usecs_irq = 9;
+    optional uint32 rx_coalesce_usecs_high = 10;
+    optional uint32 rx_coalesce_usecs_low = 11;
+    optional uint32 rx_max_coalesced_frames = 12;
+    optional uint32 rx_max_coalesced_frames_irq = 13;
+    optional uint32 rx_max_coalesced_frames_high = 14;
+    optional uint32 rx_max_coalesced_frames_low = 15;
+    optional bool use_adaptive_tx_coalesce = 16;
+    optional uint32 tx_coalesce_usecs = 17;
+    optional uint32 tx_coalesce_usecs_irq = 18;
+    optional uint32 tx_coalesce_usecs_high = 19;
+    optional uint32 tx_coalesce_usecs_low = 20;
+    optional uint32 tx_max_coalesced_frames = 21;
+    optional uint32 tx_max_coalesced_frames_irq = 22;
+    optional uint32 tx_max_coalesced_frames_high = 23;
+    optional uint32 tx_max_coalesced_frames_low = 24;
 }
 
 message interface_coalesce_list
