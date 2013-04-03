@@ -218,10 +218,12 @@ void dabbad_interface_settings_modify(Dabba__DabbaService_Service * service,
 		}
 	}
 
-	if (apply)
-		dev_settings_set(settingsp->id->name, &eth_set);
+	if (apply) {
+		/* FIXME find a way to report error separately */
+		rc = dev_settings_set(settingsp->id->name, &eth_set);
+		rc = rtnl_link_change(sock, link, change, 0);
+	}
 
-	rc = rtnl_link_change(sock, link, change, 0);
 	rtnl_link_put(link);
  out:
 	settingsp->status->code = rc;
