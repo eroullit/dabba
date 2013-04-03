@@ -336,22 +336,22 @@ void dabbad_interface_capabilities_get(Dabba__DabbaService_Service * service,
 		free(capabilities_list.list[a]->supported_speed->ethernet);
 		free(capabilities_list.list[a]->supported_speed->fast_ethernet);
 		free(capabilities_list.list[a]->supported_speed->gbps_ethernet);
-		free(capabilities_list.list[a]->
-		     supported_speed->_10gbps_ethernet);
+		free(capabilities_list.list[a]->supported_speed->
+		     _10gbps_ethernet);
 		free(capabilities_list.list[a]->advertising_speed->ethernet);
-		free(capabilities_list.list[a]->
-		     advertising_speed->fast_ethernet);
-		free(capabilities_list.list[a]->
-		     advertising_speed->gbps_ethernet);
-		free(capabilities_list.list[a]->
-		     advertising_speed->_10gbps_ethernet);
+		free(capabilities_list.list[a]->advertising_speed->
+		     fast_ethernet);
+		free(capabilities_list.list[a]->advertising_speed->
+		     gbps_ethernet);
+		free(capabilities_list.list[a]->advertising_speed->
+		     _10gbps_ethernet);
 		free(capabilities_list.list[a]->lp_advertising_speed->ethernet);
-		free(capabilities_list.list[a]->
-		     lp_advertising_speed->fast_ethernet);
-		free(capabilities_list.list[a]->
-		     lp_advertising_speed->gbps_ethernet);
-		free(capabilities_list.list[a]->
-		     lp_advertising_speed->_10gbps_ethernet);
+		free(capabilities_list.list[a]->lp_advertising_speed->
+		     fast_ethernet);
+		free(capabilities_list.list[a]->lp_advertising_speed->
+		     gbps_ethernet);
+		free(capabilities_list.list[a]->lp_advertising_speed->
+		     _10gbps_ethernet);
 		free(capabilities_list.list[a]->supported_opt);
 		free(capabilities_list.list[a]->supported_speed);
 		free(capabilities_list.list[a]->advertising_opt);
@@ -363,7 +363,7 @@ void dabbad_interface_capabilities_get(Dabba__DabbaService_Service * service,
 		free(capabilities_list.list[a]);
 	}
 	free(capabilities_list.list);
-	nl_object_free(OBJ_CAST(link));
+	link_destroy(link);
 	link_cache_destroy(sock, cache);
 }
 
@@ -570,6 +570,6 @@ void dabbad_interface_capabilities_modify(Dabba__DabbaService_Service * service,
  out:
 	capabilitiesp->status->code = rc;
 	closure(capabilitiesp->status, closure_data);
-	nl_object_free(OBJ_CAST(change));
+	link_destroy(change);
 	link_cache_destroy(sock, cache);
 }

@@ -140,7 +140,7 @@ void dabbad_interface_settings_get(Dabba__DabbaService_Service * service,
 		free(pause_list.list[a]);
 	}
 	free(pause_list.list);
-	nl_object_free(OBJ_CAST(link));
+	link_destroy(link);
 	link_cache_destroy(sock, cache);
 }
 
@@ -224,6 +224,6 @@ void dabbad_interface_settings_modify(Dabba__DabbaService_Service * service,
  out:
 	settingsp->status->code = rc;
 	closure(settingsp->status, closure_data);
-	nl_object_free(OBJ_CAST(change));
+	link_destroy(change);
 	link_cache_destroy(sock, cache);
 }

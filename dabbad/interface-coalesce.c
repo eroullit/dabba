@@ -180,7 +180,7 @@ void dabbad_interface_coalesce_get(Dabba__DabbaService_Service * service,
 		free(coalesce_list.list[a]);
 	}
 	free(coalesce_list.list);
-	nl_object_free(OBJ_CAST(link));
+	link_destroy(link);
 	link_cache_destroy(sock, cache);
 }
 

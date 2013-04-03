@@ -61,3 +61,9 @@ void link_cache_destroy(struct nl_sock *sock, struct nl_cache *cache)
 	nl_cache_free(cache);
 	nl_socket_free(sock);
 }
+
+void link_destroy(struct rtnl_link *link)
+{
+	if (link)
+		nl_object_free(OBJ_CAST(link));
+}

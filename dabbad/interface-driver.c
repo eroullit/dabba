@@ -130,6 +130,6 @@ void dabbad_interface_driver_get(Dabba__DabbaService_Service * service,
 		free(driver_list.list[a]);
 	}
 	free(driver_list.list);
-	nl_object_free(OBJ_CAST(link));
+	link_destroy(link);
 	link_cache_destroy(sock, cache);
 }

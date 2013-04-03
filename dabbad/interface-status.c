@@ -137,7 +137,7 @@ void dabbad_interface_status_get(Dabba__DabbaService_Service * service,
 		free(status_list.list[a]);
 	}
 	free(status_list.list);
-	nl_object_free(OBJ_CAST(link));
+	link_destroy(link);
 	link_cache_destroy(sock, cache);
 }
 
@@ -188,6 +188,6 @@ void dabbad_interface_status_modify(Dabba__DabbaService_Service * service,
  out:
 	statusp->status->code = rc;
 	closure(statusp->status, closure_data);
-	nl_object_free(OBJ_CAST(change));
+	link_destroy(change);
 	link_cache_destroy(sock, cache);
 }
