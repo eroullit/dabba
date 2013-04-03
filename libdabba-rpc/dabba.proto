@@ -28,11 +28,12 @@ message interface_status_list
 
 message interface_driver
 {
-    required interface_id id = 1;
-    optional string name = 2;
-    optional string version = 3;
-    optional string fw_version = 4;
-    optional string bus_info = 5;
+    required error_code status = 1;
+    required interface_id id = 2;
+    optional string name = 3;
+    optional string version = 4;
+    optional string fw_version = 5;
+    optional string bus_info = 6;
 }
 
 message interface_driver_list
