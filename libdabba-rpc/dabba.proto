@@ -171,28 +171,29 @@ message interface_capabilities_list
 
 message interface_statistics
 {
-    required interface_id id = 1;
-    required uint64 rx_byte = 2;
-    required uint64 rx_packet = 3;
-    required uint64 rx_error = 4;
-    required uint64 rx_dropped = 5;
-    required uint64 rx_compressed = 6;
-    required uint64 tx_byte = 7;
-    required uint64 tx_packet = 8;
-    required uint64 tx_error = 9;
-    required uint64 tx_dropped = 10;
-    required uint64 tx_compressed = 11;
-    required uint64 rx_error_fifo = 12;
-    required uint64 rx_error_frame = 13;
-    required uint64 rx_error_crc = 14;
-    required uint64 rx_error_length = 15;
-    required uint64 rx_error_missed = 16;
-    required uint64 rx_error_over = 17;
-    required uint64 tx_error_fifo = 18;
-    required uint64 tx_error_carrier = 19;
-    required uint64 tx_error_heartbeat = 20;
-    required uint64 tx_error_window = 21;
-    required uint64 tx_error_aborted = 22;
+    required error_code status = 1;
+    required interface_id id = 2;
+    required uint64 rx_byte = 3;
+    required uint64 rx_packet = 4;
+    required uint64 rx_error = 5;
+    required uint64 rx_dropped = 6;
+    required uint64 rx_compressed = 7;
+    required uint64 tx_byte = 8;
+    required uint64 tx_packet = 9;
+    required uint64 tx_error = 10;
+    required uint64 tx_dropped = 11;
+    required uint64 tx_compressed = 12;
+    required uint64 rx_error_fifo = 13;
+    required uint64 rx_error_frame = 14;
+    required uint64 rx_error_crc = 15;
+    required uint64 rx_error_length = 16;
+    required uint64 rx_error_missed = 17;
+    required uint64 rx_error_over = 18;
+    required uint64 tx_error_fifo = 19;
+    required uint64 tx_error_carrier = 20;
+    required uint64 tx_error_heartbeat = 21;
+    required uint64 tx_error_window = 22;
+    required uint64 tx_error_aborted = 23;
 }
 
 message interface_statistics_list
