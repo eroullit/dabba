@@ -64,17 +64,21 @@ static void __interface_driver_get(struct nl_object *obj, void *arg)
 	dabba__interface_driver__init(driverp);
 
 	driverp->id = malloc(sizeof(*driverp->id));
+	driverp->status = malloc(sizeof(*driverp->status));
 
-	if (!driverp->id) {
+	if (!driverp->id || !driverp->status) {
+		free(driverp->id);
+		free(driverp->status);
 		free(driverp);
 		return;
 	}
 
 	dabba__interface_id__init(driverp->id);
+	dabba__error_code__init(driverp->status);
 
 	driverp->id->name = rtnl_link_get_name(link);
 
-	dev_driver_get(driverp->id->name, &drvinfo);
+	driverp->status->code = dev_driver_get(driverp->id->name, &drvinfo);
 
 	driverp->name = strndup(drvinfo.driver, sizeof(drvinfo.driver));
 	driverp->version = strndup(drvinfo.version, sizeof(drvinfo.version));
@@ -123,6 +127,7 @@ void dabbad_interface_driver_get(Dabba__DabbaService_Service * service,
 	closure(driver_listp, closure_data);
 	for (a = 0; a < driver_list.n_list; a++) {
 		free(driver_list.list[a]->id);
+		free(driver_list.list[a]->status);
 		free(driver_list.list[a]->name);
 		free(driver_list.list[a]->version);
 		free(driver_list.list[a]->fw_version);
