@@ -336,22 +336,22 @@ void dabbad_interface_capabilities_get(Dabba__DabbaService_Service * service,
 		free(capabilities_list.list[a]->supported_speed->ethernet);
 		free(capabilities_list.list[a]->supported_speed->fast_ethernet);
 		free(capabilities_list.list[a]->supported_speed->gbps_ethernet);
-		free(capabilities_list.list[a]->supported_speed->
-		     _10gbps_ethernet);
+		free(capabilities_list.list[a]->
+		     supported_speed->_10gbps_ethernet);
 		free(capabilities_list.list[a]->advertising_speed->ethernet);
-		free(capabilities_list.list[a]->advertising_speed->
-		     fast_ethernet);
-		free(capabilities_list.list[a]->advertising_speed->
-		     gbps_ethernet);
-		free(capabilities_list.list[a]->advertising_speed->
-		     _10gbps_ethernet);
+		free(capabilities_list.list[a]->
+		     advertising_speed->fast_ethernet);
+		free(capabilities_list.list[a]->
+		     advertising_speed->gbps_ethernet);
+		free(capabilities_list.list[a]->
+		     advertising_speed->_10gbps_ethernet);
 		free(capabilities_list.list[a]->lp_advertising_speed->ethernet);
-		free(capabilities_list.list[a]->lp_advertising_speed->
-		     fast_ethernet);
-		free(capabilities_list.list[a]->lp_advertising_speed->
-		     gbps_ethernet);
-		free(capabilities_list.list[a]->lp_advertising_speed->
-		     _10gbps_ethernet);
+		free(capabilities_list.list[a]->
+		     lp_advertising_speed->fast_ethernet);
+		free(capabilities_list.list[a]->
+		     lp_advertising_speed->gbps_ethernet);
+		free(capabilities_list.list[a]->
+		     lp_advertising_speed->_10gbps_ethernet);
 		free(capabilities_list.list[a]->supported_opt);
 		free(capabilities_list.list[a]->supported_speed);
 		free(capabilities_list.list[a]->advertising_opt);
@@ -486,7 +486,7 @@ void dabbad_interface_capabilities_modify(Dabba__DabbaService_Service * service,
 	struct nl_cache *cache;
 	struct rtnl_link *link, *change;
 	struct ethtool_cmd eth_set;
-	int apply = 0, rc = 0;
+	int apply = 0, rc;
 
 	assert(service);
 	assert(closure_data);
@@ -494,13 +494,17 @@ void dabbad_interface_capabilities_modify(Dabba__DabbaService_Service * service,
 	cache = link_cache_alloc(&sock);
 	change = rtnl_link_alloc();
 
-	if (!cache || !change)
+	if (!cache || !change) {
+		rc = ENOMEM;
 		goto out;
+	}
 
 	link = rtnl_link_get_by_name(cache, capabilitiesp->id->name);
 
-	if (!link)
+	if (!link) {
+		rc = ENODEV;
 		goto out;
+	}
 
 	rc = dev_settings_get(capabilitiesp->id->name, &eth_set);
 
