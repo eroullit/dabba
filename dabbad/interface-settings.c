@@ -176,44 +176,46 @@ void dabbad_interface_settings_modify(Dabba__DabbaService_Service * service,
 
 	rc = dev_settings_get(settingsp->id->name, &eth_set);
 
-	if (settingsp->has_speed) {
-		ethtool_cmd_speed_set(&eth_set, settingsp->speed);
-		apply = 1;
-	}
+	if (!rc) {
+		if (settingsp->has_speed) {
+			ethtool_cmd_speed_set(&eth_set, settingsp->speed);
+			apply = 1;
+		}
 
-	if (settingsp->has_duplex) {
-		eth_set.duplex = settingsp->duplex;
-		apply = 1;
-	}
+		if (settingsp->has_duplex) {
+			eth_set.duplex = settingsp->duplex;
+			apply = 1;
+		}
 
-	if (settingsp->has_autoneg) {
-		eth_set.autoneg = settingsp->autoneg;
-		apply = 1;
-	}
+		if (settingsp->has_autoneg) {
+			eth_set.autoneg = settingsp->autoneg;
+			apply = 1;
+		}
 
-	if (settingsp->has_port) {
-		eth_set.port = settingsp->port;
-		apply = 1;
-	}
+		if (settingsp->has_port) {
+			eth_set.port = settingsp->port;
+			apply = 1;
+		}
 
-	if (settingsp->has_maxrxpkt) {
-		eth_set.maxrxpkt = settingsp->maxrxpkt;
-		apply = 1;
-	}
+		if (settingsp->has_maxrxpkt) {
+			eth_set.maxrxpkt = settingsp->maxrxpkt;
+			apply = 1;
+		}
 
-	if (settingsp->has_maxtxpkt) {
-		eth_set.maxtxpkt = settingsp->maxtxpkt;
-		apply = 1;
-	}
+		if (settingsp->has_maxtxpkt) {
+			eth_set.maxtxpkt = settingsp->maxtxpkt;
+			apply = 1;
+		}
 
-	if (settingsp->has_mtu) {
-		rtnl_link_set_mtu(change, settingsp->mtu);
-		apply = 1;
-	}
+		if (settingsp->has_mtu) {
+			rtnl_link_set_mtu(change, settingsp->mtu);
+			apply = 1;
+		}
 
-	if (settingsp->has_tx_qlen) {
-		rtnl_link_set_txqlen(change, settingsp->tx_qlen);
-		apply = 1;
+		if (settingsp->has_tx_qlen) {
+			rtnl_link_set_txqlen(change, settingsp->tx_qlen);
+			apply = 1;
+		}
 	}
 
 	if (apply)
