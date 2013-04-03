@@ -65,13 +65,17 @@ static void __interface_statistics_get(struct nl_object *obj, void *arg)
 	dabba__interface_statistics__init(statisticsp);
 
 	statisticsp->id = malloc(sizeof(*statisticsp->id));
+	statisticsp->status = malloc(sizeof(*statisticsp->status));
 
-	if (!statisticsp->id) {
+	if (!statisticsp->id || !statisticsp->status) {
+		free(statisticsp->status);
+		free(statisticsp->id);
 		free(statisticsp);
 		return;
 	}
 
 	dabba__interface_id__init(statisticsp->id);
+	dabba__error_code__init(statisticsp->status);
 
 	statisticsp->id->name = rtnl_link_get_name(link);
 	statisticsp->rx_byte = rtnl_link_get_stat(link, RTNL_LINK_RX_BYTES);
@@ -153,6 +157,7 @@ void dabbad_interface_statistics_get(Dabba__DabbaService_Service * service,
  out:
 	closure(statistics_listp, closure_data);
 	for (a = 0; a < statistics_list.n_list; a++) {
+		free(statistics_list.list[a]->status);
 		free(statistics_list.list[a]->id);
 		free(statistics_list.list[a]);
 	}
