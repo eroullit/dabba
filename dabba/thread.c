@@ -394,6 +394,7 @@ int cmd_thread_modify(int argc, const char **argv)
 
 	int ret, rc = 0;
 	Dabba__Thread thread = DABBA__THREAD__INIT;
+	Dabba__ErrorCode err = DABBA__ERROR_CODE__INIT;
 	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
 	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 	ProtobufCService *service;
@@ -447,6 +448,8 @@ int cmd_thread_modify(int argc, const char **argv)
 			goto out;
 		}
 	}
+
+	thread.status = &err;
 
 	service = dabba_rpc_client_connect(server_id, server_type);
 

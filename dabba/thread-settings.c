@@ -42,6 +42,8 @@ static void thread_settings_print(const Dabba__ThreadList * result,
 	rpc_header_print("threads");
 
 	for (a = 0; result && a < result->n_list; a++) {
+		printf("    ");
+		__rpc_error_code_print(result->list[a]->status->code);
 		printf("    - id: %" PRIu64 "\n", result->list[a]->id->id);
 		printf("      type: %s\n",
 		       thread_type2str(result->list[a]->type));
@@ -80,8 +82,8 @@ int rpc_thread_settings_modify(ProtobufCService * service,
 	assert(service);
 	assert(thread);
 
-	dabba__dabba_service__thread_modify(service, thread, rpc_dummy_print,
-					    &is_done);
+	dabba__dabba_service__thread_modify(service, thread,
+					    rpc_error_code_print, &is_done);
 
 	dabba_rpc_call_is_done(&is_done);
 
