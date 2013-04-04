@@ -411,6 +411,7 @@ void dabbad_thread_get(Dabba__DabbaService_Service * service,
 	struct packet_thread *pkt_thread;
 	size_t a = 0, cs_len = 128;
 	cpu_set_t run_on;
+	int rc = 0;
 
 	assert(service);
 	assert(id_listp);
@@ -440,14 +441,17 @@ void dabbad_thread_get(Dabba__DabbaService_Service * service,
 
 		settings_list.list[a]->id =
 		    malloc(sizeof(*settings_list.list[a]->id));
+		settings_list.list[a]->status =
+		    malloc(sizeof(*settings_list.list[a]->status));
 		settings_list.list[a]->cpu_set =
 		    calloc(cs_len, sizeof(*settings_list.list[a]->cpu_set));
 
-		if (!settings_list.list[a]->id
+		if (!settings_list.list[a]->id || !settings_list.list[a]->status
 		    || !settings_list.list[a]->cpu_set)
 			goto out;
 
 		dabba__thread_id__init(settings_list.list[a]->id);
+		dabba__error_code__init(settings_list.list[a]->status);
 	}
 
 	settingsp = *settings_list.list;
@@ -457,13 +461,17 @@ void dabbad_thread_get(Dabba__DabbaService_Service * service,
 		settingsp->has_sched_policy = settingsp->has_sched_priority = 1;
 		settingsp->has_type = 1;
 		settingsp->id->id = (uint64_t) pkt_thread->id;
-		dabbad_thread_sched_param_get(pkt_thread,
-					      (int16_t *) &
-					      settingsp->sched_priority,
-					      (int16_t *) &
-					      settingsp->sched_policy);
-		dabbad_thread_sched_affinity_get(pkt_thread, &run_on);
+
+		/* FIXME find a way to report error separately */
+		rc = dabbad_thread_sched_param_get(pkt_thread,
+						   (int16_t *) &
+						   settingsp->sched_priority,
+						   (int16_t *) &
+						   settingsp->sched_policy);
+		rc = dabbad_thread_sched_affinity_get(pkt_thread, &run_on);
 		cpu_affinity2str(&run_on, settingsp->cpu_set, cs_len);
+
+		settingsp->status->code = rc;
 		settingsp->type = pkt_thread->type;
 		settingsp++;
 	}
@@ -476,6 +484,7 @@ void dabbad_thread_get(Dabba__DabbaService_Service * service,
 	for (a = 0; a < settings_list.n_list; a++) {
 		if (settings_list.list[a]) {
 			free(settings_list.list[a]->id);
+			free(settings_list.list[a]->status);
 			free(settings_list.list[a]->cpu_set);
 		}
 
