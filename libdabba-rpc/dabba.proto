@@ -280,7 +280,7 @@ service dabba_service
     rpc interface_statistics_get (interface_id_list) returns (interface_statistics_list);
     rpc thread_get (thread_id_list) returns (thread_list);
     rpc thread_capabilities_get (dummy) returns (thread_capabilities_list);
-    rpc thread_modify (thread) returns (dummy);
+    rpc thread_modify (thread) returns (error_code);
     rpc capture_get (thread_id_list) returns (capture_list);
     rpc capture_start (capture) returns (error_code);
     rpc capture_stop (thread_id) returns (error_code);
