@@ -57,16 +57,17 @@ message interface_pause_list
 
 message interface_offload
 {
-    required interface_id id = 1;
-    optional uint32 rx_csum = 2;
-    optional uint32 tx_csum = 3;
-    optional uint32 sg = 4;
-    optional uint32 tso = 5;
-    optional uint32 ufo = 6;
-    optional uint32 gso = 7;
-    optional uint32 gro = 8;
-    optional uint32 lro = 9;
-    optional uint32 rxhash = 10;
+    required error_code status = 1;
+    required interface_id id = 2;
+    optional uint32 rx_csum = 3;
+    optional uint32 tx_csum = 4;
+    optional uint32 sg = 5;
+    optional uint32 tso = 6;
+    optional uint32 ufo = 7;
+    optional uint32 gso = 8;
+    optional uint32 gro = 9;
+    optional uint32 lro = 10;
+    optional uint32 rxhash = 11;
 }
 
 message interface_offload_list
