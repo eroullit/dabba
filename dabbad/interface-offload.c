@@ -46,6 +46,7 @@ static void __interface_offload_get(struct nl_object *obj, void *arg)
 	Dabba__InterfaceOffloadList *offload_list = arg;
 	Dabba__InterfaceOffload *offloadp, **listpp;
 	size_t lsize = sizeof(*offload_list->list) * (offload_list->n_list + 1);
+	int rc;
 
 	listpp = realloc(offload_list->list, lsize);
 
@@ -63,13 +64,17 @@ static void __interface_offload_get(struct nl_object *obj, void *arg)
 	dabba__interface_offload__init(offloadp);
 
 	offloadp->id = malloc(sizeof(*offloadp->id));
+	offloadp->status = malloc(sizeof(*offloadp->status));
 
-	if (!offloadp->id) {
+	if (!offloadp->id || !offloadp->status) {
+		free(offloadp->status);
+		free(offloadp->id);
 		free(offloadp);
 		return;
 	}
 
 	dabba__interface_id__init(offloadp->id);
+	dabba__error_code__init(offloadp->status);
 
 	offloadp->id->name = rtnl_link_get_name(link);
 
@@ -77,13 +82,16 @@ static void __interface_offload_get(struct nl_object *obj, void *arg)
 	offloadp->has_tso = offloadp->has_ufo = offloadp->has_gso = 1;
 	offloadp->has_gro = offloadp->has_lro = offloadp->rxhash = 1;
 
-	dev_rx_csum_offload_get(offloadp->id->name, &offloadp->rx_csum);
-	dev_tx_csum_offload_get(offloadp->id->name, &offloadp->tx_csum);
-	dev_scatter_gather_get(offloadp->id->name, &offloadp->sg);
-	dev_tcp_seg_offload_get(offloadp->id->name, &offloadp->tso);
-	dev_udp_frag_offload_get(offloadp->id->name, &offloadp->ufo);
-	dev_generic_seg_offload_get(offloadp->id->name, &offloadp->gso);
-	dev_generic_rcv_offload_get(offloadp->id->name, &offloadp->gro);
+	/* FIXME find a way to report error separately */
+	rc = dev_rx_csum_offload_get(offloadp->id->name, &offloadp->rx_csum);
+	rc = dev_tx_csum_offload_get(offloadp->id->name, &offloadp->tx_csum);
+	rc = dev_scatter_gather_get(offloadp->id->name, &offloadp->sg);
+	rc = dev_tcp_seg_offload_get(offloadp->id->name, &offloadp->tso);
+	rc = dev_udp_frag_offload_get(offloadp->id->name, &offloadp->ufo);
+	rc = dev_generic_seg_offload_get(offloadp->id->name, &offloadp->gso);
+	rc = dev_generic_rcv_offload_get(offloadp->id->name, &offloadp->gro);
+
+	offloadp->status->code = rc;
 
 	offload_list->n_list++;
 }
@@ -125,6 +133,7 @@ void dabbad_interface_offload_get(Dabba__DabbaService_Service * service,
  out:
 	closure(pause_listp, closure_data);
 	for (a = 0; a < pause_list.n_list; a++) {
+		free(pause_list.list[a]->status);
 		free(pause_list.list[a]->id);
 		free(pause_list.list[a]);
 	}
