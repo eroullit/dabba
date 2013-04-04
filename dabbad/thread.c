@@ -526,14 +526,31 @@ void dabbad_thread_capabilities_get(Dabba__DabbaService_Service * service,
 			goto out;
 
 		dabba__thread_capabilities__init(capabilities_list.list[a]);
+
+		capabilities_list.list[a]->status =
+		    malloc(sizeof(*capabilities_list.list[a]->status));
+
+		if (!capabilities_list.list[a]->status)
+			goto out;
+
+		dabba__error_code__init(capabilities_list.list[a]->status);
 	}
 
 	for (a = 0; a < psize; a++) {
 		capabilities_list.list[a]->policy = policy[a];
+
+		/* FIXME find a way to report error separately */
 		capabilities_list.list[a]->prio_min =
 		    sched_get_priority_min(policy[a]);
+
+		if (capabilities_list.list[a]->prio_min < 0)
+			capabilities_list.list[a]->status->code = errno;
+
 		capabilities_list.list[a]->prio_max =
 		    sched_get_priority_max(policy[a]);
+
+		if (capabilities_list.list[a]->prio_max < 0)
+			capabilities_list.list[a]->status->code = errno;
 	}
 
 	capabilitiesp = &capabilities_list;
@@ -541,8 +558,12 @@ void dabbad_thread_capabilities_get(Dabba__DabbaService_Service * service,
  out:
 	closure(capabilitiesp, closure_data);
 
-	for (a = 0; a < psize; a++)
+	for (a = 0; a < psize; a++) {
+		if (capabilities_list.list[a])
+			free(capabilities_list.list[a]->status);
+
 		free(capabilities_list.list[a]);
+	}
 
 	free(capabilities_list.list);
 }
