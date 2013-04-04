@@ -367,12 +367,12 @@ int dabbad_thread_stop(struct packet_thread *pkt_thread)
 
 void dabbad_thread_modify(Dabba__DabbaService_Service * service,
 			  const Dabba__Thread * thread,
-			  Dabba__Dummy_Closure closure, void *closure_data)
+			  Dabba__ErrorCode_Closure closure, void *closure_data)
 {
-	Dabba__Dummy dummy = DABBA__DUMMY__INIT;
 	struct packet_thread *pkt_thread;
 	int16_t sched_policy, sched_prio;
 	cpu_set_t run_on;
+	int rc = 0;
 
 	assert(service);
 	assert(thread);
@@ -393,12 +393,15 @@ void dabbad_thread_modify(Dabba__DabbaService_Service * service,
 		if (thread->cpu_set)
 			str2cpu_affinity(thread->cpu_set, &run_on);
 
-		dabbad_thread_sched_param_set(pkt_thread, sched_prio,
-					      sched_policy);
-		dabbad_thread_sched_affinity_set(pkt_thread, &run_on);
+		/* FIXME find a way to report error separately */
+		rc = dabbad_thread_sched_param_set(pkt_thread, sched_prio,
+						   sched_policy);
+		rc = dabbad_thread_sched_affinity_set(pkt_thread, &run_on);
 	}
 
-	closure(&dummy, closure_data);
+	thread->status->code = rc;
+
+	closure(thread->status, closure_data);
 }
 
 void dabbad_thread_get(Dabba__DabbaService_Service * service,

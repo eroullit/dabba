@@ -65,7 +65,7 @@ int dabbad_thread_stop(struct packet_thread *pkt_thread);
 
 void dabbad_thread_modify(Dabba__DabbaService_Service * service,
 			  const Dabba__Thread * thread,
-			  Dabba__Dummy_Closure closure, void *closure_data);
+			  Dabba__ErrorCode_Closure closure, void *closure_data);
 
 void dabbad_thread_get(Dabba__DabbaService_Service * service,
 		       const Dabba__ThreadIdList * id_listp,
