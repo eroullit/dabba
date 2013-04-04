@@ -214,11 +214,12 @@ message thread_id_list
 
 message thread
 {
-    required thread_id id = 1;
-    optional string cpu_set = 2;
-    optional int32 type = 3;
-    optional int32 sched_policy = 4;
-    optional int32 sched_priority = 5;
+    required error_code status = 1;
+    required thread_id id = 2;
+    optional string cpu_set = 3;
+    optional int32 type = 4;
+    optional int32 sched_policy = 5;
+    optional int32 sched_priority = 6;
 }
 
 message thread_list
