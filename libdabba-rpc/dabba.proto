@@ -229,9 +229,10 @@ message thread_list
 
 message thread_capabilities
 {
-    required int32 policy = 1;
-    required int32 prio_min = 2;
-    required int32 prio_max = 3;
+    required error_code status = 1;
+    required int32 policy = 2;
+    required int32 prio_min = 3;
+    required int32 prio_max = 4;
 }
 
 message thread_capabilities_list
