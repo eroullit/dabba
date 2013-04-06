@@ -36,22 +36,23 @@ const char *thread_type2str(const int type);
 static void thread_settings_print(const Dabba__ThreadList * result,
 				  void *closure_data)
 {
+	const Dabba__Thread *thread;
 	size_t a;
 	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
 
 	rpc_header_print("threads");
 
 	for (a = 0; result && a < result->n_list; a++) {
+		thread = result->list[a];
 		printf("    ");
-		__rpc_error_code_print(result->list[a]->status->code);
-		printf("    - id: %" PRIu64 "\n", result->list[a]->id->id);
-		printf("      type: %s\n",
-		       thread_type2str(result->list[a]->type));
+		__rpc_error_code_print(thread->status->code);
+		printf("    - id: %" PRIu64 "\n", thread->id->id);
+		printf("      type: %s\n", thread_type2str(thread->type));
 		printf("      scheduling policy: %s\n",
-		       sched_policy2str(result->list[a]->sched_policy));
+		       sched_policy2str(thread->sched_policy));
 		printf("      scheduling priority: %i\n",
-		       result->list[a]->sched_priority);
-		printf("      cpu affinity: %s\n", result->list[a]->cpu_set);
+		       thread->sched_priority);
+		printf("      cpu affinity: %s\n", thread->cpu_set);
 		/* TODO map priority/policy protobuf enums to string */
 	}
 
