@@ -36,12 +36,6 @@
 #include <dabba/rpc.h>
 #include <dabba/help.h>
 
-static void display_interface_offload_header(void)
-{
-	printf("---\n");
-	printf("  interfaces:\n");
-}
-
 static void interface_offload_list_print(const Dabba__InterfaceOffloadList *
 					 result, void *closure_data)
 {
@@ -51,7 +45,7 @@ static void interface_offload_list_print(const Dabba__InterfaceOffloadList *
 
 	assert(closure_data);
 
-	display_interface_offload_header();
+	rpc_header_print("interfaces");
 
 	for (a = 0; result && a < result->n_list; a++) {
 		offloadp = result->list[a];

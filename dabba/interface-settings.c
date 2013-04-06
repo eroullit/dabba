@@ -39,12 +39,6 @@
 
 extern const char *port2str(const uint8_t port);
 
-static void display_interface_settings_header(void)
-{
-	printf("---\n");
-	printf("  interfaces:\n");
-}
-
 static void interface_settings_list_print(const Dabba__InterfaceSettingsList *
 					  result, void *closure_data)
 {
@@ -54,7 +48,7 @@ static void interface_settings_list_print(const Dabba__InterfaceSettingsList *
 
 	assert(closure_data);
 
-	display_interface_settings_header();
+	rpc_header_print("interfaces");
 
 	for (a = 0; result && a < result->n_list; a++) {
 		settingsp = result->list[a];

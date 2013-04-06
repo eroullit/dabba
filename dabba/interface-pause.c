@@ -38,12 +38,6 @@
 #include <dabba/rpc.h>
 #include <dabba/help.h>
 
-static void display_interface_pause_header(void)
-{
-	printf("---\n");
-	printf("  interfaces:\n");
-}
-
 static void interface_pause_list_print(const Dabba__InterfacePauseList *
 				       result, void *closure_data)
 {
@@ -53,7 +47,7 @@ static void interface_pause_list_print(const Dabba__InterfacePauseList *
 
 	assert(closure_data);
 
-	display_interface_pause_header();
+	rpc_header_print("interfaces");
 
 	for (a = 0; result && a < result->n_list; a++) {
 		pausep = result->list[a];

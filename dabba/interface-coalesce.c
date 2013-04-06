@@ -38,12 +38,6 @@
 #include <dabba/help.h>
 #include <dabba/macros.h>
 
-static void display_interface_coalesce_header(void)
-{
-	printf("---\n");
-	printf("  interfaces:\n");
-}
-
 static void interface_coalesce_list_print(const Dabba__InterfaceCoalesceList *
 					  result, void *closure_data)
 {
@@ -53,7 +47,7 @@ static void interface_coalesce_list_print(const Dabba__InterfaceCoalesceList *
 
 	assert(closure_data);
 
-	display_interface_coalesce_header();
+	rpc_header_print("interfaces");
 
 	for (a = 0; result && a < result->n_list; a++) {
 		coalescep = result->list[a];

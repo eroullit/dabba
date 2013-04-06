@@ -37,12 +37,6 @@
 #include <dabba/rpc.h>
 #include <dabba/help.h>
 
-static void display_interface_statistics_header(void)
-{
-	printf("---\n");
-	printf("  interfaces:\n");
-}
-
 static void interface_statistics_list_print(const Dabba__InterfaceStatisticsList
 					    * result, void *closure_data)
 {
@@ -52,7 +46,7 @@ static void interface_statistics_list_print(const Dabba__InterfaceStatisticsList
 
 	assert(closure_data);
 
-	display_interface_statistics_header();
+	rpc_header_print("interfaces");
 
 	for (a = 0; result && a < result->n_list; a++) {
 		statisticsp = result->list[a];

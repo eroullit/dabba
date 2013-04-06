@@ -36,12 +36,6 @@
 #include <dabba/rpc.h>
 #include <dabba/help.h>
 
-static void display_interface_driver_header(void)
-{
-	printf("---\n");
-	printf("  interfaces:\n");
-}
-
 static void interface_driver_list_print(const Dabba__InterfaceDriverList *
 					result, void *closure_data)
 {
@@ -51,7 +45,7 @@ static void interface_driver_list_print(const Dabba__InterfaceDriverList *
 
 	assert(closure_data);
 
-	display_interface_driver_header();
+	rpc_header_print("interfaces");
 
 	for (a = 0; result && a < result->n_list; a++) {
 		driverp = result->list[a];

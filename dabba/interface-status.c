@@ -38,12 +38,6 @@
 #include <dabba/rpc.h>
 #include <dabba/help.h>
 
-static void display_interface_status_header(void)
-{
-	printf("---\n");
-	printf("  interfaces:\n");
-}
-
 static void interface_status_list_print(const Dabba__InterfaceStatusList *
 					result, void *closure_data)
 {
@@ -53,7 +47,7 @@ static void interface_status_list_print(const Dabba__InterfaceStatusList *
 
 	assert(closure_data);
 
-	display_interface_status_header();
+	rpc_header_print("interfaces");
 
 	for (a = 0; result && a < result->n_list; a++) {
 		statusp = result->list[a];
