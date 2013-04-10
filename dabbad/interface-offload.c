@@ -169,30 +169,29 @@ void dabbad_interface_offload_modify(Dabba__DabbaService_Service * service,
 		goto out;
 	}
 
-	/* FIXME find a way to report error separately */
-	if (offloadp->has_rx_csum)
+	if (!rc && offloadp->has_rx_csum)
 		rc = dev_rx_csum_offload_set(offloadp->id->name,
 					     offloadp->rx_csum);
 
-	if (offloadp->has_tx_csum)
+	if (!rc && offloadp->has_tx_csum)
 		rc = dev_tx_csum_offload_set(offloadp->id->name,
 					     offloadp->tx_csum);
 
-	if (offloadp->has_sg)
+	if (!rc && offloadp->has_sg)
 		rc = dev_scatter_gather_set(offloadp->id->name, offloadp->sg);
 
-	if (offloadp->has_tso)
+	if (!rc && offloadp->has_tso)
 		rc = dev_tcp_seg_offload_set(offloadp->id->name, offloadp->tso);
 
-	if (offloadp->has_ufo)
+	if (!rc && offloadp->has_ufo)
 		rc = dev_udp_frag_offload_set(offloadp->id->name,
 					      offloadp->ufo);
 
-	if (offloadp->has_gso)
+	if (!rc && offloadp->has_gso)
 		rc = dev_generic_seg_offload_set(offloadp->id->name,
 						 offloadp->gso);
 
-	if (offloadp->has_gro)
+	if (!rc && offloadp->has_gro)
 		rc = dev_generic_rcv_offload_set(offloadp->id->name,
 						 offloadp->gro);
 
