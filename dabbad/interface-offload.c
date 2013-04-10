@@ -141,3 +141,14 @@ void dabbad_interface_offload_get(Dabba__DabbaService_Service * service,
 	link_destroy(link);
 	link_cache_destroy(sock, cache);
 }
+
+void dabbad_interface_offload_modify(Dabba__DabbaService_Service * service,
+				     const Dabba__InterfaceOffload * offloadp,
+				     Dabba__ErrorCode_Closure closure,
+				     void *closure_data)
+{
+	assert(service);
+	assert(closure_data);
+
+	closure(offloadp->status, closure_data);
+}
