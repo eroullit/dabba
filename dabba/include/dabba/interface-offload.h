@@ -27,4 +27,6 @@
 int rpc_interface_offload_get(ProtobufCService * service,
 			      const Dabba__InterfaceIdList * id_list);
 
+int cmd_interface_offload_modify(int argc, const char **argv);
+
 #endif				/* INTERFACE_OFFLOAD_H */

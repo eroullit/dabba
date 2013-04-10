@@ -327,7 +327,8 @@ static int cmd_interface_modify(int argc, const char **argv)
 		{"pause", cmd_interface_pause_modify},
 		{"settings", cmd_interface_settings_modify},
 		{"coalesce", cmd_interface_coalesce_modify},
-		{"capabilities", cmd_interface_capabilities_modify}
+		{"capabilities", cmd_interface_capabilities_modify},
+		{"offload", cmd_interface_offload_modify}
 	};
 
 	return cmd_run_builtin(cmd, ARRAY_SIZE(cmd), argc, argv);
