@@ -28,4 +28,6 @@ int str2bool(const char *const str, int *const val);
 int str2speed(const char *const str, uint32_t * const speed);
 int str2duplex(const char *const str, int *const duplex);
 
+char *duplex2str(const int duplex);
+
 #endif				/* CLI_H */

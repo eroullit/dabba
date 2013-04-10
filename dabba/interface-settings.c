@@ -57,8 +57,7 @@ static void interface_settings_list_print(const Dabba__InterfaceSettingsList *
 		printf("    - name: %s\n", settingsp->id->name);
 		printf("      settings:\n");
 		printf("        speed: %u\n", settingsp->speed);
-		printf("        duplex: %s\n",
-		       settingsp->duplex ? "full" : "half");
+		printf("        duplex: %s\n", duplex2str(settingsp->duplex));
 		printf("        autoneg: %s\n", print_tf(settingsp->autoneg));
 		printf("        mtu: %u\n", settingsp->mtu);
 		printf("        tx qlen: %u\n", settingsp->tx_qlen);

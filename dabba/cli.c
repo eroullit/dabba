@@ -93,3 +93,22 @@ int str2duplex(const char *const str, int *const duplex)
 
 	return rc;
 }
+
+char *duplex2str(const int duplex)
+{
+	char *res;
+
+	switch (duplex) {
+	case DUPLEX_HALF:
+		res = "half";
+		break;
+	case DUPLEX_FULL:
+		res = "full";
+		break;
+	default:
+		res = "unknown";
+		break;
+	}
+
+	return res;
+}
