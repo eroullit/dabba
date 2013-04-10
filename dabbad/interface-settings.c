@@ -90,7 +90,7 @@ static void __interface_settings_get(struct nl_object *obj, void *arg)
 	settingsp->tx_qlen = rtnl_link_get_txqlen(link);
 
 	settingsp->speed = ethtool_cmd_speed(&settings);
-	settingsp->duplex = settings.duplex == DUPLEX_FULL;
+	settingsp->duplex = settings.duplex;
 	settingsp->autoneg = settings.autoneg == AUTONEG_ENABLE;
 	settingsp->maxrxpkt = settings.maxrxpkt;
 	settingsp->maxtxpkt = settings.maxtxpkt;
