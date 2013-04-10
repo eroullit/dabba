@@ -170,13 +170,13 @@ void dabbad_interface_offload_modify(Dabba__DabbaService_Service * service,
 	}
 
 	/* FIXME find a way to report error separately */
-	rc = dev_rx_csum_offload_set(offloadp->id->name, &offloadp->rx_csum);
-	rc = dev_tx_csum_offload_set(offloadp->id->name, &offloadp->tx_csum);
-	rc = dev_scatter_gather_set(offloadp->id->name, &offloadp->sg);
-	rc = dev_tcp_seg_offload_set(offloadp->id->name, &offloadp->tso);
-	rc = dev_udp_frag_offload_set(offloadp->id->name, &offloadp->ufo);
-	rc = dev_generic_seg_offload_set(offloadp->id->name, &offloadp->gso);
-	rc = dev_generic_rcv_offload_set(offloadp->id->name, &offloadp->gro);
+	rc = dev_rx_csum_offload_set(offloadp->id->name, offloadp->rx_csum);
+	rc = dev_tx_csum_offload_set(offloadp->id->name, offloadp->tx_csum);
+	rc = dev_scatter_gather_set(offloadp->id->name, offloadp->sg);
+	rc = dev_tcp_seg_offload_set(offloadp->id->name, offloadp->tso);
+	rc = dev_udp_frag_offload_set(offloadp->id->name, offloadp->ufo);
+	rc = dev_generic_seg_offload_set(offloadp->id->name, offloadp->gso);
+	rc = dev_generic_rcv_offload_set(offloadp->id->name, offloadp->gro);
 
  out:
 	offloadp->status->code = rc;

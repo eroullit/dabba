@@ -58,14 +58,23 @@ int dev_pause_set(const char *const dev, struct ethtool_pauseparam *pause);
 int dev_coalesce_get(const char *const dev, struct ethtool_coalesce *coalesce);
 int dev_coalesce_set(const char *const dev, struct ethtool_coalesce *coalesce);
 int dev_rx_csum_offload_get(const char *const dev, uint32_t * rx_csum);
+int dev_rx_csum_offload_set(const char *const dev, uint32_t rx_csum);
 int dev_tx_csum_offload_get(const char *const dev, uint32_t * tx_csum);
+int dev_tx_csum_offload_set(const char *const dev, uint32_t tx_csum);
 int dev_scatter_gather_get(const char *const dev, uint32_t * sg);
+int dev_scatter_gather_set(const char *const dev, uint32_t sg);
 int dev_tcp_seg_offload_get(const char *const dev, uint32_t * tso);
+int dev_tcp_seg_offload_set(const char *const dev, uint32_t tso);
 int dev_udp_frag_offload_get(const char *const dev, uint32_t * ufo);
+int dev_udp_frag_offload_set(const char *const dev, uint32_t ufo);
 int dev_generic_seg_offload_get(const char *const dev, uint32_t * gso);
+int dev_generic_seg_offload_set(const char *const dev, uint32_t gso);
 int dev_generic_rcv_offload_get(const char *const dev, uint32_t * gro);
+int dev_generic_rcv_offload_set(const char *const dev, uint32_t gro);
 int dev_large_rcv_offload_get(const char *const dev, uint32_t * lro);
+int dev_large_rcv_offload_set(const char *const dev, uint32_t lro);
 int dev_rx_hash_offload_get(const char *const dev, uint32_t * rxhash);
+int dev_rx_hash_offload_set(const char *const dev, uint32_t rxhash);
 
 int dev_link_get(const char *const dev, uint32_t * link);
 

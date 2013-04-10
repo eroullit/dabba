@@ -486,6 +486,140 @@ int dev_rx_hash_offload_get(const char *const dev, uint32_t * rxhash)
 }
 
 /**
+ * \brief Set the interface receive checksum offload status
+ * \param[in]       dev	        interface name
+ * \param[in]       rx_csum	pointer to the receive checksum offload status
+ * \return 0 on success, -1 if the interface receive checksum offload status could not be set.
+ */
+
+int dev_rx_csum_offload_set(const char *const dev, uint32_t rx_csum)
+{
+	return dev_ethtool_value_get(dev, ETHTOOL_SRXCSUM, &rx_csum);
+}
+
+/**
+ * \brief Set the interface transmit checksum offload status
+ * \param[in]       dev	        interface name
+ * \param[in]       tx_csum	pointer to the transmit checksum offload status
+ * \return 0 on success, -1 if the interface transmit checksum offload status could not be set.
+ */
+
+int dev_tx_csum_offload_set(const char *const dev, uint32_t tx_csum)
+{
+	return dev_ethtool_value_get(dev, ETHTOOL_STXCSUM, &tx_csum);
+}
+
+/**
+ * \brief Set the interface scatter gather status
+ * \param[in]       dev	        interface name
+ * \param[in]       sg		pointer to the transmit scatter gather status
+ * \return 0 on success, -1 if the interface scatter gather status could not be set.
+ */
+
+int dev_scatter_gather_set(const char *const dev, uint32_t sg)
+{
+	return dev_ethtool_value_get(dev, ETHTOOL_SSG, &sg);
+}
+
+/**
+ * \brief Set the interface tcp segment offload status
+ * \param[in]       dev	        interface name
+ * \param[in]       tso		pointer to the tcp segment offload status
+ * \return 0 on success, -1 if the interface tcp segment offload status could not be set.
+ */
+
+int dev_tcp_seg_offload_set(const char *const dev, uint32_t tso)
+{
+	return dev_ethtool_value_get(dev, ETHTOOL_STSO, &tso);
+}
+
+/**
+ * \brief Set the interface udp fragment offload status
+ * \param[in]       dev	        interface name
+ * \param[in]      ufo		pointer to the udp fragment offload status
+ * \return 0 on success, -1 if the interface udp fragment offload status could not be set.
+ */
+
+int dev_udp_frag_offload_set(const char *const dev, uint32_t ufo)
+{
+	return dev_ethtool_value_get(dev, ETHTOOL_SUFO, &ufo);
+}
+
+/**
+ * \brief Set the interface generic segmentation offload status
+ * \param[in]       dev	        interface name
+ * \param[in]       gso		pointer to the generic segmentation offload status
+ * \return 0 on success, -1 if the interface generic segmentation offload status could not be set.
+ */
+
+int dev_generic_seg_offload_set(const char *const dev, uint32_t gso)
+{
+	return dev_ethtool_value_get(dev, ETHTOOL_SGSO, &gso);
+}
+
+/**
+ * \brief Set the interface generic receive offload status
+ * \param[in]       dev	        interface name
+ * \param[in]       gro		pointer to the generic receive offload status
+ * \return 0 on success, -1 if the interface generic receive offload status could not be set.
+ */
+
+int dev_generic_rcv_offload_set(const char *const dev, uint32_t gro)
+{
+	return dev_ethtool_value_get(dev, ETHTOOL_SGRO, &gro);
+}
+
+/**
+ * \brief Set the interface large receive offload status
+ * \param[in]       dev	        interface name
+ * \param[in]       lro		pointer to the large receive offload status
+ * \return 0 on success, -1 if the interface large receive offload status could not be set.
+ */
+
+int dev_large_rcv_offload_set(const char *const dev, uint32_t lro)
+{
+	int rc;
+	uint32_t flags = 0;
+
+	rc = dev_ethtool_value_get(dev, ETHTOOL_GFLAGS, &flags);
+
+	if (rc)
+		return rc;
+
+	if (lro)
+		flags |= ETH_FLAG_LRO;
+	else
+		flags &= ~ETH_FLAG_LRO;
+
+	return dev_ethtool_value_get(dev, ETHTOOL_SFLAGS, &flags);
+}
+
+/**
+ * \brief Set the interface receive hashing offload status
+ * \param[in]       dev	        interface name
+ * \param[in]       rxhash	pointer to the receive hashing offload status
+ * \return 0 on success, -1 if the interface receive hashing offload status could not be set.
+ */
+
+int dev_rx_hash_offload_set(const char *const dev, uint32_t rxhash)
+{
+	int rc;
+	uint32_t flags = 0;
+
+	rc = dev_ethtool_value_get(dev, ETHTOOL_GFLAGS, &flags);
+
+	if (rc)
+		return rc;
+
+	if (rxhash)
+		flags |= ETH_FLAG_RXHASH;
+	else
+		flags &= ~ETH_FLAG_RXHASH;
+
+	return dev_ethtool_value_get(dev, ETHTOOL_SFLAGS, &flags);
+}
+
+/**
  * \brief Get the interface link status
  * \param[in]       dev	        interface name
  * \param[out]      link	pointer to the interface link status
