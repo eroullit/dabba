@@ -157,7 +157,7 @@ int cmd_interface_offload_modify(int argc, const char **argv)
 				 NULL)) != EOF) {
 		switch (ret) {
 		case OPT_RX_CSUM_OFFLOAD:
-			rc = str2bool(optarg, (int *)&offload.rx_csum);
+			rc = str2bool(optarg, &offload.rx_csum);
 
 			if (rc)
 				goto out;
@@ -165,7 +165,7 @@ int cmd_interface_offload_modify(int argc, const char **argv)
 			offload.has_rx_csum = 1;
 			break;
 		case OPT_TX_CSUM_OFFLOAD:
-			rc = str2bool(optarg, (int *)&offload.tx_csum);
+			rc = str2bool(optarg, &offload.tx_csum);
 
 			if (rc)
 				goto out;
@@ -173,7 +173,7 @@ int cmd_interface_offload_modify(int argc, const char **argv)
 			offload.has_tx_csum = 1;
 			break;
 		case OPT_SG:
-			rc = str2bool(optarg, (int *)&offload.sg);
+			rc = str2bool(optarg, &offload.sg);
 
 			if (rc)
 				goto out;
@@ -181,7 +181,7 @@ int cmd_interface_offload_modify(int argc, const char **argv)
 			offload.has_sg = 1;
 			break;
 		case OPT_TSO:
-			rc = str2bool(optarg, (int *)&offload.tso);
+			rc = str2bool(optarg, &offload.tso);
 
 			if (rc)
 				goto out;
@@ -189,7 +189,7 @@ int cmd_interface_offload_modify(int argc, const char **argv)
 			offload.has_tso = 1;
 			break;
 		case OPT_UFO:
-			rc = str2bool(optarg, (int *)&offload.ufo);
+			rc = str2bool(optarg, &offload.ufo);
 
 			if (rc)
 				goto out;
@@ -197,7 +197,7 @@ int cmd_interface_offload_modify(int argc, const char **argv)
 			offload.has_ufo = 1;
 			break;
 		case OPT_GSO:
-			rc = str2bool(optarg, (int *)&offload.gso);
+			rc = str2bool(optarg, &offload.gso);
 
 			if (rc)
 				goto out;
@@ -205,7 +205,7 @@ int cmd_interface_offload_modify(int argc, const char **argv)
 			offload.has_gso = 1;
 			break;
 		case OPT_GRO:
-			rc = str2bool(optarg, (int *)&offload.gro);
+			rc = str2bool(optarg, &offload.gro);
 
 			if (rc)
 				goto out;
@@ -213,7 +213,7 @@ int cmd_interface_offload_modify(int argc, const char **argv)
 			offload.has_gro = 1;
 			break;
 		case OPT_LRO:
-			rc = str2bool(optarg, (int *)&offload.lro);
+			rc = str2bool(optarg, &offload.lro);
 
 			if (rc)
 				goto out;
@@ -221,7 +221,7 @@ int cmd_interface_offload_modify(int argc, const char **argv)
 			offload.has_lro = 1;
 			break;
 		case OPT_RXHASH_OFFLOAD:
-			rc = str2bool(optarg, (int *)&offload.rxhash);
+			rc = str2bool(optarg, &offload.rxhash);
 
 			if (rc)
 				goto out;
