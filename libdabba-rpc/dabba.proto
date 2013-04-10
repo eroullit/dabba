@@ -59,15 +59,15 @@ message interface_offload
 {
     required error_code status = 1;
     required interface_id id = 2;
-    optional uint32 rx_csum = 3;
-    optional uint32 tx_csum = 4;
-    optional uint32 sg = 5;
-    optional uint32 tso = 6;
-    optional uint32 ufo = 7;
-    optional uint32 gso = 8;
-    optional uint32 gro = 9;
-    optional uint32 lro = 10;
-    optional uint32 rxhash = 11;
+    optional bool rx_csum = 3;
+    optional bool tx_csum = 4;
+    optional bool sg = 5;
+    optional bool tso = 6;
+    optional bool ufo = 7;
+    optional bool gso = 8;
+    optional bool gro = 9;
+    optional bool lro = 10;
+    optional bool rxhash = 11;
 }
 
 message interface_offload_list
