@@ -393,10 +393,14 @@ void dabbad_thread_modify(Dabba__DabbaService_Service * service,
 		if (thread->cpu_set)
 			str2cpu_affinity(thread->cpu_set, &run_on);
 
-		/* FIXME find a way to report error separately */
-		rc = dabbad_thread_sched_param_set(pkt_thread, sched_prio,
-						   sched_policy);
-		rc = dabbad_thread_sched_affinity_set(pkt_thread, &run_on);
+		if (!rc)
+			rc = dabbad_thread_sched_param_set(pkt_thread,
+							   sched_prio,
+							   sched_policy);
+
+		if (!rc)
+			rc = dabbad_thread_sched_affinity_set(pkt_thread,
+							      &run_on);
 	}
 
 	thread->status->code = rc;
