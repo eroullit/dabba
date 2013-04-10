@@ -183,7 +183,7 @@ int dev_flags_set(const char *const dev, const short flags)
 }
 
 static int dev_ethtool_value_get(const char *const dev, const int cmd,
-				 uint32_t * value)
+				 int *value)
 {
 	int rc;
 	struct ethtool_value e;
@@ -372,7 +372,7 @@ int dev_coalesce_set(const char *const dev, struct ethtool_coalesce *coalesce)
  * \return 0 on success, -1 if the interface receive checksum offload status could not be fetched.
  */
 
-int dev_rx_csum_offload_get(const char *const dev, uint32_t * rx_csum)
+int dev_rx_csum_offload_get(const char *const dev, int *rx_csum)
 {
 	return dev_ethtool_value_get(dev, ETHTOOL_GRXCSUM, rx_csum);
 }
@@ -384,7 +384,7 @@ int dev_rx_csum_offload_get(const char *const dev, uint32_t * rx_csum)
  * \return 0 on success, -1 if the interface transmit checksum offload status could not be fetched.
  */
 
-int dev_tx_csum_offload_get(const char *const dev, uint32_t * tx_csum)
+int dev_tx_csum_offload_get(const char *const dev, int *tx_csum)
 {
 	return dev_ethtool_value_get(dev, ETHTOOL_GTXCSUM, tx_csum);
 }
@@ -396,7 +396,7 @@ int dev_tx_csum_offload_get(const char *const dev, uint32_t * tx_csum)
  * \return 0 on success, -1 if the interface scatter gather status could not be fetched.
  */
 
-int dev_scatter_gather_get(const char *const dev, uint32_t * sg)
+int dev_scatter_gather_get(const char *const dev, int *sg)
 {
 	return dev_ethtool_value_get(dev, ETHTOOL_GSG, sg);
 }
@@ -408,7 +408,7 @@ int dev_scatter_gather_get(const char *const dev, uint32_t * sg)
  * \return 0 on success, -1 if the interface tcp segment offload status could not be fetched.
  */
 
-int dev_tcp_seg_offload_get(const char *const dev, uint32_t * tso)
+int dev_tcp_seg_offload_get(const char *const dev, int *tso)
 {
 	return dev_ethtool_value_get(dev, ETHTOOL_GTSO, tso);
 }
@@ -420,7 +420,7 @@ int dev_tcp_seg_offload_get(const char *const dev, uint32_t * tso)
  * \return 0 on success, -1 if the interface udp fragment offload status could not be fetched.
  */
 
-int dev_udp_frag_offload_get(const char *const dev, uint32_t * ufo)
+int dev_udp_frag_offload_get(const char *const dev, int *ufo)
 {
 	return dev_ethtool_value_get(dev, ETHTOOL_GUFO, ufo);
 }
@@ -432,7 +432,7 @@ int dev_udp_frag_offload_get(const char *const dev, uint32_t * ufo)
  * \return 0 on success, -1 if the interface generic segmentation offload status could not be fetched.
  */
 
-int dev_generic_seg_offload_get(const char *const dev, uint32_t * gso)
+int dev_generic_seg_offload_get(const char *const dev, int *gso)
 {
 	return dev_ethtool_value_get(dev, ETHTOOL_GGSO, gso);
 }
@@ -444,7 +444,7 @@ int dev_generic_seg_offload_get(const char *const dev, uint32_t * gso)
  * \return 0 on success, -1 if the interface generic receive offload status could not be fetched.
  */
 
-int dev_generic_rcv_offload_get(const char *const dev, uint32_t * gro)
+int dev_generic_rcv_offload_get(const char *const dev, int *gro)
 {
 	return dev_ethtool_value_get(dev, ETHTOOL_GGRO, gro);
 }
@@ -456,10 +456,10 @@ int dev_generic_rcv_offload_get(const char *const dev, uint32_t * gro)
  * \return 0 on success, -1 if the interface large receive offload status could not be fetched.
  */
 
-int dev_large_rcv_offload_get(const char *const dev, uint32_t * lro)
+int dev_large_rcv_offload_get(const char *const dev, int *lro)
 {
 	int rc;
-	uint32_t flags = 0;
+	int flags = 0;
 
 	rc = dev_ethtool_value_get(dev, ETHTOOL_GFLAGS, &flags);
 	*lro = flags & ETH_FLAG_LRO;
@@ -474,10 +474,10 @@ int dev_large_rcv_offload_get(const char *const dev, uint32_t * lro)
  * \return 0 on success, -1 if the interface receive hashing offload status could not be fetched.
  */
 
-int dev_rx_hash_offload_get(const char *const dev, uint32_t * rxhash)
+int dev_rx_hash_offload_get(const char *const dev, int *rxhash)
 {
 	int rc;
-	uint32_t flags = 0;
+	int flags = 0;
 
 	rc = dev_ethtool_value_get(dev, ETHTOOL_GFLAGS, &flags);
 	*rxhash = flags & ETH_FLAG_RXHASH;
@@ -492,7 +492,7 @@ int dev_rx_hash_offload_get(const char *const dev, uint32_t * rxhash)
  * \return 0 on success, -1 if the interface receive checksum offload status could not be set.
  */
 
-int dev_rx_csum_offload_set(const char *const dev, uint32_t rx_csum)
+int dev_rx_csum_offload_set(const char *const dev, int rx_csum)
 {
 	return dev_ethtool_value_get(dev, ETHTOOL_SRXCSUM, &rx_csum);
 }
@@ -504,7 +504,7 @@ int dev_rx_csum_offload_set(const char *const dev, uint32_t rx_csum)
  * \return 0 on success, -1 if the interface transmit checksum offload status could not be set.
  */
 
-int dev_tx_csum_offload_set(const char *const dev, uint32_t tx_csum)
+int dev_tx_csum_offload_set(const char *const dev, int tx_csum)
 {
 	return dev_ethtool_value_get(dev, ETHTOOL_STXCSUM, &tx_csum);
 }
@@ -516,7 +516,7 @@ int dev_tx_csum_offload_set(const char *const dev, uint32_t tx_csum)
  * \return 0 on success, -1 if the interface scatter gather status could not be set.
  */
 
-int dev_scatter_gather_set(const char *const dev, uint32_t sg)
+int dev_scatter_gather_set(const char *const dev, int sg)
 {
 	return dev_ethtool_value_get(dev, ETHTOOL_SSG, &sg);
 }
@@ -528,7 +528,7 @@ int dev_scatter_gather_set(const char *const dev, uint32_t sg)
  * \return 0 on success, -1 if the interface tcp segment offload status could not be set.
  */
 
-int dev_tcp_seg_offload_set(const char *const dev, uint32_t tso)
+int dev_tcp_seg_offload_set(const char *const dev, int tso)
 {
 	return dev_ethtool_value_get(dev, ETHTOOL_STSO, &tso);
 }
@@ -540,7 +540,7 @@ int dev_tcp_seg_offload_set(const char *const dev, uint32_t tso)
  * \return 0 on success, -1 if the interface udp fragment offload status could not be set.
  */
 
-int dev_udp_frag_offload_set(const char *const dev, uint32_t ufo)
+int dev_udp_frag_offload_set(const char *const dev, int ufo)
 {
 	return dev_ethtool_value_get(dev, ETHTOOL_SUFO, &ufo);
 }
@@ -552,7 +552,7 @@ int dev_udp_frag_offload_set(const char *const dev, uint32_t ufo)
  * \return 0 on success, -1 if the interface generic segmentation offload status could not be set.
  */
 
-int dev_generic_seg_offload_set(const char *const dev, uint32_t gso)
+int dev_generic_seg_offload_set(const char *const dev, int gso)
 {
 	return dev_ethtool_value_get(dev, ETHTOOL_SGSO, &gso);
 }
@@ -564,7 +564,7 @@ int dev_generic_seg_offload_set(const char *const dev, uint32_t gso)
  * \return 0 on success, -1 if the interface generic receive offload status could not be set.
  */
 
-int dev_generic_rcv_offload_set(const char *const dev, uint32_t gro)
+int dev_generic_rcv_offload_set(const char *const dev, int gro)
 {
 	return dev_ethtool_value_get(dev, ETHTOOL_SGRO, &gro);
 }
@@ -576,10 +576,10 @@ int dev_generic_rcv_offload_set(const char *const dev, uint32_t gro)
  * \return 0 on success, -1 if the interface large receive offload status could not be set.
  */
 
-int dev_large_rcv_offload_set(const char *const dev, uint32_t lro)
+int dev_large_rcv_offload_set(const char *const dev, int lro)
 {
 	int rc;
-	uint32_t flags = 0;
+	int flags = 0;
 
 	rc = dev_ethtool_value_get(dev, ETHTOOL_GFLAGS, &flags);
 
@@ -601,10 +601,10 @@ int dev_large_rcv_offload_set(const char *const dev, uint32_t lro)
  * \return 0 on success, -1 if the interface receive hashing offload status could not be set.
  */
 
-int dev_rx_hash_offload_set(const char *const dev, uint32_t rxhash)
+int dev_rx_hash_offload_set(const char *const dev, int rxhash)
 {
 	int rc;
-	uint32_t flags = 0;
+	int flags = 0;
 
 	rc = dev_ethtool_value_get(dev, ETHTOOL_GFLAGS, &flags);
 
@@ -626,7 +626,7 @@ int dev_rx_hash_offload_set(const char *const dev, uint32_t rxhash)
  * \return 0 on success, -1 if the interface link status could not be fetched.
  */
 
-int dev_link_get(const char *const dev, uint32_t * link)
+int dev_link_get(const char *const dev, int *link)
 {
 	return dev_ethtool_value_get(dev, ETHTOOL_GLINK, link);
 }
