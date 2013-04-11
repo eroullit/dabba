@@ -157,6 +157,13 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 
 #define DEFAULT_CAPTURE_FRAME_NUMBER 32
 
+/**
+ * \brief Invoke capture start remote procedure call
+ * \param[in]           service	        Pointer to protobuf service
+ * \param[in]           capture 	Pointer to capture settings to create
+ * \return always returns zero.
+ */
+
 int rpc_capture_start(ProtobufCService * service,
 		      const Dabba__Capture * capture)
 {
@@ -174,6 +181,13 @@ int rpc_capture_start(ProtobufCService * service,
 	return 0;
 }
 
+/**
+ * \brief Invoke capture stop remote procedure call
+ * \param[in]           service	        Pointer to protobuf service
+ * \param[in]           id 	        Pointer to capture id to stop
+ * \return always returns zero.
+ */
+
 int rpc_capture_stop(ProtobufCService * service, const Dabba__ThreadId * id)
 {
 	protobuf_c_boolean is_done = 0;
@@ -188,6 +202,13 @@ int rpc_capture_stop(ProtobufCService * service, const Dabba__ThreadId * id)
 
 	return 0;
 }
+
+/**
+ * \brief Parse argument vector to prepare a capture start query
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv	        Argument vector
+ * \return 0 on success, \c EINVAL on invalid input.
+ */
 
 int cmd_capture_start(int argc, const char **argv)
 {
@@ -274,6 +295,13 @@ int cmd_capture_start(int argc, const char **argv)
 	return service ? rpc_capture_start(service, &capture) : EINVAL;
 }
 
+/**
+ * \brief Parse argument vector to prepare a capture stop query
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv	        Argument vector
+ * \return 0 on success, \c EINVAL on invalid input.
+ */
+
 int cmd_capture_stop(int argc, const char **argv)
 {
 	enum capture_start_option {
@@ -336,6 +364,12 @@ int cmd_capture_stop(int argc, const char **argv)
 	return service ? rpc_capture_stop(service, &id) : EINVAL;
 }
 
+/**
+ * \brief Parse argument vector to prepare a capture list get query
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv	        Argument vector
+ * \return 0 on success, \c EINVAL on invalid input.
+ */
 int cmd_capture_get(int argc, const char **argv)
 {
 	enum capture_option {
