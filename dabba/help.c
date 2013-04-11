@@ -51,17 +51,15 @@ void show_usage(const struct option *opt)
 
 	printf("%s", dabba_usage_string);
 
-	if (opt != NULL) {
-		while (opt->name != NULL) {
-			printf("  --%s", opt->name);
-			if (opt->has_arg == required_argument)
-				printf(" <arg>\n");
-			else if (opt->has_arg == optional_argument)
-				printf(" [arg]\n");
-			else
-				printf("\n");
-			opt++;
-		}
+	while (opt->name != NULL) {
+		printf("  --%s", opt->name);
+		if (opt->has_arg == required_argument)
+			printf(" <arg>\n");
+		else if (opt->has_arg == optional_argument)
+			printf(" [arg]\n");
+		else
+			printf("\n");
+		opt++;
 	}
 }
 

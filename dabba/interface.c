@@ -155,7 +155,6 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
-#include <assert.h>
 #include <errno.h>
 #include <getopt.h>
 #include <linux/ethtool.h>

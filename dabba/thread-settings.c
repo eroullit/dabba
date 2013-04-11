@@ -40,6 +40,8 @@ static void thread_settings_print(const Dabba__ThreadList * result,
 	size_t a;
 	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
 
+	assert(closure_data);
+
 	rpc_header_print("threads");
 
 	for (a = 0; result && a < result->n_list; a++) {

@@ -37,6 +37,8 @@ static void capture_settings_print(const Dabba__CaptureList *
 	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
 	size_t a;
 
+	assert(closure_data);
+
 	rpc_header_print("captures");
 
 	for (a = 0; result && a < result->n_list; a++) {

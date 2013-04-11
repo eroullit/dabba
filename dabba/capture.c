@@ -143,7 +143,6 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 #include <getopt.h>
 #include <inttypes.h>
 #include <errno.h>
@@ -163,6 +162,9 @@ int rpc_capture_start(ProtobufCService * service,
 {
 	protobuf_c_boolean is_done = 0;
 
+	assert(service);
+	assert(capture);
+
 	/* TODO Print create capture thread id ? */
 	dabba__dabba_service__capture_start(service, capture,
 					    rpc_error_code_print, &is_done);
@@ -175,6 +177,9 @@ int rpc_capture_start(ProtobufCService * service,
 int rpc_capture_stop(ProtobufCService * service, const Dabba__ThreadId * id)
 {
 	protobuf_c_boolean is_done = 0;
+
+	assert(service);
+	assert(id);
 
 	dabba__dabba_service__capture_stop(service, id,
 					   rpc_error_code_print, &is_done);
