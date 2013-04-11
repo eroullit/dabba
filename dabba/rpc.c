@@ -35,8 +35,8 @@
 ProtobufCService *dabba_rpc_client_connect(const char *const name,
 					   const ProtobufC_RPC_AddressType type)
 {
-	/* The first failure triggers a instantaneous retry, we want 10 retry */
-	size_t a, nretry = 11;
+	/* The first failure triggers a instantaneous retry, we want 3 retry */
+	size_t a, nretry = 4;
 	ProtobufCService *service;
 	ProtobufC_RPC_Client *client;
 
@@ -53,7 +53,7 @@ ProtobufCService *dabba_rpc_client_connect(const char *const name,
 
 	client = (ProtobufC_RPC_Client *) service;
 
-	protobuf_c_rpc_client_set_autoreconnect_period(client, 1000);
+	protobuf_c_rpc_client_set_autoreconnect_period(client, 100);
 
 	for (a = 0; a < nretry && !protobuf_c_rpc_client_is_connected(client);
 	     a++)
