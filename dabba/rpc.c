@@ -29,6 +29,7 @@
 
 #include <stdio.h>
 #include <unistd.h>
+#include <errno.h>
 #include <dabba/rpc.h>
 
 ProtobufCService *dabba_rpc_client_connect(const char *const name,
@@ -85,10 +86,12 @@ void rpc_error_code_print(const Dabba__ErrorCode const *result,
 {
 	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
 
-	assert(result);
 	assert(closure_data);
 
-	__rpc_error_code_print(result->code);
+	if (result)
+		__rpc_error_code_print(result->code);
+	else
+		__rpc_error_code_print(EINVAL);
 
 	*status = 1;
 }
