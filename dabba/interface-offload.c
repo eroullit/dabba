@@ -50,9 +50,9 @@ static void interface_offload_list_print(const Dabba__InterfaceOffloadList *
 
 	for (a = 0; result && a < result->n_list; a++) {
 		offloadp = result->list[a];
+		printf("    - name: %s\n", offloadp->id->name);
 		printf("    ");
 		__rpc_error_code_print(offloadp->status->code);
-		printf("    - name: %s\n", offloadp->id->name);
 		printf("      offload:\n");
 		printf("        rx checksum: %s\n",
 		       print_tf(offloadp->rx_csum));

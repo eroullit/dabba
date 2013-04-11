@@ -51,9 +51,9 @@ static void interface_status_list_print(const Dabba__InterfaceStatusList *
 
 	for (a = 0; result && a < result->n_list; a++) {
 		statusp = result->list[a];
+		printf("    - name: %s\n", statusp->id->name);
 		printf("    ");
 		__rpc_error_code_print(statusp->status->code);
-		printf("    - name: %s\n", statusp->id->name);
 		printf("      status: {");
 		printf("connectivity: %s, ", print_tf(statusp->connectivity));
 		printf("up: %s, ", print_tf(statusp->up));

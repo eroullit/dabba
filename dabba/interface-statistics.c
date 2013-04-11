@@ -50,9 +50,9 @@ static void interface_statistics_list_print(const Dabba__InterfaceStatisticsList
 
 	for (a = 0; result && a < result->n_list; a++) {
 		statisticsp = result->list[a];
+		printf("    - name: %s\n", statisticsp->id->name);
 		printf("    ");
 		__rpc_error_code_print(statisticsp->status->code);
-		printf("    - name: %s\n", statisticsp->id->name);
 		printf("      statistics:\n");
 		printf("          rx: {");
 		printf("byte: %" PRIu64 ", ", statisticsp->rx_byte);

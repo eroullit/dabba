@@ -49,9 +49,9 @@ static void interface_driver_list_print(const Dabba__InterfaceDriverList *
 
 	for (a = 0; result && a < result->n_list; a++) {
 		driverp = result->list[a];
+		printf("    - name: %s\n", driverp->id->name);
 		printf("    ");
 		__rpc_error_code_print(driverp->status->code);
-		printf("    - name: %s\n", driverp->id->name);
 		printf("      driver name: %s\n", driverp->name);
 		printf("      driver version: %s\n", driverp->version);
 		printf("      firmware version: %s\n", driverp->fw_version);

@@ -52,9 +52,9 @@ static void interface_settings_list_print(const Dabba__InterfaceSettingsList *
 
 	for (a = 0; result && a < result->n_list; a++) {
 		settingsp = result->list[a];
+		printf("    - name: %s\n", settingsp->id->name);
 		printf("    ");
 		__rpc_error_code_print(settingsp->status->code);
-		printf("    - name: %s\n", settingsp->id->name);
 		printf("      settings:\n");
 		printf("        speed: %u\n", settingsp->speed);
 		printf("        duplex: %s\n", duplex2str(settingsp->duplex));

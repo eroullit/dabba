@@ -31,6 +31,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <dabba/rpc.h>
+#include <string.h>
 
 ProtobufCService *dabba_rpc_client_connect(const char *const name,
 					   const ProtobufC_RPC_AddressType type)
@@ -78,7 +79,7 @@ void rpc_header_print(const char *const title)
 
 void __rpc_error_code_print(const int error_code)
 {
-	printf("# error code: %i\n", error_code);
+	printf("  rc: %i # %s\n", error_code, strerror(error_code));
 }
 
 void rpc_error_code_print(const Dabba__ErrorCode const *result,

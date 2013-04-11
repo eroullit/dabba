@@ -51,9 +51,9 @@ static void interface_pause_list_print(const Dabba__InterfacePauseList *
 
 	for (a = 0; result && a < result->n_list; a++) {
 		pausep = result->list[a];
+		printf("    - name: %s\n", pausep->id->name);
 		printf("    ");
 		__rpc_error_code_print(pausep->status->code);
-		printf("    - name: %s\n", pausep->id->name);
 		printf("      pause:\n");
 		printf("        autoneg: %s\n", print_tf(pausep->autoneg));
 		printf("        rx: %s\n", print_tf(pausep->rx_pause));

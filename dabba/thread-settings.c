@@ -46,9 +46,9 @@ static void thread_settings_print(const Dabba__ThreadList * result,
 
 	for (a = 0; result && a < result->n_list; a++) {
 		thread = result->list[a];
+		printf("    - id: %" PRIu64 "\n", thread->id->id);
 		printf("    ");
 		__rpc_error_code_print(thread->status->code);
-		printf("    - id: %" PRIu64 "\n", thread->id->id);
 		printf("      type: %s\n", thread_type2str(thread->type));
 		printf("      scheduling policy: %s\n",
 		       sched_policy2str(thread->sched_policy));

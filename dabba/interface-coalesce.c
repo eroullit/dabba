@@ -51,9 +51,9 @@ static void interface_coalesce_list_print(const Dabba__InterfaceCoalesceList *
 
 	for (a = 0; result && a < result->n_list; a++) {
 		coalescep = result->list[a];
+		printf("    - name: %s\n", coalescep->id->name);
 		printf("    ");
 		__rpc_error_code_print(coalescep->status->code);
-		printf("    - name: %s\n", coalescep->id->name);
 		printf("      coalesce:\n");
 		printf("        packet rate high: %u\n",
 		       coalescep->pkt_rate_high);
