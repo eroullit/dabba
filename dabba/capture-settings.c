@@ -30,6 +30,13 @@
 #include <stdio.h>
 #include <dabba/rpc.h>
 
+/**
+ * \internal
+ * \brief Print capture settings list to \c stdout
+ * \param[in]           result	        Pointer to capture settings list
+ * \param[in,out]       closure_data	Pointer to protobuf closure data
+ */
+
 static void capture_settings_print(const Dabba__CaptureList *
 				   result, void *closure_data)
 {
@@ -55,6 +62,14 @@ static void capture_settings_print(const Dabba__CaptureList *
 
 	*status = 1;
 }
+
+/**
+ * \brief Invoke capture settings get remote procedure call
+ * \param[in]           service	        Pointer to protobuf service
+ * \param[in]           id_list 	Pointer to capture id list
+ * \return always returns zero.
+ * \note an empty id list will query all captures currently running.
+ */
 
 int rpc_capture_settings_get(ProtobufCService * service,
 			     const Dabba__ThreadIdList * id_list)
