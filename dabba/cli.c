@@ -33,6 +33,13 @@
 #include <errno.h>
 #include <linux/ethtool.h>
 
+/**
+ * \brief Parse input string to return \c true or \c false boolean
+ * \param[in]           str	        String to parse
+ * \param[out]          val	        Output boolean
+ * \return 0 on success, \c EINVAL on invalid input.
+ */
+
 int str2bool(const char *const str, int *const val)
 {
 	int rc = 0;
@@ -49,6 +56,14 @@ int str2bool(const char *const str, int *const val)
 
 	return rc;
 }
+
+/**
+ * \brief Parse input string to return a supported interface speed
+ * \param[in]           str	        String to parse
+ * \param[out]          speed	        Output speed value
+ * \return 0 on success, \c EINVAL on invalid input.
+ * \note speed equals \c SPEED_UNKNOWN when the string does not match any speed.
+ */
 
 int str2speed(const char *const str, uint32_t * const speed)
 {
@@ -75,6 +90,14 @@ int str2speed(const char *const str, uint32_t * const speed)
 	return rc;
 }
 
+/**
+ * \brief Parse input string to return a supported interface duplex mode
+ * \param[in]           str	        String to parse
+ * \param[out]          duplex	        Output duplex mode
+ * \return 0 on success, \c EINVAL on invalid input.
+ * \note duplex equals \c DUPLEX_UNKNOWN when the string does not match any duplex mode.
+ */
+
 int str2duplex(const char *const str, int *const duplex)
 {
 	int rc = 0;
@@ -93,6 +116,13 @@ int str2duplex(const char *const str, int *const duplex)
 
 	return rc;
 }
+
+/**
+ * \brief Return a string representation of a duplex mode
+ * \param[in]           duplex	        Duplex mode
+ * \return duplex mode string
+ * \note returns \¢ "unknown" if the input duplex mode is neither \c full nor \c half.
+ */
 
 char *duplex2str(const int duplex)
 {
