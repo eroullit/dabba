@@ -61,4 +61,16 @@ number_of_interface_get()
     sed '1,2d' /proc/net/dev | wc -l | cut -f 1 -d ' '
 }
 
+sys_class_net_get()
+{
+    local dev="$(cat "$1")"
+    local param="$2"
+    local rc
+
+    cat "/sys/class/net/$dev/$param" > tmp_set 2> /dev/null
+    rc=$?
+
+    (test -s tmp_set && test $rc = 0 && cat tmp_set) || echo "0"
+}
+
 # vim: ft=sh:tabstop=4:et

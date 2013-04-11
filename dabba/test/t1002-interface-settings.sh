@@ -21,18 +21,6 @@ test_description='Test dabba interface settings command'
 
 . ./dabba-test-lib.sh
 
-sys_class_net_get()
-{
-    local dev="$(cat "$1")"
-    local param="$2"
-    local rc
-
-    cat "/sys/class/net/$dev/$param" > tmp_set 2> /dev/null
-    rc=$?
-
-    (test -s tmp_set && test $rc = 0 && cat tmp_set) || echo "0"
-}
-
 #test_expect_success 'invoke dabba interface settings command w/o dabbad' "
 #    test_must_fail $DABBA_PATH/dabba settings list
 #"
