@@ -38,9 +38,9 @@ cat <<EOF
 EOF
 }
 
-#test_expect_success 'invoke dabba interface status w/o dabbad' "
-#    test_must_fail $DABBA_PATH/dabba interface status
-#"
+test_expect_success 'invoke dabba interface status w/o dabbad' "
+    test_expect_code 22 $DABBA_PATH/dabba interface get status
+"
 
 test_expect_success DUMMY_DEV "Setup: Remove all dummy interfaces" "
     test_might_fail flush_dummy_interface

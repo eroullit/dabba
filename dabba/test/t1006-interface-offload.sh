@@ -23,9 +23,9 @@ test_description='Test dabba interface offload command'
 
 dev_nr=$(number_of_interface_get)
 
-#test_expect_success 'invoke dabba interface offload command w/o dabbad' "
-#    test_must_fail $DABBA_PATH/dabba offload list
-#"
+test_expect_success 'invoke dabba interface offload command w/o dabbad' "
+    test_expect_code 22 $DABBA_PATH/dabba interface get offload
+"
 
 test_expect_success "Setup: Start dabbad" "
     '$DABBAD_PATH'/dabbad --daemonize
