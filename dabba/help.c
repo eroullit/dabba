@@ -75,7 +75,7 @@ void show_usage(const struct option *opt)
  * \param[in]           num	        Indent level
  */
 
-static inline void mput_char(char c, uint32_t num)
+static inline void mput_char(const char c, uint32_t num)
 {
 	while (num--)
 		putchar(c);
