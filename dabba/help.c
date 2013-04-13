@@ -45,6 +45,11 @@ struct cmdname_help {
 	char help[80];
 };
 
+/**
+ * \brief print option list to \c stdout
+ * \param[in]           opt	        Pointer to option array
+ */
+
 void show_usage(const struct option *opt)
 {
 	assert(opt);
@@ -63,17 +68,33 @@ void show_usage(const struct option *opt)
 	}
 }
 
+/**
+ * \internal
+ * \brief add some indenting on \c stdout
+ * \param[in]           c	        Character to indent
+ * \param[in]           num	        Indent level
+ */
+
 static inline void mput_char(char c, uint32_t num)
 {
 	while (num--)
 		putchar(c);
 }
 
+/**
+ * \brief print on \c stdout that the invoked command is unknown
+ * \param[in]           cmd	        Pointer to invoked command string
+ */
+
 void help_unknown_cmd(const char *const cmd)
 {
 	assert(cmd);
 	printf("'%s' is not a dabba command. See 'dabba --help'.\n", cmd);
 }
+
+/**
+ * \brief list on \c stdout the commonly used commands.
+ */
 
 static void list_common_cmds_help(void)
 {
@@ -124,6 +145,13 @@ int cmd_help(int argc, const char **argv)
 
 	return rc ? errno : rc;
 }
+
+/**
+ * \brief Print tool version number to \c stdout
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv		Argument vector
+ * \return Always returns zero.
+ */
 
 int cmd_version(int argc, const char **argv)
 {
