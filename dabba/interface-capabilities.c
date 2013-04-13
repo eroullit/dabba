@@ -41,6 +41,13 @@
 
 extern const char *port2str(const uint8_t port);
 
+/**
+ * \internal
+ * \brief Protobuf closure to print interface capabilities list in YAML
+ * \param[in]           result	        Pointer to interface capabilities list
+ * \param[in]           closure_data	Pointer to protobuf closure data
+ */
+
 static void interface_capabilities_list_print(const
 					      Dabba__InterfaceCapabilitiesList *
 					      result, void *closure_data)
@@ -82,16 +89,16 @@ static void interface_capabilities_list_print(const
 		       "            10000: {half: false, full: %s}\n",
 		       print_tf(capabilitiesp->supported_speed->ethernet->half),
 		       print_tf(capabilitiesp->supported_speed->ethernet->full),
-		       print_tf(capabilitiesp->supported_speed->fast_ethernet->
-				half),
-		       print_tf(capabilitiesp->supported_speed->fast_ethernet->
-				full),
-		       print_tf(capabilitiesp->supported_speed->gbps_ethernet->
-				half),
-		       print_tf(capabilitiesp->supported_speed->gbps_ethernet->
-				full),
 		       print_tf(capabilitiesp->supported_speed->
-				_10gbps_ethernet->full));
+				fast_ethernet->half),
+		       print_tf(capabilitiesp->supported_speed->
+				fast_ethernet->full),
+		       print_tf(capabilitiesp->supported_speed->
+				gbps_ethernet->half),
+		       print_tf(capabilitiesp->supported_speed->
+				gbps_ethernet->full),
+		       print_tf(capabilitiesp->
+				supported_speed->_10gbps_ethernet->full));
 		printf("        advertised:\n");
 		printf("          autoneg: %s\n",
 		       print_tf(capabilitiesp->advertising_opt->autoneg));
@@ -102,20 +109,20 @@ static void interface_capabilities_list_print(const
 		       "            100:   {half: %s, full: %s}\n"
 		       "            1000:  {half: %s, full: %s}\n"
 		       "            10000: {half: false, full: %s}\n",
-		       print_tf(capabilitiesp->advertising_speed->ethernet->
-				half),
-		       print_tf(capabilitiesp->advertising_speed->ethernet->
-				full),
 		       print_tf(capabilitiesp->advertising_speed->
-				fast_ethernet->half),
+				ethernet->half),
 		       print_tf(capabilitiesp->advertising_speed->
-				fast_ethernet->full),
-		       print_tf(capabilitiesp->advertising_speed->
-				gbps_ethernet->half),
-		       print_tf(capabilitiesp->advertising_speed->
-				gbps_ethernet->full),
-		       print_tf(capabilitiesp->advertising_speed->
-				_10gbps_ethernet->full));
+				ethernet->full),
+		       print_tf(capabilitiesp->
+				advertising_speed->fast_ethernet->half),
+		       print_tf(capabilitiesp->
+				advertising_speed->fast_ethernet->full),
+		       print_tf(capabilitiesp->
+				advertising_speed->gbps_ethernet->half),
+		       print_tf(capabilitiesp->
+				advertising_speed->gbps_ethernet->full),
+		       print_tf(capabilitiesp->
+				advertising_speed->_10gbps_ethernet->full));
 		printf("        link-partner advertised:\n");
 		printf("          autoneg: %s\n",
 		       print_tf(capabilitiesp->lp_advertising_opt->autoneg));
@@ -126,24 +133,32 @@ static void interface_capabilities_list_print(const
 		       "            100:   {half: %s, full: %s}\n"
 		       "            1000:  {half: %s, full: %s}\n"
 		       "            10000: {half: false, full: %s}\n",
-		       print_tf(capabilitiesp->lp_advertising_speed->ethernet->
-				half),
-		       print_tf(capabilitiesp->lp_advertising_speed->ethernet->
-				full),
 		       print_tf(capabilitiesp->lp_advertising_speed->
-				fast_ethernet->half),
+				ethernet->half),
 		       print_tf(capabilitiesp->lp_advertising_speed->
-				fast_ethernet->full),
-		       print_tf(capabilitiesp->lp_advertising_speed->
-				gbps_ethernet->half),
-		       print_tf(capabilitiesp->lp_advertising_speed->
-				gbps_ethernet->full),
-		       print_tf(capabilitiesp->lp_advertising_speed->
-				_10gbps_ethernet->full));
+				ethernet->full),
+		       print_tf(capabilitiesp->
+				lp_advertising_speed->fast_ethernet->half),
+		       print_tf(capabilitiesp->
+				lp_advertising_speed->fast_ethernet->full),
+		       print_tf(capabilitiesp->
+				lp_advertising_speed->gbps_ethernet->half),
+		       print_tf(capabilitiesp->
+				lp_advertising_speed->gbps_ethernet->full),
+		       print_tf(capabilitiesp->
+				lp_advertising_speed->_10gbps_ethernet->full));
 	}
 
 	*status = 1;
 }
+
+/**
+ * \brief Invoke interface capabilities get RPC
+ * \param[in]           service	        Pointer to protobuf service structure
+ * \param[in]           id_list         Pointer to interface id to fetch
+ * \return Always returns 0.
+ * \note An empty id list will query the capabilities of all available interfaces
+ */
 
 int rpc_interface_capabilities_get(ProtobufCService * service,
 				   const Dabba__InterfaceIdList * id_list)
@@ -161,6 +176,15 @@ int rpc_interface_capabilities_get(ProtobufCService * service,
 
 	return 0;
 }
+
+/**
+ * \internal
+ * \brief Invoke interface capabilities list RPC
+ * \param[in]           service	        Pointer to protobuf service structure
+ * \param[in]           id_list         Pointer to interface id to fetch
+ * \return Always returns 0.
+ * \note An empty id list will query the capabilities of all available interfaces
+ */
 
 static int rpc_interface_capabilities_modify(ProtobufCService * service,
 					     const Dabba__InterfaceCapabilities
@@ -180,6 +204,13 @@ static int rpc_interface_capabilities_modify(ProtobufCService * service,
 
 	return 0;
 }
+
+/**
+ * \brief Prepare interface capabilities modify RPC from \c argv
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv	        Argument vector
+ * \return Returns 0 on success, else otherwise.
+ */
 
 int cmd_interface_capabilities_modify(int argc, const char **argv)
 {
