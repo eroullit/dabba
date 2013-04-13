@@ -131,14 +131,16 @@ int rpc_interface_coalesce_get(ProtobufCService * service,
 }
 
 /**
+ * \internal
  * \brief Invoke interface coalesce modify RPC
  * \param[in]           service	        Pointer to protobuf service structure
  * \param[in]           coalesce        Pointer to interface new coalesce settings
  * \return Always returns 0.
  */
 
-int rpc_interface_coalesce_modify(ProtobufCService * service,
-				  const Dabba__InterfaceCoalesce * coalescep)
+static int rpc_interface_coalesce_modify(ProtobufCService * service,
+					 const Dabba__InterfaceCoalesce *
+					 coalescep)
 {
 	protobuf_c_boolean is_done = 0;
 
