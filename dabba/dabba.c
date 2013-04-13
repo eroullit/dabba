@@ -99,6 +99,16 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabba/interface.h>
 #include <dabba/capture.h>
 
+/**
+ * \internal
+ * \brief run command function and pass it \c argc / \c argv
+ * \param[in]           p	        Pointer to command structure
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv	        Argument vector
+ * \return 0 on success, else on failure.
+ * \note on success, \c stdout pipe/socket is checked, flushed and closed.
+ */
+
 static int run_builtin(const struct cmd_struct *p, int argc, const char **argv)
 {
 	int status;
@@ -136,6 +146,17 @@ static int run_builtin(const struct cmd_struct *p, int argc, const char **argv)
 	return 0;
 }
 
+/**
+ * \brief run command function and pass it \c argc / \c argv
+ * \brief also check if \c argv contains help parameters
+ * \param[in]           p	        Pointer to command structure
+ * \param[in]           cmd_len	        Number of valid command passed
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv	        Argument vector
+ * \return 0 on success, else on failure, \c ENOSYS if the command is unknown.
+ * \note on success, \c stdout pipe/socket is checked, flushed and closed.
+ */
+
 int cmd_run_builtin(const struct cmd_struct *cmd, const size_t cmd_len,
 		    int argc, const char **argv)
 {
@@ -165,6 +186,13 @@ int cmd_run_builtin(const struct cmd_struct *cmd, const size_t cmd_len,
 
 	return ENOSYS;
 }
+
+/**
+ * \brief start function. Pass on \cargc / \c argv to commands
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv	        Argument vector
+ * \return 0 on success, else on failure.
+ */
 
 int main(int argc, const char **argv)
 {
