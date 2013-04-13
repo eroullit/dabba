@@ -68,7 +68,7 @@ static void capture_settings_print(const Dabba__CaptureList *
  * \param[in]           service	        Pointer to protobuf service
  * \param[in]           id_list 	Pointer to capture id list
  * \return always returns zero.
- * \note an empty id list will query all captures currently running.
+ * \note An empty id list will query all captures currently running.
  */
 
 int rpc_capture_settings_get(ProtobufCService * service,

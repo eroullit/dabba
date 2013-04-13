@@ -121,7 +121,7 @@ int str2duplex(const char *const str, int *const duplex)
  * \brief Return a string representation of a duplex mode
  * \param[in]           duplex	        Duplex mode
  * \return duplex mode string
- * \note returns \¢ "unknown" if the input duplex mode is neither \c full nor \c half.
+ * \note returns \c "unknown" if the input duplex mode is neither \c full nor \c half.
  */
 
 char *duplex2str(const int duplex)
