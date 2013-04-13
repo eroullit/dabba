@@ -38,6 +38,13 @@
 #include <dabba/help.h>
 #include <dabba/macros.h>
 
+/**
+ * \internal
+ * \brief Protobuf closure to print interface coalesce list in YAML
+ * \param[in]           result	        Pointer to interface coalesce list
+ * \param[in]           closure_data	Pointer to protobuf closure data
+ */
+
 static void interface_coalesce_list_print(const Dabba__InterfaceCoalesceList *
 					  result, void *closure_data)
 {
@@ -98,6 +105,14 @@ static void interface_coalesce_list_print(const Dabba__InterfaceCoalesceList *
 	*status = 1;
 }
 
+/**
+ * \brief Invoke interface coalesce get RPC
+ * \param[in]           service	        Pointer to protobuf service structure
+ * \param[in]           id_list         Pointer to interface id to fetch
+ * \return Always returns 0.
+ * \note An empty id list will query the coalesce status of all available interfaces.
+ */
+
 int rpc_interface_coalesce_get(ProtobufCService * service,
 			       const Dabba__InterfaceIdList * id_list)
 {
@@ -115,6 +130,13 @@ int rpc_interface_coalesce_get(ProtobufCService * service,
 	return 0;
 }
 
+/**
+ * \brief Invoke interface coalesce modify RPC
+ * \param[in]           service	        Pointer to protobuf service structure
+ * \param[in]           coalesce        Pointer to interface new coalesce settings
+ * \return Always returns 0.
+ */
+
 int rpc_interface_coalesce_modify(ProtobufCService * service,
 				  const Dabba__InterfaceCoalesce * coalescep)
 {
@@ -131,6 +153,13 @@ int rpc_interface_coalesce_modify(ProtobufCService * service,
 
 	return 0;
 }
+
+/**
+ * \brief Prepare interface coalesce modify RPC from \c argv
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv	        Argument vector
+ * \return Returns 0 on success, else otherwise.
+ */
 
 int cmd_interface_coalesce_modify(int argc, const char **argv)
 {
