@@ -41,6 +41,14 @@
 #include <dabbad/interface.h>
 #include <dabbad/interface-coalesce.h>
 
+/**
+ * \internal
+ * \brief Get the coalesce settings of a network interface
+ * \param[in]           obj	        Pointer to interface netlink structure
+ * \param[in]           arg             Pointer to interface coalesce protobuf message
+ * \note Might silently skip an interface if memory could not be allocated.
+ */
+
 static void __interface_coalesce_get(struct nl_object *obj, void *arg)
 {
 	struct rtnl_link *link = (struct rtnl_link *)obj;
@@ -137,6 +145,15 @@ static void __interface_coalesce_get(struct nl_object *obj, void *arg)
 	coalesce_list->n_list++;
 }
 
+/**
+ * \brief Get the coalesce settings of a list of requested network interfaces
+ * \param[in]           service	        Pointer to protobuf service structure
+ * \param[in]           id_list         Pointer to the requested interface id list
+ * \param[in]           closure         Pointer to protobuf closure function pointer
+ * \param[in,out]       closure_data	Pointer to protobuf closure data
+ * \note Might silently skip an interface if memory could not be allocated.
+ */
+
 void dabbad_interface_coalesce_get(Dabba__DabbaService_Service * service,
 				   const Dabba__InterfaceIdList * id_list,
 				   Dabba__InterfaceCoalesceList_Closure
@@ -183,6 +200,16 @@ void dabbad_interface_coalesce_get(Dabba__DabbaService_Service * service,
 	link_destroy(link);
 	link_cache_destroy(sock, cache);
 }
+
+/**
+ * \brief Modify the coalesce settings of a requested network interface
+ * \param[in]           service	        Pointer to protobuf service structure
+ * \param[in]           coalescep       Pointer to the new interface coalesce settings
+ * \param[in]           closure         Pointer to protobuf closure function pointer
+ * \param[in,out]       closure_data	Pointer to protobuf closure data
+ * \note This RPC only modifies the requested coalesce settings
+ * \note If the requested interface coalesce settings cannot be fetched, no modification will occur.
+ */
 
 void dabbad_interface_coalesce_modify(Dabba__DabbaService_Service * service,
 				      const Dabba__InterfaceCoalesce *

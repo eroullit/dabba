@@ -40,6 +40,14 @@
 #include <dabbad/interface.h>
 #include <dabbad/interface-offload.h>
 
+/**
+ * \internal
+ * \brief Get the offload settings of a network interface
+ * \param[in]           obj	        Pointer to interface netlink structure
+ * \param[in]           arg             Pointer to interface offload protobuf message
+ * \note Might silently skip an interface if memory could not be allocated.
+ */
+
 static void __interface_offload_get(struct nl_object *obj, void *arg)
 {
 	struct rtnl_link *link = (struct rtnl_link *)obj;
@@ -96,6 +104,15 @@ static void __interface_offload_get(struct nl_object *obj, void *arg)
 	offload_list->n_list++;
 }
 
+/**
+ * \brief Get the offload settings of a list of requested network interfaces
+ * \param[in]           service	        Pointer to protobuf service structure
+ * \param[in]           id_list         Pointer to the requested interface id list
+ * \param[in]           closure         Pointer to protobuf closure function pointer
+ * \param[in,out]       closure_data	Pointer to protobuf closure data
+ * \note Might silently skip an interface if memory could not be allocated.
+ */
+
 void dabbad_interface_offload_get(Dabba__DabbaService_Service * service,
 				  const Dabba__InterfaceIdList * id_list,
 				  Dabba__InterfaceOffloadList_Closure
@@ -141,6 +158,18 @@ void dabbad_interface_offload_get(Dabba__DabbaService_Service * service,
 	link_destroy(link);
 	link_cache_destroy(sock, cache);
 }
+
+/**
+ * \brief Modify the offload settings of a requested network interface
+ * \param[in]           service	        Pointer to protobuf service structure
+ * \param[in]           offloadp        Pointer to the new interface offload settings
+ * \param[in]           closure         Pointer to protobuf closure function pointer
+ * \param[in,out]       closure_data	Pointer to protobuf closure data
+ * \note This RPC only modifies the requested offload settings
+ * \note If the requested interface coalesce settings cannot be fetched, no modification will occur.
+ * \note The offload settings are applied by best-effort,
+ *       if a modification fails no further modifications are applied
+ */
 
 void dabbad_interface_offload_modify(Dabba__DabbaService_Service * service,
 				     const Dabba__InterfaceOffload * offloadp,

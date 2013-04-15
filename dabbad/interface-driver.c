@@ -40,6 +40,14 @@
 #include <dabbad/interface.h>
 #include <dabbad/interface-driver.h>
 
+/**
+ * \internal
+ * \brief Get the driver settings of a network interface
+ * \param[in]           obj	        Pointer to interface netlink structure
+ * \param[in]           arg             Pointer to interface driver protobuf message
+ * \note Might silently skip an interface if memory could not be allocated.
+ */
+
 static void __interface_driver_get(struct nl_object *obj, void *arg)
 {
 	struct rtnl_link *link = (struct rtnl_link *)obj;
@@ -88,6 +96,15 @@ static void __interface_driver_get(struct nl_object *obj, void *arg)
 
 	driver_list->n_list++;
 }
+
+/**
+ * \brief Get the driver settings of a list of requested network interfaces
+ * \param[in]           service	        Pointer to protobuf service structure
+ * \param[in]           id_list         Pointer to the requested interface id list
+ * \param[in]           closure         Pointer to protobuf closure function pointer
+ * \param[in,out]       closure_data	Pointer to protobuf closure data
+ * \note Might silently skip an interface if memory could not be allocated.
+ */
 
 void dabbad_interface_driver_get(Dabba__DabbaService_Service * service,
 				 const Dabba__InterfaceIdList * id_list,

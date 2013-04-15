@@ -41,6 +41,14 @@
 #include <dabbad/interface.h>
 #include <dabbad/interface-capabilities.h>
 
+/**
+ * \internal
+ * \brief Get the capabilities of a network interface
+ * \param[in]           obj	        Pointer to interface netlink structure
+ * \param[in]           arg             Pointer to interface capabilities protobuf message
+ * \note Might silently skip an interface if memory could not be allocated.
+ */
+
 static void __interface_capabilities_get(struct nl_object *obj, void *arg)
 {
 	struct rtnl_link *link = (struct rtnl_link *)obj;
@@ -295,6 +303,15 @@ static void __interface_capabilities_get(struct nl_object *obj, void *arg)
 	capabilities_list->n_list++;
 }
 
+/**
+ * \brief Get the capabilities of a list of requested network interfaces
+ * \param[in]           service	        Pointer to protobuf service structure
+ * \param[in]           id_list         Pointer to the requested interface id list
+ * \param[in]           closure         Pointer to protobuf closure function pointer
+ * \param[in,out]       closure_data	Pointer to protobuf closure data
+ * \note Might silently skip an interface if memory could not be allocated.
+ */
+
 void dabbad_interface_capabilities_get(Dabba__DabbaService_Service * service,
 				       const Dabba__InterfaceIdList * id_list,
 				       Dabba__InterfaceCapabilitiesList_Closure
@@ -336,22 +353,22 @@ void dabbad_interface_capabilities_get(Dabba__DabbaService_Service * service,
 		free(capabilities_list.list[a]->supported_speed->ethernet);
 		free(capabilities_list.list[a]->supported_speed->fast_ethernet);
 		free(capabilities_list.list[a]->supported_speed->gbps_ethernet);
-		free(capabilities_list.list[a]->supported_speed->
-		     _10gbps_ethernet);
+		free(capabilities_list.list[a]->
+		     supported_speed->_10gbps_ethernet);
 		free(capabilities_list.list[a]->advertising_speed->ethernet);
-		free(capabilities_list.list[a]->advertising_speed->
-		     fast_ethernet);
-		free(capabilities_list.list[a]->advertising_speed->
-		     gbps_ethernet);
-		free(capabilities_list.list[a]->advertising_speed->
-		     _10gbps_ethernet);
+		free(capabilities_list.list[a]->
+		     advertising_speed->fast_ethernet);
+		free(capabilities_list.list[a]->
+		     advertising_speed->gbps_ethernet);
+		free(capabilities_list.list[a]->
+		     advertising_speed->_10gbps_ethernet);
 		free(capabilities_list.list[a]->lp_advertising_speed->ethernet);
-		free(capabilities_list.list[a]->lp_advertising_speed->
-		     fast_ethernet);
-		free(capabilities_list.list[a]->lp_advertising_speed->
-		     gbps_ethernet);
-		free(capabilities_list.list[a]->lp_advertising_speed->
-		     _10gbps_ethernet);
+		free(capabilities_list.list[a]->
+		     lp_advertising_speed->fast_ethernet);
+		free(capabilities_list.list[a]->
+		     lp_advertising_speed->gbps_ethernet);
+		free(capabilities_list.list[a]->
+		     lp_advertising_speed->_10gbps_ethernet);
 		free(capabilities_list.list[a]->supported_opt);
 		free(capabilities_list.list[a]->supported_speed);
 		free(capabilities_list.list[a]->advertising_opt);
@@ -366,6 +383,14 @@ void dabbad_interface_capabilities_get(Dabba__DabbaService_Service * service,
 	link_destroy(link);
 	link_cache_destroy(sock, cache);
 }
+
+/**
+ * \internal
+ * \brief Modify the advertised option capabilities from a protobuf interface option capabilities message
+ * \param[in,out]       adv_opt 	Pointer to the interface advertised option capabilities flags
+ * \param[in]           caps            Pointer to the new advertised interface option settings
+ * \param[in,out]       apply           Pointer to flags to signal settings changes
+ */
 
 static void interface_advertising_option_set(uint32_t * const adv_opt,
 					     const
@@ -394,6 +419,14 @@ static void interface_advertising_option_set(uint32_t * const adv_opt,
 		*apply = 1;
 	}
 }
+
+/**
+ * \internal
+ * \brief Modify the advertised speed capabilities from a protobuf interface speed capabilities message
+ * \param[in,out]       adv_speed	Pointer to the interface advertised speed capabilities flags
+ * \param[in]           speed           Pointer to the new advertised interface speed settings
+ * \param[in,out]       apply           Pointer to flags to signal settings changes
+ */
 
 static void interface_speed_option_set(uint32_t * const adv_speed,
 				       const Dabba__InterfaceSpeedCapabilites *
@@ -475,6 +508,16 @@ static void interface_speed_option_set(uint32_t * const adv_speed,
 		}
 	}
 }
+
+/**
+ * \brief Modify the capabilities of a requested network interface
+ * \param[in]           service	        Pointer to protobuf service structure
+ * \param[in]           capabilitiesp   Pointer to the new interface capabilities settings
+ * \param[in]           closure         Pointer to protobuf closure function pointer
+ * \param[in,out]       closure_data	Pointer to protobuf closure data
+ * \note This RPC only modifies the requested capabilities settings
+ * \note If the requested interface capabilities cannot be fetched, no modification will occur.
+ */
 
 void dabbad_interface_capabilities_modify(Dabba__DabbaService_Service * service,
 					  const Dabba__InterfaceCapabilities *
