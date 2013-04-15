@@ -37,6 +37,12 @@
 #include <libdabba/macros.h>
 #include <dabbad/thread.h>
 
+static const char sched_policy[][8] = {
+	[SCHED_OTHER] = "other",
+	[SCHED_FIFO] = "fifo",
+	[SCHED_RR] = "rr"
+};
+
 /**
  * \brief Parse input string to return \c true or \c false boolean
  * \param[in]           str	        String to parse
@@ -146,12 +152,6 @@ char *duplex2str(const int duplex)
 
 	return res;
 }
-
-static const char sched_policy[][8] = {
-	[SCHED_OTHER] = "other",
-	[SCHED_FIFO] = "fifo",
-	[SCHED_RR] = "rr"
-};
 
 /**
  * \brief Get the policy value out of the policy name.
