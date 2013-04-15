@@ -198,7 +198,7 @@ const char *thread_type2str(const int type)
 		[CAPTURE_THREAD] = "capture"
 	};
 
-	int max = ARRAY_SIZE(thread_type);
+	const int max = ARRAY_SIZE(thread_type);
 
 	return type >= 0 && type < max ? thread_type[type] : "unknown";
 }
@@ -221,5 +221,7 @@ const char *port2str(const uint8_t port)
 		[PORT_DA] = "da"
 	};
 
-	return port < sizeof(port_str) ? port_str[port] : "unknown";
+	const size_t max = ARRAY_SIZE(port_str);
+
+	return port < max ? port_str[port] : "unknown";
 }
