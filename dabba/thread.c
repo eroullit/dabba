@@ -182,18 +182,16 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <errno.h>
 #include <inttypes.h>
 #include <assert.h>
-#include <sched.h>
 #include <getopt.h>
-#include <sys/resource.h>
 
 #include <libdabba/macros.h>
 #include <dabbad/thread.h>
-#include <dabba/dabba.h>
 #include <dabba/thread-capabilities.h>
 #include <dabba/thread-settings.h>
 #include <dabba/rpc.h>
 #include <dabba/cli.h>
 #include <dabba/help.h>
+#include <dabba/dabba.h>
 
 /**
  * \brief Parse argument vector to prepare a thread list get query
