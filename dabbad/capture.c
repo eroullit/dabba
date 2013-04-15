@@ -101,6 +101,15 @@ static struct packet_capture_thread *dabbad_capture_thread_get(struct packet_thr
 	return container_of(pkt_thread, struct packet_capture_thread, thread);
 }
 
+/**
+ * \brief RPC to stop a running capture
+ * \param[in]           service	        Pointer to protobuf service structure
+ * \param[in]           idp             Pointer to the thread id to stop
+ * \param[in]           closure         Pointer to protobuf closure function pointer
+ * \param[in]           closure_data	Pointer to protobuf closure data
+ * \return Returns 0 on success, else on failure via its closure function.
+ */
+
 void dabbad_capture_stop(Dabba__DabbaService_Service * service,
 			 const Dabba__ThreadId * idp,
 			 Dabba__ErrorCode_Closure closure, void *closure_data)
@@ -133,6 +142,15 @@ void dabbad_capture_stop(Dabba__DabbaService_Service * service,
 	err.code = rc;
 	closure(&err, closure_data);
 }
+
+/**
+ * \brief RPC to stop a running capture
+ * \param[in]           service	        Pointer to protobuf service structure
+ * \param[in]           idp             Pointer to the thread id to stop
+ * \param[in]           closure         Pointer to protobuf closure function pointer
+ * \param[in,out]       closure_data	Pointer to protobuf closure data
+ * \return Returns 0 on success, else on failure via its closure function.
+ */
 
 void dabbad_capture_start(Dabba__DabbaService_Service * service,
 			  const Dabba__Capture * capturep,
@@ -189,6 +207,15 @@ void dabbad_capture_start(Dabba__DabbaService_Service * service,
 	capturep->status->code = rc;
 	closure(capturep->status, closure_data);
 }
+
+/**
+ * \brief RPC to list requested running captures
+ * \param[in]           service	        Pointer to protobuf service structure
+ * \param[in]           id_listp        Pointer to the thread id list to get
+ * \param[in]           closure         Pointer to protobuf closure function pointer
+ * \param[in,out]       closure_data	Pointer to protobuf closure data
+ * \return Returns 0 on success, else on failure via its closure function.
+ */
 
 void dabbad_capture_get(Dabba__DabbaService_Service * service,
 			const Dabba__ThreadIdList * id_listp,
