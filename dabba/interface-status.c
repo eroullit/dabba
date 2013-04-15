@@ -106,8 +106,8 @@ int rpc_interface_status_get(ProtobufCService * service,
  * \return Always returns 0.
  */
 
-int rpc_interface_status_modify(ProtobufCService * service,
-				const Dabba__InterfaceStatus * statusp)
+static int rpc_interface_status_modify(ProtobufCService * service,
+				       const Dabba__InterfaceStatus * statusp)
 {
 	protobuf_c_boolean is_done = 0;
 
