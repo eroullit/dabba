@@ -251,6 +251,13 @@ const char *thread_type2str(const int type)
 	    && thread_type[type] ? thread_type[type] : "unknown";
 }
 
+/**
+ * \brief Parse argument vector to prepare a thread list get query
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv	        Argument vector
+ * \return 0 on success, \c EINVAL on invalid input.
+ */
+
 int cmd_thread_get(int argc, const char **argv)
 {
 	enum thread_option {
@@ -361,6 +368,13 @@ int cmd_thread_get(int argc, const char **argv)
 
 	return rc;
 }
+
+/**
+ * \brief Parse argument vector to prepare a thread modify query
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv	        Argument vector
+ * \return 0 on success, \c EINVAL on invalid input.
+ */
 
 int cmd_thread_modify(int argc, const char **argv)
 {

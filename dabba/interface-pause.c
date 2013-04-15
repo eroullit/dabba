@@ -38,6 +38,13 @@
 #include <dabba/rpc.h>
 #include <dabba/help.h>
 
+/**
+ * \internal
+ * \brief Protobuf closure to print interface pause list in YAML
+ * \param[in]           result	        Pointer to interface pause list
+ * \param[in]           closure_data	Pointer to protobuf closure data
+ */
+
 static void interface_pause_list_print(const Dabba__InterfacePauseList *
 				       result, void *closure_data)
 {
@@ -63,6 +70,14 @@ static void interface_pause_list_print(const Dabba__InterfacePauseList *
 	*status = 1;
 }
 
+/**
+ * \brief Invoke interface pause get RPC
+ * \param[in]           service	        Pointer to protobuf service structure
+ * \param[in]           id_list         Pointer to interface id to fetch
+ * \return Always returns 0.
+ * \note An empty id list will query the pause status of all available interfaces.
+ */
+
 int rpc_interface_pause_get(ProtobufCService * service,
 			    const Dabba__InterfaceIdList * id_list)
 {
@@ -80,6 +95,14 @@ int rpc_interface_pause_get(ProtobufCService * service,
 	return 0;
 }
 
+/**
+ * \internal
+ * \brief Invoke interface pause modify RPC
+ * \param[in]           service	        Pointer to protobuf service structure
+ * \param[in]           pausep        Pointer to interface new pause settings
+ * \return Always returns 0.
+ */
+
 int rpc_interface_pause_modify(ProtobufCService * service,
 			       const Dabba__InterfacePause * pausep)
 {
@@ -96,6 +119,13 @@ int rpc_interface_pause_modify(ProtobufCService * service,
 
 	return 0;
 }
+
+/**
+ * \brief Prepare interface pause modify RPC from \c argv
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv	        Argument vector
+ * \return Returns 0 on success, else otherwise.
+ */
 
 int cmd_interface_pause_modify(int argc, const char **argv)
 {

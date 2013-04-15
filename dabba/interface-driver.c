@@ -36,6 +36,13 @@
 #include <dabba/rpc.h>
 #include <dabba/help.h>
 
+/**
+ * \internal
+ * \brief Protobuf closure to print interface driver list in YAML
+ * \param[in]           result	        Pointer to interface driver list
+ * \param[in]           closure_data	Pointer to protobuf closure data
+ */
+
 static void interface_driver_list_print(const Dabba__InterfaceDriverList *
 					result, void *closure_data)
 {
@@ -60,6 +67,14 @@ static void interface_driver_list_print(const Dabba__InterfaceDriverList *
 
 	*status = 1;
 }
+
+/**
+ * \brief Invoke interface driver get RPC
+ * \param[in]           service	        Pointer to protobuf service structure
+ * \param[in]           id_list         Pointer to interface id to fetch
+ * \return Always returns 0.
+ * \note An empty id list will query the driver information of all available interfaces.
+ */
 
 int rpc_interface_driver_get(ProtobufCService * service,
 			     const Dabba__InterfaceIdList * id_list)

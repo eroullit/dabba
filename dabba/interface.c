@@ -180,6 +180,13 @@ enum interface_modify_option {
 	OPT_INTERFACE_ID,
 };
 
+/**
+ * \brief Converts the interface port in a string represation of it.
+ * \param[in]           port	        Interface port settings
+ * \return Returns string representation of an interface port.
+ * \note Returns the string "unknown" if the interface port is not known.
+ */
+
 const char *port2str(const uint8_t port)
 {
 	static const char *const port_str[] = {
@@ -193,6 +200,14 @@ const char *port2str(const uint8_t port)
 
 	return port < sizeof(port_str) ? port_str[port] : "unknown";
 }
+
+/**
+ * \internal
+ * \brief Selects interface get RPC from \c argv
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv	        Argument vector
+ * \return 0 on success, else otherwise.
+ */
 
 static int cmd_interface_get(int argc, const char **argv)
 {
@@ -318,6 +333,14 @@ static int cmd_interface_get(int argc, const char **argv)
 
 	return rc;
 }
+
+/**
+ * \internal
+ * \brief Selects interface modify RPC from \c argv
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv	        Argument vector
+ * \return 0 on success, else otherwise.
+ */
 
 static int cmd_interface_modify(int argc, const char **argv)
 {

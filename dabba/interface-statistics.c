@@ -37,6 +37,13 @@
 #include <dabba/rpc.h>
 #include <dabba/help.h>
 
+/**
+ * \internal
+ * \brief Protobuf closure to print interface statistics list in YAML
+ * \param[in]           result	        Pointer to interface statistics list
+ * \param[in]           closure_data	Pointer to protobuf closure data
+ */
+
 static void interface_statistics_list_print(const Dabba__InterfaceStatisticsList
 					    * result, void *closure_data)
 {
@@ -88,6 +95,15 @@ static void interface_statistics_list_print(const Dabba__InterfaceStatisticsList
 
 	*status = 1;
 }
+
+/**
+ * \brief Invoke interface statistics get RPC
+ * \param[in]           service	        Pointer to protobuf service structure
+ * \param[in]           id_li
+ * st         Pointer to interface id to fetch
+ * \return Always returns 0.
+ * \note An empty id list will query the statistics counters of all available interfaces.
+ */
 
 int rpc_interface_statistics_get(ProtobufCService * service,
 				 const Dabba__InterfaceIdList * id_list)

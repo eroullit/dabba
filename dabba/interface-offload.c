@@ -37,6 +37,13 @@
 #include <dabba/cli.h>
 #include <dabba/help.h>
 
+/**
+ * \internal
+ * \brief Protobuf closure to print interface offload list in YAML
+ * \param[in]           result	        Pointer to interface offload list
+ * \param[in]           closure_data	Pointer to protobuf closure data
+ */
+
 static void interface_offload_list_print(const Dabba__InterfaceOffloadList *
 					 result, void *closure_data)
 {
@@ -70,6 +77,14 @@ static void interface_offload_list_print(const Dabba__InterfaceOffloadList *
 
 	*status = 1;
 }
+
+/**
+ * \brief Invoke interface offload get RPC
+ * \param[in]           service	        Pointer to protobuf service structure
+ * \param[in]           id_list         Pointer to interface id to fetch
+ * \return Always returns 0.
+ * \note An empty id list will query the coalesce status of all available interfaces.
+ */
 
 int rpc_interface_offload_get(ProtobufCService * service,
 			      const Dabba__InterfaceIdList * id_list)

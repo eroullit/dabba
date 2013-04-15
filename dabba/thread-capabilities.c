@@ -32,6 +32,13 @@
 
 const char *sched_policy2str(const int policy_value);
 
+/**
+ * \internal
+ * \brief Protobuf closure to print thread capabilities list in YAML
+ * \param[in]           result	        Pointer to thread capabilities list
+ * \param[in]           closure_data	Pointer to protobuf closure data
+ */
+
 static void thread_capabilities_print(const Dabba__ThreadCapabilitiesList *
 				      result, void *closure_data)
 {
@@ -55,6 +62,14 @@ static void thread_capabilities_print(const Dabba__ThreadCapabilitiesList *
 
 	*status = 1;
 }
+
+/**
+ * \brief Invoke thread capabilities get RPC
+ * \param[in]           service	        Pointer to protobuf service structure
+ * \param[in]           id_list         Pointer to thread id to fetch
+ * \return Always returns 0.
+ * \note An empty id list will query the status of all available thread.
+ */
 
 int rpc_thread_capabilities_get(ProtobufCService * service,
 				const Dabba__ThreadIdList * id_list)

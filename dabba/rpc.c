@@ -33,6 +33,14 @@
 #include <dabba/rpc.h>
 #include <string.h>
 
+/**
+ * \brief Connect the client to the selected server to make a RPC
+ * \param[in]           name	        Dabbad server name
+ * \param[in]           type		unix domain or TCP socket connection
+ * \return Returns a protobuf service handle pointer
+ * \note Performs 3 retries each 100ms if the requested server does not answer.
+ */
+
 ProtobufCService *dabba_rpc_client_connect(const char *const name,
 					   const ProtobufC_RPC_AddressType type)
 {
@@ -63,12 +71,22 @@ ProtobufCService *dabba_rpc_client_connect(const char *const name,
 	return a < nretry ? service : NULL;
 }
 
+/**
+ * \brief Poll until an RPC call is dispatched and completed
+ * \param[in]           is_done	        Pointer to protobuf completion variable
+ */
+
 void dabba_rpc_call_is_done(protobuf_c_boolean * is_done)
 {
 	assert(is_done);
 	while (!(*is_done))
 		protobuf_c_dispatch_run(protobuf_c_dispatch_default());
 }
+
+/**
+ * \brief Print a YAML document header on \c stdout
+ * \param[in]           title	        Title string
+ */
 
 void rpc_header_print(const char *const title)
 {
@@ -77,10 +95,23 @@ void rpc_header_print(const char *const title)
 	printf("---\n  %s:\n", title);
 }
 
+/**
+ * \internal
+ * \brief Print RPC error code to \c stdout
+ * \param[in]           error_code	 Error code value
+ * \note also prints a string describing error number as a YAML comment
+ */
+
 void __rpc_error_code_print(const int error_code)
 {
 	printf("  rc: %i # %s\n", error_code, strerror(error_code));
 }
+
+/**
+ * \brief Print RPC error code to \c stdout
+ * \param[in]           result  	 RPC error code message
+ * \param[in]           closure_data	 Pointer to protobuf closure data
+ */
 
 void rpc_error_code_print(const Dabba__ErrorCode const *result,
 			  void *closure_data)

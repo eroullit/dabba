@@ -38,6 +38,13 @@
 #include <dabba/rpc.h>
 #include <dabba/help.h>
 
+/**
+ * \internal
+ * \brief Protobuf closure to print interface status list in YAML
+ * \param[in]           result	        Pointer to interface status list
+ * \param[in]           closure_data	Pointer to protobuf closure data
+ */
+
 static void interface_status_list_print(const Dabba__InterfaceStatusList *
 					result, void *closure_data)
 {
@@ -66,6 +73,14 @@ static void interface_status_list_print(const Dabba__InterfaceStatusList *
 	*status = 1;
 }
 
+/**
+ * \brief Invoke interface status get RPC
+ * \param[in]           service	        Pointer to protobuf service structure
+ * \param[in]           id_list         Pointer to interface id to fetch
+ * \return Always returns 0.
+ * \note An empty id list will query the status of all available interfaces.
+ */
+
 int rpc_interface_status_get(ProtobufCService * service,
 			     const Dabba__InterfaceIdList * id_list)
 {
@@ -83,6 +98,14 @@ int rpc_interface_status_get(ProtobufCService * service,
 	return 0;
 }
 
+/**
+ * \internal
+ * \brief Invoke interface status modify RPC
+ * \param[in]           service	        Pointer to protobuf service structure
+ * \param[in]           status          Pointer to interface new status settings
+ * \return Always returns 0.
+ */
+
 int rpc_interface_status_modify(ProtobufCService * service,
 				const Dabba__InterfaceStatus * statusp)
 {
@@ -99,6 +122,13 @@ int rpc_interface_status_modify(ProtobufCService * service,
 
 	return 0;
 }
+
+/**
+ * \brief Prepare interface status modify RPC from \c argv
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv	        Argument vector
+ * \return Returns 0 on success, else otherwise.
+ */
 
 int cmd_interface_status_modify(int argc, const char **argv)
 {

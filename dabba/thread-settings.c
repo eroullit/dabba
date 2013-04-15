@@ -33,6 +33,13 @@
 const char *sched_policy2str(const int policy_value);
 const char *thread_type2str(const int type);
 
+/**
+ * \internal
+ * \brief Protobuf closure to print thread settings list in YAML
+ * \param[in]           result	        Pointer to thread settings list
+ * \param[in]           closure_data	Pointer to protobuf closure data
+ */
+
 static void thread_settings_print(const Dabba__ThreadList * result,
 				  void *closure_data)
 {
@@ -61,6 +68,14 @@ static void thread_settings_print(const Dabba__ThreadList * result,
 	*status = 1;
 }
 
+/**
+ * \brief Invoke thread settings get RPC
+ * \param[in]           service	        Pointer to protobuf service structure
+ * \param[in]           id_list         Pointer to thread id to fetch
+ * \return Always returns 0.
+ * \note An empty id list will query the status of all available thread.
+ */
+
 int rpc_thread_settings_get(ProtobufCService * service,
 			    const Dabba__ThreadIdList * id_list)
 {
@@ -76,6 +91,13 @@ int rpc_thread_settings_get(ProtobufCService * service,
 
 	return 0;
 }
+
+/**
+ * \brief Invoke thread settings modify RPC
+ * \param[in]           service	        Pointer to protobuf service structure
+ * \param[in]           status          Pointer to thread new status settings
+ * \return Always returns 0.
+ */
 
 int rpc_thread_settings_modify(ProtobufCService * service,
 			       const Dabba__Thread * thread)
