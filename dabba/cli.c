@@ -200,6 +200,5 @@ const char *thread_type2str(const int type)
 
 	int max = ARRAY_SIZE(thread_type);
 
-	return type >= 0 && type < max
-	    && thread_type[type] ? thread_type[type] : "unknown";
+	return type >= 0 && type < max ? thread_type[type] : "unknown";
 }
