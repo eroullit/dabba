@@ -37,8 +37,6 @@
 #include <dabba/cli.h>
 #include <dabba/help.h>
 
-extern const char *port2str(const uint8_t port);
-
 /**
  * \internal
  * \brief Protobuf closure to print interface settings list in YAML

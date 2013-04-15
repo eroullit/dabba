@@ -202,3 +202,24 @@ const char *thread_type2str(const int type)
 
 	return type >= 0 && type < max ? thread_type[type] : "unknown";
 }
+
+/**
+ * \brief Converts the interface port in a string representation of it.
+ * \param[in]           port	        Interface port settings
+ * \return Returns string representation of an interface port.
+ * \note Returns the string "unknown" if the interface port is not known.
+ */
+
+const char *port2str(const uint8_t port)
+{
+	static const char *const port_str[] = {
+		[PORT_TP] = "tp",
+		[PORT_AUI] = "aui",
+		[PORT_MII] = "mii",
+		[PORT_FIBRE] = "fibre",
+		[PORT_BNC] = "bnc",
+		[PORT_DA] = "da"
+	};
+
+	return port < sizeof(port_str) ? port_str[port] : "unknown";
+}
