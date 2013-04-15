@@ -31,7 +31,11 @@
 #include <stdint.h>
 #include <assert.h>
 #include <errno.h>
+#include <sched.h>
 #include <linux/ethtool.h>
+
+#include <libdabba/macros.h>
+#include <dabbad/thread.h>
 
 /**
  * \brief Parse input string to return \c true or \c false boolean
@@ -141,4 +145,61 @@ char *duplex2str(const int duplex)
 	}
 
 	return res;
+}
+
+static const char sched_policy[][8] = {
+	[SCHED_OTHER] = "other",
+	[SCHED_FIFO] = "fifo",
+	[SCHED_RR] = "rr"
+};
+
+/**
+ * \brief Get the policy value out of the policy name.
+ * \param[in]           policy_name	Policy name string
+ * \return Related policy value
+ */
+
+int str2sched_policy(const char *const policy_name)
+{
+	const size_t max = ARRAY_SIZE(sched_policy);
+	size_t a;
+
+	assert(policy_name);
+
+	for (a = 0; a < max; a++)
+		if (sched_policy[a] && !strcmp(policy_name, sched_policy[a]))
+			break;
+
+	return a < max ? a : SCHED_OTHER;
+}
+
+/**
+ * \brief Get the policy name out of the policy value.
+ * \param[in]           policy_name	Policy value
+ * \return Related policy name
+ */
+
+const char *sched_policy2str(const int policy)
+{
+	const int max = ARRAY_SIZE(sched_policy);
+
+	return policy >= 0 && policy < max ? sched_policy[policy] : "unknown";
+}
+
+/**
+ * \brief Get the thread name out of the thread type value
+ * \param[in]           type	Thread type value
+ * \return Thread name string
+ */
+
+const char *thread_type2str(const int type)
+{
+	static const char thread_type[][8] = {
+		[CAPTURE_THREAD] = "capture"
+	};
+
+	int max = ARRAY_SIZE(thread_type);
+
+	return type >= 0 && type < max
+	    && thread_type[type] ? thread_type[type] : "unknown";
 }
