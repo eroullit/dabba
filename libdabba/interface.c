@@ -43,7 +43,6 @@
 
 #include <libdabba/interface.h>
 #include <libdabba/strlcpy.h>
-#include <bits/ioctls.h>
 
 static int dev_kernel_request(struct ifreq *ifr, const int request)
 {
