@@ -39,8 +39,6 @@
 #include <dabbad/interface.h>
 #include <dabbad/interface-statistics.h>
 
-#include "libdabba-rpc/rpc.h"
-
 /**
  * \internal
  * \brief Get the statistics of a network interface
