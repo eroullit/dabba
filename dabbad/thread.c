@@ -48,10 +48,22 @@
 static TAILQ_HEAD(packet_thread_head, packet_thread) packet_thread_head =
 TAILQ_HEAD_INITIALIZER(packet_thread_head);
 
+/**
+ * \internal
+ * \brief Returns the first thread of the thread list
+ * \return Pointer to the first thread of the thread list
+ */
+
 static struct packet_thread *dabbad_thread_first(void)
 {
 	return TAILQ_FIRST(&packet_thread_head);
 }
+
+/**
+ * \internal
+ * \brief Returns next thread present in the thread list
+ * \return Pointer to the next thread of the thread list
+ */
 
 static struct packet_thread *dabbad_thread_next(struct packet_thread
 						*pkt_thread)
@@ -84,7 +96,7 @@ struct packet_thread *dabbad_thread_type_first(const enum packet_thread_type
  * \param[in] pkt_thread xurrent thread entry
  * \param[in] type type of the next running thread to get
  * \return 	Pointer to the next thread element,
- * 		NULL when \c pkt_thread was the last element
+ * 		\c NULL when \c pkt_thread was the last element
  */
 
 struct packet_thread *dabbad_thread_type_next(struct packet_thread *pkt_thread,
@@ -102,7 +114,7 @@ struct packet_thread *dabbad_thread_type_next(struct packet_thread *pkt_thread,
 /**
  * \brief Get the thread information from an existing pthread id
  * \param[in] thread_id pthread id to search
- * \return Pointer to the corresponding thread element, NULL when not found.
+ * \return Pointer to the corresponding thread element, \c NULL when not found.
  */
 
 struct packet_thread *dabbad_thread_data_get(const pthread_t thread_id)
@@ -249,6 +261,14 @@ static int cpu_affinity2str(const cpu_set_t * const mask, char *str,
 	return 0;
 }
 
+/**
+ * \internal
+ * \brief Get the next token present in a string
+ * \param[in]           q	        String to search
+ * \param[in]           sep	        Token to look for
+ * \return Pointer to the character after the requested token
+ */
+
 static char *nexttoken(char *q, int sep)
 {
 	if (q)
@@ -260,6 +280,14 @@ static char *nexttoken(char *q, int sep)
 
 static int str2cpu_affinity(char *str, cpu_set_t * mask)
     __attribute__ ((unused));
+
+/**
+ * \internal
+ * \brief Get the next token present in a string
+ * \param[in]           q	        String to search
+ * \param[in]           sep	        Token to look for
+ * \return Pointer to the character after the requested token
+ */
 
 static int str2cpu_affinity(char *str, cpu_set_t * mask)
 {
@@ -339,7 +367,7 @@ int dabbad_thread_start(struct packet_thread *pkt_thread,
 /**
  * \brief Stop a running thread
  * \param[in] pkt_thread running thread to stop
- * \return return value of \c pthread_cancel(3) or \¢ EINVAL if thread could not be found
+ * \return return value of \c pthread_cancel(3) or \c EINVAL if thread could not be found
  */
 
 int dabbad_thread_stop(struct packet_thread *pkt_thread)
@@ -364,6 +392,17 @@ int dabbad_thread_stop(struct packet_thread *pkt_thread)
 
 	return rc;
 }
+
+/**
+ * \brief Modify the settings of a requested thread
+ * \param[in]           service	        Pointer to protobuf service structure
+ * \param[in]           thread          Pointer to the new thread settings
+ * \param[in]           closure         Pointer to protobuf closure function pointer
+ * \param[in,out]       closure_data	Pointer to protobuf closure data
+ * \note This RPC only modifies the requested interface status
+ * \note The thread settings are applied by best-effort,
+ *       if a modification fails no further modifications are applied
+ */
 
 void dabbad_thread_modify(Dabba__DabbaService_Service * service,
 			  const Dabba__Thread * thread,
@@ -407,6 +446,14 @@ void dabbad_thread_modify(Dabba__DabbaService_Service * service,
 
 	closure(thread->status, closure_data);
 }
+
+/**
+ * \brief Get the settings of a list of requested thread
+ * \param[in]           service	        Pointer to protobuf service structure
+ * \param[in]           id_list         Pointer to the requested thread id list
+ * \param[in]           closure         Pointer to protobuf closure function pointer
+ * \param[in,out]       closure_data	Pointer to protobuf closure data
+ */
 
 void dabbad_thread_get(Dabba__DabbaService_Service * service,
 		       const Dabba__ThreadIdList * id_listp,
@@ -500,6 +547,14 @@ void dabbad_thread_get(Dabba__DabbaService_Service * service,
 
 	free(settings_list.list);
 }
+
+/**
+ * \brief Get the supported thread capabilities of the system
+ * \param[in]           service	        Pointer to protobuf service structure
+ * \param[in]           dummy           Pointer to a dummy message
+ * \param[in]           closure         Pointer to protobuf closure function pointer
+ * \param[in,out]       closure_data	Pointer to protobuf closure data
+ */
 
 void dabbad_thread_capabilities_get(Dabba__DabbaService_Service * service,
 				    const Dabba__Dummy * dummy,

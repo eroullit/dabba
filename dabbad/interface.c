@@ -41,6 +41,14 @@
 #include <libdabba/interface.h>
 #include <dabbad/interface.h>
 
+/**
+ * \brief Allocate the current interface cache from netlink
+ * \param[in,out]       sock	        Double pointer to a netlink socket
+ * \return Returns newly allocated netlink cache on success, NULL on failure.
+ * \note use \c link_cache_destroy() to free allocated memory
+ * \see link_cache_destroy()
+ */
+
 struct nl_cache *link_cache_alloc(struct nl_sock **sock)
 {
 	struct nl_cache *cache = NULL;
@@ -55,6 +63,14 @@ struct nl_cache *link_cache_alloc(struct nl_sock **sock)
 
 	return cache;
 }
+
+/**
+ * \brief Free interface cache returned by netlink
+ * \param[in,out]       sock	        Double pointer to a netlink socket
+ * \return Returns newly allocated netlink cache on success, NULL on failure.
+ * \note use it to free memory allocated by \c link_cache_alloc()
+ * \see link_cache_alloc()
+ */
 
 void link_cache_destroy(struct nl_sock *sock, struct nl_cache *cache)
 {
