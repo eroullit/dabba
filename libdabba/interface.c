@@ -44,6 +44,15 @@
 #include <libdabba/interface.h>
 #include <libdabba/strlcpy.h>
 
+/**
+ * \internal
+ * \brief Perform an \c ioctl(2) call on an interface request structure
+ * \param[in]	ifr	Pointer to interface request structure to use
+ * \param[out]	request Ioctl command to perform
+ * \return 0 on success, \c errno from \c socket(2), \c ioctl(2)
+ * \return or \c close(2) on failure
+ */
+
 static int dev_kernel_request(struct ifreq *ifr, const int request)
 {
 	int rc, sock;
@@ -66,8 +75,8 @@ static int dev_kernel_request(struct ifreq *ifr, const int request)
  * \brief Get the interface index of a specific interface
  * \param[in]	dev	Device name
  * \param[out]	index	Interface index of the interface
- * \return 0 on success, errno from \c socket(2), \c ioctl(2) 
- * \return or \c close(2) on failure
+ * \return 0 on success, non zero if the index could not be fetched
+ * \see dev_kernel_request()
  *
  * This function queries the kernel about the interface
  * index related to the interface name.
@@ -102,8 +111,8 @@ int devname_to_ifindex(const char *const dev, int *index)
  * \param[in]	index	Interface index of the interface
  * \param[out]	dev	Device name
  * \param[in]	dev_len	Device name buffer length
- * \return 0 on success, errno from \c socket(2), \c ioctl(2) 
- * \return or \c close(2) on failure
+ * \return 0 on success, non zero if the name could not be fetched
+ * \see dev_kernel_request()
  *
  * This function queries the kernel about the interface
  * index related to the interface name.
@@ -139,7 +148,8 @@ int ifindex_to_devname(const int index, char *dev, size_t dev_len)
  * \brief Get the interface status flags
  * \param[in]       dev	        interface name
  * \param[out]      flags	current interface status flags
- * \return 0 on success, -1 if the interface status flags could not be fetched.
+ * \return 0 on success, non zero if the interface status flags could not be fetched.
+ * \see dev_kernel_request()
  */
 
 int dev_flags_get(const char *const dev, short *flags)
@@ -165,7 +175,8 @@ int dev_flags_get(const char *const dev, short *flags)
  * \brief Set the interface status flags
  * \param[in]       dev	        interface name
  * \param[in]       flags	new interface status flags
- * \return 0 on success, else if the interface status flags could not be changed.
+ * \return 0 on success, non zero if the interface status flags could not be set.
+ * \see dev_kernel_request()
  */
 
 int dev_flags_set(const char *const dev, const short flags)
@@ -180,6 +191,16 @@ int dev_flags_set(const char *const dev, const short flags)
 
 	return dev_kernel_request(&ifr, SIOCSIFFLAGS);
 }
+
+/**
+ * \internal
+ * \brief Perform an ethtool request via \c ioctl(2)
+ * \param[in]       dev	        interface name
+ * \param[in]       cmd 	ethtool command to run
+ * \param[in,out]   value 	Pointer to the value to use for the command
+ * \return 0 on success, non zero if the ethtool command reports an error
+ * \see dev_kernel_request()
+ */
 
 static int dev_ethtool_value_get(const char *const dev, const int cmd,
 				 int *value)
@@ -210,7 +231,8 @@ static int dev_ethtool_value_get(const char *const dev, const int cmd,
  * \brief Get the interface driver information
  * \param[in]       dev	        interface name
  * \param[out]      driver	pointer to the driver info
- * \return 0 on success, -1 if the interface driver information could not be fetched.
+ * \return 0 on success, non zero if the interface driver information could not be fetched.
+ * \see dev_kernel_request()
  */
 
 int dev_driver_get(const char *const dev, struct ethtool_drvinfo *driver)
@@ -233,7 +255,8 @@ int dev_driver_get(const char *const dev, struct ethtool_drvinfo *driver)
  * \brief Get the interface hardware settings
  * \param[in]       dev	        interface name
  * \param[out]      settings	pointer to the interface hardware settings
- * \return 0 on success, -1 if the interface hardware settings could not be fetched.
+ * \return 0 on success, non zero if the interface hardware settings could not be fetched.
+ * \see dev_kernel_request()
  */
 
 int dev_settings_get(const char *const dev, struct ethtool_cmd *settings)
@@ -255,8 +278,9 @@ int dev_settings_get(const char *const dev, struct ethtool_cmd *settings)
 /**
  * \brief Set the interface hardware settings
  * \param[in]       dev	        interface name
- * \param[in]      settings	pointer to the interface hardware settings
- * \return 0 on success, -1 if the interface hardware settings could not be set.
+ * \param[in]       settings	pointer to the interface hardware settings
+ * \return 0 on success, non zero if the interface hardware settings could not be set.
+ * \see dev_kernel_request()
  */
 
 int dev_settings_set(const char *const dev, struct ethtool_cmd *settings)
@@ -278,7 +302,8 @@ int dev_settings_set(const char *const dev, struct ethtool_cmd *settings)
  * \brief Get the interface pause settings
  * \param[in]       dev	        interface name
  * \param[out]      pause	pointer to the interface pause settings
- * \return 0 on success, -1 if the interface pause settings could not be fetched.
+ * \return 0 on success, non zero if the interface pause settings could not be fetched.
+ * \see dev_kernel_request()
  */
 
 int dev_pause_get(const char *const dev, struct ethtool_pauseparam *pause)
@@ -301,7 +326,8 @@ int dev_pause_get(const char *const dev, struct ethtool_pauseparam *pause)
  * \brief Set the interface pause settings
  * \param[in]       dev	        interface name
  * \param[in]      pause	pointer to the interface pause settings
- * \return 0 on success, -1 if the interface pause settings could not be set.
+ * \return 0 on success, non zero if the interface pause settings could not be set.
+ * \see dev_kernel_request()
  */
 
 int dev_pause_set(const char *const dev, struct ethtool_pauseparam *pause)
@@ -323,7 +349,8 @@ int dev_pause_set(const char *const dev, struct ethtool_pauseparam *pause)
  * \brief Get the interface coalesce settings
  * \param[in]       dev	        interface name
  * \param[out]      coalesce	pointer to the interface coalesce settings
- * \return 0 on success, -1 if the interface coalesce settings could not be fetched.
+ * \return 0 on success, non zero if the interface coalesce settings could not be fetched.
+ * \see dev_kernel_request()
  */
 
 int dev_coalesce_get(const char *const dev, struct ethtool_coalesce *coalesce)
@@ -346,7 +373,8 @@ int dev_coalesce_get(const char *const dev, struct ethtool_coalesce *coalesce)
  * \brief Get the interface coalesce settings
  * \param[in]       dev	        interface name
  * \param[in]      coalesce	pointer to the interface coalesce settings
- * \return 0 on success, -1 if the interface coalesce settings could not be set.
+ * \return 0 on success, non zero if the interface coalesce settings could not be set.
+ * \see dev_kernel_request()
  */
 
 int dev_coalesce_set(const char *const dev, struct ethtool_coalesce *coalesce)
@@ -368,7 +396,8 @@ int dev_coalesce_set(const char *const dev, struct ethtool_coalesce *coalesce)
  * \brief Get the interface receive checksum offload status
  * \param[in]       dev	        interface name
  * \param[out]      rx_csum	pointer to the receive checksum offload status
- * \return 0 on success, -1 if the interface receive checksum offload status could not be fetched.
+ * \return 0 on success, non zero if the interface receive checksum offload status could not be fetched.
+ * \see dev_kernel_request()
  */
 
 int dev_rx_csum_offload_get(const char *const dev, int *rx_csum)
@@ -380,7 +409,8 @@ int dev_rx_csum_offload_get(const char *const dev, int *rx_csum)
  * \brief Get the interface transmit checksum offload status
  * \param[in]       dev	        interface name
  * \param[out]      tx_csum	pointer to the transmit checksum offload status
- * \return 0 on success, -1 if the interface transmit checksum offload status could not be fetched.
+ * \return 0 on success, non zero if the interface transmit checksum offload status could not be fetched.
+ * \see dev_kernel_request()
  */
 
 int dev_tx_csum_offload_get(const char *const dev, int *tx_csum)
@@ -392,7 +422,8 @@ int dev_tx_csum_offload_get(const char *const dev, int *tx_csum)
  * \brief Get the interface scatter gather status
  * \param[in]       dev	        interface name
  * \param[out]      sg		pointer to the transmit scatter gather status
- * \return 0 on success, -1 if the interface scatter gather status could not be fetched.
+ * \return 0 on success, non zero if the interface scatter gather status could not be fetched.
+ * \see dev_kernel_request()
  */
 
 int dev_scatter_gather_get(const char *const dev, int *sg)
@@ -404,7 +435,8 @@ int dev_scatter_gather_get(const char *const dev, int *sg)
  * \brief Get the interface tcp segment offload status
  * \param[in]       dev	        interface name
  * \param[out]      tso		pointer to the tcp segment offload status
- * \return 0 on success, -1 if the interface tcp segment offload status could not be fetched.
+ * \return 0 on success, non zero if the interface tcp segment offload status could not be fetched.
+ * \see dev_kernel_request()
  */
 
 int dev_tcp_seg_offload_get(const char *const dev, int *tso)
@@ -416,7 +448,8 @@ int dev_tcp_seg_offload_get(const char *const dev, int *tso)
  * \brief Get the interface udp fragment offload status
  * \param[in]       dev	        interface name
  * \param[out]      ufo		pointer to the udp fragment offload status
- * \return 0 on success, -1 if the interface udp fragment offload status could not be fetched.
+ * \return 0 on success, non zero if the interface udp fragment offload status could not be fetched.
+ * * \see dev_kernel_request()
  */
 
 int dev_udp_frag_offload_get(const char *const dev, int *ufo)
@@ -428,7 +461,8 @@ int dev_udp_frag_offload_get(const char *const dev, int *ufo)
  * \brief Get the interface generic segmentation offload status
  * \param[in]       dev	        interface name
  * \param[out]      gso		pointer to the generic segmentation offload status
- * \return 0 on success, -1 if the interface generic segmentation offload status could not be fetched.
+ * \return 0 on success, non zero if the interface generic segmentation offload status could not be fetched.
+ * \see dev_kernel_request()
  */
 
 int dev_generic_seg_offload_get(const char *const dev, int *gso)
@@ -440,7 +474,8 @@ int dev_generic_seg_offload_get(const char *const dev, int *gso)
  * \brief Get the interface generic receive offload status
  * \param[in]       dev	        interface name
  * \param[out]      gro		pointer to the generic receive offload status
- * \return 0 on success, -1 if the interface generic receive offload status could not be fetched.
+ * \return 0 on success, non zero if the interface generic receive offload status could not be fetched.
+ * \see dev_kernel_request()
  */
 
 int dev_generic_rcv_offload_get(const char *const dev, int *gro)
@@ -452,7 +487,8 @@ int dev_generic_rcv_offload_get(const char *const dev, int *gro)
  * \brief Get the interface large receive offload status
  * \param[in]       dev	        interface name
  * \param[out]      lro		pointer to the large receive offload status
- * \return 0 on success, -1 if the interface large receive offload status could not be fetched.
+ * \return 0 on success, non zero if the interface large receive offload status could not be fetched.
+ * \see dev_kernel_request()
  */
 
 int dev_large_rcv_offload_get(const char *const dev, int *lro)
@@ -470,7 +506,8 @@ int dev_large_rcv_offload_get(const char *const dev, int *lro)
  * \brief Get the interface receive hashing offload status
  * \param[in]       dev	        interface name
  * \param[out]      rxhash	pointer to the receive hashing offload status
- * \return 0 on success, -1 if the interface receive hashing offload status could not be fetched.
+ * \return 0 on success, non zero if the interface receive hashing offload status could not be fetched.
+ * \see dev_kernel_request()
  */
 
 int dev_rx_hash_offload_get(const char *const dev, int *rxhash)
@@ -488,7 +525,8 @@ int dev_rx_hash_offload_get(const char *const dev, int *rxhash)
  * \brief Set the interface receive checksum offload status
  * \param[in]       dev	        interface name
  * \param[in]       rx_csum	pointer to the receive checksum offload status
- * \return 0 on success, -1 if the interface receive checksum offload status could not be set.
+ * \return 0 on success, non zero if the interface receive checksum offload status could not be set.
+ * \see dev_kernel_request()
  */
 
 int dev_rx_csum_offload_set(const char *const dev, int rx_csum)
@@ -500,7 +538,8 @@ int dev_rx_csum_offload_set(const char *const dev, int rx_csum)
  * \brief Set the interface transmit checksum offload status
  * \param[in]       dev	        interface name
  * \param[in]       tx_csum	pointer to the transmit checksum offload status
- * \return 0 on success, -1 if the interface transmit checksum offload status could not be set.
+ * \return 0 on success, non zero if the interface transmit checksum offload status could not be set.
+ * \see dev_kernel_request()
  */
 
 int dev_tx_csum_offload_set(const char *const dev, int tx_csum)
@@ -512,7 +551,8 @@ int dev_tx_csum_offload_set(const char *const dev, int tx_csum)
  * \brief Set the interface scatter gather status
  * \param[in]       dev	        interface name
  * \param[in]       sg		pointer to the transmit scatter gather status
- * \return 0 on success, -1 if the interface scatter gather status could not be set.
+ * \return 0 on success, non zero if the interface scatter gather status could not be set.
+ * \see dev_kernel_request()
  */
 
 int dev_scatter_gather_set(const char *const dev, int sg)
@@ -524,7 +564,8 @@ int dev_scatter_gather_set(const char *const dev, int sg)
  * \brief Set the interface tcp segment offload status
  * \param[in]       dev	        interface name
  * \param[in]       tso		pointer to the tcp segment offload status
- * \return 0 on success, -1 if the interface tcp segment offload status could not be set.
+ * \return 0 on success, non zero if the interface tcp segment offload status could not be set.
+ * \see dev_kernel_request()
  */
 
 int dev_tcp_seg_offload_set(const char *const dev, int tso)
@@ -535,8 +576,9 @@ int dev_tcp_seg_offload_set(const char *const dev, int tso)
 /**
  * \brief Set the interface udp fragment offload status
  * \param[in]       dev	        interface name
- * \param[in]      ufo		pointer to the udp fragment offload status
- * \return 0 on success, -1 if the interface udp fragment offload status could not be set.
+ * \param[in]       ufo		pointer to the udp fragment offload status
+ * \return 0 on success, non zero if the interface udp fragment offload status could not be set.
+ * \see dev_kernel_request()
  */
 
 int dev_udp_frag_offload_set(const char *const dev, int ufo)
@@ -548,7 +590,8 @@ int dev_udp_frag_offload_set(const char *const dev, int ufo)
  * \brief Set the interface generic segmentation offload status
  * \param[in]       dev	        interface name
  * \param[in]       gso		pointer to the generic segmentation offload status
- * \return 0 on success, -1 if the interface generic segmentation offload status could not be set.
+ * \return 0 on success, non zero if the interface generic segmentation offload status could not be set.
+ * \see dev_kernel_request()
  */
 
 int dev_generic_seg_offload_set(const char *const dev, int gso)
@@ -560,7 +603,8 @@ int dev_generic_seg_offload_set(const char *const dev, int gso)
  * \brief Set the interface generic receive offload status
  * \param[in]       dev	        interface name
  * \param[in]       gro		pointer to the generic receive offload status
- * \return 0 on success, -1 if the interface generic receive offload status could not be set.
+ * \return 0 on success, non zero if the interface generic receive offload status could not be set.
+ * \see dev_kernel_request()
  */
 
 int dev_generic_rcv_offload_set(const char *const dev, int gro)
@@ -572,7 +616,8 @@ int dev_generic_rcv_offload_set(const char *const dev, int gro)
  * \brief Set the interface large receive offload status
  * \param[in]       dev	        interface name
  * \param[in]       lro		pointer to the large receive offload status
- * \return 0 on success, -1 if the interface large receive offload status could not be set.
+ * \return 0 on success, non zero if the interface large receive offload status could not be set.
+ * \see dev_kernel_request()
  */
 
 int dev_large_rcv_offload_set(const char *const dev, int lro)
@@ -597,7 +642,8 @@ int dev_large_rcv_offload_set(const char *const dev, int lro)
  * \brief Set the interface receive hashing offload status
  * \param[in]       dev	        interface name
  * \param[in]       rxhash	pointer to the receive hashing offload status
- * \return 0 on success, -1 if the interface receive hashing offload status could not be set.
+ * \return 0 on success, non zero if the interface receive hashing offload status could not be set.
+ * \see dev_kernel_request()
  */
 
 int dev_rx_hash_offload_set(const char *const dev, int rxhash)
@@ -622,7 +668,8 @@ int dev_rx_hash_offload_set(const char *const dev, int rxhash)
  * \brief Get the interface link status
  * \param[in]       dev	        interface name
  * \param[out]      link	pointer to the interface link status
- * \return 0 on success, -1 if the interface link status could not be fetched.
+ * \return 0 on success, non zero if the interface link status could not be fetched.
+ * \see dev_kernel_request()
  */
 
 int dev_link_get(const char *const dev, int *link)
