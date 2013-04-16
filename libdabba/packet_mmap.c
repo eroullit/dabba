@@ -50,7 +50,7 @@
  * \return 0 on success, error code of \c setsockopt(2) on failure
  */
 
-static int packet_mmap_register(const struct packet_mmap *const pkt_mmap)
+static int packet_mmap_register(struct packet_mmap *pkt_mmap)
 {
 	assert(pkt_mmap);
 
@@ -129,7 +129,7 @@ static void packet_mmap_munmap(struct packet_mmap *pkt_mmap)
  * \return 0 on success, error code from \c bind(2) on failure
  */
 
-static int packet_mmap_bind(const struct packet_mmap *const pkt_mmap)
+static int packet_mmap_bind(struct packet_mmap *pkt_mmap)
 {
 	struct sockaddr_ll sll;
 
@@ -228,7 +228,12 @@ int packet_mmap_create(struct packet_mmap *pkt_mmap,
 		       const enum packet_mmap_frame_size frame_size,
 		       const size_t frame_nr)
 {
+	static int (*const pkt_mmap_fn[]) (struct packet_mmap * pkt_mmap) = {
+	packet_mmap_register,
+		    packet_mmap_mmap,
+		    packet_mmap_vector_create, packet_mmap_bind};
 	int rc = 0;
+	size_t a;
 
 	assert(pkt_mmap);
 	assert(dev);
@@ -241,7 +246,7 @@ int packet_mmap_create(struct packet_mmap *pkt_mmap,
 	rc = devname_to_ifindex(dev, &pkt_mmap->ifindex);
 
 	if (rc != 0)
-		goto out;
+		return rc;
 
 	pkt_mmap->type = type;
 	pkt_mmap->pf_sock = pf_sock;
@@ -253,32 +258,18 @@ int packet_mmap_create(struct packet_mmap *pkt_mmap,
 
 	if (pkt_mmap->layout.tp_frame_nr == 0
 	    || pkt_mmap->layout.tp_block_nr == 0) {
-		rc = EINVAL;
-		goto out;
+		return EINVAL;
 	}
 
-	rc = packet_mmap_register(pkt_mmap);
+	for (a = 0; a < ARRAY_SIZE(pkt_mmap_fn); a++) {
+		rc = pkt_mmap_fn[a] (pkt_mmap);
 
-	if (rc != 0)
-		goto out;
+		if (rc) {
+			packet_mmap_destroy(pkt_mmap);
+			break;
+		}
 
-	rc = packet_mmap_mmap(pkt_mmap);
+	}
 
-	if (rc != 0)
-		goto out;
-
-	rc = packet_mmap_vector_create(pkt_mmap);
-
-	if (rc != 0)
-		goto out;
-
-	rc = packet_mmap_bind(pkt_mmap);
-
-	if (rc != 0)
-		goto out;
-
-	return (0);
- out:
-	packet_mmap_destroy(pkt_mmap);
-	return (rc);
+	return rc;
 }
