@@ -58,7 +58,7 @@ yaml_number_of_interface_get()
 
 number_of_interface_get()
 {
-    sed '1,2d' /proc/net/dev | wc -l | cut -f 1 -d ' '
+    sed '1,2d' /proc/net/dev | wc -l
 }
 
 sys_class_net_get()
