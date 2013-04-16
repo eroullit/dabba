@@ -83,7 +83,7 @@ static void interface_offload_list_print(const Dabba__InterfaceOffloadList *
  * \param[in]           service	        Pointer to protobuf service structure
  * \param[in]           id_list         Pointer to interface id to fetch
  * \return Always returns 0.
- * \note An empty id list will query the coalesce status of all available interfaces.
+ * \note An empty id list will query the offload status of all available interfaces.
  */
 
 int rpc_interface_offload_get(ProtobufCService * service,
