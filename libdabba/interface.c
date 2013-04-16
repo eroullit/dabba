@@ -72,6 +72,40 @@ static int dev_kernel_request(struct ifreq *ifr, const int request)
 }
 
 /**
+ * \internal
+ * \brief Perform an ethtool request via \c ioctl(2)
+ * \param[in]       dev	        interface name
+ * \param[in]       cmd 	ethtool command to run
+ * \param[in,out]   value 	Pointer to the value to use for the command
+ * \return 0 on success, non zero if the ethtool command reports an error
+ * \see dev_kernel_request()
+ */
+
+static int dev_ethtool_request(const char *const dev, const int cmd, int *value)
+{
+	int rc;
+	struct ethtool_value e;
+	struct ifreq ifr;
+
+	assert(dev);
+	assert(value);
+
+	memset(&e, 0, sizeof(e));
+	memset(&ifr, 0, sizeof(ifr));
+
+	strlcpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name));
+	e.cmd = cmd;
+	ifr.ifr_data = (caddr_t) & e;
+
+	rc = dev_kernel_request(&ifr, SIOCETHTOOL);
+
+	if (!rc)
+		*value = e.data;
+
+	return rc;
+}
+
+/**
  * \brief Get the interface index of a specific interface
  * \param[in]	dev	Device name
  * \param[out]	index	Interface index of the interface
@@ -190,41 +224,6 @@ int dev_flags_set(const char *const dev, const short flags)
 	ifr.ifr_flags = flags;
 
 	return dev_kernel_request(&ifr, SIOCSIFFLAGS);
-}
-
-/**
- * \internal
- * \brief Perform an ethtool request via \c ioctl(2)
- * \param[in]       dev	        interface name
- * \param[in]       cmd 	ethtool command to run
- * \param[in,out]   value 	Pointer to the value to use for the command
- * \return 0 on success, non zero if the ethtool command reports an error
- * \see dev_kernel_request()
- */
-
-static int dev_ethtool_value_get(const char *const dev, const int cmd,
-				 int *value)
-{
-	int rc;
-	struct ethtool_value e;
-	struct ifreq ifr;
-
-	assert(dev);
-	assert(value);
-
-	memset(&e, 0, sizeof(e));
-	memset(&ifr, 0, sizeof(ifr));
-
-	strlcpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name));
-	e.cmd = cmd;
-	ifr.ifr_data = (caddr_t) & e;
-
-	rc = dev_kernel_request(&ifr, SIOCETHTOOL);
-
-	if (!rc)
-		*value = e.data;
-
-	return rc;
 }
 
 /**
@@ -402,7 +401,7 @@ int dev_coalesce_set(const char *const dev, struct ethtool_coalesce *coalesce)
 
 int dev_rx_csum_offload_get(const char *const dev, int *rx_csum)
 {
-	return dev_ethtool_value_get(dev, ETHTOOL_GRXCSUM, rx_csum);
+	return dev_ethtool_request(dev, ETHTOOL_GRXCSUM, rx_csum);
 }
 
 /**
@@ -415,7 +414,7 @@ int dev_rx_csum_offload_get(const char *const dev, int *rx_csum)
 
 int dev_tx_csum_offload_get(const char *const dev, int *tx_csum)
 {
-	return dev_ethtool_value_get(dev, ETHTOOL_GTXCSUM, tx_csum);
+	return dev_ethtool_request(dev, ETHTOOL_GTXCSUM, tx_csum);
 }
 
 /**
@@ -428,7 +427,7 @@ int dev_tx_csum_offload_get(const char *const dev, int *tx_csum)
 
 int dev_scatter_gather_get(const char *const dev, int *sg)
 {
-	return dev_ethtool_value_get(dev, ETHTOOL_GSG, sg);
+	return dev_ethtool_request(dev, ETHTOOL_GSG, sg);
 }
 
 /**
@@ -441,7 +440,7 @@ int dev_scatter_gather_get(const char *const dev, int *sg)
 
 int dev_tcp_seg_offload_get(const char *const dev, int *tso)
 {
-	return dev_ethtool_value_get(dev, ETHTOOL_GTSO, tso);
+	return dev_ethtool_request(dev, ETHTOOL_GTSO, tso);
 }
 
 /**
@@ -454,7 +453,7 @@ int dev_tcp_seg_offload_get(const char *const dev, int *tso)
 
 int dev_udp_frag_offload_get(const char *const dev, int *ufo)
 {
-	return dev_ethtool_value_get(dev, ETHTOOL_GUFO, ufo);
+	return dev_ethtool_request(dev, ETHTOOL_GUFO, ufo);
 }
 
 /**
@@ -467,7 +466,7 @@ int dev_udp_frag_offload_get(const char *const dev, int *ufo)
 
 int dev_generic_seg_offload_get(const char *const dev, int *gso)
 {
-	return dev_ethtool_value_get(dev, ETHTOOL_GGSO, gso);
+	return dev_ethtool_request(dev, ETHTOOL_GGSO, gso);
 }
 
 /**
@@ -480,7 +479,7 @@ int dev_generic_seg_offload_get(const char *const dev, int *gso)
 
 int dev_generic_rcv_offload_get(const char *const dev, int *gro)
 {
-	return dev_ethtool_value_get(dev, ETHTOOL_GGRO, gro);
+	return dev_ethtool_request(dev, ETHTOOL_GGRO, gro);
 }
 
 /**
@@ -496,7 +495,7 @@ int dev_large_rcv_offload_get(const char *const dev, int *lro)
 	int rc;
 	int flags = 0;
 
-	rc = dev_ethtool_value_get(dev, ETHTOOL_GFLAGS, &flags);
+	rc = dev_ethtool_request(dev, ETHTOOL_GFLAGS, &flags);
 	*lro = flags & ETH_FLAG_LRO;
 
 	return rc;
@@ -515,7 +514,7 @@ int dev_rx_hash_offload_get(const char *const dev, int *rxhash)
 	int rc;
 	int flags = 0;
 
-	rc = dev_ethtool_value_get(dev, ETHTOOL_GFLAGS, &flags);
+	rc = dev_ethtool_request(dev, ETHTOOL_GFLAGS, &flags);
 	*rxhash = flags & ETH_FLAG_RXHASH;
 
 	return rc;
@@ -531,7 +530,7 @@ int dev_rx_hash_offload_get(const char *const dev, int *rxhash)
 
 int dev_rx_csum_offload_set(const char *const dev, int rx_csum)
 {
-	return dev_ethtool_value_get(dev, ETHTOOL_SRXCSUM, &rx_csum);
+	return dev_ethtool_request(dev, ETHTOOL_SRXCSUM, &rx_csum);
 }
 
 /**
@@ -544,7 +543,7 @@ int dev_rx_csum_offload_set(const char *const dev, int rx_csum)
 
 int dev_tx_csum_offload_set(const char *const dev, int tx_csum)
 {
-	return dev_ethtool_value_get(dev, ETHTOOL_STXCSUM, &tx_csum);
+	return dev_ethtool_request(dev, ETHTOOL_STXCSUM, &tx_csum);
 }
 
 /**
@@ -557,7 +556,7 @@ int dev_tx_csum_offload_set(const char *const dev, int tx_csum)
 
 int dev_scatter_gather_set(const char *const dev, int sg)
 {
-	return dev_ethtool_value_get(dev, ETHTOOL_SSG, &sg);
+	return dev_ethtool_request(dev, ETHTOOL_SSG, &sg);
 }
 
 /**
@@ -570,7 +569,7 @@ int dev_scatter_gather_set(const char *const dev, int sg)
 
 int dev_tcp_seg_offload_set(const char *const dev, int tso)
 {
-	return dev_ethtool_value_get(dev, ETHTOOL_STSO, &tso);
+	return dev_ethtool_request(dev, ETHTOOL_STSO, &tso);
 }
 
 /**
@@ -583,7 +582,7 @@ int dev_tcp_seg_offload_set(const char *const dev, int tso)
 
 int dev_udp_frag_offload_set(const char *const dev, int ufo)
 {
-	return dev_ethtool_value_get(dev, ETHTOOL_SUFO, &ufo);
+	return dev_ethtool_request(dev, ETHTOOL_SUFO, &ufo);
 }
 
 /**
@@ -596,7 +595,7 @@ int dev_udp_frag_offload_set(const char *const dev, int ufo)
 
 int dev_generic_seg_offload_set(const char *const dev, int gso)
 {
-	return dev_ethtool_value_get(dev, ETHTOOL_SGSO, &gso);
+	return dev_ethtool_request(dev, ETHTOOL_SGSO, &gso);
 }
 
 /**
@@ -609,7 +608,7 @@ int dev_generic_seg_offload_set(const char *const dev, int gso)
 
 int dev_generic_rcv_offload_set(const char *const dev, int gro)
 {
-	return dev_ethtool_value_get(dev, ETHTOOL_SGRO, &gro);
+	return dev_ethtool_request(dev, ETHTOOL_SGRO, &gro);
 }
 
 /**
@@ -625,7 +624,7 @@ int dev_large_rcv_offload_set(const char *const dev, int lro)
 	int rc;
 	int flags = 0;
 
-	rc = dev_ethtool_value_get(dev, ETHTOOL_GFLAGS, &flags);
+	rc = dev_ethtool_request(dev, ETHTOOL_GFLAGS, &flags);
 
 	if (rc)
 		return rc;
@@ -635,7 +634,7 @@ int dev_large_rcv_offload_set(const char *const dev, int lro)
 	else
 		flags &= ~ETH_FLAG_LRO;
 
-	return dev_ethtool_value_get(dev, ETHTOOL_SFLAGS, &flags);
+	return dev_ethtool_request(dev, ETHTOOL_SFLAGS, &flags);
 }
 
 /**
@@ -651,7 +650,7 @@ int dev_rx_hash_offload_set(const char *const dev, int rxhash)
 	int rc;
 	int flags = 0;
 
-	rc = dev_ethtool_value_get(dev, ETHTOOL_GFLAGS, &flags);
+	rc = dev_ethtool_request(dev, ETHTOOL_GFLAGS, &flags);
 
 	if (rc)
 		return rc;
@@ -661,7 +660,7 @@ int dev_rx_hash_offload_set(const char *const dev, int rxhash)
 	else
 		flags &= ~ETH_FLAG_RXHASH;
 
-	return dev_ethtool_value_get(dev, ETHTOOL_SFLAGS, &flags);
+	return dev_ethtool_request(dev, ETHTOOL_SFLAGS, &flags);
 }
 
 /**
@@ -674,5 +673,5 @@ int dev_rx_hash_offload_set(const char *const dev, int rxhash)
 
 int dev_link_get(const char *const dev, int *link)
 {
-	return dev_ethtool_value_get(dev, ETHTOOL_GLINK, link);
+	return dev_ethtool_request(dev, ETHTOOL_GLINK, link);
 }
