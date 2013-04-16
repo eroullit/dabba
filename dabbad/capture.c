@@ -144,9 +144,9 @@ void dabbad_capture_stop(Dabba__DabbaService_Service * service,
 }
 
 /**
- * \brief RPC to stop a running capture
+ * \brief RPC to start a new capture
  * \param[in]           service	        Pointer to protobuf service structure
- * \param[in]           idp             Pointer to the thread id to stop
+ * \param[in]           capturep        Pointer to new capture thread settings
  * \param[in]           closure         Pointer to protobuf closure function pointer
  * \param[in,out]       closure_data	Pointer to protobuf closure data
  * \return Returns 0 on success, else on failure via its closure function.
