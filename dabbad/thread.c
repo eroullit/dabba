@@ -278,9 +278,6 @@ static char *nexttoken(char *q, int sep)
 	return q;
 }
 
-static int str2cpu_affinity(char *str, cpu_set_t * mask)
-    __attribute__ ((unused));
-
 /**
  * \internal
  * \brief Get the next token present in a string
