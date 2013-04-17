@@ -21,7 +21,23 @@ IF(DOXYGEN_FOUND)
 	ADD_DEPENDENCIES(doc ${PROJECT_NAME}-doc)
 ENDIF(DOXYGEN_FOUND)
 
-ADD_EXECUTABLE(${PROJECT_NAME} dabbad.c interface.c interface-status.c interface-driver.c interface-pause.c interface-offload.c interface-settings.c interface-coalesce.c interface-capabilities.c interface-statistics.c rpc.c help.c capture.c misc.c thread.c)
+ADD_EXECUTABLE(${PROJECT_NAME}
+	dabbad.c
+	interface.c
+	interface-status.c
+	interface-driver.c
+	interface-pause.c
+	interface-offload.c
+	interface-settings.c
+	interface-coalesce.c
+	interface-capabilities.c
+	interface-statistics.c
+	rpc.c
+	help.c
+	capture.c
+	misc.c
+	thread.c
+)
 
 TARGET_LINK_LIBRARIES (${PROJECT_NAME} libdabba libdabba-rpc ${CMAKE_THREAD_LIBS_INIT} ${NL_LIBRARIES})
 
