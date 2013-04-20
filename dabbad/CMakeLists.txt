@@ -11,9 +11,7 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/include
                         ${CMAKE_SOURCE_DIR}/libdabba/include
 			${NL_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/libdabba-rpc/include)
-
-# FIXME Fix path when rpc headers are generated in the right include directory
-INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR})
+INCLUDE_DIRECTORIES(${LIBDABBA_RPC_INCLUDE_DIR})
 
 IF(DOXYGEN_FOUND)
 	CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)

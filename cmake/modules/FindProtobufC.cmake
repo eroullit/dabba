@@ -21,12 +21,12 @@
 #  PROTOBUFC_INCLUDE_DIRS - the path to the libprotobufc-c header files
 #  PROTOBUFC_LIBRARY - the path to the libprotobufc-c library
 # The module defines the following function:
-#  PROTOBUFC_GENERATE_C(PROTOSRCS_VAR PROTOHDRS_VAR PROTOFILE) -
+#  PROTOBUFC_GENERATE_C(PROTOSRCS_VAR PROTOHDRS_VAR OUT_DIR PROTOFILE) -
 # 	function to generate the needed C code from the prototype file.
 
 # Inspired and adapted from CMake FindProtobuf.cmake
 
-FUNCTION(PROTOBUFC_GENERATE_C SRCS HDRS)
+FUNCTION(PROTOBUFC_GENERATE_C SRCS HDRS OUT_DIR)
   IF(NOT ARGN)
     MESSAGE(SEND_ERROR "ERROR: PROTOBUFC_GENERATE_C() called without any proto files")
     RETURN()
@@ -51,15 +51,15 @@ FUNCTION(PROTOBUFC_GENERATE_C SRCS HDRS)
   FOREACH(FIL ${ARGN})
     GET_FILENAME_COMPONENT(ABS_FIL ${FIL} ABSOLUTE)
     GET_FILENAME_COMPONENT(FIL_WE ${FIL} NAME_WE)
-    
-    LIST(APPEND ${SRCS} "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb-c.c")
-    LIST(APPEND ${HDRS} "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb-c.h")
+
+    LIST(APPEND ${SRCS} "${OUT_DIR}/${FIL_WE}.pb-c.c")
+    LIST(APPEND ${HDRS} "${OUT_DIR}/${FIL_WE}.pb-c.h")
 
     ADD_CUSTOM_COMMAND(
-      OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb-c.c"
-             "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb-c.h"
+      OUTPUT "${OUT_DIR}/${FIL_WE}.pb-c.c"
+             "${OUT_DIR}/${FIL_WE}.pb-c.h"
       COMMAND  ${PROTOBUFC_PROTOC_EXECUTABLE}
-      ARGS --c_out  ${CMAKE_CURRENT_BINARY_DIR} ${_protobuf_include_path} ${ABS_FIL}
+      ARGS --c_out  ${OUT_DIR} ${_protobuf_include_path} ${ABS_FIL}
       DEPENDS ${ABS_FIL}
       COMMENT "Running C protocol buffer compiler on ${FIL}"
       VERBATIM )
