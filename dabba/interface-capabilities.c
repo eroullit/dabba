@@ -27,6 +27,137 @@
 
 /* __LICENSE_HEADER_END__ */
 
+/*
+
+=head1 NAME
+
+dabba-interface-capabilities - Manage network interface advertised capabilities
+
+=head1 SYNOPSIS
+
+dabba interface <command> capabilities [<arguments>...] [--help]
+
+=head1 DESCRIPTION
+
+Give the user the possibility to manage the available
+network interfaces capabilities.
+
+=head1 COMMANDS
+
+=over
+
+=item get
+
+Fetch and print status capabilities information about currently supported
+interfaces.
+The output is formatted in YAML.
+
+=item modify
+
+Apply new capabilities settings to a specific network interface.
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item --id <name>
+
+interface name to work on.
+
+=item --aui (true|false)
+
+Activate or shutdown the attachment unit interface if available.
+
+=item --tp (true|false)
+
+Activate or shutdown the twisted pair port if available.
+
+=item --bnc (true|false)
+
+Activate or shutdown the BNC port if available.
+
+=item --fibre (true|false)
+
+Activate or shutdown the fibre port if available.
+
+=item --mii (true|false)
+
+Activate or shutdown the MII port if available.
+
+=item --speed (10|100|1000|10000)
+
+Select which advertised speed capabilities should be modified.
+
+=item --half-duplex (true|false)
+
+Set the interface half duplex advertised capability at a specific speed
+
+=item --full-duplex (true|false)
+
+Set the interface full duplex advertised capability at a specific speed
+
+=item --autoneg (true|false)
+
+Set the interface auto negotiation advertised capability
+
+=item --pause (true|false)
+
+Set the interface pause advertised capability
+
+=back
+
+=head1 EXAMPLES
+
+=over
+
+=item dabba interface get capabilities
+
+Output the capabilities of all available network interfaces.
+
+=item dabba interface modify capabilities --id eth0 --speed 100 --half-duplex false
+
+Stop advertising half duplex capability at 100Mbps on 'eth0' (if supported)
+
+=item dabba interface modify capabilities --id eth0 --pause true
+
+Enable advertised pause capability on 'eth0' (if supported)
+
+=back
+
+=head1 AUTHOR
+
+Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
+
+=head1 BUGS
+
+=over
+
+=item Please report bugs to <https://github.com/eroullit/dabba/issues>
+
+=item dabba project project page: <https://github.com/eroullit/dabba>
+
+=back
+
+=head1 COPYRIGHT
+
+=over
+
+=item Copyright © 2012 Emmanuel Roullit.
+
+=item License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.
+
+=item This is free software: you are free to change and redistribute it.
+
+=item There is NO WARRANTY, to the extent permitted by law.
+
+=back
+
+=cut
+
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
