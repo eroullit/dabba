@@ -114,7 +114,7 @@ Output the list of network interface which can be used by dabba.
 
 =item dabba interface modify --id eth0 --up true --running true --promiscuous true
 
-Modify the status of the interface 'eth0' to be up and running and alse
+Modify the status of the interface 'eth0' to be up and running and also
 listen to all incoming packets.
 
 =back
