@@ -30,7 +30,6 @@ ADD_EXECUTABLE(${PROJECT_NAME}
 	interface-statistics.c
 	rpc.c
 	capture.c
-	capture-settings.c
 	thread.c
 	thread-capabilities.c
 	thread-settings.c

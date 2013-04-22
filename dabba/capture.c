@@ -153,9 +153,41 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabba/help.h>
 #include <dabba/rpc.h>
 #include <dabba/thread.h>
-#include <dabba/capture-settings.h>
 
 #define DEFAULT_CAPTURE_FRAME_NUMBER 32
+
+/**
+ * \internal
+ * \brief Print capture settings list to \c stdout
+ * \param[in]           result	        Pointer to capture settings list
+ * \param[in,out]       closure_data	Pointer to protobuf closure data
+ */
+
+static void capture_settings_print(const Dabba__CaptureList *
+				   result, void *closure_data)
+{
+	const Dabba__Capture *capture;
+	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
+	size_t a;
+
+	assert(closure_data);
+
+	rpc_header_print("captures");
+
+	for (a = 0; result && a < result->n_list; a++) {
+		capture = result->list[a];
+		printf("    - id: %" PRIu64 "\n", (uint64_t) capture->id->id);
+		printf("    ");
+		__rpc_error_code_print(capture->status->code);
+		printf("      packet mmap size: %" PRIu64 "\n",
+		       capture->frame_nr * capture->frame_size);
+		printf("      frame number: %" PRIu64 "\n", capture->frame_nr);
+		printf("      pcap: %s\n", capture->pcap);
+		printf("      interface: %s\n", capture->interface);
+	}
+
+	*status = 1;
+}
 
 /**
  * \brief Invoke capture start remote procedure call
@@ -164,8 +196,8 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
  * \return always returns zero.
  */
 
-int rpc_capture_start(ProtobufCService * service,
-		      const Dabba__Capture * capture)
+static int rpc_capture_start(ProtobufCService * service,
+			     const Dabba__Capture * capture)
 {
 	protobuf_c_boolean is_done = 0;
 
@@ -188,7 +220,8 @@ int rpc_capture_start(ProtobufCService * service,
  * \return always returns zero.
  */
 
-int rpc_capture_stop(ProtobufCService * service, const Dabba__ThreadId * id)
+static int rpc_capture_stop(ProtobufCService * service,
+			    const Dabba__ThreadId * id)
 {
 	protobuf_c_boolean is_done = 0;
 
@@ -204,13 +237,37 @@ int rpc_capture_stop(ProtobufCService * service, const Dabba__ThreadId * id)
 }
 
 /**
+ * \brief Invoke capture settings get remote procedure call
+ * \param[in]           service	        Pointer to protobuf service
+ * \param[in]           id_list 	Pointer to capture id list
+ * \return always returns zero.
+ * \note An empty id list will query all captures currently running.
+ */
+
+static int rpc_capture_get(ProtobufCService * service,
+			   const Dabba__ThreadIdList * id_list)
+{
+	protobuf_c_boolean is_done = 0;
+
+	assert(service);
+	assert(id_list);
+
+	dabba__dabba_service__capture_get(service, id_list,
+					  capture_settings_print, &is_done);
+
+	dabba_rpc_call_is_done(&is_done);
+
+	return 0;
+}
+
+/**
  * \brief Parse argument vector to prepare a capture start query
  * \param[in]           argc	        Argument counter
  * \param[in]           argv	        Argument vector
  * \return 0 on success, \c EINVAL on invalid input.
  */
 
-int cmd_capture_start(int argc, const char **argv)
+static int cmd_capture_start(int argc, const char **argv)
 {
 	enum capture_start_option {
 		OPT_CAPTURE_INTERFACE,
@@ -302,7 +359,7 @@ int cmd_capture_start(int argc, const char **argv)
  * \return 0 on success, \c EINVAL on invalid input.
  */
 
-int cmd_capture_stop(int argc, const char **argv)
+static int cmd_capture_stop(int argc, const char **argv)
 {
 	enum capture_start_option {
 		OPT_CAPTURE_ID,
@@ -370,7 +427,7 @@ int cmd_capture_stop(int argc, const char **argv)
  * \param[in]           argv	        Argument vector
  * \return 0 on success, \c EINVAL on invalid input.
  */
-int cmd_capture_get(int argc, const char **argv)
+static int cmd_capture_get(int argc, const char **argv)
 {
 	enum capture_option {
 		/* option */
@@ -442,7 +499,7 @@ int cmd_capture_get(int argc, const char **argv)
 	service = dabba_rpc_client_connect(server_id, server_type);
 
 	if (service)
-		rc = rpc_capture_settings_get(service, &id_list);
+		rc = rpc_capture_get(service, &id_list);
 	else
 		rc = EINVAL;
 
