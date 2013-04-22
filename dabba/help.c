@@ -33,6 +33,7 @@
 #include <errno.h>
 #include <getopt.h>
 #include <assert.h>
+#include <limits.h>
 #include <libdabba/macros.h>
 
 static const char dabba_usage_string[] =
@@ -131,7 +132,7 @@ static void list_common_cmds_help(void)
 
 int cmd_help(int argc, const char **argv)
 {
-	char help_name[32];
+	char help_name[NAME_MAX];
 	int rc = 0, a;
 	size_t offset;
 
