@@ -22,7 +22,7 @@ test_description='Test dabba interface coalesce command'
 . ./dabba-test-lib.sh
 
 test_expect_success 'invoke dabba interface coalesce command w/o dabbad' "
-    test_expect_code 22 $DABBA_PATH/dabba interface get coalesce
+    test_expect_code 22 $DABBA_PATH/dabba interface coalesce get
 "
 
 test_expect_success "Setup: Start dabbad" "
@@ -30,7 +30,7 @@ test_expect_success "Setup: Start dabbad" "
 "
 
 test_expect_success 'invoke dabba interface coalesce command with dabbad' "
-    '$DABBA_PATH'/dabba interface get coalesce > result
+    '$DABBA_PATH'/dabba interface coalesce get > result
 "
 
 test_expect_success PYTHON_YAML "Parse interface coalesce YAML output" "

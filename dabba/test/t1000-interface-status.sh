@@ -39,7 +39,7 @@ EOF
 }
 
 test_expect_success 'invoke dabba interface status w/o dabbad' "
-    test_expect_code 22 $DABBA_PATH/dabba interface get status
+    test_expect_code 22 $DABBA_PATH/dabba interface status get
 "
 
 test_expect_success DUMMY_DEV "Setup: Remove all dummy interfaces" "
@@ -64,7 +64,7 @@ test_expect_success "Check 'dabba interface' help output" "
 "
 
 test_expect_success "invoke dabba interface status with dabbad" "
-    '$DABBA_PATH'/dabba interface get status > result &&
+    '$DABBA_PATH'/dabba interface status get > result &&
     grep '\- name: ' result > name_result &&
     generate_yaml_status > expected &&
     sort -o expected_sorted expected &&
@@ -95,11 +95,11 @@ cat > expected_lo_promisc <<EOF
 $bool
 EOF
     test_expect_success "Activate promiscuous mode on loopback device" "
-        '$DABBA_PATH'/dabba interface modify status --id lo --promiscuous $bool
+        '$DABBA_PATH'/dabba interface status modify --id lo --promiscuous $bool
     "
 
     test_expect_success "Fetch filtered status information of loopback device" "
-        '$DABBA_PATH'/dabba interface get status --id lo > result
+        '$DABBA_PATH'/dabba interface status get --id lo > result
     "
 
     test_expect_success PYTHON_YAML "Parse filtered interface status YAML output" "

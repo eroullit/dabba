@@ -22,7 +22,7 @@ test_description='Test dabba interface capabilities command'
 . ./dabba-test-lib.sh
 
 test_expect_success 'invoke dabba interface capabilities command w/o dabbad' "
-    test_expect_code 22 $DABBA_PATH/dabba interface get capabilities
+    test_expect_code 22 $DABBA_PATH/dabba interface capabilities get
 "
 
 test_expect_success "Setup: Start dabbad" "
@@ -30,7 +30,7 @@ test_expect_success "Setup: Start dabbad" "
 "
 
 test_expect_success 'invoke dabba interface capabilities command with dabbad' "
-    '$DABBA_PATH'/dabba interface get capabilities > result
+    '$DABBA_PATH'/dabba interface capabilities get > result
 "
 
 test_expect_success PYTHON_YAML "Parse interface capabilities YAML output" "

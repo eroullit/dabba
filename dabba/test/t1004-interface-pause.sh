@@ -24,7 +24,7 @@ test_description='Test dabba interface pause command'
 dev_nr=$(number_of_interface_get)
 
 test_expect_success 'invoke dabba interface pause command w/o dabbad' "
-    test_expect_code 22 $DABBA_PATH/dabba interface get pause
+    test_expect_code 22 $DABBA_PATH/dabba interface pause get 
 "
 
 test_expect_success "Setup: Start dabbad" "
@@ -32,7 +32,7 @@ test_expect_success "Setup: Start dabbad" "
 "
 
 test_expect_success 'invoke dabba interface pause command with dabbad' "
-    '$DABBA_PATH'/dabba interface get pause > result
+    '$DABBA_PATH'/dabba interface pause get > result
 "
 
 test_expect_success PYTHON_YAML "Parse interface pause YAML output" "
