@@ -32,10 +32,13 @@
 #include <getopt.h>
 #include <errno.h>
 #include <assert.h>
+#include <libdabba/macros.h>
 #include <dabba/macros.h>
 #include <dabba/rpc.h>
 #include <dabba/cli.h>
 #include <dabba/help.h>
+#include <dabba/interface.h>
+#include <dabba/dabba.h>
 
 /**
  * \internal
@@ -79,6 +82,7 @@ static void interface_offload_list_print(const Dabba__InterfaceOffloadList *
 }
 
 /**
+ * \internal
  * \brief Invoke interface offload get RPC
  * \param[in]           service	        Pointer to protobuf service structure
  * \param[in]           id_list         Pointer to interface id to fetch
@@ -86,8 +90,8 @@ static void interface_offload_list_print(const Dabba__InterfaceOffloadList *
  * \note An empty id list will query the offload status of all available interfaces.
  */
 
-int rpc_interface_offload_get(ProtobufCService * service,
-			      const Dabba__InterfaceIdList * id_list)
+static int rpc_interface_offload_get(ProtobufCService * service,
+				     const Dabba__InterfaceIdList * id_list)
 {
 	protobuf_c_boolean is_done = 0;
 
@@ -103,8 +107,9 @@ int rpc_interface_offload_get(ProtobufCService * service,
 	return 0;
 }
 
-int rpc_interface_offload_modify(ProtobufCService * service,
-				 const Dabba__InterfaceOffload * offloadp)
+static int rpc_interface_offload_modify(ProtobufCService * service,
+					const Dabba__InterfaceOffload *
+					offloadp)
 {
 	protobuf_c_boolean is_done = 0;
 
@@ -120,7 +125,7 @@ int rpc_interface_offload_modify(ProtobufCService * service,
 	return 0;
 }
 
-int cmd_interface_offload_modify(int argc, const char **argv)
+static int cmd_interface_offload_modify(int argc, const char **argv)
 {
 	enum interface_option {
 		/* option */
@@ -286,4 +291,19 @@ int cmd_interface_offload_modify(int argc, const char **argv)
  out:
 	free(offload.id);
 	return rc;
+}
+
+static int cmd_interface_offload_get(int argc, const char **argv)
+{
+	return rpc_interface_get(argc, argv, rpc_interface_offload_get);
+}
+
+int cmd_interface_offload(int argc, const char **argv)
+{
+	static const struct cmd_struct cmd[] = {
+		{"get", cmd_interface_offload_get},
+		{"modify", cmd_interface_offload_modify}
+	};
+
+	return cmd_run_builtin(cmd, ARRAY_SIZE(cmd), argc, argv);
 }

@@ -24,8 +24,6 @@
 #ifndef INTERFACE_PAUSE_H
 #define	INTERFACE_PAUSE_H
 
-int rpc_interface_pause_get(ProtobufCService * service,
-			    const Dabba__InterfaceIdList * id_list);
-int cmd_interface_pause_modify(int argc, const char **argv);
+int cmd_interface_pause(int argc, const char **argv);
 
 #endif				/* INTERFACE_PAUSE_H */

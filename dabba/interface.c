@@ -181,14 +181,16 @@ enum interface_modify_option {
 };
 
 /**
- * \internal
  * \brief Selects interface get RPC from \c argv
  * \param[in]           argc	        Argument counter
  * \param[in]           argv	        Argument vector
+ * \param[in]           rpc	        RPC getter to run
  * \return 0 on success, else otherwise.
  */
 
-static int cmd_interface_get(int argc, const char **argv)
+int rpc_interface_get(int argc, const char **argv,
+		      int (*const rpc) (ProtobufCService * service,
+					const Dabba__InterfaceIdList * id_list))
 {
 	enum interface_option {
 		/* option */
@@ -196,22 +198,6 @@ static int cmd_interface_get(int argc, const char **argv)
 		OPT_TCP,
 		OPT_LOCAL,
 		OPT_HELP
-	};
-
-	static const struct rpc_struct {
-		const char *const cmd;
-		int (*const rpc) (ProtobufCService * service,
-				  const Dabba__InterfaceIdList * id_list);
-	} interface_commands[] = {
-		{
-		"statistics", rpc_interface_statistics_get}, {
-		"status", rpc_interface_status_get}, {
-		"settings", rpc_interface_settings_get}, {
-		"pause", rpc_interface_pause_get}, {
-		"offload", rpc_interface_offload_get}, {
-		"driver", rpc_interface_driver_get}, {
-		"coalesce", rpc_interface_coalesce_get}, {
-		"capabilities", rpc_interface_capabilities_get}
 	};
 
 	const struct option interface_option[] = {
@@ -224,26 +210,18 @@ static int cmd_interface_get(int argc, const char **argv)
 
 	int ret, rc = 0;
 	size_t a;
-	const char *cmd = argv[0];
 	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
 	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 	ProtobufCService *service;
 	Dabba__InterfaceIdList id_list = DABBA__INTERFACE_ID_LIST__INIT;
 	Dabba__InterfaceId **idpp;
-	int (*rpc_get) (ProtobufCService * service,
-			const Dabba__InterfaceIdList * id_list) = NULL;
 
-	if (argc || argv[0]) {
-		/* Parse get action to run */
-		for (a = 0; a < ARRAY_SIZE(interface_commands); a++)
-			if (!strcmp(interface_commands[a].cmd, cmd)) {
-				rpc_get = interface_commands[a].rpc;
-				break;
-			}
-	}
-
-	if (!rpc_get)
+	if (!rpc)
 		return ENOSYS;
+
+	/* HACK: getopt*() start to parse options at argv[1] */
+	argc++;
+	argv--;
 
 	/* parse action options */
 	while ((ret =
@@ -297,7 +275,7 @@ static int cmd_interface_get(int argc, const char **argv)
 	service = dabba_rpc_client_connect(server_id, server_type);
 
 	if (service)
-		rc = rpc_get(service, &id_list);
+		rc = rpc(service, &id_list);
 	else
 		rc = EINVAL;
 
@@ -314,28 +292,6 @@ static int cmd_interface_get(int argc, const char **argv)
 }
 
 /**
- * \internal
- * \brief Selects interface modify RPC from \c argv
- * \param[in]           argc	        Argument counter
- * \param[in]           argv	        Argument vector
- * \return 0 on success, else otherwise.
- */
-
-static int cmd_interface_modify(int argc, const char **argv)
-{
-	static struct cmd_struct cmd[] = {
-		{"status", cmd_interface_status_modify},
-		{"pause", cmd_interface_pause_modify},
-		{"settings", cmd_interface_settings_modify},
-		{"coalesce", cmd_interface_coalesce_modify},
-		{"capabilities", cmd_interface_capabilities_modify},
-		{"offload", cmd_interface_offload_modify}
-	};
-
-	return cmd_run_builtin(cmd, ARRAY_SIZE(cmd), argc, argv);
-}
-
-/**
  * \brief Parse which interface sub-command.
  * \param[in]           argc	        Argument counter
  * \param[in]           argv		Argument vector
@@ -349,8 +305,14 @@ static int cmd_interface_modify(int argc, const char **argv)
 int cmd_interface(int argc, const char **argv)
 {
 	static const struct cmd_struct cmd[] = {
-		{"get", cmd_interface_get},
-		{"modify", cmd_interface_modify}
+		{"capabilities", cmd_interface_capabilities},
+		{"coalesce", cmd_interface_coalesce},
+		{"driver", cmd_interface_driver},
+		{"offload", cmd_interface_offload},
+		{"pause", cmd_interface_pause},
+		{"settings", cmd_interface_settings},
+		{"statistics", cmd_interface_statistics},
+		{"status", cmd_interface_status},
 	};
 
 	return cmd_run_builtin(cmd, ARRAY_SIZE(cmd), argc, argv);

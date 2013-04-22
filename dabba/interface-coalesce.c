@@ -32,11 +32,13 @@
 #include <getopt.h>
 #include <assert.h>
 #include <errno.h>
-
+#include <libdabba/macros.h>
 #include <dabba/rpc.h>
 #include <dabba/cli.h>
 #include <dabba/help.h>
 #include <dabba/macros.h>
+#include <dabba/interface.h>
+#include <dabba/dabba.h>
 
 /**
  * \internal
@@ -106,6 +108,7 @@ static void interface_coalesce_list_print(const Dabba__InterfaceCoalesceList *
 }
 
 /**
+ * \internal
  * \brief Invoke interface coalesce get RPC
  * \param[in]           service	        Pointer to protobuf service structure
  * \param[in]           id_list         Pointer to interface id to fetch
@@ -113,8 +116,8 @@ static void interface_coalesce_list_print(const Dabba__InterfaceCoalesceList *
  * \note An empty id list will query the coalesce status of all available interfaces.
  */
 
-int rpc_interface_coalesce_get(ProtobufCService * service,
-			       const Dabba__InterfaceIdList * id_list)
+static int rpc_interface_coalesce_get(ProtobufCService * service,
+				      const Dabba__InterfaceIdList * id_list)
 {
 	protobuf_c_boolean is_done = 0;
 
@@ -163,7 +166,7 @@ static int rpc_interface_coalesce_modify(ProtobufCService * service,
  * \return Returns 0 on success, else otherwise.
  */
 
-int cmd_interface_coalesce_modify(int argc, const char **argv)
+static int cmd_interface_coalesce_modify(int argc, const char **argv)
 {
 	enum interface_option {
 		OPT_ADAPTIVE_RX,
@@ -392,4 +395,19 @@ int cmd_interface_coalesce_modify(int argc, const char **argv)
  out:
 	free(coalesce.id);
 	return rc;
+}
+
+static int cmd_interface_coalesce_get(int argc, const char **argv)
+{
+	return rpc_interface_get(argc, argv, rpc_interface_coalesce_get);
+}
+
+int cmd_interface_coalesce(int argc, const char **argv)
+{
+	static const struct cmd_struct cmd[] = {
+		{"get", cmd_interface_coalesce_get},
+		{"modify", cmd_interface_coalesce_modify}
+	};
+
+	return cmd_run_builtin(cmd, ARRAY_SIZE(cmd), argc, argv);
 }

@@ -33,10 +33,13 @@
 #include <inttypes.h>
 #include <assert.h>
 #include <errno.h>
+#include <libdabba/macros.h>
 #include <dabba/macros.h>
 #include <dabba/cli.h>
 #include <dabba/rpc.h>
 #include <dabba/help.h>
+#include <dabba/interface.h>
+#include <dabba/dabba.h>
 
 /**
  * \internal
@@ -74,6 +77,7 @@ static void interface_status_list_print(const Dabba__InterfaceStatusList *
 }
 
 /**
+ * \internal
  * \brief Invoke interface status get RPC
  * \param[in]           service	        Pointer to protobuf service structure
  * \param[in]           id_list         Pointer to interface id to fetch
@@ -81,8 +85,8 @@ static void interface_status_list_print(const Dabba__InterfaceStatusList *
  * \note An empty id list will query the status of all available interfaces.
  */
 
-int rpc_interface_status_get(ProtobufCService * service,
-			     const Dabba__InterfaceIdList * id_list)
+static int rpc_interface_status_get(ProtobufCService * service,
+				    const Dabba__InterfaceIdList * id_list)
 {
 	protobuf_c_boolean is_done = 0;
 
@@ -130,7 +134,7 @@ static int rpc_interface_status_modify(ProtobufCService * service,
  * \return Returns 0 on success, else otherwise.
  */
 
-int cmd_interface_status_modify(int argc, const char **argv)
+static int cmd_interface_status_modify(int argc, const char **argv)
 {
 	enum interface_option {
 		/* option */
@@ -228,4 +232,19 @@ int cmd_interface_status_modify(int argc, const char **argv)
  out:
 	free(status.id);
 	return rc;
+}
+
+static int cmd_interface_status_get(int argc, const char **argv)
+{
+	return rpc_interface_get(argc, argv, rpc_interface_status_get);
+}
+
+int cmd_interface_status(int argc, const char **argv)
+{
+	static const struct cmd_struct cmd[] = {
+		{"get", cmd_interface_status_get},
+		{"modify", cmd_interface_status_modify}
+	};
+
+	return cmd_run_builtin(cmd, ARRAY_SIZE(cmd), argc, argv);
 }

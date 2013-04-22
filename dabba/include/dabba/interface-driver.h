@@ -24,7 +24,6 @@
 #ifndef INTERFACE_DRIVER_H
 #define	INTERFACE_DRIVER_H
 
-int rpc_interface_driver_get(ProtobufCService * service,
-			     const Dabba__InterfaceIdList * id_list);
+int cmd_interface_driver(int argc, const char **argv);
 
 #endif				/* INTERFACE_DRIVER_H */

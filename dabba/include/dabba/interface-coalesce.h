@@ -24,9 +24,6 @@
 #ifndef INTERFACE_COALESCE_H
 #define	INTERFACE_COALESCE_H
 
-int rpc_interface_coalesce_get(ProtobufCService * service,
-			       const Dabba__InterfaceIdList * id_list);
-
-int cmd_interface_coalesce_modify(int argc, const char **argv);
+int cmd_interface_coalesce(int argc, const char **argv);
 
 #endif				/* INTERFACE_COALESCE_H */

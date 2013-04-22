@@ -33,10 +33,13 @@
 #include <inttypes.h>
 #include <assert.h>
 #include <errno.h>
+#include <libdabba/macros.h>
 #include <dabba/macros.h>
 #include <dabba/cli.h>
 #include <dabba/rpc.h>
 #include <dabba/help.h>
+#include <dabba/interface.h>
+#include <dabba/dabba.h>
 
 /**
  * \internal
@@ -71,6 +74,7 @@ static void interface_pause_list_print(const Dabba__InterfacePauseList *
 }
 
 /**
+ * \internal
  * \brief Invoke interface pause get RPC
  * \param[in]           service	        Pointer to protobuf service structure
  * \param[in]           id_list         Pointer to interface id to fetch
@@ -78,8 +82,8 @@ static void interface_pause_list_print(const Dabba__InterfacePauseList *
  * \note An empty id list will query the pause status of all available interfaces.
  */
 
-int rpc_interface_pause_get(ProtobufCService * service,
-			    const Dabba__InterfaceIdList * id_list)
+static int rpc_interface_pause_get(ProtobufCService * service,
+				   const Dabba__InterfaceIdList * id_list)
 {
 	protobuf_c_boolean is_done = 0;
 
@@ -103,8 +107,8 @@ int rpc_interface_pause_get(ProtobufCService * service,
  * \return Always returns 0.
  */
 
-int rpc_interface_pause_modify(ProtobufCService * service,
-			       const Dabba__InterfacePause * pausep)
+static int rpc_interface_pause_modify(ProtobufCService * service,
+				      const Dabba__InterfacePause * pausep)
 {
 	protobuf_c_boolean is_done = 0;
 
@@ -127,7 +131,7 @@ int rpc_interface_pause_modify(ProtobufCService * service,
  * \return Returns 0 on success, else otherwise.
  */
 
-int cmd_interface_pause_modify(int argc, const char **argv)
+static int cmd_interface_pause_modify(int argc, const char **argv)
 {
 	enum interface_option {
 		/* option */
@@ -233,4 +237,19 @@ int cmd_interface_pause_modify(int argc, const char **argv)
  out:
 	free(pause.id);
 	return rc;
+}
+
+static int cmd_interface_pause_get(int argc, const char **argv)
+{
+	return rpc_interface_get(argc, argv, rpc_interface_pause_get);
+}
+
+int cmd_interface_pause(int argc, const char **argv)
+{
+	static const struct cmd_struct cmd[] = {
+		{"get", cmd_interface_pause_get},
+		{"modify", cmd_interface_pause_modify}
+	};
+
+	return cmd_run_builtin(cmd, ARRAY_SIZE(cmd), argc, argv);
 }

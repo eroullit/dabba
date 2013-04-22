@@ -32,10 +32,13 @@
 #include <getopt.h>
 #include <errno.h>
 #include <assert.h>
+#include <libdabba/macros.h>
 #include <dabba/macros.h>
 #include <dabba/rpc.h>
 #include <dabba/cli.h>
 #include <dabba/help.h>
+#include <dabba/interface.h>
+#include <dabba/dabba.h>
 
 /**
  * \internal
@@ -82,8 +85,8 @@ static void interface_settings_list_print(const Dabba__InterfaceSettingsList *
  * \note An empty id list will query the settings of all available interfaces.
  */
 
-int rpc_interface_settings_get(ProtobufCService * service,
-			       const Dabba__InterfaceIdList * id_list)
+static int rpc_interface_settings_get(ProtobufCService * service,
+				      const Dabba__InterfaceIdList * id_list)
 {
 	protobuf_c_boolean is_done = 0;
 
@@ -132,7 +135,7 @@ static int rpc_interface_settings_modify(ProtobufCService * service,
  * \return Returns 0 on success, else otherwise.
  */
 
-int cmd_interface_settings_modify(int argc, const char **argv)
+static int cmd_interface_settings_modify(int argc, const char **argv)
 {
 	enum interface_option {
 		/* option */
@@ -260,4 +263,19 @@ int cmd_interface_settings_modify(int argc, const char **argv)
  out:
 	free(settings.id);
 	return rc;
+}
+
+static int cmd_interface_settings_get(int argc, const char **argv)
+{
+	return rpc_interface_get(argc, argv, rpc_interface_settings_get);
+}
+
+int cmd_interface_settings(int argc, const char **argv)
+{
+	static const struct cmd_struct cmd[] = {
+		{"get", cmd_interface_settings_get},
+		{"modify", cmd_interface_settings_modify}
+	};
+
+	return cmd_run_builtin(cmd, ARRAY_SIZE(cmd), argc, argv);
 }

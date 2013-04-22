@@ -164,11 +164,13 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <assert.h>
 #include <errno.h>
 #include <linux/ethtool.h>
-
+#include <libdabba/macros.h>
 #include <dabba/rpc.h>
 #include <dabba/cli.h>
 #include <dabba/help.h>
 #include <dabba/macros.h>
+#include <dabba/interface.h>
+#include <dabba/dabba.h>
 
 /**
  * \internal
@@ -282,6 +284,7 @@ static void interface_capabilities_list_print(const
 }
 
 /**
+ * \internal
  * \brief Invoke interface capabilities get RPC
  * \param[in]           service	        Pointer to protobuf service structure
  * \param[in]           id_list         Pointer to interface id to fetch
@@ -289,8 +292,9 @@ static void interface_capabilities_list_print(const
  * \note An empty id list will query the capabilities of all available interfaces
  */
 
-int rpc_interface_capabilities_get(ProtobufCService * service,
-				   const Dabba__InterfaceIdList * id_list)
+static int rpc_interface_capabilities_get(ProtobufCService * service,
+					  const Dabba__InterfaceIdList *
+					  id_list)
 {
 	protobuf_c_boolean is_done = 0;
 
@@ -341,7 +345,7 @@ static int rpc_interface_capabilities_modify(ProtobufCService * service,
  * \return Returns 0 on success, else otherwise.
  */
 
-int cmd_interface_capabilities_modify(int argc, const char **argv)
+static int cmd_interface_capabilities_modify(int argc, const char **argv)
 {
 	enum interface_option {
 		/* option */
@@ -544,4 +548,19 @@ int cmd_interface_capabilities_modify(int argc, const char **argv)
  out:
 	free(capabilities.id);
 	return rc;
+}
+
+static int cmd_interface_capabilities_get(int argc, const char **argv)
+{
+	return rpc_interface_get(argc, argv, rpc_interface_capabilities_get);
+}
+
+int cmd_interface_capabilities(int argc, const char **argv)
+{
+	static const struct cmd_struct cmd[] = {
+		{"get", cmd_interface_capabilities_get},
+		{"modify", cmd_interface_capabilities_modify}
+	};
+
+	return cmd_run_builtin(cmd, ARRAY_SIZE(cmd), argc, argv);
 }

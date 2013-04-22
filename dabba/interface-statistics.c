@@ -33,9 +33,12 @@
 #include <inttypes.h>
 #include <assert.h>
 #include <errno.h>
+#include <libdabba/macros.h>
 #include <dabba/macros.h>
 #include <dabba/rpc.h>
 #include <dabba/help.h>
+#include <dabba/interface.h>
+#include <dabba/dabba.h>
 
 /**
  * \internal
@@ -97,6 +100,7 @@ static void interface_statistics_list_print(const Dabba__InterfaceStatisticsList
 }
 
 /**
+ * \internal
  * \brief Invoke interface statistics get RPC
  * \param[in]           service	        Pointer to protobuf service structure
  * \param[in]           id_li
@@ -105,8 +109,8 @@ static void interface_statistics_list_print(const Dabba__InterfaceStatisticsList
  * \note An empty id list will query the statistics counters of all available interfaces.
  */
 
-int rpc_interface_statistics_get(ProtobufCService * service,
-				 const Dabba__InterfaceIdList * id_list)
+static int rpc_interface_statistics_get(ProtobufCService * service,
+					const Dabba__InterfaceIdList * id_list)
 {
 	protobuf_c_boolean is_done = 0;
 
@@ -120,4 +124,18 @@ int rpc_interface_statistics_get(ProtobufCService * service,
 	dabba_rpc_call_is_done(&is_done);
 
 	return 0;
+}
+
+static int cmd_interface_statistics_get(int argc, const char **argv)
+{
+	return rpc_interface_get(argc, argv, rpc_interface_statistics_get);
+}
+
+int cmd_interface_statistics(int argc, const char **argv)
+{
+	static const struct cmd_struct cmd[] = {
+		{"get", cmd_interface_statistics_get}
+	};
+
+	return cmd_run_builtin(cmd, ARRAY_SIZE(cmd), argc, argv);
 }

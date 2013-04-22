@@ -24,9 +24,6 @@
 #ifndef INTERFACE_CAPABILITIES_H
 #define	INTERFACE_CAPABILITIES_H
 
-int rpc_interface_capabilities_get(ProtobufCService * service,
-				   const Dabba__InterfaceIdList * id_list);
-
-int cmd_interface_capabilities_modify(int argc, const char **argv);
+int cmd_interface_capabilities(int argc, const char **argv);
 
 #endif				/* INTERFACE_CAPABILITIES_H */
