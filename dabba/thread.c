@@ -210,16 +210,6 @@ int cmd_thread_get(int argc, const char **argv)
 		OPT_HELP
 	};
 
-	static const struct rpc_struct {
-		const char *const cmd;
-		int (*const rpc) (ProtobufCService * service,
-				  const Dabba__ThreadIdList * id_list);
-	} thread_commands[] = {
-		{
-		"settings", rpc_thread_settings_get}, {
-		"capabilities", rpc_thread_capabilities_get}
-	};
-
 	const struct option thread_option[] = {
 		{"id", required_argument, NULL, OPT_THREAD_ID},
 		{"tcp", optional_argument, NULL, OPT_TCP},
@@ -229,27 +219,11 @@ int cmd_thread_get(int argc, const char **argv)
 	};
 
 	int ret, rc = 0;
-	size_t a;
-	const char *cmd = argv[0];
 	Dabba__ThreadIdList id_list = DABBA__THREAD_ID_LIST__INIT;
 	Dabba__ThreadId **idpp;
 	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
 	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 	ProtobufCService *service;
-	int (*rpc_get) (ProtobufCService * service,
-			const Dabba__ThreadIdList * id_list) = NULL;
-
-	if (argc || argv[0]) {
-		/* Parse get action to run */
-		for (a = 0; a < ARRAY_SIZE(thread_commands); a++)
-			if (!strcmp(thread_commands[a].cmd, cmd)) {
-				rpc_get = thread_commands[a].rpc;
-				break;
-			}
-	}
-
-	if (!rpc_get)
-		return ENOSYS;
 
 	/* parse options and actions to run */
 	while ((ret =
@@ -299,7 +273,7 @@ int cmd_thread_get(int argc, const char **argv)
 	service = dabba_rpc_client_connect(server_id, server_type);
 
 	if (service)
-		rc = rpc_get(service, &id_list);
+		rc = rpc_thread_settings_get(service, &id_list);
 	else
 		rc = EINVAL;
 
@@ -433,6 +407,7 @@ int cmd_thread_modify(int argc, const char **argv)
 int cmd_thread(int argc, const char **argv)
 {
 	static const struct cmd_struct cmd[] = {
+		{"capabilities", cmd_thread_capabilities},
 		{"get", cmd_thread_get},
 		{"modify", cmd_thread_modify}
 	};

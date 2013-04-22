@@ -28,7 +28,12 @@
 /* __LICENSE_HEADER_END__ */
 
 #include <stdio.h>
+#include <getopt.h>
+#include <errno.h>
+#include <libdabba/macros.h>
 #include <dabba/rpc.h>
+#include <dabba/help.h>
+#include <dabba/dabba.h>
 
 const char *sched_policy2str(const int policy_value);
 
@@ -64,6 +69,7 @@ static void thread_capabilities_print(const Dabba__ThreadCapabilitiesList *
 }
 
 /**
+ * \internal
  * \brief Invoke thread capabilities get RPC
  * \param[in]           service	        Pointer to protobuf service structure
  * \param[in]           id_list         Pointer to thread id to fetch
@@ -71,8 +77,8 @@ static void thread_capabilities_print(const Dabba__ThreadCapabilitiesList *
  * \note An empty id list will query the status of all available thread.
  */
 
-int rpc_thread_capabilities_get(ProtobufCService * service,
-				const Dabba__ThreadIdList * id_list)
+static int rpc_thread_capabilities_get(ProtobufCService * service,
+				       const Dabba__ThreadIdList * id_list)
 {
 	protobuf_c_boolean is_done = 0;
 	Dabba__Dummy dummy = DABBA__DUMMY__INIT;
@@ -87,4 +93,77 @@ int rpc_thread_capabilities_get(ProtobufCService * service,
 	dabba_rpc_call_is_done(&is_done);
 
 	return 0;
+}
+
+static int cmd_thread_capabilities_get(int argc, const char **argv)
+{
+	enum thread_option {
+		/* option */
+		OPT_TCP,
+		OPT_LOCAL,
+		OPT_HELP
+	};
+
+	const struct option thread_option[] = {
+		{"tcp", optional_argument, NULL, OPT_TCP},
+		{"local", optional_argument, NULL, OPT_LOCAL},
+		{"help", no_argument, NULL, OPT_HELP},
+		{NULL, 0, NULL, 0},
+	};
+
+	int ret, rc = 0;
+	Dabba__ThreadIdList id_list = DABBA__THREAD_ID_LIST__INIT;
+	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+	ProtobufCService *service;
+
+	/* HACK: getopt*() start to parse options at argv[1] */
+	argc++;
+	argv--;
+
+	/* parse options and actions to run */
+	while ((ret =
+		getopt_long_only(argc, (char **)argv, "", thread_option,
+				 NULL)) != EOF) {
+		switch (ret) {
+		case OPT_TCP:
+			server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
+			server_id = DABBA_RPC_DEFAULT_TCP_SERVER_NAME;
+
+			if (optarg)
+				server_id = optarg;
+			break;
+		case OPT_LOCAL:
+			server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+			server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+
+			if (optarg)
+				server_id = optarg;
+			break;
+		case OPT_HELP:
+		default:
+			show_usage(thread_option);
+			rc = -1;
+			goto out;
+		}
+	}
+
+	service = dabba_rpc_client_connect(server_id, server_type);
+
+	if (!service)
+		return EINVAL;
+
+	rpc_thread_capabilities_get(service, &id_list);
+ out:
+	return rc;
+
+}
+
+int cmd_thread_capabilities(int argc, const char **argv)
+{
+	static const struct cmd_struct cmd[] = {
+		{"get", cmd_thread_capabilities_get}
+	};
+
+	return cmd_run_builtin(cmd, ARRAY_SIZE(cmd), argc, argv);
 }
