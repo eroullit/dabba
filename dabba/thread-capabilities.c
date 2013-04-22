@@ -32,10 +32,9 @@
 #include <errno.h>
 #include <libdabba/macros.h>
 #include <dabba/rpc.h>
+#include <dabba/cli.h>
 #include <dabba/help.h>
 #include <dabba/dabba.h>
-
-const char *sched_policy2str(const int policy_value);
 
 /**
  * \internal

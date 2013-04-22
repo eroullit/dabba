@@ -29,9 +29,7 @@
 
 #include <stdio.h>
 #include <dabba/rpc.h>
-
-const char *sched_policy2str(const int policy_value);
-const char *thread_type2str(const int type);
+#include <dabba/cli.h>
 
 /**
  * \internal
