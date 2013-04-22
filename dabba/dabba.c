@@ -188,7 +188,7 @@ int cmd_run_builtin(const struct cmd_struct *cmd, const size_t cmd_len,
 }
 
 /**
- * \brief start function. Pass on \cargc / \c argv to commands
+ * \brief start function. Pass on \c argc / \c argv to commands
  * \param[in]           argc	        Argument counter
  * \param[in]           argv	        Argument vector
  * \return 0 on success, else on failure.
