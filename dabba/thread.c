@@ -187,11 +187,93 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <libdabba/macros.h>
 #include <dabbad/thread.h>
 #include <dabba/thread-capabilities.h>
-#include <dabba/thread-settings.h>
 #include <dabba/rpc.h>
 #include <dabba/cli.h>
 #include <dabba/help.h>
 #include <dabba/dabba.h>
+
+/**
+ * \internal
+ * \brief Protobuf closure to print thread settings list in YAML
+ * \param[in]           result	        Pointer to thread settings list
+ * \param[in]           closure_data	Pointer to protobuf closure data
+ */
+
+static void thread_print(const Dabba__ThreadList * result, void *closure_data)
+{
+	const Dabba__Thread *thread;
+	size_t a;
+	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
+
+	assert(closure_data);
+
+	rpc_header_print("threads");
+
+	for (a = 0; result && a < result->n_list; a++) {
+		thread = result->list[a];
+		printf("    - id: %" PRIu64 "\n", thread->id->id);
+		printf("    ");
+		__rpc_error_code_print(thread->status->code);
+		printf("      type: %s\n", thread_type2str(thread->type));
+		printf("      scheduling policy: %s\n",
+		       sched_policy2str(thread->sched_policy));
+		printf("      scheduling priority: %i\n",
+		       thread->sched_priority);
+		printf("      cpu affinity: %s\n", thread->cpu_set);
+		/* TODO map priority/policy protobuf enums to string */
+	}
+
+	*status = 1;
+}
+
+/**
+ * \internal
+ * \brief Invoke thread settings get RPC
+ * \param[in]           service	        Pointer to protobuf service structure
+ * \param[in]           id_list         Pointer to thread id to fetch
+ * \return Always returns 0.
+ * \note An empty id list will query the status of all available thread.
+ */
+
+static int rpc_thread_get(ProtobufCService * service,
+			  const Dabba__ThreadIdList * id_list)
+{
+	protobuf_c_boolean is_done = 0;
+
+	assert(service);
+	assert(id_list);
+
+	dabba__dabba_service__thread_get(service, id_list,
+					 thread_print, &is_done);
+
+	dabba_rpc_call_is_done(&is_done);
+
+	return 0;
+}
+
+/**
+ * \internal
+ * \brief Invoke thread settings modify RPC
+ * \param[in]           service	        Pointer to protobuf service structure
+ * \param[in]           status          Pointer to thread new status settings
+ * \return Always returns 0.
+ */
+
+static int rpc_thread_modify(ProtobufCService * service,
+			     const Dabba__Thread * thread)
+{
+	protobuf_c_boolean is_done = 0;
+
+	assert(service);
+	assert(thread);
+
+	dabba__dabba_service__thread_modify(service, thread,
+					    rpc_error_code_print, &is_done);
+
+	dabba_rpc_call_is_done(&is_done);
+
+	return 0;
+}
 
 /**
  * \brief Parse argument vector to prepare a thread list get query
@@ -200,7 +282,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
  * \return 0 on success, \c EINVAL on invalid input.
  */
 
-int cmd_thread_get(int argc, const char **argv)
+static int cmd_thread_get(int argc, const char **argv)
 {
 	enum thread_option {
 		/* option */
@@ -273,7 +355,7 @@ int cmd_thread_get(int argc, const char **argv)
 	service = dabba_rpc_client_connect(server_id, server_type);
 
 	if (service)
-		rc = rpc_thread_settings_get(service, &id_list);
+		rc = rpc_thread_get(service, &id_list);
 	else
 		rc = EINVAL;
 
@@ -292,7 +374,7 @@ int cmd_thread_get(int argc, const char **argv)
  * \return 0 on success, \c EINVAL on invalid input.
  */
 
-int cmd_thread_modify(int argc, const char **argv)
+static int cmd_thread_modify(int argc, const char **argv)
 {
 	enum thread_option {
 		/* action */
@@ -386,7 +468,7 @@ int cmd_thread_modify(int argc, const char **argv)
 	if (!service)
 		return EINVAL;
 
-	rpc_thread_settings_modify(service, &thread);
+	rpc_thread_modify(service, &thread);
  out:
 	free(thread.id);
 	return rc;

@@ -32,7 +32,6 @@ ADD_EXECUTABLE(${PROJECT_NAME}
 	capture.c
 	thread.c
 	thread-capabilities.c
-	thread-settings.c
 )
 
 TARGET_LINK_LIBRARIES (${PROJECT_NAME} libdabba-rpc)
