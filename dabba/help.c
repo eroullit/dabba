@@ -149,7 +149,7 @@ int cmd_help(int argc, const char **argv)
 				     sizeof(help_name) - offset, "-%s",
 				     argv[a]);
 
-		rc = execlp("man", "man", help_name, (char *)NULL);
+		rc = execlp("man", "man", help_name, NULL);
 	}
 
 	return rc ? errno : rc;
