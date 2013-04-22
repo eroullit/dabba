@@ -132,14 +132,22 @@ static void list_common_cmds_help(void)
 int cmd_help(int argc, const char **argv)
 {
 	char help_name[32];
-	int rc = 0;
+	int rc = 0, a;
+	size_t offset;
 
 	if (argc < 1 || !argv[0]) {
 		printf("usage: %s\n\n", dabba_usage_string);
 		list_common_cmds_help();
 		printf("\n%s\n", dabba_more_info_string);
 	} else {
-		snprintf(help_name, sizeof(help_name), "dabba-%s", argv[0]);
+		offset = snprintf(help_name, sizeof(help_name), "dabba");
+
+		for (a = 0; a < argc; a++)
+			offset +=
+			    snprintf(&help_name[offset],
+				     sizeof(help_name) - offset, "-%s",
+				     argv[a]);
+
 		rc = execlp("man", "man", help_name, (char *)NULL);
 	}
 
