@@ -27,6 +27,136 @@
 
 /* __LICENSE_HEADER_END__ */
 
+/*
+
+=head1 NAME
+
+dabba-interface-offload - Manage network interface offload settings
+
+=head1 SYNOPSIS
+
+dabba interface offload <command> [<arguments>...] [--help]
+
+=head1 DESCRIPTION
+
+Give the user the possibility to manage the offload settings of supported
+network interfaces.
+
+=head1 COMMANDS
+
+=over
+
+=item get
+
+Fetch and print offload information about currently supported interfaces.
+The output is formatted in YAML.
+
+=item modify
+
+Apply new offload settings to a specific network interface.
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item --id <name>
+
+interface name to work on.
+
+=item --rx-csum (true|false)
+
+Activate or shutdown receive checksum offload.
+
+=item --tx-csum (true|false)
+
+Activate or shutdown transmit checksum offload.
+
+=item --sg (true|false)
+
+Activate or shutdown scatter gather.
+
+=item --tso (true|false)
+
+Activate or shutdown TCP segment offload.
+
+=item --ufo (true|false)
+
+Activate or shutdown UDP fragment offload.
+
+=item --gso (true|false)
+
+Activate or shutdown generic segmentation offload.
+
+=item --gro (true|false)
+
+Activate or shutdown generic receive offload.
+
+=item --lro (true|false)
+
+Activate or shutdown large receive offload.
+
+=item --rx-hash (true|false)
+
+Activate or shutdown receive hash offload.
+
+=back
+
+=head1 EXAMPLES
+
+=over
+
+=item dabba interface offload get
+
+Output the offload settings of all available network interfaces.
+
+=item dabba interface offload get --id eth0
+
+Output the offload settings of 'eth0'.
+
+=item dabba interface offload modify --id eth0 --lro true
+
+Enable the large receive offload on 'eth0' (if supported).
+
+=item dabba interface offload modify --id eth0 --tso false
+
+Disable TCP segment offload on 'eth0'.
+
+=back
+
+=head1 AUTHOR
+
+Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
+
+=head1 BUGS
+
+=over
+
+=item Please report bugs to <https://github.com/eroullit/dabba/issues>
+
+=item dabba project project page: <https://github.com/eroullit/dabba>
+
+=back
+
+=head1 COPYRIGHT
+
+=over
+
+=item Copyright © 2012 Emmanuel Roullit.
+
+=item License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.
+
+=item This is free software: you are free to change and redistribute it.
+
+=item There is NO WARRANTY, to the extent permitted by law.
+
+=back
+
+=cut
+
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
