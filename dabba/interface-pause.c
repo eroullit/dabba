@@ -27,6 +27,112 @@
 
 /* __LICENSE_HEADER_END__ */
 
+/*
+
+=head1 NAME
+
+dabba-interface-pause - Manage network interface pause settings
+
+=head1 SYNOPSIS
+
+dabba interface pause <command> [<arguments>...] [--help]
+
+=head1 DESCRIPTION
+
+Give the user the possibility to manage the pause settings of supported
+network interfaces.
+
+=head1 COMMANDS
+
+=over
+
+=item get
+
+Fetch and print pause information about currently supported interfaces.
+The output is formatted in YAML.
+
+=item modify
+
+Apply new pause settings to a specific network interface.
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item --id <name>
+
+interface name to work on.
+
+=item --rx-pause (true|false)
+
+Activate or shutdown receive pause.
+
+=item --tx-pause (true|false)
+
+Activate or shutdown transmit pause.
+
+=item --autoneg (true|false)
+
+Activate or shutdown pause settings autonegotiation.
+
+=back
+
+=head1 EXAMPLES
+
+=over
+
+=item dabba interface pause get
+
+Output the pause settings of all available network interfaces.
+
+=item dabba interface pause get --id eth0
+
+Output the pause settings of 'eth0'.
+
+=item dabba interface pause modify --id eth0 --tx-pause true
+
+Enable transmit pause settings on 'eth0' (if supported).
+
+=item dabba interface pause modify --id eth0 --autoneg false
+
+Disable pause settings autonegotiation on 'eth0' (if supported).
+
+=back
+
+=head1 AUTHOR
+
+Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
+
+=head1 BUGS
+
+=over
+
+=item Please report bugs to <https://github.com/eroullit/dabba/issues>
+
+=item dabba project project page: <https://github.com/eroullit/dabba>
+
+=back
+
+=head1 COPYRIGHT
+
+=over
+
+=item Copyright © 2012 Emmanuel Roullit.
+
+=item License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.
+
+=item This is free software: you are free to change and redistribute it.
+
+=item There is NO WARRANTY, to the extent permitted by law.
+
+=back
+
+=cut
+
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
