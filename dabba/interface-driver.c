@@ -27,6 +27,88 @@
 
 /* __LICENSE_HEADER_END__ */
 
+/*
+
+=head1 NAME
+
+dabba-interface-driver - Manage network interface driver settings
+
+=head1 SYNOPSIS
+
+dabba interface driver <command> [<arguments>...] [--help]
+
+=head1 DESCRIPTION
+
+Give the user the possibility to manage the driver settings of supported
+network interfaces.
+
+=head1 COMMANDS
+
+=over
+
+=item get
+
+Fetch and print driver information about currently supported interfaces.
+The output is formatted in YAML.
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item --id <name>
+
+interface name to work on.
+
+=back
+
+=head1 EXAMPLES
+
+=over
+
+=item dabba interface driver get
+
+Output the driver settings of all available network interfaces.
+
+=item dabba interface driver get --id eth0
+
+Output the driver settings of 'eth0'.
+
+=back
+
+=head1 AUTHOR
+
+Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
+
+=head1 BUGS
+
+=over
+
+=item Please report bugs to <https://github.com/eroullit/dabba/issues>
+
+=item dabba project project page: <https://github.com/eroullit/dabba>
+
+=back
+
+=head1 COPYRIGHT
+
+=over
+
+=item Copyright © 2012 Emmanuel Roullit.
+
+=item License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.
+
+=item This is free software: you are free to change and redistribute it.
+
+=item There is NO WARRANTY, to the extent permitted by law.
+
+=back
+
+=cut
+
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
