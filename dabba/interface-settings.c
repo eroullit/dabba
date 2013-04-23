@@ -27,6 +27,120 @@
 
 /* __LICENSE_HEADER_END__ */
 
+/*
+
+=head1 NAME
+
+dabba-interface-settings - Manage network interface hardware settings
+
+=head1 SYNOPSIS
+
+dabba interface settings <command> [<arguments>...] [--help]
+
+=head1 DESCRIPTION
+
+Give the user the possibility to manage the hardware settings of supported
+network interfaces.
+
+=head1 COMMANDS
+
+=over
+
+=item get
+
+Fetch and print hardware settings information about currently supported interfaces.
+The output is formatted in YAML.
+
+=item modify
+
+Apply new hardware settings to a specific network interface.
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item --id <name>
+
+interface name to work on.
+
+=item --speed (10|100|1000|10000)
+
+Set speed on network interface
+
+=item --duplex (half|full)
+
+Set network interface duplex mode
+
+=item --autoneg (true|false)
+
+Activate or shutdown speed autonegotiation.
+
+=item --mtu <mtu>
+
+Set the maximum transfer unit of a network interface
+
+=item --txqlen <qlen>
+
+Set the length of the transmit queue of the network interface
+
+=back
+
+=head1 EXAMPLES
+
+=over
+
+=item dabba interface settings get
+
+Output the hardware settings of all available network interfaces.
+
+=item dabba interface settings get --id eth0
+
+Output the hardware settings of 'eth0'.
+
+=item dabba interface settings modify --id eth0 --speed 100
+
+Set 'eth0' to use a 100Mbps connectivity (if supported).
+
+=item dabba interface settings modify --id eth0 --autoneg false
+
+Disable speed autonegotiation on 'eth0'.
+
+=back
+
+=head1 AUTHOR
+
+Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
+
+=head1 BUGS
+
+=over
+
+=item Please report bugs to <https://github.com/eroullit/dabba/issues>
+
+=item dabba project project page: <https://github.com/eroullit/dabba>
+
+=back
+
+=head1 COPYRIGHT
+
+=over
+
+=item Copyright © 2012 Emmanuel Roullit.
+
+=item License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.
+
+=item This is free software: you are free to change and redistribute it.
+
+=item There is NO WARRANTY, to the extent permitted by law.
+
+=back
+
+=cut
+
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
