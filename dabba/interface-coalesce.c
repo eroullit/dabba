@@ -27,6 +27,190 @@
 
 /* __LICENSE_HEADER_END__ */
 
+/*
+
+=head1 NAME
+
+dabba-interface-coalesce - Manage network interface coalesce settings
+
+=head1 SYNOPSIS
+
+dabba interface coalesce <command> [<arguments>...] [--help]
+
+=head1 DESCRIPTION
+
+Give the user the possibility to manage the coalesce settings of supported
+network interfaces.
+
+=head1 COMMANDS
+
+=over
+
+=item get
+
+Fetch and print coalesce information about currently supported interfaces.
+The output is formatted in YAML.
+
+=item modify
+
+Apply new coalesce settings to a specific network interface.
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item --id <name>
+
+interface name to work on.
+
+=item --rx-usecs <time-interval>
+
+Time interval in microseconds to delay a receive interrupt after a packet arrives
+
+=item --rx-usecs-irq <time-interval>
+
+Same as --rx-usecs, except that this value applies while an interrupt is being serviced by the host.
+
+=item --rx-usecs-low <time-interval>
+
+Time interval in microseconds to delay a receive interrupt after a packet arrives,
+when the packet rate is below "packet rate low".
+
+=item --rx-usecs-high <time-interval>
+
+Time interval in microseconds to delay a receive interrupt after a packet arrives,
+when the packet rate is above "packet rate high".
+
+=item --rx-frames <frame-interval>
+
+Maximum number of packets to receive before a receive interrupt is triggered.
+
+=item --rx-frames-irq <frame-interval>
+
+Same as --rx-frames, except that this value applies while an interrupt is being serviced by the host.
+
+=item --rx-frames-low <frame-interval>
+
+Number of frames to delay a receive interrupt after a packet arrives,
+when the packet rate is below "packet rate low".
+
+=item --rx-frames-high <frame-interval>
+
+Number of frames to delay a receive interrupt after a packet arrives,
+when the packet rate is above "packet rate high".
+
+=item --tx-usecs <time-interval>
+
+Time interval in microseconds to delay a transmit interrupt after a packet arrives
+
+=item --tx-usecs-irq <time-interval>
+
+Same as --tx-usecs, except that this value applies while an interrupt is being serviced by the host.
+
+=item --tx-usecs-low <time-interval>
+
+Time interval in microseconds to delay a transmit interrupt after a packet arrives,
+when the packet rate is below "packet rate low".
+
+=item --tx-usecs-high <time-interval>
+
+Time interval in microseconds to delay a transmit interrupt after a packet arrives,
+when the packet rate is above "packet rate high".
+
+=item --tx-frames <frame-interval>
+
+Maximum number of packets to transmit before a transmit interrupt is triggered.
+
+=item --tx-frames-irq <frame-interval>
+
+Same as --tx-frames, except that this value applies while an interrupt is being serviced by the host.
+
+=item --tx-frames-low <frame-interval>
+
+Number of frames to delay a transmit interrupt after a packet arrives,
+when the packet rate is below "packet rate low".
+
+=item --tx-frames-high <frame-interval>
+
+Number of frames to delay a transmit interrupt after a packet arrives,
+when the packet rate is above "packet rate high".
+
+=item --adaptive-rx (true|false)
+
+Activate or shutdown adaptive receive coalescing.
+
+=item --adaptive-tx (true|false)
+
+Activate or shutdown adaptive transmit coalescing.
+
+=item --stats-block-usecs <time-interval>
+
+How many usecs to delay in-memory statistics block updates.
+Some drivers do not have an in-memory statistic block, 
+and in such cases this value is ignored. This value must not be zero.
+
+=item --sample-interval <time-interval>
+
+How often to do adaptive coalescing packet rate sampling, measured in seconds. This value must not be zero.
+
+=back
+
+=head1 EXAMPLES
+
+=over
+
+=item dabba interface coalesce get
+
+Output the coalesce settings of all available network interfaces.
+
+=item dabba interface coalesce get --id eth0
+
+Output the coalesce settings of 'eth0'.
+
+=item dabba interface coalesce modify --id eth0 --tx-frames 128
+
+Set the transmit interrupt coalescing to 128 frames on 'eth0' (if supported).
+
+=item dabba interface coalesce modify --id eth0 --adaptive-rx true
+
+Enable adaptive receive interrupt coalescing on 'eth0' (if supported).
+
+=back
+
+=head1 AUTHOR
+
+Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
+
+=head1 BUGS
+
+=over
+
+=item Please report bugs to <https://github.com/eroullit/dabba/issues>
+
+=item dabba project project page: <https://github.com/eroullit/dabba>
+
+=back
+
+=head1 COPYRIGHT
+
+=over
+
+=item Copyright © 2012 Emmanuel Roullit.
+
+=item License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.
+
+=item This is free software: you are free to change and redistribute it.
+
+=item There is NO WARRANTY, to the extent permitted by law.
+
+=back
+
+=cut
+
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
