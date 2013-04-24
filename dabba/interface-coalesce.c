@@ -155,6 +155,18 @@ and in such cases this value is ignored. This value must not be zero.
 
 How often to do adaptive coalescing packet rate sampling, measured in seconds. This value must not be zero.
 
+=item --tcp[=<hostname>:<port>]
+
+Query a running instance of dabbad using a TCP socket (default: localhost:55994)
+
+=item --local[=<path>]
+
+Query a running instance of dabbad using a Unix domain socket (default: /tmp/dabba)
+
+=item --help
+
+Prints the help message on the terminal
+
 =back
 
 =head1 EXAMPLES

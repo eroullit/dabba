@@ -106,6 +106,18 @@ For instance: 0,5,7,9-11.
 Reference a thread by its unique thread id.
 The thread id can be fetched using "dabba thread list".
 
+=item --tcp[=<hostname>:<port>]
+
+Query a running instance of dabbad using a TCP socket (default: localhost:55994)
+
+=item --local[=<path>]
+
+Query a running instance of dabbad using a Unix domain socket (default: /tmp/dabba)
+
+=item --help
+
+Prints the help message on the terminal
+
 =back
 
 =head1 EXAMPLES

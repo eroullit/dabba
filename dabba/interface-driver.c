@@ -61,6 +61,18 @@ The output is formatted in YAML.
 
 interface name to work on.
 
+=item --tcp[=<hostname>:<port>]
+
+Query a running instance of dabbad using a TCP socket (default: localhost:55994)
+
+=item --local[=<path>]
+
+Query a running instance of dabbad using a Unix domain socket (default: /tmp/dabba)
+
+=item --help
+
+Prints the help message on the terminal
+
 =back
 
 =head1 EXAMPLES
