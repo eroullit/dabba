@@ -27,6 +27,7 @@
 
 /* __LICENSE_HEADER_END__ */
 
+#include <string.h>
 #include <errno.h>
 
 #include <google/protobuf-c/protobuf-c-rpc.h>
@@ -66,6 +67,9 @@ int dabbad_rpc_msg_poll(const char *const name,
 	assert(name);
 	assert(type == PROTOBUF_C_RPC_ADDRESS_LOCAL
 	       || type == PROTOBUF_C_RPC_ADDRESS_TCP);
+
+	if (strlen(name) == 0)
+		return EINVAL;
 
 	server = protobuf_c_rpc_server_new(type, name,
 					   (ProtobufCService *) & dabba_service,
