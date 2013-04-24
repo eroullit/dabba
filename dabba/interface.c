@@ -141,13 +141,6 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabba/help.h>
 #include <dabba/macros.h>
 
-enum interface_modify_option {
-	OPT_INTERFACE_UP,
-	OPT_INTERFACE_RUNNING,
-	OPT_INTERFACE_PROMISC,
-	OPT_INTERFACE_ID,
-};
-
 /**
  * \brief Selects interface get RPC from \c argv
  * \param[in]           argc	        Argument counter
