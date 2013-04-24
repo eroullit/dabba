@@ -170,7 +170,7 @@ static void interface_status_list_print(const Dabba__InterfaceStatusList *
 		printf("connectivity: %s, ", print_tf(statusp->connectivity));
 		printf("up: %s, ", print_tf(statusp->up));
 		printf("running: %s, ", print_tf(statusp->running));
-		printf("promiscuous: %s, ", print_tf(statusp->promiscous));
+		printf("promiscuous: %s, ", print_tf(statusp->promiscuous));
 		printf("loopback: %s", print_tf(statusp->loopback));
 		printf("}\n");
 	}
@@ -300,12 +300,12 @@ static int cmd_interface_status_modify(int argc, const char **argv)
 			break;
 
 		case OPT_INTERFACE_PROMISCUOUS:
-			rc = str2bool(optarg, &status.promiscous);
+			rc = str2bool(optarg, &status.promiscuous);
 
 			if (rc)
 				goto out;
 
-			status.has_promiscous = 1;
+			status.has_promiscuous = 1;
 			break;
 		case OPT_INTERFACE_UP:
 			rc = str2bool(optarg, &status.up);

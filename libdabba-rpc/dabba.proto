@@ -16,7 +16,7 @@ message interface_status
     required interface_id id = 2;
     optional bool up = 3;
     optional bool running = 4;
-    optional bool promiscous = 5;
+    optional bool promiscuous = 5;
     optional bool loopback = 6;
     optional bool connectivity = 7;
 }

@@ -87,7 +87,7 @@ static void __interface_status_get(struct nl_object *obj, void *arg)
 	dabba__error_code__init(statusp->status);
 
 	statusp->has_connectivity = statusp->has_loopback = statusp->has_up = 1;
-	statusp->has_promiscous = statusp->has_running = 1;
+	statusp->has_promiscuous = statusp->has_running = 1;
 
 	statusp->id->name = rtnl_link_get_name(link);
 	flags = rtnl_link_get_flags(link);
@@ -98,7 +98,7 @@ static void __interface_status_get(struct nl_object *obj, void *arg)
 	statusp->loopback = (flags & IFF_LOOPBACK) == IFF_LOOPBACK;
 	statusp->up = (flags & IFF_UP) == IFF_UP;
 	statusp->running = (flags & IFF_RUNNING) == IFF_RUNNING;
-	statusp->promiscous = (flags & IFF_PROMISC) == IFF_PROMISC;
+	statusp->promiscuous = (flags & IFF_PROMISC) == IFF_PROMISC;
 
 	status_list->n_list++;
 }
@@ -195,8 +195,8 @@ void dabbad_interface_status_modify(Dabba__DabbaService_Service * service,
 		goto out;
 	}
 
-	if (statusp->has_promiscous) {
-		if (statusp->promiscous)
+	if (statusp->has_promiscuous) {
+		if (statusp->promiscuous)
 			rtnl_link_set_flags(change, IFF_PROMISC);
 		else
 			rtnl_link_unset_flags(change, IFF_PROMISC);
