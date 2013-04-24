@@ -37,17 +37,12 @@ ADD_EXECUTABLE(${PROJECT_NAME}
 TARGET_LINK_LIBRARIES (${PROJECT_NAME} libdabba-rpc)
 
 POD2MAN(${CMAKE_CURRENT_SOURCE_DIR}/dabba.c dabba 1)
-POD2MAN(${CMAKE_CURRENT_SOURCE_DIR}/interface.c dabba-interface 1)
-POD2MAN(${CMAKE_CURRENT_SOURCE_DIR}/interface-capabilities.c dabba-interface-capabilities 1)
-POD2MAN(${CMAKE_CURRENT_SOURCE_DIR}/interface-coalesce.c dabba-interface-coalesce 1)
-POD2MAN(${CMAKE_CURRENT_SOURCE_DIR}/interface-driver.c dabba-interface-driver 1)
-POD2MAN(${CMAKE_CURRENT_SOURCE_DIR}/interface-offload.c dabba-interface-offload 1)
-POD2MAN(${CMAKE_CURRENT_SOURCE_DIR}/interface-pause.c dabba-interface-pause 1)
-POD2MAN(${CMAKE_CURRENT_SOURCE_DIR}/interface-settings.c dabba-interface-settings 1)
-POD2MAN(${CMAKE_CURRENT_SOURCE_DIR}/interface-statistics.c dabba-interface-statistics 1)
-POD2MAN(${CMAKE_CURRENT_SOURCE_DIR}/interface-status.c dabba-interface-status 1)
-POD2MAN(${CMAKE_CURRENT_SOURCE_DIR}/capture.c dabba-capture 1)
-POD2MAN(${CMAKE_CURRENT_SOURCE_DIR}/thread.c dabba-thread 1)
+
+FOREACH(CMD_FILE capture thread interface interface-capabilities
+		 interface-coalesce interface-driver interface-offload
+		 interface-pause interface-settings interface-statistics interface-status)
+	POD2MAN(${CMAKE_CURRENT_SOURCE_DIR}/${CMD_FILE}.c dabba-${CMD_FILE} 1)
+ENDFOREACH()
 
 INSTALL(TARGETS dabba DESTINATION sbin COMPONENT applications)
 
