@@ -27,6 +27,108 @@
 
 /* __LICENSE_HEADER_END__ */
 
+/*
+
+=head1 NAME
+
+dabba-interface-status - Manage network interface status
+
+=head1 SYNOPSIS
+
+dabba interface status <command> [<arguments>...] [--help]
+
+=head1 DESCRIPTION
+
+Give the user the possibility to manage the status of supported
+network interfaces.
+
+=head1 COMMANDS
+
+=over
+
+=item get
+
+Fetch and print status information about currently supported interfaces.
+The output is formatted in YAML.
+
+=item modify
+
+Apply new status to a specific network interface.
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item --id <name>
+
+interface name to work on.
+
+=item --promiscuous (true|false)
+
+Activate or shutdown promiscuous mode.
+
+=item --up (true|false)
+
+Activate or shutdown the entire network interface.
+
+=back
+
+=head1 EXAMPLES
+
+=over
+
+=item dabba interface status get
+
+Output the status of all available network interfaces.
+
+=item dabba interface status get --id eth0
+
+Output the status of 'eth0'.
+
+=item dabba interface status modify --id eth0 --promiscuous true
+
+Set 'eth0' in promiscuous mode.
+
+=item dabba interface status modify --id eth0 --up false
+
+Disable 'eth0' network interface.
+
+=back
+
+=head1 AUTHOR
+
+Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
+
+=head1 BUGS
+
+=over
+
+=item Please report bugs to <https://github.com/eroullit/dabba/issues>
+
+=item dabba project project page: <https://github.com/eroullit/dabba>
+
+=back
+
+=head1 COPYRIGHT
+
+=over
+
+=item Copyright © 2012 Emmanuel Roullit.
+
+=item License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.
+
+=item This is free software: you are free to change and redistribute it.
+
+=item There is NO WARRANTY, to the extent permitted by law.
+
+=back
+
+=cut
+
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
