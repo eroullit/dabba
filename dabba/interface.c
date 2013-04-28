@@ -35,21 +35,19 @@ dabba-interface - Manage network interface
 
 =head1 SYNOPSIS
 
-dabba interface <command> [<arguments>...] [--help]
+dabba [--help] interface <subcommand> <action> [<arguments>...]
 
 =head1 DESCRIPTION
 
 Give the user the possibility to manage the available network interfaces.
 
-=head1 COMMANDS
+=head1 SUBCOMMANDS
 
 =over
 
 =item status
 
-Fetch and print status information and statistics about currently
-supported interfaces.
-The output is formatted in YAML.
+Output network interfaces status information.
 
 =item driver
 
@@ -81,9 +79,20 @@ Modify status of available network interfaces.
 
 =back
 
-=head1 OPTIONS
+=head1 ACTIONS
+
+Most of the subcommands have the following actions available.
+For more information, check the subcommand related manpage.
 
 =over
+
+=item get
+
+Fetch interface informations and print it on stdout in YAML format.
+
+=item modify
+
+Modify interface settings depending on given parameters.
 
 =back
 
