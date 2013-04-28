@@ -35,14 +35,14 @@ dabba-interface-status - Manage network interface status
 
 =head1 SYNOPSIS
 
-dabba interface status <command> [<arguments>...] [--help]
+dabba interface status <action> [<arguments>...] [--help]
 
 =head1 DESCRIPTION
 
 Give the user the possibility to manage the status of supported
 network interfaces.
 
-=head1 COMMANDS
+=head1 ACTIONS
 
 =over
 

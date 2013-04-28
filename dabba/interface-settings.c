@@ -35,14 +35,14 @@ dabba-interface-settings - Manage network interface hardware settings
 
 =head1 SYNOPSIS
 
-dabba interface settings <command> [<arguments>...] [--help]
+dabba interface settings <action> [<arguments>...] [--help]
 
 =head1 DESCRIPTION
 
 Give the user the possibility to manage the hardware settings of supported
 network interfaces.
 
-=head1 COMMANDS
+=head1 ACTIONS
 
 =over
 

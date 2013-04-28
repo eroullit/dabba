@@ -35,14 +35,14 @@ dabba-interface-offload - Manage network interface offload settings
 
 =head1 SYNOPSIS
 
-dabba interface offload <command> [<arguments>...] [--help]
+dabba interface offload <action> [<arguments>...] [--help]
 
 =head1 DESCRIPTION
 
 Give the user the possibility to manage the offload settings of supported
 network interfaces.
 
-=head1 COMMANDS
+=head1 ACTIONS
 
 =over
 

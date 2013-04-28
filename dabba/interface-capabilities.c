@@ -35,14 +35,14 @@ dabba-interface-capabilities - Manage network interface advertised capabilities
 
 =head1 SYNOPSIS
 
-dabba interface <command> capabilities [<arguments>...] [--help]
+dabba interface capabilities <action> [<arguments>...] [--help]
 
 =head1 DESCRIPTION
 
 Give the user the possibility to manage the available
 network interfaces capabilities.
 
-=head1 COMMANDS
+=head1 ACTIONS
 
 =over
 

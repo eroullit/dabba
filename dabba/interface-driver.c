@@ -35,14 +35,14 @@ dabba-interface-driver - Manage network interface driver settings
 
 =head1 SYNOPSIS
 
-dabba interface driver <command> [<arguments>...] [--help]
+dabba interface driver <action> [<arguments>...] [--help]
 
 =head1 DESCRIPTION
 
 Give the user the possibility to manage the driver settings of supported
 network interfaces.
 
-=head1 COMMANDS
+=head1 ACTIONS
 
 =over
 

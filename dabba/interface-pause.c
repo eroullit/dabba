@@ -35,14 +35,14 @@ dabba-interface-pause - Manage network interface pause settings
 
 =head1 SYNOPSIS
 
-dabba interface pause <command> [<arguments>...] [--help]
+dabba interface pause <action> [<arguments>...] [--help]
 
 =head1 DESCRIPTION
 
 Give the user the possibility to manage the pause settings of supported
 network interfaces.
 
-=head1 COMMANDS
+=head1 ACTIONS
 
 =over
 

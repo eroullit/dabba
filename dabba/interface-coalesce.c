@@ -35,14 +35,14 @@ dabba-interface-coalesce - Manage network interface coalesce settings
 
 =head1 SYNOPSIS
 
-dabba interface coalesce <command> [<arguments>...] [--help]
+dabba interface coalesce <action> [<arguments>...] [--help]
 
 =head1 DESCRIPTION
 
 Give the user the possibility to manage the coalesce settings of supported
 network interfaces.
 
-=head1 COMMANDS
+=head1 ACTIONS
 
 =over
 

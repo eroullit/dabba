@@ -35,14 +35,14 @@ dabba-interface-statistics - Manage network interface traffic statistics
 
 =head1 SYNOPSIS
 
-dabba interface statistics <command> [<arguments>...] [--help]
+dabba interface statistics <action> [<arguments>...] [--help]
 
 =head1 DESCRIPTION
 
 Give the user the possibility to manage the statistics of supported
 network interfaces.
 
-=head1 COMMANDS
+=head1 ACTIONS
 
 =over
 
