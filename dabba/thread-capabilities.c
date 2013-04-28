@@ -1,6 +1,6 @@
 /**
  * \file thread-capabilities.c
- * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2013
+ * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (C) 2013
  * \date 2013
  */
 

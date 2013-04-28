@@ -1,6 +1,6 @@
 /**
  * \file interface-settings.c
- * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2012
+ * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (C) 2012
  * \date 2012
  */
 
@@ -139,7 +139,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 
 =over
 
-=item Copyright © 2012 Emmanuel Roullit.
+=item Copyright (C) 2012 Emmanuel Roullit.
 
 =item License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.
 
