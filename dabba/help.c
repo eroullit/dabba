@@ -37,9 +37,9 @@
 #include <libdabba/macros.h>
 
 static const char dabba_usage_string[] =
-    "dabba [--help] [--version] <command> [<args>]\n";
+    "dabba [--help] [--version] <command> [<subcommand>] <action> [<args>]\n";
 static const char dabba_more_info_string[] =
-    "See 'dabba help <command>' for more info on a specific command.";
+    "See 'dabba help <command> [<subcommand>]' for more specific information.";
 
 struct cmdname_help {
 	char name[16];
