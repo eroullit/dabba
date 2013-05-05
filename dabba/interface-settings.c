@@ -194,7 +194,7 @@ static void interface_settings_list_print(const Dabba__InterfaceSettingsList *
 		printf("        duplex: %s\n", duplex2str(settingsp->duplex));
 		printf("        autoneg: %s\n", print_tf(settingsp->autoneg));
 		printf("        mtu: %u\n", settingsp->mtu);
-		printf("        tx qlen: %u\n", settingsp->tx_qlen);
+		printf("        txqlen: %u\n", settingsp->tx_qlen);
 		printf("        port: %s\n", port2str(settingsp->port));
 		printf("        max rx packet: %u\n", settingsp->maxrxpkt);
 		printf("        max tx packet: %u\n", settingsp->maxtxpkt);

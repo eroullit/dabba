@@ -46,7 +46,7 @@ do
         dictkeys2values interfaces $i settings speed < parsed > output_speed
         dictkeys2values interfaces $i settings mtu < parsed > output_mtu
         dictkeys2values interfaces $i settings duplex < parsed > output_duplex
-        dictkeys2values interfaces $i settings 'tx qlen' < parsed > output_qlen
+        dictkeys2values interfaces $i settings 'txqlen' < parsed > output_qlen
     "
 
     test_expect_success PYTHON_YAML "Query interface settings via /sys/class/net" "
