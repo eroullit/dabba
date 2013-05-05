@@ -43,16 +43,16 @@ for i in `seq 0 $(($(number_of_interface_get)-1))`
 do
     test_expect_success PYTHON_YAML "Query interface settings output" "
         dictkeys2values interfaces $i name < parsed > output_name &&
-        dictkeys2values interfaces $i settings speed < parsed > output_speed
-        dictkeys2values interfaces $i settings mtu < parsed > output_mtu
-        dictkeys2values interfaces $i settings duplex < parsed > output_duplex
+        dictkeys2values interfaces $i settings speed < parsed > output_speed &&
+        dictkeys2values interfaces $i settings mtu < parsed > output_mtu &&
+        dictkeys2values interfaces $i settings duplex < parsed > output_duplex &&
         dictkeys2values interfaces $i settings 'txqlen' < parsed > output_qlen
     "
 
     test_expect_success PYTHON_YAML "Query interface settings via /sys/class/net" "
-        sys_class_net_get output_name speed > sys_speed
-        sys_class_net_get output_name mtu > sys_mtu
-        sys_class_net_get output_name duplex > sys_duplex
+        sys_class_net_get output_name speed > sys_speed &&
+        sys_class_net_get output_name mtu > sys_mtu &&
+        sys_class_net_get output_name duplex > sys_duplex &&
         sys_class_net_get output_name tx_queue_len > sys_qlen
     "
 
@@ -99,7 +99,7 @@ do
     "
 
     test_expect_success TEST_DEV,PYTHON_YAML "Check test interface new $item settings" "
-        echo '$test_value' > 'expect_$item'
+        echo '$test_value' > 'expect_$item' &&
         test_cmp 'expect_$item' 'result_$item'
     "
 done
