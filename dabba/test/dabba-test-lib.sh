@@ -23,9 +23,11 @@ DABBAD_PATH="$SHARNESS_TEST_DIRECTORY/../../dabbad"
 DABBA_PATH="$SHARNESS_TEST_DIRECTORY/../../dabba"
 
 PYTHON_PATH="$(command -v python)"
+ETHTOOL_PATH="$(command -v ethtool)"
 
 "$PYTHON_PATH" -c "import yaml" > /dev/null 2>&1 && test_set_prereq PYTHON_YAML
 taskset -h > /dev/null 2>&1 && test_set_prereq TASKSET
+"$ETHTOOL_PATH" -h > /dev/null 2>&1 && test_set_prereq ETHTOOL
 test -n "$TEST_DEV" && test_set_prereq TEST_DEV
 
 yaml2dict()
