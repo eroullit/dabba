@@ -94,7 +94,7 @@ do
 cat > expected_lo_promisc <<EOF
 $bool
 EOF
-    test_expect_success "Activate promiscuous mode on loopback device" "
+    test_expect_success "Modify promiscuous mode on loopback device" "
         '$DABBA_PATH'/dabba interface status modify --id lo --promiscuous $bool
     "
 
