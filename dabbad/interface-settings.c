@@ -168,7 +168,7 @@ void dabbad_interface_settings_get(Dabba__DabbaService_Service * service,
  * \param[in]           closure         Pointer to protobuf closure function pointer
  * \param[in,out]       closure_data	Pointer to protobuf closure data
  * \note This RPC only modifies the requested interface settings
- * \note If the requested interface settings cannot be fetched, no modification will occur.
+ * \note If the requested interface hardware settings cannot be fetched, no hardware modification will occur.
  */
 
 void dabbad_interface_settings_modify(Dabba__DabbaService_Service * service,
@@ -181,7 +181,7 @@ void dabbad_interface_settings_modify(Dabba__DabbaService_Service * service,
 	struct nl_cache *cache;
 	struct rtnl_link *link, *change;
 	struct ethtool_cmd eth_set;
-	int apply = 0, rc;
+	int eth_apply = 0, nl_apply = 0, rc;
 
 	assert(service);
 	assert(closure_data);
@@ -206,49 +206,49 @@ void dabbad_interface_settings_modify(Dabba__DabbaService_Service * service,
 	if (!rc) {
 		if (settingsp->has_speed) {
 			ethtool_cmd_speed_set(&eth_set, settingsp->speed);
-			apply = 1;
+			eth_apply = 1;
 		}
 
 		if (settingsp->has_duplex) {
 			eth_set.duplex = settingsp->duplex;
-			apply = 1;
+			eth_apply = 1;
 		}
 
 		if (settingsp->has_autoneg) {
 			eth_set.autoneg = settingsp->autoneg;
-			apply = 1;
+			eth_apply = 1;
 		}
 
 		if (settingsp->has_port) {
 			eth_set.port = settingsp->port;
-			apply = 1;
+			eth_apply = 1;
 		}
 
 		if (settingsp->has_maxrxpkt) {
 			eth_set.maxrxpkt = settingsp->maxrxpkt;
-			apply = 1;
+			eth_apply = 1;
 		}
 
 		if (settingsp->has_maxtxpkt) {
 			eth_set.maxtxpkt = settingsp->maxtxpkt;
-			apply = 1;
-		}
-
-		if (settingsp->has_mtu) {
-			rtnl_link_set_mtu(change, settingsp->mtu);
-			apply = 1;
-		}
-
-		if (settingsp->has_tx_qlen) {
-			rtnl_link_set_txqlen(change, settingsp->tx_qlen);
-			apply = 1;
+			eth_apply = 1;
 		}
 	}
 
-	if (!rc && apply)
+	if (settingsp->has_mtu) {
+		rtnl_link_set_mtu(change, settingsp->mtu);
+		nl_apply = 1;
+	}
+
+	if (settingsp->has_tx_qlen) {
+		rtnl_link_set_txqlen(change, settingsp->tx_qlen);
+		nl_apply = 1;
+	}
+
+	if (!rc && eth_apply)
 		rc = dev_settings_set(settingsp->id->name, &eth_set);
 
-	if (!rc && apply)
+	if (nl_apply)
 		rc = rtnl_link_change(sock, link, change, 0);
 
 	rtnl_link_put(link);
