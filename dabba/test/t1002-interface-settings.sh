@@ -21,7 +21,7 @@ test_description='Test dabba interface settings command'
 
 . ./dabba-test-lib.sh
 
-test_mtu=1234
+test_value=1234
 
 test_expect_success 'invoke dabba interface settings command w/o dabbad' "
     test_expect_code 22 $DABBA_PATH/dabba interface settings get
@@ -74,36 +74,35 @@ do
     "
 done
 
-test_expect_success TEST_DEV "Fetch test interface settings" "
-    echo '$TEST_DEV' > test_dev &&
-    sys_class_net_get test_dev mtu > sys_mtu
-"
+for item in mtu txqlen
+do
+    test_expect_success TEST_DEV "Fetch test interface settings" "
+        echo '$TEST_DEV' > test_dev &&
+        sys_class_net_get test_dev '$item' > 'sys_$item'
+    "
 
-test_expect_success TEST_DEV "Modify test interface maximum transfer unit" "
-    '$DABBA_PATH'/dabba interface settings modify --id '$TEST_DEV' --mtu '$test_mtu'
-"
+    test_expect_success TEST_DEV "Modify test interface $item" "
+        '$DABBA_PATH'/dabba interface settings modify --id '$TEST_DEV' --$item '$test_value'
+    "
 
-test_expect_success TEST_DEV "Fetch test interface settings" "
-    '$DABBA_PATH'/dabba interface settings get --id '$TEST_DEV' > result
-"
+    test_expect_success TEST_DEV "Fetch test interface settings" "
+        '$DABBA_PATH'/dabba interface settings get --id '$TEST_DEV' > result
+    "
 
-test_expect_success TEST_DEV,PYTHON_YAML "Parse test interface settings YAML output" "
-    yaml2dict result > parsed
-"
+    test_expect_success TEST_DEV,PYTHON_YAML "Parse test interface settings YAML output" "
+        yaml2dict result > parsed
+    "
 
-test_expect_success TEST_DEV,PYTHON_YAML "Query test interface settings output" "
-    dictkeys2values interfaces 0 name < parsed > result_name &&
-    dictkeys2values interfaces 0 settings mtu < parsed > result_mtu
-"
+    test_expect_success TEST_DEV,PYTHON_YAML "Query test interface settings output" "
+        dictkeys2values interfaces 0 name < parsed > result_name &&
+        dictkeys2values interfaces 0 settings '$item' < parsed > 'result_$item'
+    "
 
-test_expect_success TEST_DEV,PYTHON_YAML "Check test interface new MTU settings" "
-    echo '$test_mtu' > expect_mtu
-    test_cmp expect_mtu result_mtu
-"
-
-test_expect_success TEST_DEV "Cleanup: Restore test interface maximum transfer unit" "
-    '$DABBA_PATH'/dabba interface settings modify --id '$TEST_DEV' --mtu `cat sys_mtu`
-"
+    test_expect_success TEST_DEV,PYTHON_YAML "Check test interface new $item settings" "
+        echo '$test_value' > 'expect_$item'
+        test_cmp 'expect_$item' 'result_$item'
+    "
+done
 
 test_expect_success "Cleanup: Stop dabbad" "
     killall dabbad
