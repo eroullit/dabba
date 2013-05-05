@@ -27,6 +27,7 @@ PYTHON_PATH="$(command -v python)"
 modinfo dummy > /dev/null 2>&1 && test_set_prereq DUMMY_DEV
 "$PYTHON_PATH" -c "import yaml" > /dev/null 2>&1 && test_set_prereq PYTHON_YAML
 taskset -h > /dev/null 2>&1 && test_set_prereq TASKSET
+test -n "$TEST_DEV" && test_set_prereq TEST_DEV
 
 flush_dummy_interface()
 {

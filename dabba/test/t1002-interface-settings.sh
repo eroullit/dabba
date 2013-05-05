@@ -22,18 +22,9 @@ test_description='Test dabba interface settings command'
 . ./dabba-test-lib.sh
 
 test_mtu=1234
-test_dev="dummy0"
 
 test_expect_success 'invoke dabba interface settings command w/o dabbad' "
     test_expect_code 22 $DABBA_PATH/dabba interface settings get
-"
-
-test_expect_success DUMMY_DEV "Setup: Remove all dummy interfaces" "
-    test_might_fail flush_dummy_interface
-"
-
-test_expect_success DUMMY_DEV "Activate dummy interface" "
-    create_dummy_interface 1
 "
 
 test_expect_success "Setup: Start dabbad" "
@@ -83,39 +74,35 @@ do
     "
 done
 
-test_expect_success DUMMY_DEV "Fetch dummy interface settings" "
-    echo '$test_dev' > test_dev &&
+test_expect_success TEST_DEV "Fetch test interface settings" "
+    echo '$TEST_DEV' > test_dev &&
     sys_class_net_get test_dev mtu > sys_mtu
 "
 
-test_expect_success DUMMY_DEV "Modify interface '$test_dev' maximum transfer unit" "
-    '$DABBA_PATH'/dabba interface settings modify --id '$test_dev' --mtu '$test_mtu'
+test_expect_success TEST_DEV "Modify test interface maximum transfer unit" "
+    '$DABBA_PATH'/dabba interface settings modify --id '$TEST_DEV' --mtu '$test_mtu'
 "
 
-test_expect_success DUMMY_DEV "Fetch interface '$test_dev' settings" "
-    '$DABBA_PATH'/dabba interface settings get --id '$test_dev' > result
+test_expect_success TEST_DEV "Fetch test interface settings" "
+    '$DABBA_PATH'/dabba interface settings get --id '$TEST_DEV' > result
 "
 
-test_expect_success DUMMY_DEV,PYTHON_YAML "Parse interface settings YAML output" "
+test_expect_success TEST_DEV,PYTHON_YAML "Parse test interface settings YAML output" "
     yaml2dict result > parsed
 "
 
-test_expect_success DUMMY_DEV,PYTHON_YAML "Query interface '$test_dev' settings output" "
+test_expect_success TEST_DEV,PYTHON_YAML "Query test interface settings output" "
     dictkeys2values interfaces 0 name < parsed > result_name &&
     dictkeys2values interfaces 0 settings mtu < parsed > result_mtu
 "
 
-test_expect_success DUMMY_DEV,PYTHON_YAML "Check new MTU settings" "
+test_expect_success TEST_DEV,PYTHON_YAML "Check test interface new MTU settings" "
     echo '$test_mtu' > expect_mtu
     test_cmp expect_mtu result_mtu
 "
 
-test_expect_success DUMMY_DEV "Cleanup: Restore interface '$test_dev' maximum transfer unit" "
-    '$DABBA_PATH'/dabba interface settings modify --id '$test_dev' --mtu `cat sys_mtu`
-"
-
-test_expect_success DUMMY_DEV "Cleanup: Remove all dummy interfaces" "
-    flush_dummy_interface
+test_expect_success TEST_DEV "Cleanup: Restore test interface maximum transfer unit" "
+    '$DABBA_PATH'/dabba interface settings modify --id '$TEST_DEV' --mtu `cat sys_mtu`
 "
 
 test_expect_success "Cleanup: Stop dabbad" "

@@ -42,14 +42,6 @@ test_expect_success 'invoke dabba interface status w/o dabbad' "
     test_expect_code 22 $DABBA_PATH/dabba interface status get
 "
 
-test_expect_success DUMMY_DEV "Setup: Remove all dummy interfaces" "
-    test_might_fail flush_dummy_interface
-"
-
-test_expect_success DUMMY_DEV "Activate dummy interface" "
-    create_dummy_interface 10
-"
-
 test_expect_success "Setup: Start dabbad" "
     '$DABBAD_PATH'/dabbad --daemonize
 "
@@ -91,30 +83,26 @@ done
 
 for bool in True False
 do
-cat > expected_lo_promisc <<EOF
+cat > expected_promisc <<EOF
 $bool
 EOF
-    test_expect_success "Modify promiscuous mode on loopback device" "
-        '$DABBA_PATH'/dabba interface status modify --id lo --promiscuous $bool
+    test_expect_success TEST_DEV "Modify promiscuous mode on test device" "
+        '$DABBA_PATH'/dabba interface status modify --id '$TEST_DEV' --promiscuous $bool
     "
 
-    test_expect_success "Fetch filtered status information of loopback device" "
-        '$DABBA_PATH'/dabba interface status get --id lo > result
+    test_expect_success TEST_DEV "Fetch filtered status information" "
+        '$DABBA_PATH'/dabba interface status get --id '$TEST_DEV' > result
     "
 
-    test_expect_success PYTHON_YAML "Parse filtered interface status YAML output" "
+    test_expect_success TEST_DEV,PYTHON_YAML "Parse filtered interface status YAML output" "
         yaml2dict result > parsed &&
-        dictkeys2values interfaces 0 status promiscuous < parsed > result_lo_promisc
+        dictkeys2values interfaces 0 status promiscuous < parsed > result_promisc
     "
 
-    test_expect_success PYTHON_YAML "Check promiscuous status result" "
-        test_cmp expected_lo_promisc result_lo_promisc
+    test_expect_success TEST_DEV,PYTHON_YAML "Check promiscuous status result" "
+        test_cmp expected_promisc result_promisc
     "
 done
-
-test_expect_success DUMMY_DEV "Cleanup: Remove all dummy interfaces" "
-    flush_dummy_interface
-"
 
 test_expect_success "Cleanup: Stop dabbad" "
     killall dabbad
