@@ -82,12 +82,20 @@ ethtool_supported_autoneg_parse() {
     ethtool_parse "Supports auto-negotiation" "$1"
 }
 
+ethtool_advertised_speed_parse() {
+    ethtool_speed_parse "Advertised link modes:" "Advertised pause frame use:" "$1"
+}
+
 ethtool_advertised_pause_parse() {
     ethtool_parse "Advertised pause frame use" "$1"
 }
 
 ethtool_advertised_autoneg_parse() {
     ethtool_parse "Advertised auto-negotiation" "$1"
+}
+
+ethtool_lp_advertised_speed_parse() {
+    ethtool_speed_parse "Link partner advertised link modes:" "Link partner advertised pause frame use:" "$1"
 }
 
 ethtool_lp_advertised_pause_parse() {
@@ -122,8 +130,10 @@ do
         dictkeys2values interfaces $i capabilities supported speed < parsed > output_supported_speed &&
         dictkeys2values interfaces $i capabilities supported pause < parsed > output_supported_pause &&
         dictkeys2values interfaces $i capabilities supported autoneg < parsed > output_supported_autoneg &&
+        dictkeys2values interfaces $i capabilities advertised speed < parsed > output_advertised_speed &&
         dictkeys2values interfaces $i capabilities advertised pause < parsed > output_advertised_pause &&
         dictkeys2values interfaces $i capabilities advertised autoneg < parsed > output_advertised_autoneg &&
+        dictkeys2values interfaces $i capabilities 'link-partner advertised' speed < parsed > output_lp_advertised_speed &&
         dictkeys2values interfaces $i capabilities 'link-partner advertised' pause < parsed > output_lp_advertised_pause &&
         dictkeys2values interfaces $i capabilities 'link-partner advertised' autoneg < parsed > output_lp_advertised_autoneg
     "
@@ -134,7 +144,7 @@ do
         test_might_fail '$ETHTOOL_PATH' '$dev' > ethtool_output
     "
 
-    for feature in port supported_speed supported_pause supported_autoneg advertised_pause advertised_autoneg lp_advertised_pause lp_advertised_autoneg
+    for feature in port supported_speed supported_pause supported_autoneg advertised_speed advertised_pause advertised_autoneg lp_advertised_speed lp_advertised_pause lp_advertised_autoneg
     do
         test_expect_success ETHTOOL,PYTHON_YAML "Parse '$dev' $feature" "
             ethtool_${feature}_parse ethtool_output > ethtool_${feature}_parsed
