@@ -47,7 +47,7 @@ ethtool_speed_parse() {
     local out="{"
     local status=""
 
-    range_print "$begin" "$end" "$ethtool_output" > range_output
+    range_print "$begin" "$end" "$ethtool_output" | tr -d '\n' > range_output
 
     for speed in 10 100 1000 10000
     do
