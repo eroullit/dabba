@@ -63,4 +63,17 @@ sys_class_net_get()
     (test -s tmp_set && test $rc = 0 && cat tmp_set) || echo "0"
 }
 
+# This function prints all text between a beginning and end regexes.
+# beginning and end regexes are not printed
+# $1 begin regex
+# $2 end regex
+# $2 file to read
+range_print() {
+    local begin="$1"
+    local end="$2"
+    local file="$3"
+
+    awk '/'"$end"'/{e=0}/'"$begin"'/{gsub("'"$begin"'","",$0);e=1}{if(e==1){print}}' "$file"
+}
+
 # vim: ft=sh:tabstop=4:et
