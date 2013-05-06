@@ -70,8 +70,8 @@ for i in `seq 0 $(($(number_of_interface_get)-1))`
 do
     test_expect_success PYTHON_YAML "Query interface capabilities output" "
         dictkeys2values interfaces $i name < parsed > output_name &&
-        dictkeys2values interfaces $i capabilities port < parsed > output_port
-        dictkeys2values interfaces $i capabilities supported pause < parsed > output_supported_pause
+        dictkeys2values interfaces $i capabilities port < parsed > output_port &&
+        dictkeys2values interfaces $i capabilities supported pause < parsed > output_supported_pause &&
         dictkeys2values interfaces $i capabilities supported autoneg < parsed > output_supported_autoneg
     "
 
