@@ -40,9 +40,38 @@ ethtool_port_parse() {
     echo "$out"
 }
 
+ethtool_speed_parse() {
+    local begin="$1"
+    local end="$2"
+    local ethtool_output="$3"
+    local out="{"
+    local status=""
+
+    range_print "$begin" "$end" "$ethtool_output" > range_output
+
+    for speed in 10 100 1000 10000
+    do
+        out="$out$speed: {"
+        for duplex in full half
+        do
+            grep -qw "${speed}baseT/${duplex}" range_output
+            test $? = 0 && status="True" || status="False"
+            out="$out'$duplex': $status, "
+        done
+        out=$(echo "$out" | sed -e 's/, $/}, /g')
+    done
+
+    out=$(echo "$out" | sed -e 's/, $/}/g')
+    echo "$out"
+}
+
 ethtool_parse() {
     local status="$(awk -F: '/'"$1"'/ {print $NF}' "$2" | tr -d ' ')"
     test "$status" = "Yes" && echo "True" || echo "False"
+}
+
+ethtool_supported_speed_parse() {
+    ethtool_speed_parse "Supported link modes:" "Supported pause frame use:" "$1"
 }
 
 ethtool_supported_pause_parse() {
@@ -90,6 +119,7 @@ do
     test_expect_success PYTHON_YAML "Query interface capabilities output" "
         dictkeys2values interfaces $i name < parsed > output_name &&
         dictkeys2values interfaces $i capabilities port < parsed > output_port &&
+        dictkeys2values interfaces $i capabilities supported speed < parsed > output_supported_speed &&
         dictkeys2values interfaces $i capabilities supported pause < parsed > output_supported_pause &&
         dictkeys2values interfaces $i capabilities supported autoneg < parsed > output_supported_autoneg &&
         dictkeys2values interfaces $i capabilities advertised pause < parsed > output_advertised_pause &&
@@ -104,7 +134,7 @@ do
         test_might_fail '$ETHTOOL_PATH' '$dev' > ethtool_output
     "
 
-    for feature in port supported_pause supported_autoneg advertised_pause advertised_autoneg lp_advertised_pause lp_advertised_autoneg
+    for feature in port supported_speed supported_pause supported_autoneg advertised_pause advertised_autoneg lp_advertised_pause lp_advertised_autoneg
     do
         test_expect_success ETHTOOL,PYTHON_YAML "Parse '$dev' $feature" "
             ethtool_${feature}_parse ethtool_output > ethtool_${feature}_parsed
