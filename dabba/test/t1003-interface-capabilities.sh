@@ -49,7 +49,7 @@ ethtool_speed_parse() {
 
     range_print "$begin" "$end" "$ethtool_output" | tr -d '\n' > range_output
 
-    for speed in 10 100 1000 10000
+    for speed in 1000 10000 10 100
     do
         out="$out$speed: {"
         for duplex in full half
