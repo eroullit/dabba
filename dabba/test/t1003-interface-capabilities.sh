@@ -75,17 +75,16 @@ do
         test_might_fail '$ETHTOOL_PATH' '$dev' > ethtool_output
     "
 
-    test_expect_success ETHTOOL,PYTHON_YAML "Parse '$dev' supported ports" "
-        ethtool_port_parse ethtool_output > ethtool_port_parsed
-    "
+    for feature in port supported_pause
+    do
+        test_expect_success ETHTOOL,PYTHON_YAML "Parse '$dev' $feature" "
+            ethtool_${feature}_parse ethtool_output > ethtool_${feature}_parsed
+        "
 
-    test_expect_success ETHTOOL,PYTHON_YAML "Parse '$dev' supported pause settings" "
-        ethtool_supported_pause_parse ethtool_output > ethtool_supported_pause_parsed
-    "
-
-    test_expect_success ETHTOOL,PYTHON_YAML "Check '$dev' supported pause" "
-        test_cmp ethtool_supported_pause_parsed output_supported_pause
-    "
+        test_expect_success ETHTOOL,PYTHON_YAML "Check '$dev' $feature" "
+            test_cmp ethtool_${feature}_parsed output_$feature
+        "
+    done
 done
 
 test_expect_success "Cleanup: Stop dabbad" "
