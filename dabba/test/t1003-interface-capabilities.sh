@@ -40,34 +40,33 @@ ethtool_port_parse() {
     echo "$out"
 }
 
-ethtool_supported_pause_parse() {
-    local status="$(awk -F: '/Supported pause frame use/ {print $NF}' "$1" | tr -d ' ')"
+ethtool_parse() {
+    local status="$(awk -F: '/'"$1"'/ {print $NF}' "$2" | tr -d ' ')"
     test "$status" = "Yes" && echo "True" || echo "False"
+}
+
+ethtool_supported_pause_parse() {
+    ethtool_parse "Supported pause frame use" "$1"
 }
 
 ethtool_supported_autoneg_parse() {
-    local status="$(awk -F: '/Supports auto-negotiation/ {print $NF}' "$1" | tr -d ' ')"
-    test "$status" = "Yes" && echo "True" || echo "False"
+    ethtool_parse "Supports auto-negotiation" "$1"
 }
 
 ethtool_advertised_pause_parse() {
-    local status="$(awk -F: '/Advertised pause frame use/ {print $NF}' "$1" | tr -d ' ')"
-    test "$status" = "Yes" && echo "True" || echo "False"
+    ethtool_parse "Advertised pause frame use" "$1"
 }
 
 ethtool_advertised_autoneg_parse() {
-    local status="$(awk -F: '/Advertised auto-negotiation/ {print $NF}' "$1" | tr -d ' ')"
-    test "$status" = "Yes" && echo "True" || echo "False"
+    ethtool_parse "Advertised auto-negotiation" "$1"
 }
 
 ethtool_lp_advertised_pause_parse() {
-    local status="$(awk -F: '/Link partner advertised pause frame use/ {print $NF}' "$1" | tr -d ' ')"
-    test "$status" = "Yes" && echo "True" || echo "False"
+    ethtool_parse "Link partner advertised pause frame use" "$1"
 }
 
 ethtool_lp_advertised_autoneg_parse() {
-    local status="$(awk -F: '/Link partner advertised auto-negotiation/ {print $NF}' "$1" | tr -d ' ')"
-    test "$status" = "Yes" && echo "True" || echo "False"
+    ethtool_parse "Link partner advertised auto-negotiation" "$1"
 }
 
 test_expect_success 'invoke dabba interface capabilities command w/o dabbad' "
