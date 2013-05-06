@@ -54,7 +54,7 @@ ethtool_speed_parse() {
         out="$out$speed: {"
         for duplex in full half
         do
-            grep -qw "${speed}baseT/${duplex}" range_output
+            grep -qiw "${speed}baseT/${duplex}" range_output
             test $? = 0 && status="True" || status="False"
             out="$out'$duplex': $status, "
         done
