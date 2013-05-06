@@ -268,6 +268,11 @@ static void __interface_capabilities_get(struct nl_object *obj, void *arg)
 	capabilitiesp->supported_speed->_10gbps_ethernet->full =
 	    (capabilities.supported & SUPPORTED_10000baseT_Full);
 
+	capabilitiesp->supported_opt->autoneg =
+	    (capabilities.supported & SUPPORTED_Autoneg);
+	capabilitiesp->supported_opt->pause =
+	    (capabilities.supported & SUPPORTED_Pause);
+
 	capabilitiesp->advertising_speed->ethernet->half =
 	    (capabilities.advertising & ADVERTISED_10baseT_Half);
 	capabilitiesp->advertising_speed->ethernet->full =
@@ -284,6 +289,11 @@ static void __interface_capabilities_get(struct nl_object *obj, void *arg)
 	capabilitiesp->advertising_speed->_10gbps_ethernet->full =
 	    (capabilities.advertising & ADVERTISED_10000baseT_Full);
 
+	capabilitiesp->advertising_opt->autoneg =
+	    (capabilities.advertising & ADVERTISED_Autoneg);
+	capabilitiesp->advertising_opt->pause =
+	    (capabilities.advertising & ADVERTISED_Pause);
+
 	capabilitiesp->lp_advertising_speed->ethernet->half =
 	    (capabilities.lp_advertising & ADVERTISED_10baseT_Half);
 	capabilitiesp->lp_advertising_speed->ethernet->full =
@@ -299,6 +309,11 @@ static void __interface_capabilities_get(struct nl_object *obj, void *arg)
 	capabilitiesp->lp_advertising_speed->_10gbps_ethernet->half = 0;
 	capabilitiesp->lp_advertising_speed->_10gbps_ethernet->full =
 	    (capabilities.lp_advertising & ADVERTISED_10000baseT_Full);
+
+	capabilitiesp->lp_advertising_opt->autoneg =
+	    (capabilities.lp_advertising & ADVERTISED_Autoneg);
+	capabilitiesp->lp_advertising_opt->pause =
+	    (capabilities.lp_advertising & ADVERTISED_Pause);
 
 	capabilities_list->n_list++;
 }
@@ -353,22 +368,22 @@ void dabbad_interface_capabilities_get(Dabba__DabbaService_Service * service,
 		free(capabilities_list.list[a]->supported_speed->ethernet);
 		free(capabilities_list.list[a]->supported_speed->fast_ethernet);
 		free(capabilities_list.list[a]->supported_speed->gbps_ethernet);
-		free(capabilities_list.list[a]->
-		     supported_speed->_10gbps_ethernet);
+		free(capabilities_list.list[a]->supported_speed->
+		     _10gbps_ethernet);
 		free(capabilities_list.list[a]->advertising_speed->ethernet);
-		free(capabilities_list.list[a]->
-		     advertising_speed->fast_ethernet);
-		free(capabilities_list.list[a]->
-		     advertising_speed->gbps_ethernet);
-		free(capabilities_list.list[a]->
-		     advertising_speed->_10gbps_ethernet);
+		free(capabilities_list.list[a]->advertising_speed->
+		     fast_ethernet);
+		free(capabilities_list.list[a]->advertising_speed->
+		     gbps_ethernet);
+		free(capabilities_list.list[a]->advertising_speed->
+		     _10gbps_ethernet);
 		free(capabilities_list.list[a]->lp_advertising_speed->ethernet);
-		free(capabilities_list.list[a]->
-		     lp_advertising_speed->fast_ethernet);
-		free(capabilities_list.list[a]->
-		     lp_advertising_speed->gbps_ethernet);
-		free(capabilities_list.list[a]->
-		     lp_advertising_speed->_10gbps_ethernet);
+		free(capabilities_list.list[a]->lp_advertising_speed->
+		     fast_ethernet);
+		free(capabilities_list.list[a]->lp_advertising_speed->
+		     gbps_ethernet);
+		free(capabilities_list.list[a]->lp_advertising_speed->
+		     _10gbps_ethernet);
 		free(capabilities_list.list[a]->supported_opt);
 		free(capabilities_list.list[a]->supported_speed);
 		free(capabilities_list.list[a]->advertising_opt);

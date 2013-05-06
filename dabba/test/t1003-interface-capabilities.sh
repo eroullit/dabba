@@ -60,6 +60,16 @@ ethtool_advertised_autoneg_parse() {
     test "$status" = "Yes" && echo "True" || echo "False"
 }
 
+ethtool_lp_advertised_pause_parse() {
+    local status="$(awk -F: '/Link partner advertised pause frame use/ {print $NF}' "$1" | tr -d ' ')"
+    test "$status" = "Yes" && echo "True" || echo "False"
+}
+
+ethtool_lp_advertised_autoneg_parse() {
+    local status="$(awk -F: '/Link partner advertised auto-negotiation/ {print $NF}' "$1" | tr -d ' ')"
+    test "$status" = "Yes" && echo "True" || echo "False"
+}
+
 test_expect_success 'invoke dabba interface capabilities command w/o dabbad' "
     test_expect_code 22 $DABBA_PATH/dabba interface capabilities get
 "
@@ -84,7 +94,9 @@ do
         dictkeys2values interfaces $i capabilities supported pause < parsed > output_supported_pause &&
         dictkeys2values interfaces $i capabilities supported autoneg < parsed > output_supported_autoneg &&
         dictkeys2values interfaces $i capabilities advertised pause < parsed > output_advertised_pause &&
-        dictkeys2values interfaces $i capabilities advertised autoneg < parsed > output_advertised_autoneg
+        dictkeys2values interfaces $i capabilities advertised autoneg < parsed > output_advertised_autoneg &&
+        dictkeys2values interfaces $i capabilities 'link-partner advertised' pause < parsed > output_lp_advertised_pause &&
+        dictkeys2values interfaces $i capabilities 'link-partner advertised' autoneg < parsed > output_lp_advertised_autoneg
     "
 
     dev=$(cat output_name)
@@ -93,7 +105,7 @@ do
         test_might_fail '$ETHTOOL_PATH' '$dev' > ethtool_output
     "
 
-    for feature in port supported_pause supported_autoneg advertised_pause advertised_autoneg
+    for feature in port supported_pause supported_autoneg advertised_pause advertised_autoneg lp_advertised_pause lp_advertised_autoneg
     do
         test_expect_success ETHTOOL,PYTHON_YAML "Parse '$dev' $feature" "
             ethtool_${feature}_parse ethtool_output > ethtool_${feature}_parsed
