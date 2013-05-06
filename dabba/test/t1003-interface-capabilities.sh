@@ -40,6 +40,11 @@ ethtool_port_parse() {
     echo "$out"
 }
 
+ethtool_supported_pause_parse() {
+    local status="$(awk -F: '/Supported pause frame use/ {print $NF}' "$1" | tr -d ' ')"
+    test "$status" = "Yes" && echo "True" || echo "False"
+}
+
 test_expect_success 'invoke dabba interface capabilities command w/o dabbad' "
     test_expect_code 22 $DABBA_PATH/dabba interface capabilities get
 "
@@ -61,6 +66,7 @@ do
     test_expect_success PYTHON_YAML "Query interface capabilities output" "
         dictkeys2values interfaces $i name < parsed > output_name &&
         dictkeys2values interfaces $i capabilities port < parsed > output_port
+        dictkeys2values interfaces $i capabilities supported pause < parsed > output_supported_pause
     "
 
     dev=$(cat output_name)
@@ -73,8 +79,12 @@ do
         ethtool_port_parse ethtool_output > ethtool_port_parsed
     "
 
-    test_expect_success ETHTOOL,PYTHON_YAML "Check '$dev' supported ports" "
-        test_cmp ethtool_port_parsed output_port
+    test_expect_success ETHTOOL,PYTHON_YAML "Parse '$dev' supported pause settings" "
+        ethtool_supported_pause_parse ethtool_output > ethtool_supported_pause_parsed
+    "
+
+    test_expect_success ETHTOOL,PYTHON_YAML "Check '$dev' supported pause" "
+        test_cmp ethtool_supported_pause_parsed output_supported_pause
     "
 done
 
