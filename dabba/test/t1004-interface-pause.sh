@@ -44,9 +44,7 @@ test_expect_success PYTHON_YAML "Parse interface pause YAML output" "
 "
 
 test_expect_success PYTHON_YAML "Check interface pause output length" "
-    echo $dev_nr > expected_dev_nr &&
-    echo $(yaml_number_of_interface_get parsed) > result_dev_nr &&
-    test_cmp expected_dev_nr result_dev_nr
+    test '$dev_nr' -eq $(yaml_number_of_interface_get parsed)
 "
 
 for i in `seq 0 $(($dev_nr-1))`
