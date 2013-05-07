@@ -21,6 +21,8 @@ test_description='Test dabba interface capabilities command'
 
 . ./dabba-test-lib.sh
 
+dev_nr=$(number_of_interface_get)
+
 ethtool_port_parse() {
     local ethtool_output="$1"
     local out="{"
@@ -124,6 +126,10 @@ test_expect_success 'invoke dabba interface capabilities command with dabbad' "
 
 test_expect_success PYTHON_YAML "Parse interface capabilities YAML output" "
     yaml2dict result > parsed
+"
+
+test_expect_success PYTHON_YAML "Check interface capabilities output length" "
+    test '$dev_nr' -eq $(yaml_number_of_interface_get parsed)
 "
 
 for i in `seq 0 $(($(yaml_number_of_interface_get parsed)-1))`
