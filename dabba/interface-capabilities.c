@@ -541,10 +541,6 @@ static int cmd_interface_capabilities_modify(int argc, const char **argv)
 	case SPEED_10000:
 		speed_cap._10gbps_ethernet = &duplex_cap;
 		break;
-	default:
-		rc = EINVAL;
-		goto out;
-		break;
 	}
 
 	capabilities.status = &err;
