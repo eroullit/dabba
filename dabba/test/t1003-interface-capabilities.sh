@@ -158,11 +158,11 @@ do
     done
 done
 
-test_expect_success TEST_DEV "Fetch test interface capabilities" "
+test_expect_success TEST_DEV "Fetch '$TEST_DEV' capabilities" "
     '$DABBA_PATH'/dabba interface capabilities get --id '$TEST_DEV' > result
 "
 
-test_expect_success TEST_DEV,PYTHON_YAML "Parse test interface capabilities YAML output" "
+test_expect_success TEST_DEV,PYTHON_YAML "Parse '$TEST_DEV' capabilities YAML output" "
     yaml2dict result > parsed
 "
 
@@ -173,23 +173,23 @@ for speed in 10 100 1000 10000
 do
     for duplex in half full
     do
-        test_expect_success TEST_DEV,PYTHON_YAML "Query test interface ${speed}Mbps $duplex duplex capabilities output" "
+        test_expect_success TEST_DEV,PYTHON_YAML "Query '$TEST_DEV' ${speed}Mbps $duplex duplex capabilities output" "
             dictkeys2values interfaces 0 capabilities supported speed '$speed' '$duplex' < parsed > supported_speed
         "
 
         if [ "$(cat "supported_speed" 2> /dev/null)" = "True" ]; then
             for status in False True
             do
-                test_expect_success TEST_DEV,PYTHON_YAML "Modify test interface ${speed}Mbps $duplex duplex to $status" "
+                test_expect_success TEST_DEV,PYTHON_YAML "Modify '$TEST_DEV' ${speed}Mbps $duplex duplex to $status" "
                     '$DABBA_PATH'/dabba interface capabilities modify --id '$TEST_DEV' --speed '$speed' --'$duplex'-duplex '$status' &&
                     '$DABBA_PATH'/dabba interface capabilities get --id '$TEST_DEV' > mod_result
                 "
 
-                test_expect_success TEST_DEV,PYTHON_YAML "Parse modified test interface capabilities YAML output" "
+                test_expect_success TEST_DEV,PYTHON_YAML "Parse modified '$TEST_DEV' capabilities YAML output" "
                     yaml2dict mod_result > mod_parsed
                 "
 
-                test_expect_success TEST_DEV,PYTHON_YAML "Query test interface ${speed}Mbps $duplex duplex capabilities output" "
+                test_expect_success TEST_DEV,PYTHON_YAML "Query '$TEST_DEV' ${speed}Mbps $duplex duplex capabilities output" "
                     test $(dictkeys2values interfaces 0 capabilities advertised speed "$speed" "$duplex" < mod_parsed) = '$status'
                 "
             done
