@@ -106,6 +106,10 @@ ethtool_lp_advertised_autoneg_parse() {
     ethtool_parse "Link partner advertised auto-negotiation" "$1"
 }
 
+test_expect_success "Setup: Stop already running dabbad" "
+    test_might_fail killall dabbad
+"
+
 test_expect_success 'invoke dabba interface capabilities command w/o dabbad' "
     test_expect_code 22 $DABBA_PATH/dabba interface capabilities get
 "

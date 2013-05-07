@@ -23,6 +23,10 @@ test_description='Test dabba interface pause command'
 
 dev_nr=$(number_of_interface_get)
 
+test_expect_success "Setup: Stop already running dabbad" "
+    test_might_fail killall dabbad
+"
+
 test_expect_success 'invoke dabba interface pause command w/o dabbad' "
     test_expect_code 22 $DABBA_PATH/dabba interface pause get 
 "

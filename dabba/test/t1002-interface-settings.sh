@@ -23,6 +23,10 @@ test_description='Test dabba interface settings command'
 
 test_value=1234
 
+test_expect_success "Setup: Stop already running dabbad" "
+    test_might_fail killall dabbad
+"
+
 test_expect_success 'invoke dabba interface settings command w/o dabbad' "
     test_expect_code 22 $DABBA_PATH/dabba interface settings get
 "

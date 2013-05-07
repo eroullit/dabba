@@ -21,6 +21,10 @@ test_description='Test dabba interface coalesce command'
 
 . ./dabba-test-lib.sh
 
+test_expect_success "Setup: Stop already running dabbad" "
+    test_might_fail killall dabbad
+"
+
 test_expect_success 'invoke dabba interface coalesce command w/o dabbad' "
     test_expect_code 22 $DABBA_PATH/dabba interface coalesce get
 "
