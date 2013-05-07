@@ -126,7 +126,7 @@ test_expect_success PYTHON_YAML "Parse interface capabilities YAML output" "
     yaml2dict result > parsed
 "
 
-for i in `seq 0 $(($(number_of_interface_get)-1))`
+for i in `seq 0 $(($(yaml_number_of_interface_get parsed)-1))`
 do
     test_expect_success PYTHON_YAML "Query interface capabilities output" "
         dictkeys2values interfaces $i name < parsed > output_name &&
