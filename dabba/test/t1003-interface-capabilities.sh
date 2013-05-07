@@ -144,8 +144,8 @@ do
         test_might_fail '$ETHTOOL_PATH' '$dev' > ethtool_output
     "
 
-    for feature in  port supported_speed supported_pause supported_autoneg
-                    advertised_speed advertised_pause advertised_autoneg
+    for feature in  port supported_speed supported_pause supported_autoneg \
+                    advertised_speed advertised_pause advertised_autoneg \
                     lp_advertised_speed lp_advertised_pause lp_advertised_autoneg
     do
         test_expect_success ETHTOOL,PYTHON_YAML "Parse '$dev' $feature" "
