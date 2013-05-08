@@ -206,18 +206,14 @@ static void interface_offload_list_print(const Dabba__InterfaceOffloadList *
 		printf("    ");
 		__rpc_error_code_print(offloadp->status->code);
 		printf("      offload:\n");
-		printf("        rx checksum: %s\n",
-		       print_tf(offloadp->rx_csum));
-		printf("        tx checksum: %s\n",
-		       print_tf(offloadp->tx_csum));
-		printf("        scatter gather: %s\n", print_tf(offloadp->sg));
-		printf("        tcp segment: %s\n", print_tf(offloadp->tso));
-		printf("        udp fragment: %s\n", print_tf(offloadp->ufo));
-		printf("        generic segmentation: %s\n",
-		       print_tf(offloadp->gso));
-		printf("        generic receive: %s\n",
-		       print_tf(offloadp->gro));
-		printf("        rx hashing: %s\n", print_tf(offloadp->rxhash));
+		printf("        rx-csum: %s\n", print_tf(offloadp->rx_csum));
+		printf("        tx-csum: %s\n", print_tf(offloadp->tx_csum));
+		printf("        sg: %s\n", print_tf(offloadp->sg));
+		printf("        tso: %s\n", print_tf(offloadp->tso));
+		printf("        ufo: %s\n", print_tf(offloadp->ufo));
+		printf("        gso: %s\n", print_tf(offloadp->gso));
+		printf("        gro: %s\n", print_tf(offloadp->gro));
+		printf("        rx-hash: %s\n", print_tf(offloadp->rxhash));
 	}
 
 	*status = 1;
@@ -295,7 +291,7 @@ static int cmd_interface_offload_modify(int argc, const char **argv)
 		{"gso", required_argument, NULL, OPT_GSO},
 		{"gro", required_argument, NULL, OPT_GRO},
 		{"lro", required_argument, NULL, OPT_LRO},
-		{"rxhash", required_argument, NULL, OPT_RXHASH_OFFLOAD},
+		{"rx-hash", required_argument, NULL, OPT_RXHASH_OFFLOAD},
 		{"id", required_argument, NULL, OPT_INTERFACE_ID},
 		{"tcp", optional_argument, NULL, OPT_TCP},
 		{"local", optional_argument, NULL, OPT_LOCAL},
