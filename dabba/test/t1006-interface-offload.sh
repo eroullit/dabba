@@ -23,6 +23,30 @@ test_description='Test dabba interface offload command'
 
 dev_nr=$(number_of_interface_get)
 
+ethtool_offload_parse() {
+    local pattern="$1"
+    local ethtool_output="$2"
+    local status=""
+
+    status="$(grep -i "$pattern" "$ethtool_output" | awk '{print $NF}')"
+
+    test "$status" = "on" && echo "True" || echo "False"
+}
+
+ethtool_offload_long_name_get() {
+    case "$1" in
+        "rx-csum") echo "rx-checksumming";;
+        "tx-csum") echo "tx-checksumming";;
+        "sg") echo "scatter-gather";;
+        "tso") echo "tcp-segmentation-offload";;
+        "ufo") echo "udp-fragmentation-offload";;
+        "gso") echo "generic-segmentation-offload";;
+        "gro") echo "generic-receive-offload";;
+        "lro") echo "large-receive-offload";;
+        "rx-hash") echo "receive-hashing";;
+    esac
+}
+
 test_expect_success "Setup: Stop already running dabbad" "
     test_might_fail killall dabbad
 "
@@ -51,10 +75,22 @@ do
 
     dev="$(cat output_name 2>/dev/null)"
 
-    for offload in rx-csum tx-csum sg tso ufo gso gro rxhash
+    test_expect_success ETHTOOL,PYTHON_YAML "Query interface '$dev' pause via ethtool" "
+        test_might_fail '$ETHTOOL_PATH' --show-offload '$dev' > ethtool_output
+    "
+
+    for feature in rx-csum tx-csum sg tso ufo gso gro rx-hash
     do
-        test_expect_success PYTHON_YAML "Check interface '$dev' $offload offload" "
-            dictkeys2values interfaces $i offload '$offload' < parsed > 'output_$offload'
+        test_expect_success PYTHON_YAML "Check interface '$dev' $feature offload" "
+            dictkeys2values interfaces $i offload '$feature' < parsed > 'output_$feature'
+        "
+
+        test_expect_success ETHTOOL,PYTHON_YAML "Parse '$dev' $feature offload settings" "
+            ethtool_offload_parse '$(ethtool_offload_long_name_get $feature)' ethtool_output > 'ethtool_${feature}_parsed'
+        "
+
+        test_expect_success ETHTOOL,PYTHON_YAML "Check '$dev' $feature offload settings" "
+            test_cmp 'ethtool_${feature}_parsed' 'output_$feature'
         "
     done
 done
