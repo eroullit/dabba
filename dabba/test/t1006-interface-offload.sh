@@ -46,16 +46,17 @@ test_expect_success PYTHON_YAML "Parse interface offload YAML output" "
 for i in `seq 0 $(($dev_nr-1))`
 do
     test_expect_success PYTHON_YAML "Check interface offload output key presence on device #$i" "
-        dictkeys2values interfaces $i name < parsed &&
-        dictkeys2values interfaces $i offload 'rx checksum' < parsed &&
-        dictkeys2values interfaces $i offload 'tx checksum' < parsed &&
-        dictkeys2values interfaces $i offload 'scatter gather' < parsed &&
-        dictkeys2values interfaces $i offload 'tcp segment' < parsed &&
-        dictkeys2values interfaces $i offload 'udp fragment' < parsed &&
-        dictkeys2values interfaces $i offload 'generic segmentation' < parsed &&
-        dictkeys2values interfaces $i offload 'generic receive' < parsed &&
-        dictkeys2values interfaces $i offload 'rx hashing' < parsed
+        dictkeys2values interfaces $i name < parsed > output_name
     "
+
+    dev="$(cat output_name 2>/dev/null)"
+
+    for offload in rx-csum tx-csum sg tso ufo gso gro rxhash
+    do
+        test_expect_success PYTHON_YAML "Check interface '$dev' $offload offload" "
+            dictkeys2values interfaces $i offload '$offload' < parsed > 'output_$offload'
+        "
+    done
 done
 
 test_expect_success "Cleanup: Stop dabbad" "
