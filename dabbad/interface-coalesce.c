@@ -124,11 +124,11 @@ static void __interface_coalesce_get(struct nl_object *obj, void *arg)
 	coalescep->rx_coalesce_usecs_low = coalesce.rx_coalesce_usecs_low;
 	coalescep->rx_max_coalesced_frames = coalesce.rx_max_coalesced_frames;
 	coalescep->rx_max_coalesced_frames_irq =
-	    coalesce.rx_max_coalesced_frames;
+	    coalesce.rx_max_coalesced_frames_irq;
 	coalescep->rx_max_coalesced_frames_high =
-	    coalesce.rx_max_coalesced_frames;
+	    coalesce.rx_max_coalesced_frames_high;
 	coalescep->rx_max_coalesced_frames_low =
-	    coalesce.rx_max_coalesced_frames;
+	    coalesce.rx_max_coalesced_frames_low;
 	coalescep->use_adaptive_tx_coalesce = coalesce.use_adaptive_tx_coalesce;
 	coalescep->tx_coalesce_usecs = coalesce.tx_coalesce_usecs;
 	coalescep->tx_coalesce_usecs_irq = coalesce.tx_coalesce_usecs_irq;
@@ -136,11 +136,11 @@ static void __interface_coalesce_get(struct nl_object *obj, void *arg)
 	coalescep->tx_coalesce_usecs_low = coalesce.tx_coalesce_usecs_low;
 	coalescep->tx_max_coalesced_frames = coalesce.tx_max_coalesced_frames;
 	coalescep->tx_max_coalesced_frames_irq =
-	    coalesce.tx_max_coalesced_frames;
+	    coalesce.tx_max_coalesced_frames_irq;
 	coalescep->tx_max_coalesced_frames_high =
-	    coalesce.tx_max_coalesced_frames;
+	    coalesce.tx_max_coalesced_frames_high;
 	coalescep->tx_max_coalesced_frames_low =
-	    coalesce.tx_max_coalesced_frames;
+	    coalesce.tx_max_coalesced_frames_low;
 
 	coalesce_list->n_list++;
 }
