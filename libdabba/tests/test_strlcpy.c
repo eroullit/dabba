@@ -34,10 +34,10 @@
 
 int main(int argc, char **argv)
 {
-	const char const double_lorem[] =
+	const char double_lorem[] =
 	    LOREM_BEGIN " " LOREM_END " " LOREM_BEGIN " " LOREM_END;
-	const char const lorem[] = LOREM_BEGIN " " LOREM_END;
-	const char const lorem_short[] = LOREM_BEGIN;
+	const char lorem[] = LOREM_BEGIN " " LOREM_END;
+	const char lorem_short[] = LOREM_BEGIN;
 
 	char target[sizeof(lorem)] = { 0 };
 
