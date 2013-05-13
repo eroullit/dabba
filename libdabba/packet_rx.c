@@ -67,8 +67,7 @@ void *packet_rx(void *arg)
 			struct packet_mmap_header *mmap_hdr =
 			    pkt_mmap->vec[index].iov_base;
 
-			if ((mmap_hdr->tp_h.tp_status & TP_STATUS_KERNEL) ==
-			    TP_STATUS_KERNEL) {
+			if (mmap_hdr->tp_h.tp_status == TP_STATUS_KERNEL) {
 				if (poll(&pfd, 1, -1) < 0)
 					continue;
 			}
