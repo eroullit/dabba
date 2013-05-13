@@ -67,7 +67,7 @@ sys_class_net_get()
 # beginning and end regexes are not printed
 # $1 begin regex
 # $2 end regex
-# $2 file to read
+# $3 file to read
 range_print() {
     local begin="$1"
     local end="$2"
