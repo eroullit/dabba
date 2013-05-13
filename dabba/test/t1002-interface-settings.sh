@@ -43,7 +43,11 @@ test_expect_success PYTHON_YAML "Parse interface settings YAML output" "
     yaml2dict result > parsed
 "
 
-for i in `seq 0 $(($(number_of_interface_get)-1))`
+test_expect_success PYTHON_YAML "Check interface settings output length" "
+    test $(number_of_interface_get) -eq $(yaml_number_of_interface_get parsed)
+"
+
+for i in `seq 0 $(($(yaml_number_of_interface_get parsed)-1))`
 do
     test_expect_success PYTHON_YAML "Query interface settings output" "
         dictkeys2values interfaces $i name < parsed > output_name &&

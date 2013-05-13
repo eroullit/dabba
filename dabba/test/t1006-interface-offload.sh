@@ -21,8 +21,6 @@ test_description='Test dabba interface offload command'
 
 . ./dabba-test-lib.sh
 
-dev_nr=$(number_of_interface_get)
-
 ethtool_offload_long_name_get() {
     case "$1" in
         "rx-csum") echo "rx-checksumming";;
@@ -57,7 +55,7 @@ test_expect_success PYTHON_YAML "Parse interface offload YAML output" "
     yaml2dict result > parsed
 "
 
-for i in `seq 0 $(($dev_nr-1))`
+for i in `seq 0 $(($(yaml_number_of_interface_get parsed)-1))`
 do
     test_expect_success PYTHON_YAML "Check interface offload output key presence on device #$i" "
         dictkeys2values interfaces $i name < parsed > output_name
