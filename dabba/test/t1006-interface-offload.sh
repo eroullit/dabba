@@ -23,16 +23,6 @@ test_description='Test dabba interface offload command'
 
 dev_nr=$(number_of_interface_get)
 
-ethtool_offload_parse() {
-    local pattern="$1"
-    local ethtool_output="$2"
-    local status=""
-
-    status="$(grep -i "$pattern" "$ethtool_output" | awk '{print $NF}')"
-
-    test "$status" = "on" && echo "True" || echo "False"
-}
-
 ethtool_offload_long_name_get() {
     case "$1" in
         "rx-csum") echo "rx-checksumming";;
@@ -86,7 +76,7 @@ do
         "
 
         test_expect_success ETHTOOL,PYTHON_YAML "Parse '$dev' $feature offload settings" "
-            ethtool_offload_parse '$(ethtool_offload_long_name_get $feature)' ethtool_output > 'ethtool_${feature}_parsed'
+            ethtool_status_parse '$(ethtool_offload_long_name_get $feature)' ethtool_output > 'ethtool_${feature}_parsed'
         "
 
         test_expect_success ETHTOOL,PYTHON_YAML "Check '$dev' $feature offload settings" "

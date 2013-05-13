@@ -76,4 +76,17 @@ range_print() {
     awk '/'"$end"'/{e=0}/'"$begin"'/{gsub("'"$begin"'","",$0);e=1}{if(e==1){print}}' "$file"
 }
 
+# This function prints 'True' or 'False', if ethtool feature returns 'on' or 'off'
+# $1 begin regex
+# $2 ethtool output file to read
+ethtool_status_parse() {
+    local pattern="$1"
+    local ethtool_output="$2"
+    local status=""
+
+    status="$(grep -i "$pattern" "$ethtool_output" | awk '{print $NF}')"
+
+    test "$status" = "on" && echo "True" || echo "False"
+}
+
 # vim: ft=sh:tabstop=4:et

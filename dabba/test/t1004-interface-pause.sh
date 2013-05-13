@@ -23,16 +23,6 @@ test_description='Test dabba interface pause command'
 
 dev_nr=$(number_of_interface_get)
 
-ethtool_pause_parse() {
-    local pattern="$1"
-    local ethtool_output="$2"
-    local status=""
-
-    status="$(grep -i "$pattern" "$ethtool_output" | awk '{print $NF}')"
-
-    test "$status" = "on" && echo "True" || echo "False"
-}
-
 test_expect_success "Setup: Stop already running dabbad" "
     test_might_fail killall dabbad
 "
@@ -76,7 +66,7 @@ do
         "
 
         test_expect_success ETHTOOL,PYTHON_YAML "Parse '$dev' $feature pause settings" "
-            ethtool_pause_parse '$feature' ethtool_output > 'ethtool_${feature}_parsed'
+            ethtool_status_parse '$feature' ethtool_output > 'ethtool_${feature}_parsed'
         "
 
         test_expect_success ETHTOOL,PYTHON_YAML "Check '$dev' $feature pause settings" "
