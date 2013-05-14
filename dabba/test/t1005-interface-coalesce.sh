@@ -37,18 +37,18 @@ ethtool_coalesce_name_get() {
         "rx max frame irq") echo "rx-frames-irq";;
         "rx max frame high") echo "rx-frames-high";;
         "rx max frame low") echo "rx-frames-low";;
-        "rx usec normal") echo "rx-usec";;
-        "rx usec irq") echo "rx-usec-irq";;
-        "rx usec high") echo "rx-usec-high";;
-        "rx usec low") echo "rx-usec-low";;
+        "rx usec normal") echo "rx-usecs";;
+        "rx usec irq") echo "rx-usecs-irq";;
+        "rx usec high") echo "rx-usecs-high";;
+        "rx usec low") echo "rx-usecs-low";;
         "tx max frame normal") echo "tx-frames";;
-        "tx usec normal") echo "tx-usec";;
+        "tx usec normal") echo "tx-usecs";;
         "tx max frame irq") echo "tx-frames-irq";;
         "tx max frame high") echo "tx-frames-high";;
         "tx max frame low") echo "tx-frames-low";;
-        "tx usec irq") echo "tx-usec-irq";;
-        "tx usec high") echo "tx-usec-high";;
-        "tx usec low") echo "tx-usec-low";;
+        "tx usec irq") echo "tx-usecs-irq";;
+        "tx usec high") echo "tx-usecs-high";;
+        "tx usec low") echo "tx-usecs-low";;
     esac
 }
 
