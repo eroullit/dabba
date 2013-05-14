@@ -44,6 +44,8 @@ ethtool_coalesce_name_get() {
     case "$1" in
         "packet rate high") echo "pkt-rate-high";;
         "packet rate low") echo "pkt-rate-low";;
+        "rate sample interval") echo "sample-interval";;
+        "stats block") echo "stats-block-usecs";;
         "rx max frame normal") echo "rx-frames";;
         "rx max frame irq") echo "rx-frames-irq";;
         "rx max frame high") echo "rx-frames-high";;
@@ -103,13 +105,13 @@ do
         test_might_fail '$ETHTOOL_PATH' --show-coalesce '$dev' > ethtool_output
     "
 
-    for type in high low
+    for feature in 'packet rate high' 'packet rate low' 'rate sample interval' 'stats block'
     do
-        ethtool_pattern="$(ethtool_coalesce_name_get "packet rate $type")"
+        ethtool_pattern="$(ethtool_coalesce_name_get "$feature")"
 
-        test_expect_success ETHTOOL,PYTHON_YAML "Parse '$dev' packet rate $type" "
+        test_expect_success ETHTOOL,PYTHON_YAML "Parse '$dev' $feature" "
             test $(ethtool_coalesce_parse "$ethtool_pattern" ethtool_output) = \
-            $(dictkeys2values interfaces $i coalesce "packet rate $type" < parsed)
+            $(dictkeys2values interfaces $i coalesce "$feature" < parsed)
         "
     done
 
