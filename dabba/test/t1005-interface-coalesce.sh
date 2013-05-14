@@ -25,8 +25,8 @@ ethtool_coalesce_parse() {
     local pattern="$1"
     local ethtool_output="$2"
 
-    test $(grep -c "$pattern" "$ethtool_output") -gt 0 && \
-    awk '/'$pattern'/ {print $NF}' "$ethtool_output" || echo "0"
+    test $(grep -cw "$pattern:" "$ethtool_output") -gt 0 && \
+    awk '/^'"$pattern"':/ {print $NF}' "$ethtool_output" || echo "0"
 }
 
 ethtool_coalesce_name_get() {
