@@ -29,6 +29,17 @@ ethtool_coalesce_parse() {
     awk '/^'"$pattern"':/ {print $NF}' "$ethtool_output" || echo "0"
 }
 
+ethtool_adaptive_coalesce_parse() {
+    local pattern="$1"
+    local ethtool_output="$2"
+
+    grep Adaptive "$ethtool_output"| sed 's/Adaptive //g' | sed 's/  /\n/g' > adaptive_output
+
+    status=$(awk 'tolower($1) ~ /'"$pattern"'/ {print $NF}' adaptive_output)
+
+    test "$status" = "on" && echo "True" || echo "False"
+}
+
 ethtool_coalesce_name_get() {
     case "$1" in
         "packet rate high") echo "pkt-rate-high";;
@@ -115,6 +126,11 @@ do
                 "
             done
         done
+
+        test_expect_success ETHTOOL,PYTHON_YAML "Parse '$dev' $direction adaptive" "
+            test $(ethtool_adaptive_coalesce_parse "$direction" ethtool_output) = \
+            $(dictkeys2values interfaces $i coalesce "$direction" adaptive < parsed)
+        "
     done
 done
 
