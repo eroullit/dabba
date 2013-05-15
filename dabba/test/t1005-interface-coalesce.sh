@@ -132,6 +132,45 @@ do
     done
 done
 
+test_expect_success TEST_DEV "Fetch '$TEST_DEV' coalesce settings" "
+    '$DABBA_PATH'/dabba interface coalesce get --id '$TEST_DEV' > result
+"
+
+test_expect_success TEST_DEV,PYTHON_YAML "Parse '$TEST_DEV' coalesce YAML output" "
+    yaml2dict result > parsed
+"
+
+for direction in rx tx
+do
+    for feature in usec 'max frame'
+    do
+        for type in irq high low normal
+        do
+            ethtool_pattern="$(ethtool_coalesce_name_get "$direction $feature $type")"
+            value=$(dictkeys2values interfaces 0 coalesce "$direction" "$feature" "$type" < parsed)
+
+            if [ "$value" != "0" ]; then
+                test_expect_success TEST_DEV,PYTHON_YAML "Modify '$TEST_DEV' $direction $feature $type value" "
+                    '$DABBA_PATH'/dabba interface coalesce modify --id '$TEST_DEV' --$ethtool_pattern 50 &&
+                    '$DABBA_PATH'/dabba interface coalesce get --id '$TEST_DEV' > mod_result
+                "
+
+                test_expect_success TEST_DEV,PYTHON_YAML "Parse modified '$TEST_DEV' coalesce YAML output" "
+                    yaml2dict mod_result > mod_parsed
+                "
+
+                test_expect_success TEST_DEV,PYTHON_YAML "Query '$TEST_DEV' $direction $feature $type output" "
+                    test $(dictkeys2values interfaces 0 coalesce "$direction" "$feature" "$type" < mod_parsed) = '50'
+                "
+
+                test_expect_success TEST_DEV,PYTHON_YAML "Modify '$TEST_DEV' $direction $feature $type to previous value" "
+                    '$DABBA_PATH'/dabba interface coalesce modify --id '$TEST_DEV' --'$ethtool_pattern' '$value'
+                "
+            fi
+        done
+    done
+done
+
 test_expect_success "Cleanup: Stop dabbad" "
     killall dabbad
 "
