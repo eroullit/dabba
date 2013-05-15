@@ -85,10 +85,6 @@ test_expect_success PYTHON_YAML "Parse interface coalesce YAML output" "
     yaml2dict result > parsed
 "
 
-test_expect_success "Cleanup: Stop dabbad" "
-    killall dabbad
-"
-
 test_expect_success PYTHON_YAML "Check interface coalesce output length" "
     test $(number_of_interface_get) -eq $(yaml_number_of_interface_get parsed)
 "
@@ -135,6 +131,10 @@ do
         "
     done
 done
+
+test_expect_success "Cleanup: Stop dabbad" "
+    killall dabbad
+"
 
 test_done
 
