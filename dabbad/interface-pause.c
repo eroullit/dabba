@@ -181,10 +181,10 @@ void dabbad_interface_pause_modify(Dabba__DabbaService_Service * service,
 		p.rx_pause = pause->rx_pause;
 
 	if (pause->has_tx_pause)
-		p.rx_pause = pause->tx_pause;
+		p.tx_pause = pause->tx_pause;
 
 	if (pause->has_autoneg)
-		p.rx_pause = pause->has_autoneg;
+		p.autoneg = pause->autoneg;
 
 	rc = dev_pause_set(pause->id->name, &p);
 
