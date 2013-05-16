@@ -73,6 +73,38 @@ do
     done
 done
 
+test_expect_success TEST_DEV "Fetch '$TEST_DEV' pause settings" "
+    '$DABBA_PATH'/dabba interface pause get --id '$TEST_DEV' > result
+"
+
+test_expect_success TEST_DEV,PYTHON_YAML "Parse '$TEST_DEV' coalesce YAML output" "
+    yaml2dict result > parsed
+"
+
+for feature in autoneg rx tx
+do
+    value=$(dictkeys2values interfaces 0 pause "$feature" < parsed)
+
+    if [ "$value" = "True" ]; then
+        test_expect_success TEST_DEV,PYTHON_YAML "Modify '$TEST_DEV' $feature pause settings" "
+            '$DABBA_PATH'/dabba interface pause modify --id '$TEST_DEV' --'$feature' False &&
+            '$DABBA_PATH'/dabba interface pause get --id '$TEST_DEV' > mod_result
+        "
+
+        test_expect_success TEST_DEV,PYTHON_YAML "Parse modified '$TEST_DEV' pause YAML output" "
+            yaml2dict mod_result > mod_parsed
+        "
+
+        test_expect_success TEST_DEV,PYTHON_YAML "Query '$TEST_DEV' $feature pause output" "
+            test $(dictkeys2values interfaces 0 pause "$feature" < mod_parsed) = False
+        "
+
+        test_expect_success TEST_DEV,PYTHON_YAML "Modify '$TEST_DEV' $feature pause to previous value" "
+            '$DABBA_PATH'/dabba interface pause modify --id '$TEST_DEV' --'$feature' True
+        "
+    fi
+done
+
 test_expect_success "Cleanup: Stop dabbad" "
     killall dabbad
 "
