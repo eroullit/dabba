@@ -65,11 +65,11 @@ Apply new pause settings to a specific network interface.
 
 interface name to work on.
 
-=item --rx-pause (true|false)
+=item --rx(true|false)
 
 Activate or shutdown receive pause.
 
-=item --tx-pause (true|false)
+=item --tx (true|false)
 
 Activate or shutdown transmit pause.
 
@@ -264,8 +264,8 @@ static int cmd_interface_pause_modify(int argc, const char **argv)
 
 	const struct option interface_option[] = {
 		{"id", required_argument, NULL, OPT_INTERFACE_ID},
-		{"rx-pause", required_argument, NULL, OPT_INTERFACE_RX_PAUSE},
-		{"tx-pause", required_argument, NULL, OPT_INTERFACE_TX_PAUSE},
+		{"rx", required_argument, NULL, OPT_INTERFACE_RX_PAUSE},
+		{"tx", required_argument, NULL, OPT_INTERFACE_TX_PAUSE},
 		{"autoneg", required_argument, NULL, OPT_INTERFACE_AUTONEG},
 		{"tcp", optional_argument, NULL, OPT_TCP},
 		{"local", optional_argument, NULL, OPT_LOCAL},
