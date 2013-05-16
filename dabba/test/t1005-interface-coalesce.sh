@@ -46,6 +46,7 @@ ethtool_coalesce_name_get() {
         "packet rate low") echo "pkt-rate-low";;
         "rate sample interval") echo "sample-interval";;
         "stats block") echo "stats-block-usecs";;
+        "rx adaptive") echo "adaptive-rx";;
         "rx max frame normal") echo "rx-frames";;
         "rx max frame irq") echo "rx-frames-irq";;
         "rx max frame high") echo "rx-frames-high";;
@@ -54,6 +55,7 @@ ethtool_coalesce_name_get() {
         "rx usec irq") echo "rx-usecs-irq";;
         "rx usec high") echo "rx-usecs-high";;
         "rx usec low") echo "rx-usecs-low";;
+        "tx adaptive") echo "adaptive-tx";;
         "tx max frame normal") echo "tx-frames";;
         "tx usec normal") echo "tx-usecs";;
         "tx max frame irq") echo "tx-frames-irq";;
@@ -151,7 +153,7 @@ do
 
             if [ "$value" != "0" ]; then
                 test_expect_success TEST_DEV,PYTHON_YAML "Modify '$TEST_DEV' $direction $feature $type value" "
-                    '$DABBA_PATH'/dabba interface coalesce modify --id '$TEST_DEV' --$ethtool_pattern 50 &&
+                    '$DABBA_PATH'/dabba interface coalesce modify --id '$TEST_DEV' --'$ethtool_pattern' 50 &&
                     '$DABBA_PATH'/dabba interface coalesce get --id '$TEST_DEV' > mod_result
                 "
 
@@ -169,6 +171,28 @@ do
             fi
         done
     done
+
+    ethtool_pattern="$(ethtool_coalesce_name_get "$direction adaptive")"
+    value=$(dictkeys2values interfaces 0 coalesce "$direction" adaptive < parsed)
+
+    if [ "$value" = "True" ]; then
+        test_expect_success TEST_DEV,PYTHON_YAML "Modify '$dev' $direction adaptive value" "
+            '$DABBA_PATH'/dabba interface coalesce modify --id '$TEST_DEV' --'$ethtool_pattern' false &&
+            '$DABBA_PATH'/dabba interface coalesce get --id '$TEST_DEV' > mod_result
+        "
+
+        test_expect_success TEST_DEV,PYTHON_YAML "Parse modified '$TEST_DEV' coalesce YAML output" "
+            yaml2dict mod_result > mod_parsed
+        "
+
+        test_expect_success TEST_DEV,PYTHON_YAML "Query '$TEST_DEV' $direction adaptive output" "
+            test $(dictkeys2values interfaces 0 coalesce "$direction" "$feature" "$type" < mod_parsed) = '50'
+        "
+
+        test_expect_success TEST_DEV,PYTHON_YAML "Modify '$TEST_DEV' $direction adaptive to previous value" "
+            '$DABBA_PATH'/dabba interface coalesce modify --id '$TEST_DEV' --'$ethtool_pattern' '$value'
+        "
+    fi
 done
 
 test_expect_success "Cleanup: Stop dabbad" "
