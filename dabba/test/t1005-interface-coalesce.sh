@@ -142,6 +142,31 @@ test_expect_success TEST_DEV,PYTHON_YAML "Parse '$TEST_DEV' coalesce YAML output
     yaml2dict result > parsed
 "
 
+for feature in 'packet rate high' 'packet rate low' 'rate sample interval' 'stats block'
+do
+    ethtool_pattern="$(ethtool_coalesce_name_get "$feature")"
+    value=$(dictkeys2values interfaces 0 coalesce "$feature" < parsed)
+
+    if [ "$value" != "0" ]; then
+        test_expect_success TEST_DEV,PYTHON_YAML "Modify '$TEST_DEV' $feature value" "
+            '$DABBA_PATH'/dabba interface coalesce modify --id '$TEST_DEV' --'$ethtool_pattern' 50 &&
+            '$DABBA_PATH'/dabba interface coalesce get --id '$TEST_DEV' > mod_result
+        "
+
+        test_expect_success TEST_DEV,PYTHON_YAML "Parse modified '$TEST_DEV' coalesce YAML output" "
+            yaml2dict mod_result > mod_parsed
+        "
+
+        test_expect_success TEST_DEV,PYTHON_YAML "Query '$TEST_DEV' $feature output" "
+            test $(dictkeys2values interfaces 0 coalesce "$direction" "$feature" "$type" < mod_parsed) = '50'
+        "
+
+        test_expect_success TEST_DEV,PYTHON_YAML "Modify '$TEST_DEV' $feature to previous value" "
+            '$DABBA_PATH'/dabba interface coalesce modify --id '$TEST_DEV' --'$ethtool_pattern' '$value'
+        "
+    fi
+done
+
 for direction in rx tx
 do
     for feature in usec 'max frame'
