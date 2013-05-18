@@ -201,7 +201,7 @@ do
     value=$(dictkeys2values interfaces 0 coalesce "$direction" adaptive < parsed)
 
     if [ "$value" = "True" ]; then
-        test_expect_success TEST_DEV,PYTHON_YAML "Modify '$dev' $direction adaptive value" "
+        test_expect_success TEST_DEV,PYTHON_YAML "Modify '$TEST_DEV' $direction adaptive value" "
             '$DABBA_PATH'/dabba interface coalesce modify --id '$TEST_DEV' --'$ethtool_pattern' false &&
             '$DABBA_PATH'/dabba interface coalesce get --id '$TEST_DEV' > mod_result
         "
