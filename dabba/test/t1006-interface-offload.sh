@@ -83,6 +83,40 @@ do
     done
 done
 
+test_expect_success TEST_DEV "invoke dabba interface '$TEST_DEV' offload command with dabbad" "
+    '$DABBA_PATH'/dabba interface offload get --id '$TEST_DEV' > result
+"
+
+test_expect_success TEST_DEV,PYTHON_YAML "Parse interface offload YAML output" "
+    yaml2dict result > parsed
+"
+
+for feature in rx-csum tx-csum sg tso ufo gso gro rx-hash
+do
+    test_expect_success TEST_DEV,PYTHON_YAML "Check interface '$TEST_DEV' $feature feature" "
+        dictkeys2values interfaces 0 offload '$feature' < parsed > 'output_$feature'
+    "
+
+    if [ "$(cat "output_$feature" 2> /dev/null)" = "True" ]; then
+        test_expect_success TEST_DEV,PYTHON_YAML "Modify '$TEST_DEV' $feature" "
+            '$DABBA_PATH'/dabba interface offload modify --id '$TEST_DEV' --'$feature' false &&
+            '$DABBA_PATH'/dabba interface offload get --id '$TEST_DEV' > mod_result
+        "
+
+        test_expect_success TEST_DEV,PYTHON_YAML "Parse modified '$TEST_DEV' offload YAML output" "
+            yaml2dict mod_result > mod_parsed
+        "
+
+        test_expect_success TEST_DEV,PYTHON_YAML "Query '$TEST_DEV' $feature status" "
+            test $(dictkeys2values interfaces 0 offload "$feature" < mod_parsed) = False
+        "
+
+        test_expect_success TEST_DEV,PYTHON_YAML "Modify '$TEST_DEV' $feature to previous status" "
+            '$DABBA_PATH'/dabba interface offload modify --id '$TEST_DEV' --'$feature' true
+        "
+    fi
+done
+
 test_expect_success "Cleanup: Stop dabbad" "
     killall dabbad
 "
