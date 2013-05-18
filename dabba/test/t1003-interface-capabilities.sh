@@ -185,7 +185,7 @@ do
             dictkeys2values interfaces 0 capabilities supported speed '$speed' '$duplex' < parsed > supported_speed
         "
 
-        if [ "$(cat "supported_speed" 2> /dev/null)" = "True" ]; then
+        if [ "$(cat "supported_speed" 2> /dev/null)" = "True" && "$(ethtool_advertised_speed_parse)" != "Not reported" ]; then
             for status in False True
             do
                 test_expect_success TEST_DEV,PYTHON_YAML "Modify '$TEST_DEV' ${speed}Mbps $duplex duplex to $status" "
