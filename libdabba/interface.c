@@ -95,6 +95,7 @@ static int dev_ethtool_request(const char *const dev, const int cmd, int *value)
 
 	strlcpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name));
 	e.cmd = cmd;
+	e.data = *value;
 	ifr.ifr_data = (caddr_t) & e;
 
 	rc = dev_kernel_request(&ifr, SIOCETHTOOL);
