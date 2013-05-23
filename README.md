@@ -35,6 +35,8 @@ dabba needs these to compile and run properly:
 * `libnl-3-dev`
 * `libnl-genl-3-dev`
 * `libnl-route-3-dev`
+* `protobuf-c-compiler`
+* `libprotobuf-c0-dev`
 * `setcap` (within `libcap` package)
 
 Recommended optional packages:
