@@ -2,12 +2,16 @@ PROJECT(dabbad C)
 
 FIND_PACKAGE(Doxygen)
 FIND_PACKAGE(Setcap REQUIRED)
+FIND_PACKAGE(NL REQUIRED)
 INCLUDE(Pod2Man)
 
 FILE(GLOB DABBAD_HDRS ${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/include/${PROJECT_NAME}/*.h)
 
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/include
-                        ${CMAKE_SOURCE_DIR}/libdabba/include)
+                        ${CMAKE_SOURCE_DIR}/libdabba/include
+			${NL_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/libdabba-rpc/include)
+INCLUDE_DIRECTORIES(${LIBDABBA_RPC_INCLUDE_DIR})
 
 IF(DOXYGEN_FOUND)
 	CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
@@ -15,9 +19,25 @@ IF(DOXYGEN_FOUND)
 	ADD_DEPENDENCIES(doc ${PROJECT_NAME}-doc)
 ENDIF(DOXYGEN_FOUND)
 
-ADD_EXECUTABLE(${PROJECT_NAME} dabbad.c interface.c ipc.c help.c capture.c misc.c thread.c)
+ADD_EXECUTABLE(${PROJECT_NAME}
+	dabbad.c
+	interface.c
+	interface-status.c
+	interface-driver.c
+	interface-pause.c
+	interface-offload.c
+	interface-settings.c
+	interface-coalesce.c
+	interface-capabilities.c
+	interface-statistics.c
+	rpc.c
+	help.c
+	capture.c
+	misc.c
+	thread.c
+)
 
-TARGET_LINK_LIBRARIES (${PROJECT_NAME} libdabba ${CMAKE_THREAD_LIBS_INIT})
+TARGET_LINK_LIBRARIES (${PROJECT_NAME} libdabba libdabba-rpc ${CMAKE_THREAD_LIBS_INIT} ${NL_LIBRARIES})
 
 POD2MAN(${CMAKE_CURRENT_SOURCE_DIR}/dabbad.c dabbad 8)
 

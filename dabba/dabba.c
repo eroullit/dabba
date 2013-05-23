@@ -1,6 +1,6 @@
 /**
  * \file dabba.c
- * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2012
+ * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (C) 2012
  * \date 2012
  */
 
@@ -70,7 +70,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 
 =over
 
-=item Copyright © 2012 Emmanuel Roullit.
+=item Copyright (C) 2012 Emmanuel Roullit.
 
 =item License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.
 
@@ -93,14 +93,23 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <sys/stat.h>
 
 #include <libdabba/macros.h>
-#include <dabbad/dabbad.h>
 #include <dabba/dabba.h>
 #include <dabba/help.h>
 #include <dabba/thread.h>
 #include <dabba/interface.h>
 #include <dabba/capture.h>
 
-int run_builtin(struct cmd_struct *p, int argc, const char **argv)
+/**
+ * \internal
+ * \brief run command function and pass it \c argc / \c argv
+ * \param[in]           p	        Pointer to command structure
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv	        Argument vector
+ * \return 0 on success, else on failure.
+ * \note on success, \c stdout pipe/socket is checked, flushed and closed.
+ */
+
+static int run_builtin(const struct cmd_struct *p, int argc, const char **argv)
 {
 	int status;
 	struct stat st;
@@ -137,11 +146,57 @@ int run_builtin(struct cmd_struct *p, int argc, const char **argv)
 	return 0;
 }
 
-static int handle_internal_command(int argc, const char **argv)
+/**
+ * \brief run command function and pass it \c argc / \c argv
+ * \brief also check if \c argv contains help parameters
+ * \param[in]           p	        Pointer to command structure
+ * \param[in]           cmd_len	        Number of valid command passed
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv	        Argument vector
+ * \return 0 on success, else on failure, \c ENOSYS if the command is unknown.
+ * \note on success, \c stdout pipe/socket is checked, flushed and closed.
+ */
+
+int cmd_run_builtin(const struct cmd_struct *cmd, const size_t cmd_len,
+		    int argc, const char **argv)
 {
-	size_t i;
-	const char *cmd = argv[0];
-	static struct cmd_struct commands[] = {
+	const char *cmd_str = argv[0];
+	size_t a;
+
+	if (argc == 0 || cmd_str == NULL || !strcmp(cmd_str, "--help"))
+		cmd_str = "help";
+
+	if (!strcmp(cmd_str, "--version"))
+		cmd_str = "version";
+
+	/* Turn "dabba cmd --help" into "dabba help cmd" */
+	if (argc > 1 && !strcmp(argv[1], "--help")) {
+		argv[1] = argv[0];
+		argv[0] = cmd_str = "help";
+	}
+
+	for (a = 0; a < cmd_len; a++) {
+		if (strcmp(cmd[a].cmd, cmd_str))
+			continue;
+
+		return run_builtin(&cmd[a], --argc, ++argv);
+	}
+
+	help_unknown_cmd(cmd_str);
+
+	return ENOSYS;
+}
+
+/**
+ * \brief start function. Pass on \c argc / \c argv to commands
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv	        Argument vector
+ * \return 0 on success, else on failure.
+ */
+
+int main(int argc, const char **argv)
+{
+	static const struct cmd_struct commands[] = {
 		{"interface", cmd_interface},
 		{"thread", cmd_thread},
 		{"capture", cmd_capture},
@@ -149,41 +204,5 @@ static int handle_internal_command(int argc, const char **argv)
 		{"help", cmd_help}
 	};
 
-	if (argc == 0 || cmd == NULL || !strcmp(cmd, "--help"))
-		cmd = "help";
-
-	if (argc == 0 || cmd == NULL || !strcmp(cmd, "--version"))
-		cmd = "version";
-
-	/* Turn "dabba cmd --help" into "dabba help cmd" */
-	if (argc > 1 && !strcmp(argv[1], "--help")) {
-		argv[1] = argv[0];
-		argv[0] = cmd = "help";
-	}
-
-	for (i = 0; i < ARRAY_SIZE(commands); i++) {
-		struct cmd_struct *p = commands + i;
-		if (strcmp(p->cmd, cmd))
-			continue;
-
-		argc--;
-		argv++;
-
-		return (run_builtin(p, argc, argv));
-	}
-
-	help_unknown_cmd(cmd);
-
-	return ENOSYS;
-}
-
-int main(int argc, const char **argv)
-{
-	assert(argc);
-	assert(argv);
-
-	argc--;
-	argv++;
-
-	return (handle_internal_command(argc, argv));
+	return cmd_run_builtin(commands, ARRAY_SIZE(commands), --argc, ++argv);
 }

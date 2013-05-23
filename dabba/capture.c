@@ -1,6 +1,6 @@
 /**
  * \file capture.c
- * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2012
+ * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (C) 2012
  * \date 2012
  */
 
@@ -86,6 +86,18 @@ The lowest frame number value is 8.
 Reference a capture by its unique thread id.
 The capture id can be fetched using "dabba capture list".
 
+=item --tcp[=<hostname>:<port>]
+
+Query a running instance of dabbad using a TCP socket (default: localhost:55994)
+
+=item --local[=<path>]
+
+Query a running instance of dabbad using a Unix domain socket (default: /tmp/dabba)
+
+=item --help
+
+Prints the help message on the terminal
+
 =back
 
 =head1 EXAMPLES
@@ -126,7 +138,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 
 =over
 
-=item Copyright © 2012 Emmanuel Roullit.
+=item Copyright (C) 2012 Emmanuel Roullit.
 
 =item License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.
 
@@ -143,7 +155,6 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 #include <getopt.h>
 #include <inttypes.h>
 #include <errno.h>
@@ -152,237 +163,364 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <libdabba/packet_mmap.h>
 #include <dabba/dabba.h>
 #include <dabba/help.h>
-#include <dabba/ipc.h>
+#include <dabba/rpc.h>
 #include <dabba/thread.h>
-#include <dabbad/dabbad.h>
 
 #define DEFAULT_CAPTURE_FRAME_NUMBER 32
 
-enum capture_start_option {
-	OPT_CAPTURE_INTERFACE,
-	OPT_CAPTURE_PCAP,
-	OPT_CAPTURE_FRAME_NUMBER
-};
+/**
+ * \internal
+ * \brief Print capture settings list to \c stdout
+ * \param[in]           result	        Pointer to capture settings list
+ * \param[in,out]       closure_data	Pointer to protobuf closure data
+ */
 
-enum capture_stop_option {
-	OPT_CAPTURE_ID
-};
-
-static struct option *capture_start_options_get(void)
+static void capture_settings_print(const Dabba__CaptureList *
+				   result, void *closure_data)
 {
-	static struct option capture_start_option[] = {
+	const Dabba__Capture *capture;
+	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
+	size_t a;
+
+	assert(closure_data);
+
+	rpc_header_print("captures");
+
+	for (a = 0; result && a < result->n_list; a++) {
+		capture = result->list[a];
+		printf("    - id: %" PRIu64 "\n", (uint64_t) capture->id->id);
+		printf("    ");
+		__rpc_error_code_print(capture->status->code);
+		printf("      packet mmap size: %" PRIu64 "\n",
+		       capture->frame_nr * capture->frame_size);
+		printf("      frame number: %" PRIu64 "\n", capture->frame_nr);
+		printf("      pcap: %s\n", capture->pcap);
+		printf("      interface: %s\n", capture->interface);
+	}
+
+	*status = 1;
+}
+
+/**
+ * \brief Invoke capture start remote procedure call
+ * \param[in]           service	        Pointer to protobuf service
+ * \param[in]           capture 	Pointer to capture settings to create
+ * \return always returns zero.
+ */
+
+static int rpc_capture_start(ProtobufCService * service,
+			     const Dabba__Capture * capture)
+{
+	protobuf_c_boolean is_done = 0;
+
+	assert(service);
+	assert(capture);
+
+	/* TODO Print create capture thread id ? */
+	dabba__dabba_service__capture_start(service, capture,
+					    rpc_error_code_print, &is_done);
+
+	dabba_rpc_call_is_done(&is_done);
+
+	return 0;
+}
+
+/**
+ * \brief Invoke capture stop remote procedure call
+ * \param[in]           service	        Pointer to protobuf service
+ * \param[in]           id 	        Pointer to capture id to stop
+ * \return always returns zero.
+ */
+
+static int rpc_capture_stop(ProtobufCService * service,
+			    const Dabba__ThreadId * id)
+{
+	protobuf_c_boolean is_done = 0;
+
+	assert(service);
+	assert(id);
+
+	dabba__dabba_service__capture_stop(service, id,
+					   rpc_error_code_print, &is_done);
+
+	dabba_rpc_call_is_done(&is_done);
+
+	return 0;
+}
+
+/**
+ * \brief Invoke capture settings get remote procedure call
+ * \param[in]           service	        Pointer to protobuf service
+ * \param[in]           id_list 	Pointer to capture id list
+ * \return always returns zero.
+ * \note An empty id list will query all captures currently running.
+ */
+
+static int rpc_capture_get(ProtobufCService * service,
+			   const Dabba__ThreadIdList * id_list)
+{
+	protobuf_c_boolean is_done = 0;
+
+	assert(service);
+	assert(id_list);
+
+	dabba__dabba_service__capture_get(service, id_list,
+					  capture_settings_print, &is_done);
+
+	dabba_rpc_call_is_done(&is_done);
+
+	return 0;
+}
+
+/**
+ * \brief Parse argument vector to prepare a capture start query
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv	        Argument vector
+ * \return 0 on success, \c EINVAL on invalid input.
+ */
+
+static int cmd_capture_start(int argc, const char **argv)
+{
+	enum capture_start_option {
+		OPT_CAPTURE_INTERFACE,
+		OPT_CAPTURE_PCAP,
+		OPT_CAPTURE_FRAME_NUMBER,
+		OPT_CAPTURE_FRAME_SIZE,
+		OPT_TCP,
+		OPT_LOCAL,
+		OPT_HELP
+	};
+
+	int ret;
+	Dabba__Capture capture = DABBA__CAPTURE__INIT;
+	Dabba__ErrorCode err = DABBA__ERROR_CODE__INIT;
+	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+	ProtobufCService *service;
+
+	static struct option capture_option[] = {
 		{"interface", required_argument, NULL, OPT_CAPTURE_INTERFACE},
 		{"pcap", required_argument, NULL, OPT_CAPTURE_PCAP},
 		{"frame-number", required_argument, NULL,
 		 OPT_CAPTURE_FRAME_NUMBER},
+		{"frame-size", required_argument, NULL, OPT_CAPTURE_FRAME_SIZE},
+		{"tcp", optional_argument, NULL, OPT_TCP},
+		{"local", optional_argument, NULL, OPT_LOCAL},
+		{"help", no_argument, NULL, OPT_HELP},
 		{NULL, 0, NULL, 0},
 	};
-
-	return capture_start_option;
-}
-
-static int prepare_capture_start_query(int argc, char **argv,
-				       struct dabba_capture *capture_msg)
-{
-	int ret, rc = 0;
-
-	assert(capture_msg);
 
 	/* Assume conservative values for now */
-	capture_msg->frame_size = PACKET_MMAP_ETH_FRAME_LEN;
-	capture_msg->frame_nr = DEFAULT_CAPTURE_FRAME_NUMBER;
+	capture.has_frame_nr = capture.has_frame_size = 1;
+	capture.frame_size = PACKET_MMAP_ETH_FRAME_LEN;
+	capture.frame_nr = DEFAULT_CAPTURE_FRAME_NUMBER;
+	capture.status = &err;
 
+	/* HACK: getopt*() start to parse options at argv[1] */
+	argc++;
+	argv--;
+
+	/* parse capture options */
 	while ((ret =
-		getopt_long_only(argc, argv, "", capture_start_options_get(),
+		getopt_long_only(argc, (char **)argv, "", capture_option,
 				 NULL)) != EOF) {
 		switch (ret) {
-		case OPT_CAPTURE_INTERFACE:
-			if (strlen(optarg) >= sizeof(capture_msg->dev_name))
-				rc = EINVAL;
+		case OPT_TCP:
+			server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
+			server_id = DABBA_RPC_DEFAULT_TCP_SERVER_NAME;
 
-			strncpy(capture_msg->dev_name, optarg,
-				sizeof(capture_msg->dev_name));
+			if (optarg)
+				server_id = optarg;
 			break;
+		case OPT_LOCAL:
+			server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+			server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
 
+			if (optarg)
+				server_id = optarg;
+			break;
+		case OPT_CAPTURE_INTERFACE:
+			capture.interface = optarg;
+			break;
 		case OPT_CAPTURE_PCAP:
-			if (strlen(optarg) >= sizeof(capture_msg->pcap_name))
-				rc = EINVAL;
-
-			strncpy(capture_msg->pcap_name, optarg,
-				sizeof(capture_msg->pcap_name));
+			capture.pcap = optarg;
 			break;
 		case OPT_CAPTURE_FRAME_NUMBER:
-			capture_msg->frame_nr = strtoull(optarg, NULL, 10);
+			capture.frame_nr = strtoull(optarg, NULL, 10);
 			break;
+		case OPT_CAPTURE_FRAME_SIZE:
+			capture.frame_size = strtoull(optarg, NULL, 10);
+			break;
+		case OPT_HELP:
 		default:
-			show_usage(capture_start_options_get());
-			rc = -1;
-			break;
+			show_usage(capture_option);
+			return -1;
 		}
 	}
 
-	return rc;
-}
+	service = dabba_rpc_client_connect(server_id, server_type);
 
-static void display_capture_list_msg_header(void)
-{
-	printf("---\n");
-	printf("  captures:\n");
-}
-
-static void display_capture_list(const struct dabba_capture *const capture_msg,
-				 const size_t elem_nr)
-{
-	size_t a;
-
-	assert(capture_msg);
-	assert(elem_nr <= DABBA_CAPTURE_MAX_SIZE);
-
-	for (a = 0; a < elem_nr; a++) {
-		printf("    - id: %" PRIu64 "\n", (uint64_t) capture_msg[a].id);
-		printf("      packet mmap size: %" PRIu64 "\n",
-		       capture_msg[a].frame_nr * capture_msg[a].frame_size);
-		printf("      frame number: %" PRIu64 "\n",
-		       capture_msg[a].frame_nr);
-		printf("      pcap: %s\n", capture_msg[a].pcap_name);
-		printf("      interface: %s\n", capture_msg[a].dev_name);
-	}
+	/* Check error reporting */
+	return service ? rpc_capture_start(service, &capture) : EINVAL;
 }
 
 /**
- * \brief Prepare a command to start a capture.
+ * \brief Parse argument vector to prepare a capture stop query
  * \param[in]           argc	        Argument counter
- * \param[in]           argv		Argument vector
- * \return 0 on success, else on failure.
+ * \param[in]           argv	        Argument vector
+ * \return 0 on success, \c EINVAL on invalid input.
  */
 
-int cmd_capture_start(int argc, const char **argv)
+static int cmd_capture_stop(int argc, const char **argv)
 {
-	struct dabba_ipc_msg msg;
-	int rc;
+	enum capture_start_option {
+		OPT_CAPTURE_ID,
+		OPT_TCP,
+		OPT_LOCAL,
+		OPT_HELP
+	};
 
-	assert(argc >= 0);
-	assert(argv);
+	int ret;
+	Dabba__ThreadId id = DABBA__THREAD_ID__INIT;
+	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+	ProtobufCService *service;
 
-	memset(&msg, 0, sizeof(msg));
-
-	msg.mtype = 1;
-	msg.msg_body.type = DABBA_CAPTURE_START;
-
-	rc = prepare_capture_start_query(argc, (char **)argv,
-					 msg.msg_body.msg.capture);
-
-	if (rc)
-		return rc;
-
-	/* For now, just one capture request at a time */
-	msg.msg_body.elem_nr = 1;
-
-	return dabba_ipc_msg(&msg);
-}
-
-/**
- * \brief Prepare a command to list current captures.
- * \param[in]           argc	        Argument counter
- * \param[in]           argv		Argument vector
- * \return 0 on success, else on failure.
- */
-
-int cmd_capture_list(int argc, const char **argv)
-{
-	int rc;
-	struct dabba_ipc_msg msg;
-
-	assert(argc >= 0);
-	assert(argv);
-
-	memset(&msg, 0, sizeof(msg));
-
-	msg.mtype = 1;
-	msg.msg_body.type = DABBA_CAPTURE_LIST;
-
-	display_capture_list_msg_header();
-
-	do {
-		msg.msg_body.offset += msg.msg_body.elem_nr;
-		msg.msg_body.elem_nr = 0;
-
-		rc = dabba_ipc_msg(&msg);
-
-		if (rc)
-			break;
-
-		display_capture_list(msg.msg_body.msg.capture,
-				     msg.msg_body.elem_nr);
-	} while (msg.msg_body.elem_nr);
-
-	return rc;
-}
-
-static struct option *capture_stop_options_get(void)
-{
-	static struct option capture_stop_option[] = {
+	static struct option capture_option[] = {
 		{"id", required_argument, NULL, OPT_CAPTURE_ID},
+		{"tcp", optional_argument, NULL, OPT_TCP},
+		{"local", optional_argument, NULL, OPT_LOCAL},
+		{"help", no_argument, NULL, OPT_HELP},
 		{NULL, 0, NULL, 0},
 	};
 
-	return capture_stop_option;
-}
+	/* HACK: getopt*() start to parse options at argv[1] */
+	argc++;
+	argv--;
 
-static int prepare_capture_stop_query(int argc, char **argv,
-				      struct dabba_capture *capture_msg)
-{
-	int ret, rc = 0;
-
-	assert(capture_msg);
-
+	/* parse capture options */
 	while ((ret =
-		getopt_long_only(argc, argv, "", capture_stop_options_get(),
+		getopt_long_only(argc, (char **)argv, "", capture_option,
 				 NULL)) != EOF) {
 		switch (ret) {
+		case OPT_TCP:
+			server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
+			server_id = DABBA_RPC_DEFAULT_TCP_SERVER_NAME;
+
+			if (optarg)
+				server_id = optarg;
+			break;
+		case OPT_LOCAL:
+			server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+			server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+
+			if (optarg)
+				server_id = optarg;
+			break;
 		case OPT_CAPTURE_ID:
-			capture_msg->id = strtoull(optarg, NULL, 10);
+			id.id = strtoull(optarg, NULL, 10);
 			break;
+		case OPT_HELP:
 		default:
-			show_usage(capture_stop_options_get());
-			rc = -1;
-			break;
+			show_usage(capture_option);
+			return -1;
 		}
 	}
 
-	return rc;
+	service = dabba_rpc_client_connect(server_id, server_type);
+
+	/* Check error reporting */
+	return service ? rpc_capture_stop(service, &id) : EINVAL;
 }
 
 /**
- * \brief Prepare a command to stop a active capture.
+ * \brief Parse argument vector to prepare a capture list get query
  * \param[in]           argc	        Argument counter
- * \param[in]           argv		Argument vector
- * \return 0 on success, else on failure.
+ * \param[in]           argv	        Argument vector
+ * \return 0 on success, \c EINVAL on invalid input.
  */
-
-int cmd_capture_stop(int argc, const char **argv)
+static int cmd_capture_get(int argc, const char **argv)
 {
-	struct dabba_ipc_msg msg;
-	int rc;
+	enum capture_option {
+		/* option */
+		OPT_CAPTURE_ID,
+		OPT_TCP,
+		OPT_LOCAL,
+		OPT_HELP
+	};
 
-	assert(argc >= 0);
-	assert(argv);
+	const struct option capture_option[] = {
+		{"id", required_argument, NULL, OPT_CAPTURE_ID},
+		{"tcp", optional_argument, NULL, OPT_TCP},
+		{"local", optional_argument, NULL, OPT_LOCAL},
+		{"help", no_argument, NULL, OPT_HELP},
+		{NULL, 0, NULL, 0},
+	};
 
-	memset(&msg, 0, sizeof(msg));
+	int ret, rc = 0;
+	Dabba__ThreadIdList id_list = DABBA__THREAD_ID_LIST__INIT;
+	Dabba__ThreadId **idpp;
+	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+	ProtobufCService *service;
 
-	msg.mtype = 1;
-	msg.msg_body.type = DABBA_CAPTURE_STOP;
+	while ((ret =
+		getopt_long_only(argc, (char **)argv, "", capture_option,
+				 NULL)) != EOF) {
+		switch (ret) {
+		case OPT_TCP:
+			server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
+			server_id = DABBA_RPC_DEFAULT_TCP_SERVER_NAME;
 
-	rc = prepare_capture_stop_query(argc, (char **)argv,
-					msg.msg_body.msg.capture);
+			if (optarg)
+				server_id = optarg;
+			break;
+		case OPT_LOCAL:
+			server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+			server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
 
-	if (rc)
-		return rc;
+			if (optarg)
+				server_id = optarg;
+			break;
+		case OPT_CAPTURE_ID:
+			idpp =
+			    realloc(id_list.list,
+				    sizeof(*id_list.list) * (id_list.n_list +
+							     1));
 
-	/* For now, just one capture request at a time */
-	msg.msg_body.elem_nr = 1;
+			if (!idpp)
+				return ENOMEM;
 
-	return dabba_ipc_msg(&msg);
+			id_list.list = idpp;
+
+			dabba__thread_id__init(id_list.list[id_list.n_list]);
+
+			id_list.list[id_list.n_list]->id =
+			    strtoull(optarg, NULL, 10);
+			id_list.n_list++;
+
+			break;
+		case OPT_HELP:
+		default:
+			show_usage(capture_option);
+			rc = -1;
+			goto out;
+		}
+	}
+
+	service = dabba_rpc_client_connect(server_id, server_type);
+
+	if (service)
+		rc = rpc_capture_get(service, &id_list);
+	else
+		rc = EINVAL;
+
+ out:
+	free(id_list.list);
+
+	/* Check error reporting */
+
+	return rc;
 }
 
 /**
@@ -398,21 +536,11 @@ int cmd_capture_stop(int argc, const char **argv)
 
 int cmd_capture(int argc, const char **argv)
 {
-	const char *cmd = argv[0];
-	size_t i;
-	static struct cmd_struct capture_commands[] = {
-		{"list", cmd_capture_list},
+	static const struct cmd_struct cmd[] = {
 		{"start", cmd_capture_start},
 		{"stop", cmd_capture_stop},
+		{"get", cmd_capture_get},
 	};
 
-	if (argc == 0 || cmd == NULL || !strcmp(cmd, "--help"))
-		cmd = "help";
-
-	for (i = 0; i < ARRAY_SIZE(capture_commands); i++) {
-		if (!strcmp(capture_commands[i].cmd, cmd))
-			return run_builtin(&capture_commands[i], argc, argv);
-	}
-
-	return ENOSYS;
+	return cmd_run_builtin(cmd, ARRAY_SIZE(cmd), argc, argv);
 }

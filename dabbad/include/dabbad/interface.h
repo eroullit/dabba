@@ -24,14 +24,12 @@
 #ifndef INTERFACE_H
 #define	INTERFACE_H
 
-#include <dabbad/dabbad.h>
+struct nl_cache;
+struct nl_sock;
+struct rtnl_link;
 
-int dabbad_interface_list_get(struct dabba_ipc_msg *msg);
-int dabbad_interface_driver_get(struct dabba_ipc_msg *msg);
-int dabbad_interface_settings_get(struct dabba_ipc_msg *msg);
-int dabbad_interface_pause_get(struct dabba_ipc_msg *msg);
-int dabbad_interface_coalesce_get(struct dabba_ipc_msg *msg);
-int dabbad_interface_offload_get(struct dabba_ipc_msg *msg);
-int dabbad_interface_modify(struct dabba_ipc_msg *msg);
+struct nl_cache *link_cache_alloc(struct nl_sock **sock);
+void link_cache_destroy(struct nl_sock *sock, struct nl_cache *cache);
+void link_destroy(struct rtnl_link *link);
 
 #endif				/* INTERFACE_H */

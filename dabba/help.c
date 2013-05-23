@@ -1,6 +1,6 @@
 /**
  * \file help.c
- * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2012
+ * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (C) 2012
  * \date 2012
  */
 
@@ -33,17 +33,23 @@
 #include <errno.h>
 #include <getopt.h>
 #include <assert.h>
+#include <limits.h>
 #include <libdabba/macros.h>
 
 static const char dabba_usage_string[] =
-    "dabba [--help] [--version] <command> [<args>]\n";
+    "dabba [--help] [--version] <command> [<subcommand>] <action> [<args>]\n";
 static const char dabba_more_info_string[] =
-    "See 'dabba help <command>' for more info on a specific command.";
+    "See 'dabba help <command> [<subcommand>]' for more specific information.";
 
 struct cmdname_help {
 	char name[16];
 	char help[80];
 };
+
+/**
+ * \brief print option list to \c stdout
+ * \param[in]           opt	        Pointer to option array
+ */
 
 void show_usage(const struct option *opt)
 {
@@ -51,31 +57,45 @@ void show_usage(const struct option *opt)
 
 	printf("%s", dabba_usage_string);
 
-	if (opt != NULL) {
-		while (opt->name != NULL) {
-			printf("  --%s", opt->name);
-			if (opt->has_arg == required_argument)
-				printf(" <arg>\n");
-			else if (opt->has_arg == optional_argument)
-				printf(" [arg]\n");
-			else
-				printf("\n");
-			opt++;
-		}
+	while (opt->name != NULL) {
+		printf("  --%s", opt->name);
+		if (opt->has_arg == required_argument)
+			printf(" <arg>\n");
+		else if (opt->has_arg == optional_argument)
+			printf(" [arg]\n");
+		else
+			printf("\n");
+		opt++;
 	}
 }
 
-static inline void mput_char(char c, uint32_t num)
+/**
+ * \internal
+ * \brief add some indenting on \c stdout
+ * \param[in]           c	        Character to indent
+ * \param[in]           num	        Indent level
+ */
+
+static inline void mput_char(const char c, uint32_t num)
 {
 	while (num--)
 		putchar(c);
 }
+
+/**
+ * \brief print on \c stdout that the invoked command is unknown
+ * \param[in]           cmd	        Pointer to invoked command string
+ */
 
 void help_unknown_cmd(const char *const cmd)
 {
 	assert(cmd);
 	printf("'%s' is not a dabba command. See 'dabba --help'.\n", cmd);
 }
+
+/**
+ * \brief list on \c stdout the commonly used commands.
+ */
 
 static void list_common_cmds_help(void)
 {
@@ -112,20 +132,35 @@ static void list_common_cmds_help(void)
 
 int cmd_help(int argc, const char **argv)
 {
-	char help_name[32];
-	int rc = 0;
+	char help_name[NAME_MAX];
+	int rc = 0, a;
+	size_t offset;
 
 	if (argc < 1 || !argv[0]) {
 		printf("usage: %s\n\n", dabba_usage_string);
 		list_common_cmds_help();
 		printf("\n%s\n", dabba_more_info_string);
 	} else {
-		snprintf(help_name, sizeof(help_name), "dabba-%s", argv[0]);
-		rc = execlp("man", "man", help_name, (char *)NULL);
+		offset = snprintf(help_name, sizeof(help_name), "dabba");
+
+		for (a = 0; a < argc; a++)
+			offset +=
+			    snprintf(&help_name[offset],
+				     sizeof(help_name) - offset, "-%s",
+				     argv[a]);
+
+		rc = execlp("man", "man", help_name, NULL);
 	}
 
 	return rc ? errno : rc;
 }
+
+/**
+ * \brief Print tool version number to \c stdout
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv		Argument vector
+ * \return Always returns zero.
+ */
 
 int cmd_version(int argc, const char **argv)
 {

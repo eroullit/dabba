@@ -1,3 +1,9 @@
+/**
+ * \file thread.h
+ * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2012
+ * \date 2012
+ */
+
 /* __LICENSE_HEADER_BEGIN__ */
 
 /*
@@ -28,6 +34,11 @@
 #include <sched.h>
 #include <pthread.h>
 #include <sys/queue.h>
+#include <libdabba-rpc/rpc.h>
+
+/**
+ * \brief Supported thread types
+ */
 
 enum packet_thread_type {
 	CAPTURE_THREAD
@@ -61,8 +72,18 @@ int dabbad_thread_sched_affinity_get(struct packet_thread *pkt_thread,
 int dabbad_thread_start(struct packet_thread *pkt_thread,
 			void *(*func) (void *arg), void *arg);
 int dabbad_thread_stop(struct packet_thread *pkt_thread);
-int dabbad_thread_list(struct dabba_ipc_msg *msg);
-int dabbad_thread_modify(struct dabba_ipc_msg *msg);
-int dabbad_thread_cap_list(struct dabba_ipc_msg *msg);
+
+void dabbad_thread_modify(Dabba__DabbaService_Service * service,
+			  const Dabba__Thread * thread,
+			  Dabba__ErrorCode_Closure closure, void *closure_data);
+
+void dabbad_thread_get(Dabba__DabbaService_Service * service,
+		       const Dabba__ThreadIdList * id_listp,
+		       Dabba__ThreadList_Closure closure, void *closure_data);
+
+void dabbad_thread_capabilities_get(Dabba__DabbaService_Service * service,
+				    const Dabba__Dummy * dummy,
+				    Dabba__ThreadCapabilitiesList_Closure
+				    closure, void *closure_data);
 
 #endif				/* DABBAD_THREAD_H */

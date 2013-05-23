@@ -21,13 +21,9 @@
 
 /* __LICENSE_HEADER_END__ */
 
-#ifndef IPC_H
-#define	IPC_H
+#ifndef INTERFACE_PAUSE_H
+#define	INTERFACE_PAUSE_H
 
-#include <dabbad/dabbad.h>
+int cmd_interface_pause(int argc, const char **argv);
 
-int dabbad_ipc_msg_create(void);
-int dabbad_ipc_msg_destroy(void);
-int dabbad_ipc_msg_poll(const int qid);
-
-#endif				/* IPC_H */
+#endif				/* INTERFACE_PAUSE_H */

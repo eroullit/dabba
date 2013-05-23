@@ -27,13 +27,6 @@ get_capture_thread_nr()
     "$PYTHON_PATH" -c "import yaml; y = yaml.load(open('$result_file')); print len(y['captures']);"
 }
 
-get_capture_thread_id()
-{
-    local thread_nr=$1
-    local result_file=$2
-    "$PYTHON_PATH" -c "import yaml; y = yaml.load(open('$result_file')); print y['captures'][$thread_nr]['id'];"
-}
-
 check_capture_thread_nr()
 {
     local expected_thread_nr=$1
@@ -59,29 +52,29 @@ test_expect_success "Check 'dabba capture' help output" "
     EOF
 "
 
-test_expect_success "Start capture thread on an invalid interface (too long)" "
+test_expect_failure "Start capture thread on an invalid interface (too long)" "
     test_expect_code 22 '$DABBA_PATH'/dabba capture start --interface lorem-ipsum-dolor-sit --pcap test.pcap --frame-number $frame_nr
 "
 
-test_expect_success "Start capture thread on an invalid interface (does not exist)" "
+test_expect_failure "Start capture thread on an invalid interface (does not exist)" "
     test_expect_code 19 '$DABBA_PATH'/dabba capture start --interface lorem-ipsum --pcap test.pcap --frame-number $frame_nr
 "
 
-test_expect_success "Start capture thread with a missing interface" "
+test_expect_failure "Start capture thread with a missing interface" "
     test_expect_code 22 '$DABBA_PATH'/dabba capture start --pcap test.pcap --frame-number $frame_nr
 "
 
-test_expect_success "Start capture thread with a missing pcap path" "
+test_expect_failure "Start capture thread with a missing pcap path" "
     test_expect_code 22 '$DABBA_PATH'/dabba capture start --interface any --frame-number $frame_nr
 "
 
-test_expect_success "Invoke capture command w/o any parameters" "
+test_expect_failure "Invoke capture command w/o any parameters" "
     test_expect_code 38 '$DABBA_PATH'/dabba capture
 "
 
 test_expect_success "Start capture thread with a default frame number" "
     '$DABBA_PATH'/dabba capture start --interface any --pcap test.pcap &&
-    '$DABBA_PATH'/dabba capture list > result
+    '$DABBA_PATH'/dabba capture get > result
 "
 
 test_expect_success PYTHON_YAML "Parse capture YAML output" "
@@ -100,7 +93,7 @@ test_expect_success PYTHON_YAML "Check thread default capture frame number ($def
 
 test_expect_success PYTHON_YAML "Stop capture thread with a default frame number" "
     '$DABBA_PATH'/dabba capture stop --id '$(cat result_id)' &&
-    '$DABBA_PATH'/dabba capture list > after &&
+    '$DABBA_PATH'/dabba capture get > after &&
     test_must_fail grep -wq -f result_id after
 "
 
@@ -108,7 +101,7 @@ for i in `seq 0 9`
 do
         test_expect_success "Start capture thread #$(($i+1)) on loopback" "
             '$DABBA_PATH'/dabba capture start --interface any --pcap test$i.pcap --frame-number $frame_nr &&
-            '$DABBA_PATH'/dabba capture list > result
+            '$DABBA_PATH'/dabba capture get > result
         "
 
         test_expect_success PYTHON_YAML "Parse capture YAML output" "
@@ -160,7 +153,7 @@ do
 
         test_expect_success PYTHON_YAML "Stop capture thread #$(($i+1)) on loopback" "
             '$DABBA_PATH'/dabba capture stop --id '$(cat result_id)' &&
-            '$DABBA_PATH'/dabba capture list > after &&
+            '$DABBA_PATH'/dabba capture get > after &&
             test_must_fail grep -wq -f result_id after
         "
 done

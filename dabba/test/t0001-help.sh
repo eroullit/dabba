@@ -22,7 +22,7 @@ test_description='Test dabba help output'
 . ./dabba-test-lib.sh
 
 cat > expect <<EOF
-usage: dabba [--help] [--version] <command> [<args>]
+usage: dabba [--help] [--version] <command> [<subcommand>] <action> [<args>]
 
 
 The most commonly used dabba commands are:
@@ -30,7 +30,7 @@ The most commonly used dabba commands are:
    thread      perform a thread related command
    capture     capture live traffic from an interface
 
-See 'dabba help <command>' for more info on a specific command.
+See 'dabba help <command> [<subcommand>]' for more specific information.
 EOF
 
 test_expect_success "Check dabba help output" "

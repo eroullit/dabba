@@ -21,14 +21,9 @@
 
 /* __LICENSE_HEADER_END__ */
 
-#ifndef IPC_H
-#define	IPC_H
+#ifndef INTERFACE_SETTINGS_H
+#define	INTERFACE_SETTINGS_H
 
-#include <dabbad/dabbad.h>
+int cmd_interface_settings(int argc, const char **argv);
 
-int dabba_ipc_msg(struct dabba_ipc_msg *msg);
-int dabba_ipc_fetch_all(struct dabba_ipc_msg *msg,
-			void (*msg_cb) (const struct dabba_ipc_msg *
-					const msg));
-
-#endif				/* IPC_H */
+#endif				/* INTERFACE_SETTINGS_H */

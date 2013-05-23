@@ -1,6 +1,6 @@
 /**
  * \file thread.c
- * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2012
+ * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (C) 2012
  * \date 2012
  */
 
@@ -106,6 +106,18 @@ For instance: 0,5,7,9-11.
 Reference a thread by its unique thread id.
 The thread id can be fetched using "dabba thread list".
 
+=item --tcp[=<hostname>:<port>]
+
+Query a running instance of dabbad using a TCP socket (default: localhost:55994)
+
+=item --local[=<path>]
+
+Query a running instance of dabbad using a Unix domain socket (default: /tmp/dabba)
+
+=item --help
+
+Prints the help message on the terminal
+
 =back
 
 =head1 EXAMPLES
@@ -158,7 +170,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 
 =over
 
-=item Copyright © 2012 Emmanuel Roullit.
+=item Copyright (C) 2012 Emmanuel Roullit.
 
 =item License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.
 
@@ -182,446 +194,297 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <errno.h>
 #include <inttypes.h>
 #include <assert.h>
-#include <sched.h>
 #include <getopt.h>
-#include <sys/resource.h>
 
 #include <libdabba/macros.h>
-#include <dabbad/dabbad.h>
 #include <dabbad/thread.h>
-#include <dabba/dabba.h>
-#include <dabba/ipc.h>
+#include <dabba/thread-capabilities.h>
+#include <dabba/rpc.h>
+#include <dabba/cli.h>
 #include <dabba/help.h>
-
-enum thread_modify_option {
-	OPT_THREAD_ID,
-	OPT_THREAD_SCHED_PRIO,
-	OPT_THREAD_SCHED_POLICY,
-	OPT_THREAD_CPU_AFFINITY
-};
-
-static struct sched_policy_name_mapping {
-	const char key[8];
-	int value;
-} sched_policy_mapping[] = {
-	{
-	.key = "rr",.value = SCHED_RR}, {
-	.key = "fifo",.value = SCHED_FIFO}, {
-	.key = "other",.value = SCHED_OTHER}
-};
-
-static struct thread_name_mapping {
-	const char key[8];
-	int value;
-} thread_name_mapping[] = {
-	{
-	.key = "capture",.value = CAPTURE_THREAD}
-};
+#include <dabba/dabba.h>
 
 /**
- * \brief Get the policy value out of the policy name.
- * \param[in]           policy_name	Policy name string
- * \return Related policy value
+ * \internal
+ * \brief Protobuf closure to print thread settings list in YAML
+ * \param[in]           result	        Pointer to thread settings list
+ * \param[in]           closure_data	Pointer to protobuf closure data
  */
 
-int sched_policy_value_get(const char *const policy_name)
+static void thread_print(const Dabba__ThreadList * result, void *closure_data)
 {
+	const Dabba__Thread *thread;
 	size_t a;
+	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
 
-	assert(policy_name);
+	assert(closure_data);
 
-	for (a = 0; a < ARRAY_SIZE(sched_policy_mapping) - 1; a++)
-		if (!strcmp(policy_name, sched_policy_mapping[a].key))
-			break;
+	rpc_header_print("threads");
 
-	return sched_policy_mapping[a].value;
-}
-
-/**
- * \brief Get the policy name out of the policy value.
- * \param[in]           policy_name	Policy value
- * \return Related policy name
- */
-
-const char *sched_policy_key_get(const int policy_value)
-{
-	size_t a;
-
-	for (a = 0; a < ARRAY_SIZE(sched_policy_mapping) - 1; a++)
-		if (policy_value == sched_policy_mapping[a].value)
-			break;
-
-	return sched_policy_mapping[a].key;
-}
-
-/**
- * \brief Get the thread name out of the thread type value
- * \param[in]           type	Thread type value
- * \return Thread name string
- */
-
-const char *thread_key_get(const int type)
-{
-	size_t a, max = ARRAY_SIZE(thread_name_mapping);
-
-	for (a = 0; a < max; a++)
-		if (type == thread_name_mapping[a].value)
-			break;
-
-	return a < max ? thread_name_mapping[a].key : "unknown";
-}
-
-/**
- * \brief Get the default used thread scheduling policy
- * \return \c SCHED_OTHER
- */
-
-int sched_policy_default_get(void)
-{
-	return SCHED_OTHER;
-}
-
-/**
- * \brief Get the default used thread scheduling priority
- * \return scheduling priority 0. Default value for \c SCHED_OTHER
- */
-
-int sched_prio_default_get(void)
-{
-	return 0;
-}
-
-/**
- * \brief Get the default used CPU affinity
- * \param[in]           mask		Output CPU set pointer
- * \return All set CPU set
- */
-
-void sched_cpu_affinty_default_get(cpu_set_t * mask)
-{
-	size_t a;
-
-	for (a = 0; a < CPU_SETSIZE; a++)
-		CPU_SET(a, mask);
-}
-
-static char *nexttoken(char *q, int sep)
-{
-	if (q)
-		q = strchr(q, sep);
-	if (q)
-		q++;
-	return q;
-}
-
-/**
- * \brief Parse a CPU number list to a CPU set.
- * \param[in]           str	        Input CPU list
- * \param[in]           mask		Output CPU set pointer
- * \return 0 on success, -EINVAL on failure.
- */
-
-static int str_to_cpu_affinity(char *str, cpu_set_t * mask)
-{
-	char *p, *q;
-
-	assert(str);
-	assert(mask);
-
-	q = str;
-
-	CPU_ZERO(mask);
-
-	while (p = q, q = nexttoken(q, ','), p) {
-		unsigned int a;	/* Beginning of range */
-		unsigned int b;	/* End of range */
-		unsigned int s;	/* Stride */
-		char *c1, *c2;
-
-		if (sscanf(p, "%u", &a) < 1)
-			return -EINVAL;
-
-		b = a;
-		s = 1;
-
-		c1 = nexttoken(p, '-');
-		c2 = nexttoken(p, ',');
-
-		if (c1 != NULL && (c2 == NULL || c1 < c2)) {
-			if (sscanf(c1, "%u", &b) < 1)
-				return -EINVAL;
-
-			c1 = nexttoken(c1, ':');
-
-			if (c1 != NULL && (c2 == NULL || c1 < c2))
-				if (sscanf(c1, "%u", &s) < 1)
-					return -EINVAL;
-		}
-
-		if (!(a <= b))
-			return -EINVAL;
-
-		while (a <= b) {
-			CPU_SET(a, mask);
-			a += s;
-		}
-	}
-
-	return 0;
-}
-
-/**
- * \brief Print a CPU number list from a CPU set.
- * \param[in]           cpu	        Pointer to a CPU set
- */
-
-static void display_thread_cpu_affinity(const cpu_set_t * const cpu)
-{
-	int trail_sep = 0;
-	size_t i, j, run = 0;
-
-	assert(cpu);
-
-	for (i = 0; i < CPU_SETSIZE; i++)
-		if (CPU_ISSET(i, cpu)) {
-			for (j = i + 1; j < CPU_SETSIZE; j++) {
-				if (CPU_ISSET(j, cpu))
-					run++;
-				else
-					break;
-			}
-
-			/*
-			 * Add a trailing comma at new entries but the first
-			 * to get an cpu list like: 0,1-4,5,7
-			 */
-
-			if (trail_sep) {
-				printf(",");
-				trail_sep = 1;
-			}
-
-			if (!run)
-				printf("%zu", i);
-			else if (run == 1) {
-				printf("%zu,%zu", i, i + 1);
-				i++;
-			} else {
-				printf("%zu-%zu", i, i + run);
-				i += run;
-			}
-		}
-}
-
-static void display_thread_list_header(void)
-{
-	printf("---\n");
-	printf("  threads:\n");
-}
-
-static void display_thread_list(const struct dabba_thread *const ifconf_msg,
-				const size_t elem_nr)
-{
-	size_t a;
-
-	assert(ifconf_msg);
-	assert(elem_nr <= DABBA_THREAD_MAX_SIZE);
-
-	for (a = 0; a < elem_nr; a++) {
-		printf("    - id: %" PRIu64 "\n", (uint64_t) ifconf_msg[a].id);
-		printf("      type: %s\n", thread_key_get(ifconf_msg[a].type));
+	for (a = 0; result && a < result->n_list; a++) {
+		thread = result->list[a];
+		printf("    - id: %" PRIu64 "\n", thread->id->id);
+		printf("    ");
+		__rpc_error_code_print(thread->status->code);
+		printf("      type: %s\n", thread_type2str(thread->type));
 		printf("      scheduling policy: %s\n",
-		       sched_policy_key_get(ifconf_msg[a].sched_policy));
+		       sched_policy2str(thread->sched_policy));
 		printf("      scheduling priority: %i\n",
-		       ifconf_msg[a].sched_prio);
-		printf("      cpu affinity: ");
-		display_thread_cpu_affinity(&ifconf_msg[a].cpu);
-		printf("\n");
+		       thread->sched_priority);
+		printf("      cpu affinity: %s\n", thread->cpu_set);
+		/* TODO map priority/policy protobuf enums to string */
 	}
+
+	*status = 1;
 }
 
-static void display_thread_capabilities_header(void)
+/**
+ * \internal
+ * \brief Invoke thread settings get RPC
+ * \param[in]           service	        Pointer to protobuf service structure
+ * \param[in]           id_list         Pointer to thread id to fetch
+ * \return Always returns 0.
+ * \note An empty id list will query the status of all available thread.
+ */
+
+static int rpc_thread_get(ProtobufCService * service,
+			  const Dabba__ThreadIdList * id_list)
 {
-	printf("---\n");
-	printf("  thread capabilities:\n");
+	protobuf_c_boolean is_done = 0;
+
+	assert(service);
+	assert(id_list);
+
+	dabba__dabba_service__thread_get(service, id_list,
+					 thread_print, &is_done);
+
+	dabba_rpc_call_is_done(&is_done);
+
+	return 0;
 }
 
-static void display_thread_capabilities(const struct dabba_thread_cap
-					*const thread_cap, const size_t elem_nr)
-{
-	size_t a;
-	assert(thread_cap);
+/**
+ * \internal
+ * \brief Invoke thread settings modify RPC
+ * \param[in]           service	        Pointer to protobuf service structure
+ * \param[in]           status          Pointer to thread new status settings
+ * \return Always returns 0.
+ */
 
-	for (a = 0; a < elem_nr; a++) {
-		printf("    %s:\n", sched_policy_key_get(thread_cap[a].policy));
-		printf("        scheduling priority:\n");
-		printf("            minimum: %i\n", thread_cap[a].prio_min);
-		printf("            maximum: %i\n", thread_cap[a].prio_max);
-	}
+static int rpc_thread_modify(ProtobufCService * service,
+			     const Dabba__Thread * thread)
+{
+	protobuf_c_boolean is_done = 0;
+
+	assert(service);
+	assert(thread);
+
+	dabba__dabba_service__thread_modify(service, thread,
+					    rpc_error_code_print, &is_done);
+
+	dabba_rpc_call_is_done(&is_done);
+
+	return 0;
 }
 
-static struct option *thread_modify_options_get(void)
+/**
+ * \brief Parse argument vector to prepare a thread list get query
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv	        Argument vector
+ * \return 0 on success, \c EINVAL on invalid input.
+ */
+
+static int cmd_thread_get(int argc, const char **argv)
 {
-	static struct option thread_modify_option[] = {
+	enum thread_option {
+		/* option */
+		OPT_THREAD_ID,
+		OPT_TCP,
+		OPT_LOCAL,
+		OPT_HELP
+	};
+
+	const struct option thread_option[] = {
 		{"id", required_argument, NULL, OPT_THREAD_ID},
-		{"sched-prio", required_argument, NULL, OPT_THREAD_SCHED_PRIO},
+		{"tcp", optional_argument, NULL, OPT_TCP},
+		{"local", optional_argument, NULL, OPT_LOCAL},
+		{"help", no_argument, NULL, OPT_HELP},
+		{NULL, 0, NULL, 0},
+	};
+
+	int ret, rc = 0;
+	Dabba__ThreadIdList id_list = DABBA__THREAD_ID_LIST__INIT;
+	Dabba__ThreadId **idpp;
+	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+	ProtobufCService *service;
+
+	/* parse options and actions to run */
+	while ((ret =
+		getopt_long_only(argc, (char **)argv, "", thread_option,
+				 NULL)) != EOF) {
+		switch (ret) {
+		case OPT_TCP:
+			server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
+			server_id = DABBA_RPC_DEFAULT_TCP_SERVER_NAME;
+
+			if (optarg)
+				server_id = optarg;
+			break;
+		case OPT_LOCAL:
+			server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+			server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+
+			if (optarg)
+				server_id = optarg;
+			break;
+		case OPT_THREAD_ID:
+			idpp =
+			    realloc(id_list.list,
+				    sizeof(*id_list.list) * (id_list.n_list +
+							     1));
+
+			if (!idpp)
+				return ENOMEM;
+
+			id_list.list = idpp;
+
+			dabba__thread_id__init(id_list.list[id_list.n_list]);
+
+			id_list.list[id_list.n_list]->id =
+			    strtoull(optarg, NULL, 10);
+			id_list.n_list++;
+
+			break;
+		case OPT_HELP:
+		default:
+			show_usage(thread_option);
+			rc = -1;
+			goto out;
+		}
+	}
+
+	service = dabba_rpc_client_connect(server_id, server_type);
+
+	if (service)
+		rc = rpc_thread_get(service, &id_list);
+	else
+		rc = EINVAL;
+
+ out:
+	free(id_list.list);
+
+	/* Check error reporting */
+
+	return rc;
+}
+
+/**
+ * \brief Parse argument vector to prepare a thread modify query
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv	        Argument vector
+ * \return 0 on success, \c EINVAL on invalid input.
+ */
+
+static int cmd_thread_modify(int argc, const char **argv)
+{
+	enum thread_option {
+		/* action */
+		OPT_THREAD_SETTINGS,
+		/* option */
+		OPT_THREAD_SCHED_PRIORITY,
+		OPT_THREAD_SCHED_POLICY,
+		OPT_THREAD_CPU_AFFINITY,
+		OPT_THREAD_ID,
+		OPT_TCP,
+		OPT_LOCAL,
+		OPT_HELP
+	};
+
+	const struct option thread_option[] = {
+		{"id", required_argument, NULL, OPT_THREAD_ID},
+		{"settings", no_argument, NULL, OPT_THREAD_SETTINGS},
+		{"sched-prio", required_argument, NULL,
+		 OPT_THREAD_SCHED_PRIORITY},
 		{"sched-policy", required_argument, NULL,
 		 OPT_THREAD_SCHED_POLICY},
 		{"cpu-affinity", required_argument, NULL,
 		 OPT_THREAD_CPU_AFFINITY},
+		{"tcp", optional_argument, NULL, OPT_TCP},
+		{"local", optional_argument, NULL, OPT_LOCAL},
+		{"help", no_argument, NULL, OPT_HELP},
 		{NULL, 0, NULL, 0},
 	};
 
-	return thread_modify_option;
-}
-
-static int prepare_thread_modify_query(int argc, char **argv,
-				       struct dabba_thread *thread_msg)
-{
 	int ret, rc = 0;
+	Dabba__Thread thread = DABBA__THREAD__INIT;
+	Dabba__ErrorCode err = DABBA__ERROR_CODE__INIT;
+	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+	ProtobufCService *service;
 
-	assert(thread_msg);
+	/* HACK: getopt*() start to parse options at argv[1] */
+	argc++;
+	argv--;
 
-	thread_msg->sched_prio = sched_prio_default_get();
-	thread_msg->sched_policy = sched_policy_default_get();
-	sched_cpu_affinty_default_get(&thread_msg->cpu);
-
+	/* parse options and actions to run */
 	while ((ret =
-		getopt_long_only(argc, argv, "", thread_modify_options_get(),
+		getopt_long_only(argc, (char **)argv, "", thread_option,
 				 NULL)) != EOF) {
 		switch (ret) {
-		case OPT_THREAD_ID:
-			thread_msg->id = strtoull(optarg, NULL, 10);
+		case OPT_TCP:
+			server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
+			server_id = DABBA_RPC_DEFAULT_TCP_SERVER_NAME;
+
+			if (optarg)
+				server_id = optarg;
 			break;
-		case OPT_THREAD_SCHED_PRIO:
-			thread_msg->sched_prio = strtol(optarg, NULL, 10);
-			thread_msg->usage_flags |= USE_SCHED_PRIO;
+		case OPT_LOCAL:
+			server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+			server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+
+			if (optarg)
+				server_id = optarg;
+			break;
+		case OPT_THREAD_ID:
+			thread.id = malloc(sizeof(*thread.id));
+			if (!thread.id)
+				return ENOMEM;
+
+			dabba__thread_id__init(thread.id);
+			thread.id->id = strtoull(optarg, NULL, 10);
 			break;
 		case OPT_THREAD_SCHED_POLICY:
-			thread_msg->sched_policy =
-			    sched_policy_value_get(optarg);
-			thread_msg->usage_flags |= USE_SCHED_POLICY;
+			thread.has_sched_policy = 1;
+			thread.sched_policy = str2sched_policy(optarg);
+			break;
+		case OPT_THREAD_SCHED_PRIORITY:
+			thread.has_sched_priority = 1;
+			thread.sched_priority = strtol(optarg, NULL, 10);
 			break;
 		case OPT_THREAD_CPU_AFFINITY:
-			str_to_cpu_affinity(optarg, &thread_msg->cpu);
-			thread_msg->usage_flags |= USE_CPU_MASK;
+			thread.cpu_set = optarg;
 			break;
+		case OPT_HELP:
 		default:
-			show_usage(thread_modify_options_get());
+			show_usage(thread_option);
 			rc = -1;
-			break;
+			goto out;
 		}
 	}
 
+	thread.status = &err;
+
+	service = dabba_rpc_client_connect(server_id, server_type);
+
+	if (!service)
+		return EINVAL;
+
+	rpc_thread_modify(service, &thread);
+ out:
+	free(thread.id);
 	return rc;
-}
 
-/**
- * \brief Request the current list of running threads.
- * \param[in]           argc	        Argument counter
- * \param[in]           argv		Argument vector
- * \return 0 on success, else on failure.
- */
-
-int cmd_thread_list(int argc, const char **argv)
-{
-	int rc;
-	struct dabba_ipc_msg msg;
-
-	assert(argc >= 0);
-	assert(argv);
-
-	memset(&msg, 0, sizeof(msg));
-
-	msg.mtype = 1;
-	msg.msg_body.type = DABBA_THREAD_LIST;
-
-	display_thread_list_header();
-
-	do {
-		msg.msg_body.offset += msg.msg_body.elem_nr;
-		msg.msg_body.elem_nr = 0;
-
-		rc = dabba_ipc_msg(&msg);
-
-		if (rc)
-			break;
-
-		display_thread_list(msg.msg_body.msg.thread,
-				    msg.msg_body.elem_nr);
-	} while (msg.msg_body.elem_nr);
-
-	return rc;
-}
-
-/**
- * \brief Prepare a command to modify scheduling paramters of a specific thread.
- * \param[in]           argc	        Argument counter
- * \param[in]           argv		Argument vector
- * \return 0 on success, else on failure.
- */
-
-int cmd_thread_modify(int argc, const char **argv)
-{
-	int rc;
-	struct dabba_ipc_msg msg;
-
-	assert(argc >= 0);
-	assert(argv);
-
-	memset(&msg, 0, sizeof(msg));
-
-	msg.mtype = 1;
-	msg.msg_body.type = DABBA_THREAD_MODIFY;
-
-	rc = prepare_thread_modify_query(argc, (char **)argv,
-					 msg.msg_body.msg.thread);
-
-	if (rc)
-		return rc;
-
-	/* For now, just one thread request at a time */
-	msg.msg_body.elem_nr = 1;
-
-	return dabba_ipc_msg(&msg);
-}
-
-/**
- * \brief Prepare a command to list scheduling capabilities.
- * \param[in]           argc	        Argument counter
- * \param[in]           argv		Argument vector
- * \return 0 on success, else on failure.
- */
-
-int cmd_thread_capabilities(int argc, const char **argv)
-{
-	int rc;
-	struct dabba_ipc_msg msg;
-
-	assert(argc >= 0);
-	assert(argv);
-
-	memset(&msg, 0, sizeof(msg));
-
-	msg.mtype = 1;
-	msg.msg_body.type = DABBA_THREAD_CAP_LIST;
-
-	display_thread_capabilities_header();
-
-	do {
-		msg.msg_body.offset += msg.msg_body.elem_nr;
-		msg.msg_body.elem_nr = 0;
-
-		rc = dabba_ipc_msg(&msg);
-
-		if (rc)
-			break;
-
-		display_thread_capabilities(msg.msg_body.msg.thread_cap,
-					    msg.msg_body.elem_nr);
-	} while (msg.msg_body.elem_nr);
-
-	return rc;
 }
 
 /**
@@ -637,21 +500,11 @@ int cmd_thread_capabilities(int argc, const char **argv)
 
 int cmd_thread(int argc, const char **argv)
 {
-	const char *cmd = argv[0];
-	size_t i;
-	static struct cmd_struct thread_commands[] = {
-		{"modify", cmd_thread_modify},
-		{"list", cmd_thread_list},
+	static const struct cmd_struct cmd[] = {
 		{"capabilities", cmd_thread_capabilities},
+		{"get", cmd_thread_get},
+		{"modify", cmd_thread_modify}
 	};
 
-	if (argc == 0 || cmd == NULL || !strcmp(cmd, "--help"))
-		cmd = "help";
-
-	for (i = 0; i < ARRAY_SIZE(thread_commands); i++) {
-		if (!strcmp(thread_commands[i].cmd, cmd))
-			return run_builtin(&thread_commands[i], argc, argv);
-	}
-
-	return ENOSYS;
+	return cmd_run_builtin(cmd, ARRAY_SIZE(cmd), argc, argv);
 }

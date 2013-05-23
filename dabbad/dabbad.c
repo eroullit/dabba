@@ -79,7 +79,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 
 =over
 
-=item Copyright © 2012 Emmanuel Roullit.
+=item Copyright (c) 2012 Emmanuel Roullit.
 
 =item License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.
 
@@ -103,61 +103,8 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include <dabbad/ipc.h>
+#include <dabbad/rpc.h>
 #include <dabbad/help.h>
-
-enum dabbad_opts {
-	OPT_DAEMONIZE,
-	OPT_VERSION,
-	OPT_HELP
-};
-
-/**
- * \brief Dabbad options getter
- * \return Dabbad option data structure
- */
-
-const struct option *dabbad_options_get(void)
-{
-	static const struct option dabbad_long_options[] = {
-		{"daemonize", no_argument, NULL, OPT_DAEMONIZE},
-		{"version", no_argument, NULL, OPT_VERSION},
-		{"help", no_argument, NULL, OPT_HELP},
-		{NULL, 0, NULL, 0}
-	};
-
-	return (dabbad_long_options);
-}
-
-/**
- * \internal
- * \brief Create dabbad pidfile
- * \return 0 on success, else on failure.
- *
- * This function creates start time a file containing dabbad process id.
- */
-
-static inline int dabbad_pidfile_create(void)
-{
-	int rc = EIO;
-	int pidfd = -1;
-	char pidstr[8] = { 0 };
-	ssize_t pidstrlen = 0;
-
-	pidfd = creat(DABBAD_PID_FILE, 0600);
-
-	if (pidfd < 0)
-		return errno;
-
-	pidstrlen = snprintf(pidstr, sizeof(pidstr), "%i\n", getpid());
-
-	if (write(pidfd, pidstr, pidstrlen) != pidstrlen) {
-		rc = EIO;
-	}
-
-	close(pidfd);
-	return rc;
-}
 
 /**
  * \brief Dabbad entry point
@@ -172,14 +119,33 @@ static inline int dabbad_pidfile_create(void)
 
 int main(int argc, char **argv)
 {
-	int opt, opt_idx, qid;
+	enum dabbad_opts {
+		OPT_DAEMONIZE,
+		OPT_TCP,
+		OPT_LOCAL,
+		OPT_VERSION,
+		OPT_HELP
+	};
+
+	static const struct option dabbad_long_options[] = {
+		{"daemonize", no_argument, NULL, OPT_DAEMONIZE},
+		{"tcp", optional_argument, NULL, OPT_TCP},
+		{"local", optional_argument, NULL, OPT_LOCAL},
+		{"version", no_argument, NULL, OPT_VERSION},
+		{"help", no_argument, NULL, OPT_HELP},
+		{NULL, 0, NULL, 0}
+	};
+
+	int opt, opt_idx;
 	int daemonize = 0;
+	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 
 	assert(argc);
 	assert(argv);
 
 	while ((opt =
-		getopt_long_only(argc, argv, "", dabbad_options_get(),
+		getopt_long_only(argc, argv, "", dabbad_long_options,
 				 &opt_idx)) != EOF) {
 		switch (opt) {
 		case OPT_DAEMONIZE:
@@ -189,18 +155,28 @@ int main(int argc, char **argv)
 			print_version();
 			return EXIT_SUCCESS;
 			break;
+		case OPT_TCP:
+			server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
+			server_id = DABBA_RPC_DEFAULT_TCP_SERVER_NAME;
+
+			if (optarg)
+				server_id = optarg;
+			break;
+		case OPT_LOCAL:
+			server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+			server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+
+			if (optarg)
+				server_id = optarg;
+			break;
 		case OPT_HELP:
 		default:
-			show_usage(dabbad_options_get());
+			show_usage(dabbad_long_options);
 			return EXIT_SUCCESS;
 			break;
 
 		}
 	}
-
-	assert(dabbad_pidfile_create());
-	dabbad_ipc_msg_destroy();
-	qid = dabbad_ipc_msg_create();
 
 	if (daemonize) {
 		if (daemon(-1, 0)) {
@@ -209,5 +185,5 @@ int main(int argc, char **argv)
 		}
 	}
 
-	return dabbad_ipc_msg_poll(qid);
+	return dabbad_rpc_msg_poll(server_id, server_type);
 }

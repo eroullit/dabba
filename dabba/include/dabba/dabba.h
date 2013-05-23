@@ -39,6 +39,7 @@ struct cmd_struct {
 	int (*fn) (int, const char **);	/**< Command function pointer */
 };
 
-int run_builtin(struct cmd_struct *p, int argc, const char **argv);
+int cmd_run_builtin(const struct cmd_struct *cmd, const size_t cmd_len,
+		    int argc, const char **argv);
 
 #endif				/* DABBA_H */

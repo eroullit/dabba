@@ -1,0 +1,289 @@
+package dabba;
+
+message interface_id
+{
+    required string name = 1;
+}
+
+message interface_id_list
+{
+    repeated interface_id list = 1;
+}
+
+message interface_status
+{
+    required error_code status = 1;
+    required interface_id id = 2;
+    optional bool up = 3;
+    optional bool running = 4;
+    optional bool promiscuous = 5;
+    optional bool loopback = 6;
+    optional bool connectivity = 7;
+}
+
+message interface_status_list
+{
+    repeated interface_status list = 1;
+}
+
+message interface_driver
+{
+    required error_code status = 1;
+    required interface_id id = 2;
+    optional string name = 3;
+    optional string version = 4;
+    optional string fw_version = 5;
+    optional string bus_info = 6;
+}
+
+message interface_driver_list
+{
+    repeated interface_driver list = 1;
+}
+
+message interface_pause
+{
+    required error_code status = 1;
+    required interface_id id = 2;
+    optional bool autoneg = 3;
+    optional bool rx_pause = 4;
+    optional bool tx_pause = 5;
+}
+
+message interface_pause_list
+{
+    repeated interface_pause list = 1;
+}
+
+message interface_offload
+{
+    required error_code status = 1;
+    required interface_id id = 2;
+    optional bool rx_csum = 3;
+    optional bool tx_csum = 4;
+    optional bool sg = 5;
+    optional bool tso = 6;
+    optional bool ufo = 7;
+    optional bool gso = 8;
+    optional bool gro = 9;
+    optional bool lro = 10;
+    optional bool rxhash = 11;
+}
+
+message interface_offload_list
+{
+    repeated interface_offload list = 1;
+}
+
+message interface_settings
+{
+    required error_code status = 1;
+    required interface_id id = 2;
+    optional uint32 speed = 3;
+    optional bool duplex = 4;
+    optional bool autoneg = 5;
+    optional uint32 mtu = 6;
+    optional uint32 tx_qlen = 7;
+    optional uint32 port = 8;
+    optional uint32 maxrxpkt = 9;
+    optional uint32 maxtxpkt = 10;
+}
+
+message interface_settings_list
+{
+    repeated interface_settings list = 1;
+}
+
+message interface_coalesce
+{
+    required error_code status = 1;
+    required interface_id id = 2;
+    optional uint32 pkt_rate_high = 3;
+    optional uint32 pkt_rate_low = 4;
+    optional uint32 rate_sample_interval = 5;
+    optional uint32 stats_block_coalesce_usecs = 6;
+    optional bool use_adaptive_rx_coalesce = 7;
+    optional uint32 rx_coalesce_usecs = 8;
+    optional uint32 rx_coalesce_usecs_irq = 9;
+    optional uint32 rx_coalesce_usecs_high = 10;
+    optional uint32 rx_coalesce_usecs_low = 11;
+    optional uint32 rx_max_coalesced_frames = 12;
+    optional uint32 rx_max_coalesced_frames_irq = 13;
+    optional uint32 rx_max_coalesced_frames_high = 14;
+    optional uint32 rx_max_coalesced_frames_low = 15;
+    optional bool use_adaptive_tx_coalesce = 16;
+    optional uint32 tx_coalesce_usecs = 17;
+    optional uint32 tx_coalesce_usecs_irq = 18;
+    optional uint32 tx_coalesce_usecs_high = 19;
+    optional uint32 tx_coalesce_usecs_low = 20;
+    optional uint32 tx_max_coalesced_frames = 21;
+    optional uint32 tx_max_coalesced_frames_irq = 22;
+    optional uint32 tx_max_coalesced_frames_high = 23;
+    optional uint32 tx_max_coalesced_frames_low = 24;
+}
+
+message interface_coalesce_list
+{
+    repeated interface_coalesce list = 1;
+}
+
+message interface_duplex_capabilites
+{
+    optional bool half = 1;
+    optional bool full = 2;
+}
+
+message interface_option_capabilites
+{
+    optional bool autoneg = 1;
+    optional bool pause = 2;
+}
+
+message interface_speed_capabilites
+{
+    optional interface_duplex_capabilites ethernet = 1;
+    optional interface_duplex_capabilites fast_ethernet = 2;
+    optional interface_duplex_capabilites gbps_ethernet = 3;
+/* HACK field name starting by a digit are refused */
+    optional interface_duplex_capabilites _10gbps_ethernet = 4;
+}
+
+message interface_capabilities
+{
+    required error_code status = 1;
+    required interface_id id = 2;
+    optional bool tp = 3;
+    optional bool aui = 4;
+    optional bool mii = 5;
+    optional bool fibre = 6;
+    optional bool bnc = 7;
+    optional interface_option_capabilites supported_opt = 8;
+    optional interface_option_capabilites advertising_opt = 9;
+    optional interface_option_capabilites lp_advertising_opt = 10;
+    optional interface_speed_capabilites supported_speed = 11;
+    optional interface_speed_capabilites advertising_speed = 12;
+    optional interface_speed_capabilites lp_advertising_speed = 13;
+}
+
+message interface_capabilities_list
+{
+    repeated interface_capabilities list = 1;
+}
+
+message interface_statistics
+{
+    required error_code status = 1;
+    required interface_id id = 2;
+    required uint64 rx_byte = 3;
+    required uint64 rx_packet = 4;
+    required uint64 rx_error = 5;
+    required uint64 rx_dropped = 6;
+    required uint64 rx_compressed = 7;
+    required uint64 tx_byte = 8;
+    required uint64 tx_packet = 9;
+    required uint64 tx_error = 10;
+    required uint64 tx_dropped = 11;
+    required uint64 tx_compressed = 12;
+    required uint64 rx_error_fifo = 13;
+    required uint64 rx_error_frame = 14;
+    required uint64 rx_error_crc = 15;
+    required uint64 rx_error_length = 16;
+    required uint64 rx_error_missed = 17;
+    required uint64 rx_error_over = 18;
+    required uint64 tx_error_fifo = 19;
+    required uint64 tx_error_carrier = 20;
+    required uint64 tx_error_heartbeat = 21;
+    required uint64 tx_error_window = 22;
+    required uint64 tx_error_aborted = 23;
+}
+
+message interface_statistics_list
+{
+    repeated interface_statistics list = 1;
+}
+
+message thread_id
+{
+    required uint64 id = 1;
+}
+
+message thread_id_list
+{
+    repeated thread_id list = 1;
+}
+
+message thread
+{
+    required error_code status = 1;
+    required thread_id id = 2;
+    optional string cpu_set = 3;
+    optional int32 type = 4;
+    optional int32 sched_policy = 5;
+    optional int32 sched_priority = 6;
+}
+
+message thread_list
+{
+    repeated thread list = 1;
+}
+
+message thread_capabilities
+{
+    required error_code status = 1;
+    required int32 policy = 2;
+    required int32 prio_min = 3;
+    required int32 prio_max = 4;
+}
+
+message thread_capabilities_list
+{
+    repeated thread_capabilities list = 1;
+}
+
+message error_code
+{
+    required int32 code = 1;
+}
+message dummy
+{
+    optional int32 unused = 1;
+}
+
+message capture
+{
+    required error_code status = 1;
+    optional thread_id id = 2;
+    optional string pcap = 3;
+    optional string interface = 4;
+    optional uint64 frame_nr = 5;
+    optional uint64 frame_size = 6;
+}
+
+message capture_list
+{
+    repeated capture list = 1;
+}
+
+service dabba_service
+{
+    rpc interface_status_get (interface_id_list) returns (interface_status_list);
+    rpc interface_status_modify (interface_status) returns (error_code);
+    rpc interface_driver_get (interface_id_list) returns (interface_driver_list);
+    rpc interface_pause_get (interface_id_list) returns (interface_pause_list);
+    rpc interface_pause_modify (interface_pause) returns (error_code);
+    rpc interface_offload_get (interface_id_list) returns (interface_offload_list);
+    rpc interface_offload_modify (interface_offload) returns (error_code);
+    rpc interface_settings_get (interface_id_list) returns (interface_settings_list);
+    rpc interface_settings_modify (interface_settings) returns (error_code);
+    rpc interface_coalesce_get (interface_id_list) returns (interface_coalesce_list);
+    rpc interface_coalesce_modify (interface_coalesce) returns (error_code);
+    rpc interface_capabilities_get (interface_id_list) returns (interface_capabilities_list);
+    rpc interface_capabilities_modify (interface_capabilities) returns (error_code);
+    rpc interface_statistics_get (interface_id_list) returns (interface_statistics_list);
+    rpc thread_get (thread_id_list) returns (thread_list);
+    rpc thread_capabilities_get (dummy) returns (thread_capabilities_list);
+    rpc thread_modify (thread) returns (error_code);
+    rpc capture_get (thread_id_list) returns (capture_list);
+    rpc capture_start (capture) returns (error_code);
+    rpc capture_stop (thread_id) returns (error_code);
+}

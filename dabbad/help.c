@@ -36,6 +36,7 @@ static const char _usage[] =
 
 /**
  * \brief Show dabbad usage options
+ * \param[in]       opt	        Pointer to option structure array
  */
 
 void show_usage(const struct option *opt)
@@ -57,6 +58,11 @@ void show_usage(const struct option *opt)
 		}
 	}
 }
+
+/**
+ * \brief Show current \c dabbad version on \c stdout
+ * \return Always returns 0.
+ */
 
 int print_version(void)
 {
