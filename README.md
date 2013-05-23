@@ -32,6 +32,9 @@ dabba needs these to compile and run properly:
 * Linux kernel >= 2.6.31
 * `cmake`
 * `pthread`
+* `libnl-3-dev`
+* `libnl-genl-3-dev`
+* `libnl-route-3-dev`
 * `setcap` (within `libcap` package)
 
 Recommended optional packages:
