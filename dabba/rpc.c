@@ -113,7 +113,7 @@ void __rpc_error_code_print(const int error_code)
  * \param[in]           closure_data	 Pointer to protobuf closure data
  */
 
-void rpc_error_code_print(const Dabba__ErrorCode const *result,
+void rpc_error_code_print(const Dabba__ErrorCode * const result,
 			  void *closure_data)
 {
 	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
