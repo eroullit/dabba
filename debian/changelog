@@ -1,3 +1,29 @@
+dabba (0.3) unstable; urgency=low
+  * cmake: add libnl3 dependency
+  * cmake: add libprotobuf-c/protoc-c dependency
+  * cmake: refactor pod2man target generation.
+  * dabba: removed libdabba dependency.
+  * dabba: purge ipc functions.
+  * dabba: add (capture|thread|interface) rpc call
+  * dabba: allow to contact dabbad via unix domain or tcp socket
+  * dabba: heavy cli refactoring (see manpages for more info)
+  * dabbad: add (capture|thread|interface) rpc support.
+  * dabbad: fix thread sched/prio return values
+  * doc: update doxygen function headers
+  * doc: update manpages
+  * libdabba: don't treat TP_STATUS_KERNEL as a flag.
+  * libdabba: add interface flags getter/setter
+  * libdabba: add interface hardware settings getter/setter
+  * libdabba: add interface pause getter/setter
+  * libdabba: add interface irq coalesce getter/setter
+  * libdabba: add interface hardware offload getter/setter
+  * libdabba: add interface link status getter
+  * test: add interface cli command tests
+  * test: remove obsolete DUMMY_DEV prerequisite.
+  * test: create TEST_DEV prerequisite.
+
+ -- Emmanuel Roullit <emmanuel.roullit@gmail.com>  Sun, 26 May 2013 20:01:12 +0200
+
 dabba (0.2) unstable; urgency=low
 
   * ipc: do not flush IPC message queue anymore.
