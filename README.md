@@ -103,10 +103,11 @@ $ dabba capture start --interface eth0 --pcap /tmp/example.pcap
 
 Running captures can be listed in YAML format:
 ```sh
-$ dabba capture list
+$ dabba capture get
 ---
   captures:
     - id: 3076324160
+      rc: 0 # Success
       packet mmap size: 32768
       frame number: 16
       pcap: /tmp/example.pcap
