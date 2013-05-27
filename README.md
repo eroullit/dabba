@@ -30,6 +30,7 @@ Prerequisites
 
 dabba needs these to compile and run properly:
 * Linux kernel >= 2.6.31
+* `build-essential`
 * `cmake`
 * `pthread`
 * `libnl-3-dev`
