@@ -164,5 +164,5 @@ int cmd_thread_capabilities(int argc, const char **argv)
 		{"get", cmd_thread_capabilities_get}
 	};
 
-	return cmd_run_builtin(cmd, ARRAY_SIZE(cmd), argc, argv);
+	return cmd_run_command(cmd, ARRAY_SIZE(cmd), argc, argv);
 }

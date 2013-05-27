@@ -146,34 +146,11 @@ static int run_builtin(const struct cmd_struct *p, int argc, const char **argv)
 	return 0;
 }
 
-/**
- * \brief run command function and pass it \c argc / \c argv
- * \brief also check if \c argv contains help parameters
- * \param[in]           p	        Pointer to command structure
- * \param[in]           cmd_len	        Number of valid command passed
- * \param[in]           argc	        Argument counter
- * \param[in]           argv	        Argument vector
- * \return 0 on success, else on failure, \c ENOSYS if the command is unknown.
- * \note on success, \c stdout pipe/socket is checked, flushed and closed.
- */
-
-int cmd_run_builtin(const struct cmd_struct *cmd, const size_t cmd_len,
-		    int argc, const char **argv)
+int cmd_run_action(const struct cmd_struct *cmd, const size_t cmd_len,
+		   int argc, const char **argv)
 {
 	const char *cmd_str = argv[0];
 	size_t a;
-
-	if (argc == 0 || cmd_str == NULL || !strcmp(cmd_str, "--help"))
-		cmd_str = "help";
-
-	if (!strcmp(cmd_str, "--version"))
-		cmd_str = "version";
-
-	/* Turn "dabba cmd --help" into "dabba help cmd" */
-	if (argc > 1 && !strcmp(argv[1], "--help")) {
-		argv[1] = argv[0];
-		argv[0] = cmd_str = "help";
-	}
 
 	for (a = 0; a < cmd_len; a++) {
 		if (strcmp(cmd[a].cmd, cmd_str))
@@ -185,6 +162,35 @@ int cmd_run_builtin(const struct cmd_struct *cmd, const size_t cmd_len,
 	help_unknown_cmd(cmd_str);
 
 	return ENOSYS;
+}
+
+/**
+ * \brief run command function and pass it \c argc / \c argv
+ * \brief also check if \c argv contains help parameters
+ * \param[in]           p	        Pointer to command structure
+ * \param[in]           cmd_len	        Number of valid command passed
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv	        Argument vector
+ * \return 0 on success, else on failure, \c ENOSYS if the command is unknown.
+ * \note on success, \c stdout pipe/socket is checked, flushed and closed.
+ */
+
+int cmd_run_command(const struct cmd_struct *cmd, const size_t cmd_len,
+		    int argc, const char **argv)
+{
+	if (argc == 0 || argv[0] == NULL || !strcmp(argv[0], "--help"))
+		argv[0] = "help";
+
+	if (!strcmp(argv[0], "--version"))
+		argv[0] = "version";
+
+	/* Turn "dabba cmd --help" into "dabba help cmd" */
+	if (argc > 1 && !strcmp(argv[1], "--help")) {
+		argv[1] = argv[0];
+		argv[0] = "help";
+	}
+
+	return cmd_run_action(cmd, cmd_len, argc, argv);
 }
 
 /**
@@ -204,5 +210,5 @@ int main(int argc, const char **argv)
 		{"help", cmd_help}
 	};
 
-	return cmd_run_builtin(commands, ARRAY_SIZE(commands), --argc, ++argv);
+	return cmd_run_command(commands, ARRAY_SIZE(commands), --argc, ++argv);
 }

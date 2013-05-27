@@ -202,5 +202,5 @@ int cmd_interface_driver(int argc, const char **argv)
 		{"get", cmd_interface_driver_get}
 	};
 
-	return cmd_run_builtin(cmd, ARRAY_SIZE(cmd), argc, argv);
+	return cmd_run_action(cmd, ARRAY_SIZE(cmd), argc, argv);
 }

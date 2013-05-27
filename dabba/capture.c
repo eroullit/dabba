@@ -542,5 +542,5 @@ int cmd_capture(int argc, const char **argv)
 		{"get", cmd_capture_get},
 	};
 
-	return cmd_run_builtin(cmd, ARRAY_SIZE(cmd), argc, argv);
+	return cmd_run_command(cmd, ARRAY_SIZE(cmd), argc, argv);
 }

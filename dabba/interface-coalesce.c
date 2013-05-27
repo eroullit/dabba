@@ -605,5 +605,5 @@ int cmd_interface_coalesce(int argc, const char **argv)
 		{"modify", cmd_interface_coalesce_modify}
 	};
 
-	return cmd_run_builtin(cmd, ARRAY_SIZE(cmd), argc, argv);
+	return cmd_run_action(cmd, ARRAY_SIZE(cmd), argc, argv);
 }
