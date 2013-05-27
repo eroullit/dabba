@@ -46,7 +46,7 @@ and to list information about currently running captures.
 
 =over
 
-=item list
+=item get
 
 Fetch and print information about currently running captures.
 The output is formatted in YAML.
@@ -68,7 +68,7 @@ Stop a running capture.
 =item --interface <name>
 
 Precise on which interface the capture must run.
-Use "dabba interface list" to see the list of supported interfaces.
+Use "dabba interface get" to see the list of supported interfaces.
 (the special interface "any" captures on all up and running interfaces).
 
 =item --pcap <path>
@@ -84,7 +84,7 @@ The lowest frame number value is 8.
 =item --id <thread-id>
 
 Reference a capture by its unique thread id.
-The capture id can be fetched using "dabba capture list".
+The capture id can be fetched using "dabba capture get".
 
 =item --tcp[=<hostname>:<port>]
 
@@ -104,7 +104,7 @@ Prints the help message on the terminal
 
 =over
 
-=item dabba capture list
+=item dabba capture get
 
 Output information about all running captures
 
