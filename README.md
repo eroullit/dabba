@@ -64,6 +64,30 @@ To configure dabba to run with a regular user account:
 $ sudo make setcap
 ```
 
+Testing
+=======
+
+Automatic tests are available. There are two kinds:
+* Read-only (which do not interfere with network interface settings)
+* Read-write (which modify network interface settings)
+
+WARNING: Read-write tests might degrade or disable the
+interface connectivity while tests are running. Avoid to run
+then on production interfaces.
+
+To run read-only automatic tests, make sure proper capabilities are granted and
+run in the build directory:
+```sh
+$ ctest --output-on-failure
+```
+
+To run read-only automatic tests, make sure proper capabilities are granted,
+set the `TEST_DEV` variable with the interface name to modify
+and run in the build directory:
+```sh
+$ TEST_DEV=eth0 ctest --output-on-failure
+```
+
 Getting started!
 ================
 
