@@ -38,9 +38,11 @@ SET(CPACK_PACKAGE_CONTACT "${CPACK_PACKAGE_VENDOR} <emmanuel.roullit@gmail.com>"
 SET(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_SOURCE_DIR}/debian/postinst;${CMAKE_SOURCE_DIR}/debian/shlibs")
 SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION
 "Suite of low-level multithreaded zero-copy network tools.
- dabba is based on two parts:
-  - dabbad: network task manager and process IPC background queries
-  - dabba: CLI 'à la git' to communicate with the daemon and submit tasks"
+ dabba is based on 4 parts:
+  - libdabba - low-level zero-copy network library
+  - libdabba-rpc - protobuf-based rpc library for dabbad and dabba
+  - dabbad - multi-threaded task manager and IPC query processor
+  - dabba - CLI 'à la git' to communicate with dabbad and submit tasks"
 )
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Suite of low-level multithreaded zero-copy network tools.")
 SET(CPACK_PACKAGE_DESCRIPTION "dabba is a set of multithreaded network tools using zero-copy features.")
