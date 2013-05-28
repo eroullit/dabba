@@ -9,8 +9,9 @@ This is inspired on the Dabba Walla system present in Mumbai where
 meals are regrouped and dispatched throughout the city with a high
 efficiency rate, every day of the year.
 
-The project has 3 main components:
+The project has 4 main components:
 * `libdabba` - low-level zero-copy network library
+* `libdabba-rpc` - protobuf-based rpc library for dabbad and dabba
 * `dabbad` - multi-threaded task manager and IPC query processor
 * `dabba` - CLI 'à la git' to communicate with dabbad and submit tasks
 
