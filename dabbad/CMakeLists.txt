@@ -21,7 +21,9 @@ SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6, libnl-3-dev, libnl-genl-3-dev, libnl-ro
 SET(CPACK_PACKAGE_VENDOR "Emmanuel Roullit")
 SET(CPACK_PACKAGE_CONTACT "${CPACK_PACKAGE_VENDOR} <emmanuel.roullit@gmail.com>")
 SET(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_SOURCE_DIR}/debian/postinst;${CMAKE_SOURCE_DIR}/debian/shlibs")
-SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION "dabbad - multi-threaded task manager and RPC query processor")
+SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION
+"dabbad - multi-threaded task manager and RPC query processor"
+)
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Multi-threaded task manager daemon and RPC query processor.")
 SET(CPACK_PACKAGE_DESCRIPTION "dabbad is a multi-threaded task manager and RPC query processor daemon.")
 SET(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")

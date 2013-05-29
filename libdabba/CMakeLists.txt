@@ -19,7 +19,9 @@ SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6")
 SET(CPACK_PACKAGE_VENDOR "Emmanuel Roullit")
 SET(CPACK_PACKAGE_CONTACT "${CPACK_PACKAGE_VENDOR} <emmanuel.roullit@gmail.com>")
 SET(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_SOURCE_DIR}/debian/postinst;${CMAKE_SOURCE_DIR}/debian/shlibs")
-SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION "libdabba - low-level zero-copy network library")
+SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION
+"libdabba - low-level zero-copy network library"
+)
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Library of low-level multithreaded zero-copy network function.")
 SET(CPACK_PACKAGE_DESCRIPTION "libdabba is a low-level zero-copy network library.")
 SET(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")

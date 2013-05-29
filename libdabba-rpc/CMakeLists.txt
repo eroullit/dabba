@@ -18,7 +18,9 @@ SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6, libprotobuf-c0, protobuf-c-compiler")
 SET(CPACK_PACKAGE_VENDOR "Emmanuel Roullit")
 SET(CPACK_PACKAGE_CONTACT "${CPACK_PACKAGE_VENDOR} <emmanuel.roullit@gmail.com>")
 SET(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_SOURCE_DIR}/debian/postinst;${CMAKE_SOURCE_DIR}/debian/shlibs")
-SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION " - libdabba-rpc - protobuf-based rpc library for dabbad and dabba")
+SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION
+" - libdabba-rpc - protobuf-based rpc library for dabbad and dabba"
+)
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Protobuf RPC library to communicate with dabbad.")
 SET(CPACK_PACKAGE_DESCRIPTION "Protobuf RPC library to communicate with dabbad via unix domain or tcp sockets.")
 SET(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")

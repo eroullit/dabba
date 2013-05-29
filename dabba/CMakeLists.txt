@@ -19,7 +19,9 @@ SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6, libdabba-rpc")
 SET(CPACK_PACKAGE_VENDOR "Emmanuel Roullit")
 SET(CPACK_PACKAGE_CONTACT "${CPACK_PACKAGE_VENDOR} <emmanuel.roullit@gmail.com>")
 SET(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_SOURCE_DIR}/debian/postinst;${CMAKE_SOURCE_DIR}/debian/shlibs")
-SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION "dabba - CLI 'à la git' to communicate with dabbad and submit tasks")
+SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION
+"dabba - CLI 'à la git' to communicate with dabbad and submit tasks"
+)
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "CLI tool to communicate with dabbad to submit tasks and get its status.")
 SET(CPACK_PACKAGE_DESCRIPTION "dabba is a CLI 'à la git' to communicate with dabbad and submit tasks")
 SET(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
