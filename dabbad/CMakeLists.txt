@@ -20,7 +20,6 @@ SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${PROJECT_NAME}_${CPACK_PACKAGE_VERSION}_ori
 SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6, libnl-3-dev, libnl-genl-3-dev, libnl-route-3-dev, libdabba, libdabba-rpc")
 SET(CPACK_PACKAGE_VENDOR "Emmanuel Roullit")
 SET(CPACK_PACKAGE_CONTACT "${CPACK_PACKAGE_VENDOR} <emmanuel.roullit@gmail.com>")
-SET(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_SOURCE_DIR}/debian/postinst;${CMAKE_SOURCE_DIR}/debian/shlibs")
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY
 "RPC daemon which can manage multithread task and return interface settings.
  It can receive/emit RPC messages via:
@@ -92,3 +91,6 @@ INSTALL(CODE "EXECUTE_PROCESS(COMMAND ${SETCAP_EXECUTABLE} cap_net_raw,cap_ipc_l
 
 ADD_CUSTOM_TARGET(${PROJECT_NAME}-setcap COMMAND ${SETCAP_EXECUTABLE} cap_sys_nice,cap_net_raw,cap_ipc_lock,cap_net_admin=eip ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME})
 ADD_DEPENDENCIES(setcap ${PROJECT_NAME}-setcap)
+
+# DEB PACKAGE HACK
+INSTALL(FILES debian/copyright debian/changelog.gz DESTINATION share/doc/${PROJECT_NAME})
