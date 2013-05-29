@@ -1,0 +1,41 @@
+dabba (0.3) unstable; urgency=low
+  * dabba: removed libdabba dependency.
+  * dabba: purge ipc functions.
+  * dabba: add (capture|thread|interface) rpc call
+  * dabba: allow to contact dabbad via unix domain or tcp socket
+  * dabba: heavy cli refactoring (see manpages for more info)
+  * test: add interface cli command tests
+  * test: remove obsolete DUMMY_DEV prerequisite.
+  * test: create TEST_DEV prerequisite.
+
+ -- Emmanuel Roullit <emmanuel.roullit@gmail.com>  Sun, 26 May 2013 20:01:12 +0200
+
+dabba (0.2) unstable; urgency=low
+
+  * ipc: do not flush IPC message queue anymore.
+  * ipc: fix ipc race/daemon race condition.
+  * dabba: command parsing simplifications.
+  * ipc: usleep a while on both messaging ends.
+  * ipc: Refactored IPC message query/reply functions.
+  * thread: add 'dabba thread capabilities' subcommand
+  * thread: added 'dabba thread modify' subcommand.
+  * thread: added 'dabba thread list' subcommand.
+  * test: add 'dabba thread' unit tests.
+  * test: simplified capture thread stop unit tests.
+  * header: added missing defines guards.
+
+ -- Emmanuel Roullit <emmanuel.roullit@gmail.com>  Thu, 23 Aug 2012 21:06:09 +0200
+
+dabba (0.1.1) unstable; urgency=low
+
+  * compile with -fPIE.
+  * made the option '--frame-number' parameter optional
+  * tidy up end user documentation
+
+ -- Emmanuel Roullit <emmanuel.roullit@gmail.com>  Sat, 11 Aug 2012 22:19:57 +0200
+
+dabba (0.1) unstable; urgency=low
+
+  * Initial release for Debian
+
+ -- Emmanuel Roullit <emmanuel.roullit@gmail.com>  Tue, 10 Jul 2012 07:49:55 +0200
