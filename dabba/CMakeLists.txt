@@ -84,3 +84,6 @@ ENDFOREACH()
 INSTALL(TARGETS dabba DESTINATION sbin COMPONENT applications)
 
 ADD_SUBDIRECTORY(test)
+
+# DEB PACKAGE HACK 
+INSTALL(FILES debian/copyright debian/changelog.gz DESTINATION share/doc/${PROJECT_NAME})
