@@ -21,11 +21,26 @@ SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6, libnl-3-dev, libnl-genl-3-dev, libnl-ro
 SET(CPACK_PACKAGE_VENDOR "Emmanuel Roullit")
 SET(CPACK_PACKAGE_CONTACT "${CPACK_PACKAGE_VENDOR} <emmanuel.roullit@gmail.com>")
 SET(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_SOURCE_DIR}/debian/postinst;${CMAKE_SOURCE_DIR}/debian/shlibs")
-SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION
-"dabbad - multi-threaded task manager and RPC query processor"
-)
-SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Multi-threaded task manager daemon and RPC query processor.")
-SET(CPACK_PACKAGE_DESCRIPTION "dabbad is a multi-threaded task manager and RPC query processor daemon.")
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY
+"RPC daemon which can manage multithread task and return interface settings.
+ It can receive/emit RPC messages via:
+  - unix domain sockets
+  - tcp sockets
+ It can:
+  - start/stop/get running capture threads
+  - fetch/modify running thread settings/capabilities
+  - fetch/modify available interface capabilities
+  - fetch/modify available interface interrupt coalesce settings
+  - fetch available interface driver information
+  - fetch/modify available interface hardware offload settings
+  - fetch/modify available interface pause settings
+  - fetch/modify available interface hardware settings
+  - fetch available interface statistics
+  - fetch/modify available interface status
+  - thread scheduling
+  - thread capabilities
+")
+SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION "${CPACK_PACKAGE_DESCRIPTION_SUMMARY}")
 SET(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
 SET(CPACK_DEBIAN_PACKAGE_SECTION "net")
 SET(CPACK_STRIP_FILES ON)
