@@ -18,11 +18,14 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/ .
 
 # Public: Current version of Sharness.
-export SHARNESS_VERSION="0.2.4"
+SHARNESS_VERSION="0.3.0"
+export SHARNESS_VERSION
 
-# Public: The file extension for tests.
-export SHARNESS_TEST_EXTENSION="t"
+# Public: The file extension for tests.  By default, it is set to "t".
+: ${SHARNESS_TEST_EXTENSION:=t}
+export SHARNESS_TEST_EXTENSION
 
+# Keep the original TERM for say_color
 ORIGINAL_TERM=$TERM
 
 # For repeatability, reset the environment to a known state.
@@ -31,23 +34,14 @@ LC_ALL=C
 PAGER=cat
 TZ=UTC
 TERM=dumb
-export LANG LC_ALL PAGER TERM TZ
 EDITOR=:
-unset VISUAL
-export EDITOR
-unset CDPATH
-unset GREP_OPTIONS
+export LANG LC_ALL PAGER TZ TERM EDITOR
+unset VISUAL CDPATH GREP_OPTIONS
 
 # Line feed
 LF='
 '
 
-# Each test should start with something like this, after copyright notices:
-#
-# test_description='Description of this test...
-# This test checks if command xyzzy does the right thing...
-# '
-# . ./sharness.sh
 [ "x$ORIGINAL_TERM" != "xdumb" ] && (
 		TERM=$ORIGINAL_TERM &&
 		export TERM &&
@@ -90,11 +84,18 @@ if test -n "$color"; then
 		TERM=$ORIGINAL_TERM
 		export TERM
 		case "$1" in
-			error) tput bold; tput setaf 1;; # bold red
-			skip)  tput bold; tput setaf 2;; # bold green
-			pass)  tput setaf 2;;            # green
-			info)  tput setaf 3;;            # brown
-			*) test -n "$quiet" && return;;
+		error)
+			tput bold; tput setaf 1;; # bold red
+		skip)
+			tput setaf 4;; # blue
+		warn)
+			tput setaf 3;; # brown/yellow
+		pass)
+			tput setaf 2;; # green
+		info)
+			tput setaf 6;; # cyan
+		*)
+			test -n "$quiet" && return;;
 		esac
 		shift
 		printf "%s" "$*"
@@ -106,7 +107,7 @@ else
 	say_color() {
 		test -z "$1" && test -n "$quiet" && return
 		shift
-		echo "$*"
+		printf "%s\n" "$*"
 	}
 fi
 
@@ -172,9 +173,9 @@ trap 'die' EXIT
 #
 # Returns nothing.
 test_set_prereq() {
-	satisfied="$satisfied$1 "
+	satisfied_prereq="$satisfied_prereq$1 "
 }
-satisfied=" "
+satisfied_prereq=" "
 
 # Public: Check if one or more test prerequisites are defined.
 #
@@ -205,13 +206,32 @@ test_have_prereq() {
 	missing_prereq=
 
 	for prerequisite; do
+		case "$prerequisite" in
+		!*)
+			negative_prereq=t
+			prerequisite=${prerequisite#!}
+			;;
+		*)
+			negative_prereq=
+		esac
+
 		total_prereq=$(($total_prereq + 1))
-		case $satisfied in
+		case "$satisfied_prereq" in
 		*" $prerequisite "*)
+			satisfied_this_prereq=t
+			;;
+		*)
+			satisfied_this_prereq=
+		esac
+
+		case "$satisfied_this_prereq,$negative_prereq" in
+		t,|,t)
 			ok_prereq=$(($ok_prereq + 1))
 			;;
 		*)
-			# Keep a list of missing prerequisites
+			# Keep a list of missing prerequisites; restore
+			# the negative marker if necessary.
+			prerequisite=${negative_prereq:+!}$prerequisite
 			if test -z "$missing_prereq"; then
 				missing_prereq=$prerequisite
 			else
@@ -233,7 +253,7 @@ test_ok_() {
 
 test_failure_() {
 	test_failure=$(($test_failure + 1))
-	say_color error "not ok - $test_count $1"
+	say_color error "not ok $test_count - $1"
 	shift
 	echo "$@" | sed -e 's/^/#	/'
 	test "$immediate" = "" || { EXIT_OK=t; exit 1; }
@@ -241,12 +261,12 @@ test_failure_() {
 
 test_known_broken_ok_() {
 	test_fixed=$(($test_fixed + 1))
-	say_color "" "ok $test_count - $@ # TODO known breakage"
+	say_color error "ok $test_count - $@ # TODO known breakage vanished"
 }
 
 test_known_broken_failure_() {
 	test_broken=$(($test_broken + 1))
-	say_color skip "not ok $test_count - $@ # TODO known breakage"
+	say_color warn "not ok $test_count - $@ # TODO known breakage"
 }
 
 # Public: Execute commands in debug mode.
@@ -332,7 +352,8 @@ test_skip_() {
 #
 # With three arguments, the first will be taken to be a prerequisite:
 # $1 - Comma-separated list of test prerequisites. The test will be skipped if
-#      not all of the given prerequisites are set.
+#      not all of the given prerequisites are set. To negate a prerequisite,
+#      put a "!" in front of it.
 # $2 - Test description
 # $3 - Commands to be executed.
 #
@@ -366,68 +387,6 @@ test_expect_success() {
 	echo >&3 ""
 }
 
-# debugging-friendly alternatives to "test [-f|-d|-e]"
-# The commands test the existence or non-existence of $1. $2 can be
-# given to provide a more precise diagnosis.
-test_path_is_file () {
-	if ! [ -f "$1" ]
-	then
-		echo "File $1 doesn't exist. $*"
-		false
-	fi
-}
-
-test_path_is_dir () {
-	if ! [ -d "$1" ]
-	then
-		echo "Directory $1 doesn't exist. $*"
-		false
-	fi
-}
-
-test_path_is_missing () {
-	if [ -e "$1" ]
-	then
-		echo "Path exists:"
-		ls -ld "$1"
-		if [ $# -ge 1 ]; then
-			echo "$*"
-		fi
-		false
-	fi
-}
-
-# test_line_count checks that a file has the number of lines it
-# ought to. For example:
-#
-#	test_expect_success 'produce exactly one line of output' '
-#		do something >output &&
-#		test_line_count = 1 output
-#	'
-#
-# is like "test $(wc -l <output) = 1" except that it passes the
-# output through when the number of lines is wrong.
-
-test_line_count () {
-	if test $# != 3
-	then
-		error "bug in the test script: not 3 parameters to test_line_count"
-	elif ! test $(wc -l <"$3") "$1" "$2"
-	then
-		echo "test_line_count: line count for $3 !$1 $2"
-		cat "$3"
-		return 1
-	fi
-}
-
-write_script () {
-	{
-		echo "#!${2-"$SHELL_PATH"}" &&
-		cat
-	} >"$1" &&
-	chmod +x "$1"
-}
-
 # Public: Run test commands and expect them to fail. Used to demonstrate a known
 # breakage.
 #
@@ -446,7 +405,8 @@ write_script () {
 #
 # With three arguments, the first will be taken to be a prerequisite:
 # $1 - Comma-separated list of test prerequisites. The test will be skipped if
-#      not all of the given prerequisites are set.
+#      not all of the given prerequisites are set. To negate a prerequisite,
+#      put a "!" in front of it.
 # $2 - Test description
 # $3 - Commands to be executed.
 #
@@ -655,20 +615,30 @@ test_done() {
 	fi
 
 	if test "$test_fixed" != 0; then
-		say_color pass "# fixed $test_fixed known breakage(s)"
+		say_color error "# $test_fixed known breakage(s) vanished; please update test(s)"
 	fi
 	if test "$test_broken" != 0; then
-		say_color error "# still have $test_broken known breakage(s)"
-		msg="remaining $(($test_count - $test_broken)) test(s)"
+		say_color warn "# still have $test_broken known breakage(s)"
+	fi
+	if test "$test_broken" != 0 || test "$test_fixed" != 0; then
+		test_remaining=$(( $test_count - $test_broken - $test_fixed ))
+		msg="remaining $test_remaining test(s)"
 	else
+		test_remaining=$test_count
 		msg="$test_count test(s)"
 	fi
+
 	case "$test_failure" in
 	0)
 		# Maybe print SKIP message
+		if test -n "$skip_all" && test $test_count -gt 0; then
+			error "Can't use skip_all after running some tests"
+		fi
 		[ -z "$skip_all" ] || skip_all=" # SKIP $skip_all"
 
-		say_color pass "# passed all $msg"
+		if test $test_remaining -gt 0; then
+			say_color pass "# passed all $msg"
+		fi
 		say "1..$test_count$skip_all"
 
 		test -d "$remove_trash" &&
@@ -694,15 +664,8 @@ export SHARNESS_TEST_DIRECTORY
 # Public: Build directory that will be added to PATH. By default, it is set to
 # the parent directory of SHARNESS_TEST_DIRECTORY.
 : ${SHARNESS_BUILD_DIRECTORY:="$SHARNESS_TEST_DIRECTORY/.."}
-export SHARNESS_BUILD_DIRECTORY
-
-# XXX really need TEST_INSTALLED?
-if test -n "$TEST_INSTALLED"; then
-	PATH="$TEST_INSTALLED:$SHARNESS_BUILD_DIRECTORY:$PATH"
-else
-	PATH="$SHARNESS_BUILD_DIRECTORY:$PATH"
-fi
-export PATH
+PATH="$SHARNESS_BUILD_DIRECTORY:$PATH"
+export PATH SHARNESS_BUILD_DIRECTORY
 
 # Public: Path to test script currently executed.
 SHARNESS_TEST_FILE="$0"
@@ -739,8 +702,10 @@ this_test=${this_test%.$SHARNESS_TEST_EXTENSION}
 for skp in $SKIP_TESTS; do
 	case "$this_test" in
 	$skp)
-		say_color skip >&3 "skipping test $this_test altogether"
+		say_color info >&3 "skipping test $this_test altogether"
 		skip_all="skip all tests in $this_test"
 		test_done
 	esac
 done
+
+# vi: set ts=4 sw=4 noet :

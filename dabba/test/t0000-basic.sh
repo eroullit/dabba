@@ -51,9 +51,8 @@ EOF
     ./passing-todo.sh >out 2>err &&
     ! test -s err &&
 sed -e 's/^> //' >expect <<EOF &&
-> ok 1 - pretend we have fixed a known breakage # TODO known breakage
-> # fixed 1 known breakage(s)
-> # passed all 1 test(s)
+> ok 1 - pretend we have fixed a known breakage # TODO known breakage vanished
+> # 1 known breakage(s) vanished; please update test(s)
 > 1..1
 EOF
     test_cmp expect out)
@@ -135,13 +134,13 @@ EOF
     ! test -s err &&
     ! test -f \"trash directory.failing-cleanup/clean-after-failure\" &&
 sed -e 's/Z$//' -e 's/^> //' >expect <<\EOF &&
-> not ok - 1 tests clean up even after a failure
+> not ok 1 - tests clean up even after a failure
 > #	Z
 > #	    touch clean-after-failure &&
 > #	    test_when_finished rm clean-after-failure &&
 > #	    (exit 1)
 > #	Z
-> not ok - 2 failure to clean up causes the test to fail
+> not ok 2 - failure to clean up causes the test to fail
 > #	Z
 > #	    test_when_finished \"(exit 2)\"
 > #	Z
