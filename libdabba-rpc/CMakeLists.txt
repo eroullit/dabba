@@ -20,10 +20,17 @@ SET(CPACK_PACKAGE_VENDOR "Emmanuel Roullit")
 SET(CPACK_PACKAGE_CONTACT "${CPACK_PACKAGE_VENDOR} <emmanuel.roullit@gmail.com>")
 SET(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/debian/postinst;${CMAKE_CURRENT_SOURCE_DIR}/debian/shlibs")
 SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION
-" - libdabba-rpc - protobuf-based rpc library for dabbad and dabba"
+"Protobuf based library to communicate with dabbad.
+ It supports messages to trigger:
+  - interface settings rpc
+  - capture thread rpc
+  - thread settings rpc
+  - thread capabilities rpc
+  - interface settings rpc
+"
 )
-SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Protobuf RPC library to communicate with dabbad.")
-SET(CPACK_PACKAGE_DESCRIPTION "Protobuf RPC library to communicate with dabbad via unix domain or tcp sockets.")
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${CPACK_DEBIAN_PACKAGE_DESCRIPTION}")
+SET(CPACK_PACKAGE_DESCRIPTION "${CPACK_DEBIAN_PACKAGE_DESCRIPTION}")
 SET(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
 SET(CPACK_DEBIAN_PACKAGE_SECTION "net")
 SET(CPACK_STRIP_FILES ON)
