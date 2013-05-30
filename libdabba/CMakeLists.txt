@@ -19,7 +19,7 @@ SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${PROJECT_NAME}_${CPACK_PACKAGE_VERSION}_ori
 SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6")
 SET(CPACK_PACKAGE_VENDOR "Emmanuel Roullit")
 SET(CPACK_PACKAGE_CONTACT "${CPACK_PACKAGE_VENDOR} <emmanuel.roullit@gmail.com>")
-SET(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_SOURCE_DIR}/debian/postinst;${CMAKE_SOURCE_DIR}/debian/shlibs")
+SET(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/debian/postinst;${CMAKE_CURRENT_SOURCE_DIR}/debian/shlibs")
 SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION
 "Library of low-level multithreaded zero-copy network function.
  It also regroups interface settings getter/setter functionalies
