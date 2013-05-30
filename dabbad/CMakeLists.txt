@@ -5,6 +5,51 @@ FIND_PACKAGE(Setcap REQUIRED)
 FIND_PACKAGE(NL REQUIRED)
 INCLUDE(Pod2Man)
 
+INCLUDE(FindDebArch)
+
+SET(CPACK_SOURCE_GENERATOR "TGZ")
+SET(CPACK_GENERATOR "TGZ;DEB;RPM")
+SET(CPACK_RESOURCE_FILE_README "${CMAKE_SOURCE_DIR}/README")
+SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
+SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CPACK_RESOURCE_FILE_README}")
+SET(CPACK_PACKAGE_VERSION_MAJOR "0")
+SET(CPACK_PACKAGE_VERSION_MINOR "3")
+SET(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}")
+SET(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}_${CPACK_PACKAGE_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
+SET(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
+SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${PROJECT_NAME}_${CPACK_PACKAGE_VERSION}_orig")
+SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6, libnl-3-dev, libnl-genl-3-dev, libnl-route-3-dev, libdabba${CPACK_PACKAGE_VERSION}, libdabba-rpc${CPACK_PACKAGE_VERSION}")
+SET(CPACK_PACKAGE_VENDOR "Emmanuel Roullit")
+SET(CPACK_PACKAGE_CONTACT "${CPACK_PACKAGE_VENDOR} <emmanuel.roullit@gmail.com>")
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY
+"RPC daemon which can manage multithread task and return interface settings.
+ It can receive/emit RPC messages via:
+  - unix domain sockets
+  - tcp sockets
+ It can:
+  - start/stop/get running capture threads
+  - fetch/modify running thread settings/capabilities
+  - fetch/modify available interface capabilities
+  - fetch/modify available interface interrupt coalesce settings
+  - fetch available interface driver information
+  - fetch/modify available interface hardware offload settings
+  - fetch/modify available interface pause settings
+  - fetch/modify available interface hardware settings
+  - fetch available interface statistics
+  - fetch/modify available interface status
+  - thread scheduling
+  - thread capabilities
+")
+SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION "${CPACK_PACKAGE_DESCRIPTION_SUMMARY}")
+SET(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
+SET(CPACK_DEBIAN_PACKAGE_SECTION "net")
+SET(CPACK_STRIP_FILES ON)
+SET(CPACK_SOURCE_IGNORE_FILES "/build/;/.git/;/.gitignore;/*.swp;~$;${CPACK_SOURCE_IGNORE_FILES}")
+SET(CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_CURRENT_BINARY_DIR}" "${PROJECT_NAME}" "ALL" "*")
+SET(CPACK_OUTPUT_CONFIG_FILE "CPack-config-${PROJECT_NAME}.cmake")
+
+INCLUDE(CPack)
+
 FILE(GLOB DABBAD_HDRS ${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/include/${PROJECT_NAME}/*.h)
 
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/include
@@ -47,3 +92,6 @@ INSTALL(CODE "EXECUTE_PROCESS(COMMAND ${SETCAP_EXECUTABLE} cap_net_raw,cap_ipc_l
 
 ADD_CUSTOM_TARGET(${PROJECT_NAME}-setcap COMMAND ${SETCAP_EXECUTABLE} cap_sys_nice,cap_net_raw,cap_ipc_lock,cap_net_admin=eip ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME})
 ADD_DEPENDENCIES(setcap ${PROJECT_NAME}-setcap)
+
+# DEB PACKAGE HACK
+INSTALL(FILES debian/copyright debian/changelog.gz DESTINATION share/doc/${PROJECT_NAME})

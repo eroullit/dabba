@@ -1,0 +1,30 @@
+libdabba (0.3) unstable; urgency=low
+  * doc: update doxygen function headers
+  * libdabba: don't treat TP_STATUS_KERNEL as a flag.
+  * libdabba: add interface flags getter/setter
+  * libdabba: add interface hardware settings getter/setter
+  * libdabba: add interface pause getter/setter
+  * libdabba: add interface irq coalesce getter/setter
+  * libdabba: add interface hardware offload getter/setter
+  * libdabba: add interface link status getter
+
+ -- Emmanuel Roullit <emmanuel.roullit@gmail.com>  Sun, 26 May 2013 20:01:12 +0200
+
+libdabba (0.2) unstable; urgency=low
+
+  * Unchanged
+
+ -- Emmanuel Roullit <emmanuel.roullit@gmail.com>  Thu, 23 Aug 2012 21:06:09 +0200
+
+libdabba (0.1.1) unstable; urgency=low
+
+  * compile with -fPIE.
+  * tidy up end user documentation
+
+ -- Emmanuel Roullit <emmanuel.roullit@gmail.com>  Sat, 11 Aug 2012 22:19:57 +0200
+
+libdabba (0.1) unstable; urgency=low
+
+  * Initial release for Debian
+
+ -- Emmanuel Roullit <emmanuel.roullit@gmail.com>  Tue, 10 Jul 2012 07:49:55 +0200

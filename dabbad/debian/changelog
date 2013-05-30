@@ -1,0 +1,31 @@
+dabbad (0.3) unstable; urgency=low
+  * dabbad: add (capture|thread|interface) rpc support.
+  * dabbad: fix thread sched/prio return values
+
+ -- Emmanuel Roullit <emmanuel.roullit@gmail.com>  Sun, 26 May 2013 20:01:12 +0200
+
+dabbad (0.2) unstable; urgency=low
+
+  * setcap: Grant CAP_SYS_NICE on 'make setcap'.
+  * ipc: usleep a while on both messaging ends.
+  * ipc: Refactored IPC message query/reply functions.
+  * thread: add 'dabba thread capabilities' subcommand
+  * thread: added 'dabba thread modify' subcommand.
+  * thread: added 'dabba thread list' subcommand.
+  * thread: made libdabba pthread independent.
+
+ -- Emmanuel Roullit <emmanuel.roullit@gmail.com>  Thu, 23 Aug 2012 21:06:09 +0200
+
+dabbad (0.1.1) unstable; urgency=low
+
+  * compile with -fPIE.
+  * made the option '--frame-number' parameter optional
+  * tidy up end user documentation
+
+ -- Emmanuel Roullit <emmanuel.roullit@gmail.com>  Sat, 11 Aug 2012 22:19:57 +0200
+
+dabbad (0.1) unstable; urgency=low
+
+  * Initial release for Debian
+
+ -- Emmanuel Roullit <emmanuel.roullit@gmail.com>  Tue, 10 Jul 2012 07:49:55 +0200

@@ -1,0 +1,24 @@
+libdabba-rpc (0.3) unstable; urgency=low
+  * rpc: define interface status rpc message
+  * rpc: define interface driver rpc message
+  * rpc: define interface pause rpc message
+  * rpc: define interface hardware offload rpc message
+  * rpc: define interface hardware settings rpc message
+  * rpc: define interface irq coalescing rpc message
+  * rpc: define interface capabilities rpc message
+  * rpc: define interface statistics rpc message
+  * rpc: define thread list rpc message
+  * rpc: define thread capabilities rpc message
+  * rpc: define capture list rpc message
+  * rpc: define interface status rpc getter/setter
+  * rpc: define interface driver rpc getter
+  * rpc: define interface pause rpc getter/setter
+  * rpc: define interface hardware offload rpc getter/setter
+  * rpc: define interface hardware settings rpc getter/setter
+  * rpc: define interface capabilities rpc getter/setter
+  * rpc: define interface statistics rpc getter
+  * rpc: define thread getter
+  * rpc: define thread capabilities getter
+  * rpc: define capture getter/starter/stopper
+
+ -- Emmanuel Roullit <emmanuel.roullit@gmail.com>  Sun, 26 May 2013 20:01:12 +0200
