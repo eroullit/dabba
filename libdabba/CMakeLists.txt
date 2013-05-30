@@ -21,10 +21,17 @@ SET(CPACK_PACKAGE_VENDOR "Emmanuel Roullit")
 SET(CPACK_PACKAGE_CONTACT "${CPACK_PACKAGE_VENDOR} <emmanuel.roullit@gmail.com>")
 SET(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_SOURCE_DIR}/debian/postinst;${CMAKE_SOURCE_DIR}/debian/shlibs")
 SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION
-"libdabba - low-level zero-copy network library"
+"Library of low-level multithreaded zero-copy network function.
+ It also regroups interface settings getter/setter functionalies
+ It can:
+  - prepare RX/TX zero-copy network buffer
+  - start and run multi-threaded traffic capture
+  - write capture traffic to endian agnostic pcap files
+  - fetch and modify interface driver/hardware settings
+"
 )
-SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Library of low-level multithreaded zero-copy network function.")
-SET(CPACK_PACKAGE_DESCRIPTION "libdabba is a low-level zero-copy network library.")
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${CPACK_DEBIAN_PACKAGE_DESCRIPTION}")
+SET(CPACK_PACKAGE_DESCRIPTION "${CPACK_DEBIAN_PACKAGE_DESCRIPTION}")
 SET(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
 SET(CPACK_DEBIAN_PACKAGE_SECTION "net")
 SET(CPACK_STRIP_FILES ON)
