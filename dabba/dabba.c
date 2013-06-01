@@ -39,7 +39,7 @@ dabba <command> <arguments> [--help]
 
 =head1 DESCRIPTION
 
-dabba is here to generate IPC queries to dabbad and output its
+dabba is here to generate RPC queries to dabbad and output its
 replies formatted in a YAML output
 
 =head1 OPTIONS

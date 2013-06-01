@@ -40,7 +40,7 @@ dabbad [--daemonize][--help]
 =head1 DESCRIPTION
 
 dabbad (dabba daemon) is here to manage multithreaded network captures.
-It listens an IPC interface and waits for commands to execute.
+It listens a RPC interface and waits for commands to execute.
 
 =head1 EXAMPLES
 
@@ -114,7 +114,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
  * 
  * This function is dabbad entry point.
  * It parses given arguments, configure the daemon accordingly and start
- * IPC message polling.
+ * RPC message polling.
  */
 
 int main(int argc, char **argv)
