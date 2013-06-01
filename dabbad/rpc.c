@@ -54,7 +54,7 @@ DABBA__DABBA_SERVICE__INIT(dabbad_);
 /**
  * \brief Poll server for new RPC queries to process
  * \param[in]       name	        String to RPC server address
- * \param[in]       type	        Tell if the RPC server listens to unix or TCP sockets
+ * \param[in]       type	        Tell if the RPC server listens to Unix or TCP sockets
  * \return 0 if the server successfully exited, \c EINVAL is the server could not be started
  * \note This function polls for new RPC queries endlessly
  */

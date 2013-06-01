@@ -75,7 +75,7 @@ Activate or shutdown transmit pause.
 
 =item --autoneg (true|false)
 
-Activate or shutdown pause settings autonegotiation.
+Activate or shutdown pause settings auto-negotiation.
 
 =item --tcp[=<hostname>:<port>]
 
@@ -109,7 +109,7 @@ Enable transmit pause settings on 'eth0' (if supported).
 
 =item dabba interface pause modify --id eth0 --autoneg false
 
-Disable pause settings autonegotiation on 'eth0' (if supported).
+Disable pause settings auto-negotiation on 'eth0' (if supported).
 
 =back
 

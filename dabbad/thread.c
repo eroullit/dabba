@@ -93,7 +93,7 @@ struct packet_thread *dabbad_thread_type_first(const enum packet_thread_type
 
 /**
  * \brief Get the next thread from the thread list matching the input thread type
- * \param[in] pkt_thread xurrent thread entry
+ * \param[in] pkt_thread current thread entry
  * \param[in] type type of the next running thread to get
  * \return 	Pointer to the next thread element,
  * 		\c NULL when \c pkt_thread was the last element
@@ -131,8 +131,8 @@ struct packet_thread *dabbad_thread_data_get(const pthread_t thread_id)
 /**
  * \brief Set the thread scheduling policy and priority
  * \param[in] pkt_thread thread to modify
- * \param[in] sched_prio new schduling priority to set
- * \param[in] sched_policy new schduling policy to set
+ * \param[in] sched_prio new scheduling priority to set
+ * \param[in] sched_policy new scheduling policy to set
  * \return return value of \c pthread_setschedparam(3)
  */
 
@@ -152,8 +152,8 @@ int dabbad_thread_sched_param_set(struct packet_thread *pkt_thread,
 /**
  * \brief Get the thread current scheduling policy and priority
  * \param[in] pkt_thread thread to get information from
- * \param[out] sched_prio thread's schduling priority
- * \param[out] sched_policy thread's schduling policy
+ * \param[out] sched_prio thread's scheduling priority
+ * \param[out] sched_policy thread's scheduling policy
  * \return return value of \c pthread_getschedparam(3)
  */
 

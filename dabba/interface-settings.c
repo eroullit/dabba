@@ -75,7 +75,7 @@ Set network interface duplex mode
 
 =item --autoneg (true|false)
 
-Activate or shutdown speed autonegotiation.
+Activate or shutdown speed auto-negotiation.
 
 =item --mtu <mtu>
 
@@ -117,7 +117,7 @@ Set 'eth0' to use a 100Mbps connectivity (if supported).
 
 =item dabba interface settings modify --id eth0 --autoneg false
 
-Disable speed autonegotiation on 'eth0'.
+Disable speed auto negotiation on 'eth0'.
 
 =back
 

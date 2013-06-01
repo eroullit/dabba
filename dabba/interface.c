@@ -88,7 +88,7 @@ For more information, check the subcommand related manpage.
 
 =item get
 
-Fetch interface informations and print it on stdout in YAML format.
+Fetch interface information and print it on stdout in YAML format.
 
 =item modify
 
