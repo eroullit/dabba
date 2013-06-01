@@ -14,7 +14,7 @@ dabba is a set of network tools written for Linux.
 The project has 4 main components:
     - libdabba - low-level zero-copy network library
     - libdabba-rpc - protobuf-based rpc library for dabbad and dabba
-    - dabbad - multi-threaded task manager and IPC query processor
+    - dabbad - multi-threaded task manager and RPC query processor
     - dabba - CLI 'à la git' to communicate with dabbad and submit tasks
 
 Currently supported feature are listed in the CODING file.
