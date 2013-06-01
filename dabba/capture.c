@@ -527,7 +527,7 @@ static int cmd_capture_get(int argc, const char **argv)
  * \brief Parse which capture sub-command.
  * \param[in]           argc	        Argument counter
  * \param[in]           argv		Argument vector
- * \return 0 on success, ENOSYS if the sub-command does not exist,
+ * \return 0 on success, \c ENOSYS if the sub-command does not exist,
  * else on failure.
  *
  * This function parses the capture sub-command string and the rest of the

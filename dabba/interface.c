@@ -265,7 +265,7 @@ int rpc_interface_get(int argc, const char **argv,
  * \brief Parse which interface sub-command.
  * \param[in]           argc	        Argument counter
  * \param[in]           argv		Argument vector
- * \return 0 on success, ENOSYS if the sub-command does not exist,
+ * \return 0 on success, \c ENOSYS if the sub-command does not exist,
  * else on failure.
  *
  * This function parses the interface sub-command string and the rest of the
