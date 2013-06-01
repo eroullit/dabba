@@ -1,3 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh
+set -e
 setcap cap_net_raw,cap_ipc_lock,cap_net_admin=eip /usr/sbin/dabbad
 ldconfig
