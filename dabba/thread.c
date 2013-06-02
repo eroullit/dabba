@@ -47,7 +47,7 @@ It also lists information about currently running threads.
 
 =over
 
-=item list
+=item get
 
 Fetch and print information about currently running threads.
 The output is formatted in YAML.
