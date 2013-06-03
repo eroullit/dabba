@@ -59,7 +59,7 @@
  */
 
 static TAILQ_HEAD(capture_thread_head,
-		  packet_capture_thread) capture_thread_head =
+		  packet_capture) capture_thread_head =
 TAILQ_HEAD_INITIALIZER(capture_thread_head);
 
 /**
@@ -68,7 +68,7 @@ TAILQ_HEAD_INITIALIZER(capture_thread_head);
  * \return Pointer to the first capture of the capture list
  */
 
-static struct packet_capture_thread *dabbad_capture_first(void)
+static struct packet_capture *dabbad_capture_first(void)
 {
 	return TAILQ_FIRST(&capture_thread_head);
 }
@@ -79,8 +79,8 @@ static struct packet_capture_thread *dabbad_capture_first(void)
  * \return Pointer to the next capture of the capture list
  */
 
-static struct packet_capture_thread *dabbad_capture_next(struct packet_capture_thread
-							 *capture_thread)
+static struct packet_capture *dabbad_capture_next(struct packet_capture
+						  *capture_thread)
 {
 	return capture_thread ? TAILQ_NEXT(capture_thread, entry) : NULL;
 }
@@ -91,9 +91,9 @@ static struct packet_capture_thread *dabbad_capture_next(struct packet_capture_t
  * \return Pointer to the capture matching the capture id
  */
 
-static struct packet_capture_thread *dabbad_capture_find(const pthread_t id)
+static struct packet_capture *dabbad_capture_find(const pthread_t id)
 {
-	struct packet_capture_thread *node;
+	struct packet_capture *node;
 
 	TAILQ_FOREACH(node, &capture_thread_head, entry)
 	    if (node->thread.id == id)
@@ -151,7 +151,7 @@ void dabbad_capture_stop(Dabba__DabbaService_Service * service,
 			 Dabba__ErrorCode_Closure closure, void *closure_data)
 {
 	Dabba__ErrorCode err = DABBA__ERROR_CODE__INIT;
-	struct packet_capture_thread *pkt_capture;
+	struct packet_capture *pkt_capture;
 	int rc;
 
 	assert(service);
@@ -191,7 +191,7 @@ void dabbad_capture_start(Dabba__DabbaService_Service * service,
 			  const Dabba__Capture * capturep,
 			  Dabba__ErrorCode_Closure closure, void *closure_data)
 {
-	struct packet_capture_thread *pkt_capture;
+	struct packet_capture *pkt_capture;
 	int sock, rc;
 
 	assert(service);
@@ -259,7 +259,7 @@ void dabbad_capture_get(Dabba__DabbaService_Service * service,
 {
 	Dabba__CaptureList capture_list = DABBA__CAPTURE_LIST__INIT;
 	Dabba__CaptureList *capturep = NULL;
-	struct packet_capture_thread *pkt_capture;
+	struct packet_capture *pkt_capture;
 	struct nl_sock *sock;
 	struct nl_cache *cache;
 	size_t a = 0;

@@ -38,10 +38,10 @@
  * \brief Structure representing a capture thread
  */
 
-struct packet_capture_thread {
+struct packet_capture {
 	struct packet_rx rx; /**< packet capture structure */
 	struct packet_thread thread; /**< thread structure */
-	 TAILQ_ENTRY(packet_capture_thread) entry;/**< capture entry */
+	 TAILQ_ENTRY(packet_capture) entry;/**< capture entry */
 };
 
 struct packet_thread *dabbad_capture_thread_data_get(const pthread_t thread_id);
