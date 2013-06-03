@@ -275,19 +275,12 @@ void dabbad_capture_get(Dabba__DabbaService_Service * service,
 	Dabba__CaptureList capture_list = DABBA__CAPTURE_LIST__INIT;
 	Dabba__CaptureList *capturep = NULL;
 	struct packet_capture *pkt_capture;
-	struct nl_sock *sock;
-	struct nl_cache *cache = NULL;
 	size_t a = dabbad_capture_length_get();
 
 	assert(service);
 	assert(id_listp);
 
 	if (a == 0)
-		goto out;
-
-	cache = link_cache_alloc(&sock);
-
-	if (!cache)
 		goto out;
 
 	capture_list.list = calloc(a, sizeof(*capture_list.list));
@@ -365,5 +358,4 @@ void dabbad_capture_get(Dabba__DabbaService_Service * service,
 	}
 
 	free(capture_list.list);
-	link_cache_destroy(sock, cache);
 }
