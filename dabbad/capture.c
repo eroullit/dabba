@@ -55,6 +55,56 @@
 
 /**
  * \internal
+ * \brief Capture thread management list
+ */
+
+static TAILQ_HEAD(capture_thread_head,
+		  packet_capture_thread) capture_thread_head =
+TAILQ_HEAD_INITIALIZER(capture_thread_head);
+
+/**
+ * \internal
+ * \brief Returns the first capture of the capture list
+ * \return Pointer to the first capture of the capture list
+ */
+
+static struct packet_capture_thread *dabbad_capture_first(void)
+{
+	return TAILQ_FIRST(&capture_thread_head);
+}
+
+/**
+ * \internal
+ * \brief Returns next capture present in the capture list
+ * \return Pointer to the next capture of the capture list
+ */
+
+static struct packet_capture_thread *dabbad_capture_next(struct packet_capture_thread
+							 *capture_thread)
+{
+	return capture_thread ? TAILQ_NEXT(capture_thread, entry) : NULL;
+}
+
+/**
+ * \internal
+ * \brief Returns capture matching thread id present in the capture list
+ * \return Pointer to the capture matching the capture id
+ */
+
+static struct packet_capture_thread *dabbad_capture_find(const pthread_t id)
+{
+	struct packet_capture_thread *node;
+
+	for (node = dabbad_capture_first(); node;
+	     node = dabbad_capture_next(node))
+		if (node->thread.id == id)
+			break;
+
+	return node;
+}
+
+/**
+ * \internal
  * \brief Capture thread message validator
  * \param[in] msg Capture thread message to check
  * \return 0 if the message is invalid, 1 if it is valid.
@@ -89,19 +139,6 @@ static int capture_settings_are_valid(const Dabba__Capture * capturep)
 }
 
 /**
- * \internal
- * \brief Get capture thread data from thread dabba
- * \param[in] pkt_thread pointer to thread data structure
- * \return Pointer to the corresponding capture thread information.
- */
-
-static struct packet_capture_thread *dabbad_capture_thread_get(struct packet_thread
-							       *pkt_thread)
-{
-	return container_of(pkt_thread, struct packet_capture_thread, thread);
-}
-
-/**
  * \brief RPC to stop a running capture
  * \param[in]           service	        Pointer to protobuf service structure
  * \param[in]           idp             Pointer to the thread id to stop
@@ -116,23 +153,22 @@ void dabbad_capture_stop(Dabba__DabbaService_Service * service,
 {
 	Dabba__ErrorCode err = DABBA__ERROR_CODE__INIT;
 	struct packet_capture_thread *pkt_capture;
-	struct packet_thread *pkt_thread;
 	int rc;
 
 	assert(service);
 	assert(idp);
 
-	pkt_thread = dabbad_thread_data_get((pthread_t) idp->id);
+	pkt_capture = dabbad_capture_find((pthread_t) idp->id);
 
-	if (!pkt_thread) {
+	if (!pkt_capture) {
 		rc = EINVAL;
 		goto out;
 	}
 
-	rc = dabbad_thread_stop(pkt_thread);
+	rc = dabbad_thread_stop(&pkt_capture->thread);
 
 	if (!rc) {
-		pkt_capture = dabbad_capture_thread_get(pkt_thread);
+		TAILQ_REMOVE(&capture_thread_head, pkt_capture, entry);
 		close(pkt_capture->rx.pcap_fd);
 		packet_mmap_destroy(&pkt_capture->rx.pkt_mmap);
 		free(pkt_capture);
@@ -201,7 +237,8 @@ void dabbad_capture_start(Dabba__DabbaService_Service * service,
 		packet_mmap_destroy(&pkt_capture->rx.pkt_mmap);
 		free(pkt_capture);
 		close(sock);
-	}
+	} else
+		TAILQ_INSERT_TAIL(&capture_thread_head, pkt_capture, entry);
 
  out:
 	capturep->status->code = rc;
@@ -224,7 +261,6 @@ void dabbad_capture_get(Dabba__DabbaService_Service * service,
 	Dabba__CaptureList capture_list = DABBA__CAPTURE_LIST__INIT;
 	Dabba__CaptureList *capturep = NULL;
 	struct packet_capture_thread *pkt_capture;
-	struct packet_thread *pkt_thread;
 	struct nl_sock *sock;
 	struct nl_cache *cache;
 	size_t a = 0;
@@ -237,10 +273,9 @@ void dabbad_capture_get(Dabba__DabbaService_Service * service,
 	if (!cache)
 		goto out;
 
-	for (pkt_thread = dabbad_thread_type_first(CAPTURE_THREAD); pkt_thread;
-	     pkt_thread = dabbad_thread_type_next(pkt_thread, CAPTURE_THREAD)) {
+	for (pkt_capture = dabbad_capture_first(); pkt_capture;
+	     pkt_capture = dabbad_capture_next(pkt_capture))
 		a++;
-	}
 
 	capture_list.list = calloc(a, sizeof(*capture_list.list));
 
@@ -276,12 +311,8 @@ void dabbad_capture_get(Dabba__DabbaService_Service * service,
 		dabba__error_code__init(capture_list.list[a]->status);
 	}
 
-	for (a = 0, pkt_thread = dabbad_thread_type_first(CAPTURE_THREAD);
-	     pkt_thread;
-	     a++, pkt_thread =
-	     dabbad_thread_type_next(pkt_thread, CAPTURE_THREAD)) {
-		pkt_capture = dabbad_capture_thread_get(pkt_thread);
-
+	for (a = 0, pkt_capture = dabbad_capture_first(); pkt_capture;
+	     a++, pkt_capture = dabbad_capture_next(pkt_capture)) {
 		capture_list.list[a]->has_frame_nr =
 		    capture_list.list[a]->has_frame_size = 1;
 		capture_list.list[a]->frame_nr =
