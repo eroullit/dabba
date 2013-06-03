@@ -427,17 +427,12 @@ void dabbad_thread_get(Dabba__DabbaService_Service * service,
 	Dabba__ThreadList *settings_listp = NULL;
 	Dabba__Thread *settingsp;
 	struct packet_thread *pkt_thread;
-	size_t a = 0, cs_len = 128;
+	size_t a = packet_thread_queue.length, cs_len = 128;
 	cpu_set_t run_on;
 	int rc = 0;
 
 	assert(service);
 	assert(id_listp);
-
-	for (pkt_thread = dabbad_thread_first(); pkt_thread;
-	     pkt_thread = dabbad_thread_next(pkt_thread)) {
-		a++;
-	}
 
 	if (a == 0)
 		goto out;
