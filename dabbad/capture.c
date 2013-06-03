@@ -58,31 +58,46 @@
  * \brief Capture thread management list
  */
 
-static TAILQ_HEAD(capture_thread_head,
-		  packet_capture) capture_thread_head =
-TAILQ_HEAD_INITIALIZER(capture_thread_head);
+static struct capture_queue {
+	TAILQ_HEAD(head, packet_capture) head;
+	size_t length;
+} capture_queue = {
+.head = TAILQ_HEAD_INITIALIZER(capture_queue.head),.length = 0};
 
 /**
  * \internal
- * \brief Returns the first capture of the capture list
- * \return Pointer to the first capture of the capture list
+ * \brief Get the amount of capture in the capture list
+ * \return Thread list length
  */
 
-static struct packet_capture *dabbad_capture_first(void)
+static size_t dabbad_capture_length_get(void)
 {
-	return TAILQ_FIRST(&capture_thread_head);
+	return capture_queue.length;
 }
 
 /**
  * \internal
- * \brief Returns next capture present in the capture list
- * \return Pointer to the next capture of the capture list
+ * \brief Insert a new capture to the capture list tail
  */
 
-static struct packet_capture *dabbad_capture_next(struct packet_capture
-						  *capture_thread)
+static void dabbad_capture_insert(struct packet_capture *const node)
 {
-	return capture_thread ? TAILQ_NEXT(capture_thread, entry) : NULL;
+	assert(node);
+	TAILQ_INSERT_TAIL(&capture_queue.head, node, entry);
+	capture_queue.length++;
+}
+
+/**
+ * \internal
+ * \brief Remove existing capture entry from the capture list
+ */
+
+static void dabbad_capture_remove(struct packet_capture *const node)
+{
+	assert(node);
+	assert(capture_queue.length > 0);
+	TAILQ_REMOVE(&capture_queue.head, node, entry);
+	capture_queue.length--;
 }
 
 /**
@@ -95,7 +110,7 @@ static struct packet_capture *dabbad_capture_find(const pthread_t id)
 {
 	struct packet_capture *node;
 
-	TAILQ_FOREACH(node, &capture_thread_head, entry)
+	TAILQ_FOREACH(node, &capture_queue.head, entry)
 	    if (node->thread.id == id)
 		break;
 
@@ -167,7 +182,7 @@ void dabbad_capture_stop(Dabba__DabbaService_Service * service,
 	rc = dabbad_thread_stop(&pkt_capture->thread);
 
 	if (!rc) {
-		TAILQ_REMOVE(&capture_thread_head, pkt_capture, entry);
+		dabbad_capture_remove(pkt_capture);
 		close(pkt_capture->rx.pcap_fd);
 		packet_mmap_destroy(&pkt_capture->rx.pkt_mmap);
 		free(pkt_capture);
@@ -237,7 +252,7 @@ void dabbad_capture_start(Dabba__DabbaService_Service * service,
 		free(pkt_capture);
 		close(sock);
 	} else
-		TAILQ_INSERT_TAIL(&capture_thread_head, pkt_capture, entry);
+		dabbad_capture_insert(pkt_capture);
 
  out:
 	capturep->status->code = rc;
@@ -261,20 +276,19 @@ void dabbad_capture_get(Dabba__DabbaService_Service * service,
 	Dabba__CaptureList *capturep = NULL;
 	struct packet_capture *pkt_capture;
 	struct nl_sock *sock;
-	struct nl_cache *cache;
-	size_t a = 0;
+	struct nl_cache *cache = NULL;
+	size_t a = dabbad_capture_length_get();
 
 	assert(service);
 	assert(id_listp);
+
+	if (a == 0)
+		goto out;
 
 	cache = link_cache_alloc(&sock);
 
 	if (!cache)
 		goto out;
-
-	for (pkt_capture = dabbad_capture_first(); pkt_capture;
-	     pkt_capture = dabbad_capture_next(pkt_capture))
-		a++;
 
 	capture_list.list = calloc(a, sizeof(*capture_list.list));
 
@@ -310,8 +324,9 @@ void dabbad_capture_get(Dabba__DabbaService_Service * service,
 		dabba__error_code__init(capture_list.list[a]->status);
 	}
 
-	for (a = 0, pkt_capture = dabbad_capture_first(); pkt_capture;
-	     a++, pkt_capture = dabbad_capture_next(pkt_capture)) {
+	a = 0;
+
+	TAILQ_FOREACH(pkt_capture, &capture_queue.head, entry) {
 		capture_list.list[a]->has_frame_nr =
 		    capture_list.list[a]->has_frame_size = 1;
 		capture_list.list[a]->frame_nr =
@@ -329,6 +344,8 @@ void dabbad_capture_get(Dabba__DabbaService_Service * service,
 
 		ifindex_to_devname(pkt_capture->rx.pkt_mmap.ifindex,
 				   capture_list.list[a]->interface, IFNAMSIZ);
+
+		a++;
 	}
 
 	capturep = &capture_list;
