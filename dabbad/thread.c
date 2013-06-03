@@ -53,6 +53,17 @@ static struct packet_thread_queue {
 
 /**
  * \internal
+ * \brief Get the amount of thread in the thread list
+ * \return Thread list length
+ */
+
+static size_t dabbad_thread_length_get(void)
+{
+	return packet_thread_queue.length;
+}
+
+/**
+ * \internal
  * \brief Insert a new thread to the thread list tail
  */
 
@@ -424,7 +435,7 @@ void dabbad_thread_get(Dabba__DabbaService_Service * service,
 	Dabba__ThreadList *settings_listp = NULL;
 	Dabba__Thread *settingsp;
 	struct packet_thread *pkt_thread;
-	size_t a = packet_thread_queue.length, cs_len = 128;
+	size_t a = dabbad_thread_length_get(), cs_len = 128;
 	cpu_set_t run_on;
 	int rc = 0;
 
