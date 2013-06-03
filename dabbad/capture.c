@@ -95,10 +95,9 @@ static struct packet_capture_thread *dabbad_capture_find(const pthread_t id)
 {
 	struct packet_capture_thread *node;
 
-	for (node = dabbad_capture_first(); node;
-	     node = dabbad_capture_next(node))
-		if (node->thread.id == id)
-			break;
+	TAILQ_FOREACH(node, &capture_thread_head, entry)
+	    if (node->thread.id == id)
+		break;
 
 	return node;
 }
