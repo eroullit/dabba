@@ -45,8 +45,11 @@
  * \brief Packet thread management list
  */
 
-static TAILQ_HEAD(packet_thread_head, packet_thread) packet_thread_head =
-TAILQ_HEAD_INITIALIZER(packet_thread_head);
+static struct packet_thread_queue {
+	TAILQ_HEAD(head, packet_thread) head;
+	size_t length;
+} packet_thread_queue = {
+.head = TAILQ_HEAD_INITIALIZER(packet_thread_queue.head),.length = 0};
 
 /**
  * \internal
@@ -56,7 +59,7 @@ TAILQ_HEAD_INITIALIZER(packet_thread_head);
 
 static struct packet_thread *dabbad_thread_first(void)
 {
-	return TAILQ_FIRST(&packet_thread_head);
+	return TAILQ_FIRST(&packet_thread_queue.head);
 }
 
 /**
@@ -81,7 +84,7 @@ static struct packet_thread *dabbad_thread_find(const pthread_t id)
 {
 	struct packet_thread *node;
 
-	TAILQ_FOREACH(node, &packet_thread_head, entry)
+	TAILQ_FOREACH(node, &packet_thread_queue.head, entry)
 	    if (node->id == id)
 		break;
 
@@ -316,7 +319,7 @@ int dabbad_thread_start(struct packet_thread *pkt_thread,
 		rc = pthread_detach(pkt_thread->id);
 
 	if (!rc)
-		TAILQ_INSERT_TAIL(&packet_thread_head, pkt_thread, entry);
+		TAILQ_INSERT_TAIL(&packet_thread_queue.head, pkt_thread, entry);
 
 	return rc;
 }
@@ -334,7 +337,7 @@ int dabbad_thread_stop(struct packet_thread *pkt_thread)
 
 	assert(pkt_thread);
 
-	TAILQ_FOREACH(node, &packet_thread_head, entry)
+	TAILQ_FOREACH(node, &packet_thread_queue.head, entry)
 	    if (pthread_equal(pkt_thread->id, node->id))
 		break;
 
@@ -344,7 +347,7 @@ int dabbad_thread_stop(struct packet_thread *pkt_thread)
 	rc = pthread_cancel(node->id);
 
 	if (!rc) {
-		TAILQ_REMOVE(&packet_thread_head, node, entry);
+		TAILQ_REMOVE(&packet_thread_queue.head, node, entry);
 	}
 
 	return rc;
