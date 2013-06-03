@@ -53,29 +53,6 @@ static struct packet_thread_queue {
 
 /**
  * \internal
- * \brief Returns the first thread of the thread list
- * \return Pointer to the first thread of the thread list
- */
-
-static struct packet_thread *dabbad_thread_first(void)
-{
-	return TAILQ_FIRST(&packet_thread_queue.head);
-}
-
-/**
- * \internal
- * \brief Returns next thread present in the thread list
- * \return Pointer to the next thread of the thread list
- */
-
-static struct packet_thread *dabbad_thread_next(struct packet_thread
-						*pkt_thread)
-{
-	return pkt_thread ? TAILQ_NEXT(pkt_thread, entry) : NULL;
-}
-
-/**
- * \internal
  * \brief Returns thread matching thread id present in the thread list
  * \return Pointer to the thread matching the thread id
  */
@@ -469,8 +446,7 @@ void dabbad_thread_get(Dabba__DabbaService_Service * service,
 
 	settingsp = *settings_list.list;
 
-	for (pkt_thread = dabbad_thread_first(); pkt_thread;
-	     pkt_thread = dabbad_thread_next(pkt_thread)) {
+	TAILQ_FOREACH(pkt_thread, &packet_thread_queue.head, entry) {
 		settingsp->has_sched_policy = settingsp->has_sched_priority = 1;
 		settingsp->has_type = 1;
 		settingsp->id->id = (uint64_t) pkt_thread->id;
