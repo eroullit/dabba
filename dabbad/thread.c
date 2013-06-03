@@ -72,6 +72,23 @@ static struct packet_thread *dabbad_thread_next(struct packet_thread
 }
 
 /**
+ * \internal
+ * \brief Returns thread matching thread id present in the thread list
+ * \return Pointer to the thread matching the thread id
+ */
+
+static struct packet_thread *dabbad_thread_find(const pthread_t id)
+{
+	struct packet_thread *node;
+
+	TAILQ_FOREACH(node, &packet_thread_head, entry)
+	    if (node->id == id)
+		break;
+
+	return node;
+}
+
+/**
  * \brief Set the thread scheduling policy and priority
  * \param[in] pkt_thread thread to modify
  * \param[in] sched_prio new scheduling priority to set
