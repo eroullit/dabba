@@ -318,8 +318,10 @@ int dabbad_thread_start(struct packet_thread *pkt_thread,
 	if (!rc)
 		rc = pthread_detach(pkt_thread->id);
 
-	if (!rc)
+	if (!rc) {
 		TAILQ_INSERT_TAIL(&packet_thread_queue.head, pkt_thread, entry);
+		packet_thread_queue.length++;
+	}
 
 	return rc;
 }
@@ -348,6 +350,8 @@ int dabbad_thread_stop(struct packet_thread *pkt_thread)
 
 	if (!rc) {
 		TAILQ_REMOVE(&packet_thread_queue.head, node, entry);
+		assert(packet_thread_queue.length > 0);
+		packet_thread_queue.length--;
 	}
 
 	return rc;
