@@ -72,63 +72,6 @@ static struct packet_thread *dabbad_thread_next(struct packet_thread
 }
 
 /**
- * \brief Get the first thread from the thread list matching the input thread type
- * \param[in] type type of the next running thread to get
- * \return 	Pointer to the first thread element,
- * 		NULL when no thread are currently running
- */
-
-struct packet_thread *dabbad_thread_type_first(const enum packet_thread_type
-					       type)
-{
-	struct packet_thread *node;
-
-	for (node = dabbad_thread_first(); node;
-	     node = dabbad_thread_next(node))
-		if (node->type == type)
-			break;
-
-	return node;
-}
-
-/**
- * \brief Get the next thread from the thread list matching the input thread type
- * \param[in] pkt_thread current thread entry
- * \param[in] type type of the next running thread to get
- * \return 	Pointer to the next thread element,
- * 		\c NULL when \c pkt_thread was the last element
- */
-
-struct packet_thread *dabbad_thread_type_next(struct packet_thread *pkt_thread,
-					      const enum packet_thread_type
-					      type)
-{
-	for (pkt_thread = dabbad_thread_next(pkt_thread); pkt_thread;
-	     pkt_thread = dabbad_thread_next(pkt_thread))
-		if (pkt_thread->type == type)
-			break;
-
-	return pkt_thread;
-}
-
-/**
- * \brief Get the thread information from an existing pthread id
- * \param[in] thread_id pthread id to search
- * \return Pointer to the corresponding thread element, \c NULL when not found.
- */
-
-struct packet_thread *dabbad_thread_data_get(const pthread_t thread_id)
-{
-	struct packet_thread *node;
-
-	TAILQ_FOREACH(node, &packet_thread_head, entry)
-	    if (pthread_equal(thread_id, node->id))
-		break;
-
-	return node;
-}
-
-/**
  * \brief Set the thread scheduling policy and priority
  * \param[in] pkt_thread thread to modify
  * \param[in] sched_prio new scheduling priority to set
@@ -413,7 +356,7 @@ void dabbad_thread_modify(Dabba__DabbaService_Service * service,
 	assert(service);
 	assert(thread);
 
-	pkt_thread = dabbad_thread_data_get(thread->id->id);
+	pkt_thread = dabbad_thread_find(thread->id->id);
 
 	if (pkt_thread) {
 		dabbad_thread_sched_param_get(pkt_thread, &sched_prio,
