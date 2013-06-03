@@ -53,6 +53,31 @@ static struct packet_thread_queue {
 
 /**
  * \internal
+ * \brief Insert a new thread to the thread list tail
+ */
+
+static void dabbad_thread_insert(struct packet_thread *const node)
+{
+	assert(node);
+	TAILQ_INSERT_TAIL(&packet_thread_queue.head, node, entry);
+	packet_thread_queue.length++;
+}
+
+/**
+ * \internal
+ * \brief Remove existing thread entry from the thread list
+ */
+
+static void dabbad_thread_remove(struct packet_thread *const node)
+{
+	assert(node);
+	assert(packet_thread_queue.length > 0);
+	TAILQ_REMOVE(&packet_thread_queue.head, node, entry);
+	packet_thread_queue.length--;
+}
+
+/**
+ * \internal
  * \brief Returns thread matching thread id present in the thread list
  * \return Pointer to the thread matching the thread id
  */
@@ -295,10 +320,8 @@ int dabbad_thread_start(struct packet_thread *pkt_thread,
 	if (!rc)
 		rc = pthread_detach(pkt_thread->id);
 
-	if (!rc) {
-		TAILQ_INSERT_TAIL(&packet_thread_queue.head, pkt_thread, entry);
-		packet_thread_queue.length++;
-	}
+	if (!rc)
+		dabbad_thread_insert(pkt_thread);
 
 	return rc;
 }
@@ -325,11 +348,8 @@ int dabbad_thread_stop(struct packet_thread *pkt_thread)
 
 	rc = pthread_cancel(node->id);
 
-	if (!rc) {
-		TAILQ_REMOVE(&packet_thread_queue.head, node, entry);
-		assert(packet_thread_queue.length > 0);
-		packet_thread_queue.length--;
-	}
+	if (!rc)
+		dabbad_thread_remove(node);
 
 	return rc;
 }
