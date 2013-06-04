@@ -257,6 +257,7 @@ message capture
     optional string interface = 4;
     optional uint64 frame_nr = 5;
     optional uint64 frame_size = 6;
+    optional bool append = 7;
 }
 
 message capture_list
