@@ -220,13 +220,13 @@ void dabbad_capture_stop_all(Dabba__DabbaService_Service * service,
 
 		rc = dabbad_thread_stop(&pkt_capture->thread);
 
-		if (!rc) {
-			dabbad_capture_remove(pkt_capture);
-			close(pkt_capture->rx.pcap_fd);
-			packet_mmap_destroy(&pkt_capture->rx.pkt_mmap);
-			free(pkt_capture);
+		if (rc)
 			break;
-		}
+
+		dabbad_capture_remove(pkt_capture);
+		close(pkt_capture->rx.pcap_fd);
+		packet_mmap_destroy(&pkt_capture->rx.pkt_mmap);
+		free(pkt_capture);
 	}
 
 	err.code = rc;
