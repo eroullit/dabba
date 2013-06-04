@@ -39,6 +39,7 @@
 #include <errno.h>
 #include <assert.h>
 #include <limits.h>
+#include <fcntl.h>
 #include <sys/queue.h>
 #include <net/if.h>
 #include <arpa/inet.h>
@@ -232,7 +233,19 @@ void dabbad_capture_start(Dabba__DabbaService_Service * service,
 		goto out;
 	}
 
-	pkt_capture->rx.pcap_fd = pcap_create(capturep->pcap, LINKTYPE_EN10MB);
+	if (capturep->append)
+		pkt_capture->rx.pcap_fd =
+		    pcap_open(capturep->pcap, O_RDWR | O_APPEND);
+	else
+		pkt_capture->rx.pcap_fd =
+		    pcap_create(capturep->pcap, LINKTYPE_EN10MB);
+
+	if (pkt_capture->rx.pcap_fd < 0) {
+		rc = errno;
+		free(pkt_capture);
+		close(sock);
+		goto out;
+	}
 
 	rc = packet_mmap_create(&pkt_capture->rx.pkt_mmap, capturep->interface,
 				sock, PACKET_MMAP_RX, capturep->frame_size,

@@ -81,6 +81,10 @@ Configure the packet mmap area to contain <number> of frames.
 This number must be a power of two. The default value is 32 frames.
 The lowest frame number value is 8.
 
+=item --append
+
+Append capture to existing pcap file
+
 =item --id <thread-id>
 
 Reference a capture by its unique thread id.
@@ -286,6 +290,7 @@ static int cmd_capture_start(int argc, const char **argv)
 		OPT_CAPTURE_PCAP,
 		OPT_CAPTURE_FRAME_NUMBER,
 		OPT_CAPTURE_FRAME_SIZE,
+		OPT_CAPTURE_APPEND,
 		OPT_TCP,
 		OPT_LOCAL,
 		OPT_HELP
@@ -304,6 +309,7 @@ static int cmd_capture_start(int argc, const char **argv)
 		{"frame-number", required_argument, NULL,
 		 OPT_CAPTURE_FRAME_NUMBER},
 		{"frame-size", required_argument, NULL, OPT_CAPTURE_FRAME_SIZE},
+		{"append", no_argument, NULL, OPT_CAPTURE_APPEND},
 		{"tcp", optional_argument, NULL, OPT_TCP},
 		{"local", optional_argument, NULL, OPT_LOCAL},
 		{"help", no_argument, NULL, OPT_HELP},
@@ -347,6 +353,10 @@ static int cmd_capture_start(int argc, const char **argv)
 			break;
 		case OPT_CAPTURE_FRAME_NUMBER:
 			capture.frame_nr = strtoull(optarg, NULL, 10);
+			break;
+		case OPT_CAPTURE_APPEND:
+			capture.has_append = 1;
+			capture.append = 1;
 			break;
 		case OPT_CAPTURE_FRAME_SIZE:
 			capture.frame_size = strtoull(optarg, NULL, 10);
