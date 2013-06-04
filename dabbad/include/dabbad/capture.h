@@ -58,4 +58,9 @@ void dabbad_capture_get(Dabba__DabbaService_Service * service,
 			const Dabba__ThreadIdList * id_listp,
 			Dabba__CaptureList_Closure closure, void *closure_data);
 
+void dabbad_capture_stop_all(Dabba__DabbaService_Service * service,
+			     const Dabba__Dummy * dummyp,
+			     Dabba__ErrorCode_Closure closure,
+			     void *closure_data);
+
 #endif				/* CAPTURE_H */

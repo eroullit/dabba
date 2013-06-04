@@ -194,6 +194,46 @@ void dabbad_capture_stop(Dabba__DabbaService_Service * service,
 }
 
 /**
+ * \brief RPC to stop all running captures
+ * \param[in]           service	        Pointer to protobuf service structure
+ * \param[in]           dummyp          Pointer to unused dummy rpc message
+ * \param[in]           closure         Pointer to protobuf closure function pointer
+ * \param[in]           closure_data	Pointer to protobuf closure data
+ * \return Returns 0 on success, else on failure via its closure function.
+ */
+
+void dabbad_capture_stop_all(Dabba__DabbaService_Service * service,
+			     const Dabba__Dummy * dummyp,
+			     Dabba__ErrorCode_Closure closure,
+			     void *closure_data)
+{
+	Dabba__ErrorCode err = DABBA__ERROR_CODE__INIT;
+	struct packet_capture *pkt_capture, *tmp;
+	int rc = 0;
+
+	assert(service);
+	assert(dummyp);
+
+	for (pkt_capture = TAILQ_FIRST(&capture_queue.head); pkt_capture;
+	     pkt_capture = tmp) {
+		tmp = TAILQ_NEXT(pkt_capture, entry);
+
+		rc = dabbad_thread_stop(&pkt_capture->thread);
+
+		if (!rc) {
+			dabbad_capture_remove(pkt_capture);
+			close(pkt_capture->rx.pcap_fd);
+			packet_mmap_destroy(&pkt_capture->rx.pkt_mmap);
+			free(pkt_capture);
+			break;
+		}
+	}
+
+	err.code = rc;
+	closure(&err, closure_data);
+}
+
+/**
  * \brief RPC to start a new capture
  * \param[in]           service	        Pointer to protobuf service structure
  * \param[in]           capturep        Pointer to new capture thread settings
