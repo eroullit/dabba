@@ -40,10 +40,9 @@
 #include <assert.h>
 #include <limits.h>
 #include <sys/queue.h>
+#include <net/if.h>
 #include <arpa/inet.h>
 #include <linux/if_ether.h>
-#include <netlink/cache.h>
-#include <netlink/route/link.h>
 
 #include <libdabba/macros.h>
 #include <libdabba/interface.h>
