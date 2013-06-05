@@ -145,18 +145,29 @@ do
         "
 done
 
-for i in `seq 0 9`
-do
-        test_expect_success PYTHON_YAML "Query capture thread id to stop" "
-            dictkeys2values captures $i id < parsed > result_id
-        "
+test_expect_success PYTHON_YAML "Query capture thread id to stop" "
+    dictkeys2values captures 0 id < parsed > result_id
+"
 
-        test_expect_success PYTHON_YAML "Stop capture thread #$(($i+1)) on loopback" "
-            '$DABBA_PATH'/dabba capture stop --id '$(cat result_id)' &&
-            '$DABBA_PATH'/dabba capture get > after &&
-            test_must_fail grep -wq -f result_id after
-        "
-done
+test_expect_success PYTHON_YAML "Stop capture thread #0 on loopback" "
+    '$DABBA_PATH'/dabba capture stop --id '$(cat result_id)' &&
+    '$DABBA_PATH'/dabba capture get > after &&
+    test_must_fail grep -wq -f result_id after
+"
+
+test_expect_success "Stop all running captures thread" "
+    '$DABBA_PATH'/dabba capture stop-all &&
+    '$DABBA_PATH'/dabba capture get > result
+"
+
+cat > expect << EOF
+---
+  captures:
+EOF
+
+test_expect_success "Check that the capture list is empty" "
+    test_cmp result expect
+"
 
 test_expect_success "Cleanup: Stop dabbad" "
     killall dabbad
