@@ -287,4 +287,5 @@ service dabba_service
     rpc capture_get (thread_id_list) returns (capture_list);
     rpc capture_start (capture) returns (error_code);
     rpc capture_stop (thread_id) returns (error_code);
+    rpc capture_stop_all (dummy) returns (error_code);
 }
