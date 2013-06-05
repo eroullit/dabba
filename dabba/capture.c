@@ -59,6 +59,10 @@ Start a new capture.
 
 Stop a running capture.
 
+=item stop-all
+
+Stop all running captures.
+
 =back
 
 =head1 OPTIONS
@@ -246,6 +250,29 @@ static int rpc_capture_stop(ProtobufCService * service,
 
 	dabba__dabba_service__capture_stop(service, id,
 					   rpc_error_code_print, &is_done);
+
+	dabba_rpc_call_is_done(&is_done);
+
+	return 0;
+}
+
+/**
+ * \brief Invoke capture stop all remote procedure call
+ * \param[in]           service	        Pointer to protobuf service
+ * \param[in]           dummy 	        Pointer to unused dummy rpc message
+ * \return always returns zero.
+ */
+
+static int rpc_capture_stop_all(ProtobufCService * service,
+				const Dabba__Dummy * dummy)
+{
+	protobuf_c_boolean is_done = 0;
+
+	assert(service);
+	assert(dummy);
+
+	dabba__dabba_service__capture_stop_all(service, dummy,
+					       rpc_error_code_print, &is_done);
 
 	dabba_rpc_call_is_done(&is_done);
 
@@ -444,6 +471,70 @@ static int cmd_capture_stop(int argc, const char **argv)
 }
 
 /**
+ * \brief Parse argument vector to prepare a capture reset query
+ * \param[in]           argc	        Argument counter
+ * \param[in]           argv	        Argument vector
+ * \return 0 on success, \c EINVAL on invalid input.
+ */
+
+static int cmd_capture_stop_all(int argc, const char **argv)
+{
+	enum capture_start_option {
+		OPT_TCP,
+		OPT_LOCAL,
+		OPT_HELP
+	};
+
+	int ret;
+	Dabba__Dummy dummy = DABBA__DUMMY__INIT;
+	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+	ProtobufCService *service;
+
+	static struct option capture_option[] = {
+		{"tcp", optional_argument, NULL, OPT_TCP},
+		{"local", optional_argument, NULL, OPT_LOCAL},
+		{"help", no_argument, NULL, OPT_HELP},
+		{NULL, 0, NULL, 0},
+	};
+
+	/* HACK: getopt*() start to parse options at argv[1] */
+	argc++;
+	argv--;
+
+	/* parse capture options */
+	while ((ret =
+		getopt_long_only(argc, (char **)argv, "", capture_option,
+				 NULL)) != EOF) {
+		switch (ret) {
+		case OPT_TCP:
+			server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
+			server_id = DABBA_RPC_DEFAULT_TCP_SERVER_NAME;
+
+			if (optarg)
+				server_id = optarg;
+			break;
+		case OPT_LOCAL:
+			server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+			server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+
+			if (optarg)
+				server_id = optarg;
+			break;
+		case OPT_HELP:
+		default:
+			show_usage(capture_option);
+			return -1;
+		}
+	}
+
+	service = dabba_rpc_client_connect(server_id, server_type);
+
+	/* Check error reporting */
+	return service ? rpc_capture_stop_all(service, &dummy) : EINVAL;
+}
+
+/**
  * \brief Parse argument vector to prepare a capture list get query
  * \param[in]           argc	        Argument counter
  * \param[in]           argv	        Argument vector
@@ -549,6 +640,7 @@ int cmd_capture(int argc, const char **argv)
 	static const struct cmd_struct cmd[] = {
 		{"start", cmd_capture_start},
 		{"stop", cmd_capture_stop},
+		{"stop-all", cmd_capture_stop_all},
 		{"get", cmd_capture_get},
 	};
 
