@@ -145,6 +145,10 @@ do
         "
 done
 
+test_expect_success "Generate some traffic to capture" "
+    ping -c 10 -i 0.2 -s 1500 localhost
+"
+
 test_expect_success PYTHON_YAML "Query capture thread id to stop" "
     dictkeys2values captures 0 id < parsed > result_id
 "
@@ -153,6 +157,26 @@ test_expect_success PYTHON_YAML "Stop capture thread #0 on loopback" "
     '$DABBA_PATH'/dabba capture stop --id '$(cat result_id)' &&
     '$DABBA_PATH'/dabba capture get > after &&
     test_must_fail grep -wq -f result_id after
+"
+
+test_expect_success "Measure pcap file size before appending" "
+    stat -c %s '$(pwd)/test0.pcap' > before_size
+"
+
+test_expect_success "Start a capture with pcap append" "
+    '$DABBA_PATH'/dabba capture start --interface any --pcap test0.pcap --append
+"
+
+test_expect_success "Generate some traffic to capture" "
+    ping -c 10 -i 0.2 -s 1500 localhost
+"
+
+test_expect_success "Measure pcap file size after appending" "
+    stat -c %s '$(pwd)/test0.pcap' > after_size
+"
+
+test_expect_success "Check that appended pcap file size grows" "
+    test $(cat after_size) -gt $(cat before_size)
 "
 
 test_expect_success "Stop all running captures thread" "
