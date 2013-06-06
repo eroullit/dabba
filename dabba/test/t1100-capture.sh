@@ -110,7 +110,7 @@ do
 
         test_expect_success PYTHON_YAML "Query capture YAML output" "
             echo 'any' > expect_interface &&
-            echo 'test$i.pcap' > expect_pcap &&
+            echo '$SHARNESS_TRASH_DIRECTORY/test$i.pcap' > expect_pcap &&
             echo '$ring_size' > expect_packet_mmap_size &&
             echo '$frame_nr' > expect_frame_number &&
             dictkeys2values captures $i id < parsed > result_id &&
