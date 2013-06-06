@@ -110,7 +110,7 @@ do
 
         test_expect_success PYTHON_YAML "Query capture YAML output" "
             echo 'any' > expect_interface &&
-            echo '$(pwd)/test$i.pcap' > expect_pcap &&
+            echo 'test$i.pcap' > expect_pcap &&
             echo '$ring_size' > expect_packet_mmap_size &&
             echo '$frame_nr' > expect_frame_number &&
             dictkeys2values captures $i id < parsed > result_id &&
@@ -160,7 +160,7 @@ test_expect_success PYTHON_YAML "Stop capture thread #0 on loopback" "
 "
 
 test_expect_success "Measure pcap file size before appending" "
-    stat -c %s '$(pwd)/test0.pcap' > before_size
+    stat -c %s test0.pcap > before_size
 "
 
 test_expect_success "Start a capture with pcap append" "
@@ -172,7 +172,7 @@ test_expect_success "Generate some traffic to capture" "
 "
 
 test_expect_success "Measure pcap file size after appending" "
-    stat -c %s '$(pwd)/test0.pcap' > after_size
+    stat -c %s test0.pcap > after_size
 "
 
 test_expect_success "Check that appended pcap file size grows" "
