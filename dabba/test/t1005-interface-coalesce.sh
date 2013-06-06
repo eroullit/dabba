@@ -72,15 +72,15 @@ test_expect_success "Setup: Stop already running dabbad" "
 "
 
 test_expect_success 'invoke dabba interface coalesce command w/o dabbad' "
-    test_expect_code 22 $DABBA_PATH/dabba interface coalesce get
+    test_expect_code 22 dabba interface coalesce get
 "
 
 test_expect_success "Setup: Start dabbad" "
-    '$DABBAD_PATH'/dabbad --daemonize
+    dabbad --daemonize
 "
 
 test_expect_success 'invoke dabba interface coalesce command with dabbad' "
-    '$DABBA_PATH'/dabba interface coalesce get > result
+    dabba interface coalesce get > result
 "
 
 test_expect_success PYTHON_YAML "Parse interface coalesce YAML output" "
@@ -135,7 +135,7 @@ do
 done
 
 test_expect_success TEST_DEV "Fetch '$TEST_DEV' coalesce settings" "
-    '$DABBA_PATH'/dabba interface coalesce get --id '$TEST_DEV' > result
+    dabba interface coalesce get --id '$TEST_DEV' > result
 "
 
 test_expect_success TEST_DEV,PYTHON_YAML "Parse '$TEST_DEV' coalesce YAML output" "
@@ -149,8 +149,8 @@ do
 
     if [ "$value" != "0" ]; then
         test_expect_success TEST_DEV,PYTHON_YAML "Modify '$TEST_DEV' $feature value" "
-            '$DABBA_PATH'/dabba interface coalesce modify --id '$TEST_DEV' --'$ethtool_pattern' 50 &&
-            '$DABBA_PATH'/dabba interface coalesce get --id '$TEST_DEV' > mod_result
+            dabba interface coalesce modify --id '$TEST_DEV' --'$ethtool_pattern' 50 &&
+            dabba interface coalesce get --id '$TEST_DEV' > mod_result
         "
 
         test_expect_success TEST_DEV,PYTHON_YAML "Parse modified '$TEST_DEV' coalesce YAML output" "
@@ -162,7 +162,7 @@ do
         "
 
         test_expect_success TEST_DEV,PYTHON_YAML "Modify '$TEST_DEV' $feature to previous value" "
-            '$DABBA_PATH'/dabba interface coalesce modify --id '$TEST_DEV' --'$ethtool_pattern' '$value'
+            dabba interface coalesce modify --id '$TEST_DEV' --'$ethtool_pattern' '$value'
         "
     fi
 done
@@ -178,8 +178,8 @@ do
 
             if [ "$value" != "0" ]; then
                 test_expect_success TEST_DEV,PYTHON_YAML "Modify '$TEST_DEV' $direction $feature $type value" "
-                    '$DABBA_PATH'/dabba interface coalesce modify --id '$TEST_DEV' --'$ethtool_pattern' 50 &&
-                    '$DABBA_PATH'/dabba interface coalesce get --id '$TEST_DEV' > mod_result
+                    dabba interface coalesce modify --id '$TEST_DEV' --'$ethtool_pattern' 50 &&
+                    dabba interface coalesce get --id '$TEST_DEV' > mod_result
                 "
 
                 test_expect_success TEST_DEV,PYTHON_YAML "Parse modified '$TEST_DEV' coalesce YAML output" "
@@ -191,7 +191,7 @@ do
                 "
 
                 test_expect_success TEST_DEV,PYTHON_YAML "Modify '$TEST_DEV' $direction $feature $type to previous value" "
-                    '$DABBA_PATH'/dabba interface coalesce modify --id '$TEST_DEV' --'$ethtool_pattern' '$value'
+                    dabba interface coalesce modify --id '$TEST_DEV' --'$ethtool_pattern' '$value'
                 "
             fi
         done
@@ -202,8 +202,8 @@ do
 
     if [ "$value" = "True" ]; then
         test_expect_success TEST_DEV,PYTHON_YAML "Modify '$TEST_DEV' $direction adaptive value" "
-            '$DABBA_PATH'/dabba interface coalesce modify --id '$TEST_DEV' --'$ethtool_pattern' false &&
-            '$DABBA_PATH'/dabba interface coalesce get --id '$TEST_DEV' > mod_result
+            dabba interface coalesce modify --id '$TEST_DEV' --'$ethtool_pattern' false &&
+            dabba interface coalesce get --id '$TEST_DEV' > mod_result
         "
 
         test_expect_success TEST_DEV,PYTHON_YAML "Parse modified '$TEST_DEV' coalesce YAML output" "
@@ -215,7 +215,7 @@ do
         "
 
         test_expect_success TEST_DEV,PYTHON_YAML "Modify '$TEST_DEV' $direction adaptive to previous value" "
-            '$DABBA_PATH'/dabba interface coalesce modify --id '$TEST_DEV' --'$ethtool_pattern' '$value'
+            dabba interface coalesce modify --id '$TEST_DEV' --'$ethtool_pattern' '$value'
         "
     fi
 done

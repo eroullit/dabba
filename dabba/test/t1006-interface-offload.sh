@@ -40,15 +40,15 @@ test_expect_success "Setup: Stop already running dabbad" "
 "
 
 test_expect_success 'invoke dabba interface offload command w/o dabbad' "
-    test_expect_code 22 $DABBA_PATH/dabba interface offload get
+    test_expect_code 22 dabba interface offload get
 "
 
 test_expect_success "Setup: Start dabbad" "
-    '$DABBAD_PATH'/dabbad --daemonize
+    dabbad --daemonize
 "
 
 test_expect_success 'invoke dabba interface offload command with dabbad' "
-    '$DABBA_PATH'/dabba interface offload get > result
+    dabba interface offload get > result
 "
 
 test_expect_success PYTHON_YAML "Parse interface offload YAML output" "
@@ -84,7 +84,7 @@ do
 done
 
 test_expect_success TEST_DEV "invoke dabba interface '$TEST_DEV' offload command with dabbad" "
-    '$DABBA_PATH'/dabba interface offload get --id '$TEST_DEV' > result
+    dabba interface offload get --id '$TEST_DEV' > result
 "
 
 test_expect_success TEST_DEV,PYTHON_YAML "Parse interface offload YAML output" "
@@ -99,8 +99,8 @@ do
 
     if [ "$(cat "output_$feature" 2> /dev/null)" = "True" ]; then
         test_expect_success TEST_DEV,PYTHON_YAML "Modify '$TEST_DEV' $feature" "
-            '$DABBA_PATH'/dabba interface offload modify --id '$TEST_DEV' --'$feature' false &&
-            '$DABBA_PATH'/dabba interface offload get --id '$TEST_DEV' > mod_result
+            dabba interface offload modify --id '$TEST_DEV' --'$feature' false &&
+            dabba interface offload get --id '$TEST_DEV' > mod_result
         "
 
         test_expect_success TEST_DEV,PYTHON_YAML "Parse modified '$TEST_DEV' offload YAML output" "
@@ -112,7 +112,7 @@ do
         "
 
         test_expect_success TEST_DEV,PYTHON_YAML "Modify '$TEST_DEV' $feature to previous status" "
-            '$DABBA_PATH'/dabba interface offload modify --id '$TEST_DEV' --'$feature' true
+            dabba interface offload modify --id '$TEST_DEV' --'$feature' true
         "
     fi
 done
