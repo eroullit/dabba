@@ -21,6 +21,8 @@ test_description='Test dabba capture command'
 
 . ./dabba-test-lib.sh
 
+pidfile=$(mktemppid)
+
 get_capture_thread_nr()
 {
     local result_file=$1
@@ -40,7 +42,7 @@ frame_nr="16"
 ring_size="$(($frame_nr * 2048))" # 2kB are allocated for one ethernet frame
 
 test_expect_success "Setup: Start dabbad" "
-    dabbad --daemonize
+    dabbad --daemonize --pidfile '$pidfile'
 "
 
 test_expect_success "Check 'dabba capture' help output" "
@@ -194,7 +196,7 @@ test_expect_success "Check that the capture list is empty" "
 "
 
 test_expect_success "Cleanup: Stop dabbad" "
-    killall dabbad
+    kill $(cat "$pidfile")
 "
 
 test_done

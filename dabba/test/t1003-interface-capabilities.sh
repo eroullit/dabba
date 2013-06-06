@@ -21,6 +21,8 @@ test_description='Test dabba interface capabilities command'
 
 . ./dabba-test-lib.sh
 
+pidfile=$(mktemppid)
+
 ethtool_port_parse() {
     local ethtool_output="$1"
     local out="{"
@@ -115,7 +117,7 @@ test_expect_success 'invoke dabba interface capabilities command w/o dabbad' "
 "
 
 test_expect_success "Setup: Start dabbad" "
-    dabbad --daemonize
+    dabbad --daemonize --pidfile '$pidfile'
 "
 
 test_expect_success 'invoke dabba interface capabilities command with dabbad' "
@@ -206,7 +208,7 @@ do
 done
 
 test_expect_success "Cleanup: Stop dabbad" "
-    killall dabbad
+    kill $(cat "$pidfile")
 "
 
 test_done

@@ -32,11 +32,13 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <dirent.h>
 
 #include <libdabba/strlcpy.h>
+#include <unistd.h>
 
 /**
  * \brief Path to current process open file descriptor information
@@ -129,5 +131,27 @@ int fd_to_path(const int fd, char *path, const size_t path_len)
 
  out:
 	closedir(dir);
+	return rc;
+}
+
+int create_pidfile(const char *const pidfile)
+{
+	int pidfd, len, rc = 0;
+	char pidstr[8];
+
+	assert(pidfile);
+
+	pidfd = open(pidfile, O_RDWR | O_CREAT, S_IWUSR | S_IRUSR);
+
+	if (pidfd < 0)
+		return errno;
+
+	len = snprintf(pidstr, sizeof(pidstr), "%u", getpid());
+
+	if (write(pidfd, pidstr, len) != len)
+		rc = errno;
+
+	close(pidfd);
+
 	return rc;
 }
