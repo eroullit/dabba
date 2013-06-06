@@ -21,6 +21,8 @@ test_description='Test dabba interface status command'
 
 . ./dabba-test-lib.sh
 
+pidfile=$(mktemppid)
+
 generate_status(){
         rm -f dev_status
         for dev in `sed '1,2d' /proc/net/dev | awk -F ':' '{ print $1 }' | tr -d ' '`
@@ -47,7 +49,7 @@ test_expect_success 'invoke dabba interface status w/o dabbad' "
 "
 
 test_expect_success "Setup: Start dabbad" "
-    dabbad --daemonize
+    dabbad --daemonize --pidfile '$pidfile'
 "
 
 test_expect_success "Check 'dabba interface' help output" "
@@ -113,7 +115,7 @@ EOF
 done
 
 test_expect_success "Cleanup: Stop dabbad" "
-    killall dabbad
+    kill $(cat "$pidfile")
 "
 
 test_done
