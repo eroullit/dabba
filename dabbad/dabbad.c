@@ -35,7 +35,7 @@ dabbad - Multithreaded packet mmap daemon
 
 =head1 SYNOPSIS
 
-dabbad [--daemonize][--help]
+dabbad [--daemonize][--pidfile <path>][--help]
 
 =head1 DESCRIPTION
 
@@ -54,6 +54,10 @@ see debug messages.
 =item dabbad --daemonize
 
 Start dabbad as a daemon.
+
+=item dabbad --pidfile /tmp/dabba.pid
+
+Tell dabbad to write its pid in a specific pidfile.
 
 =item dabbad --help
 
@@ -104,6 +108,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <fcntl.h>
 
 #include <dabbad/rpc.h>
+#include <dabbad/misc.h>
 #include <dabbad/help.h>
 
 /**
@@ -121,6 +126,7 @@ int main(int argc, char **argv)
 {
 	enum dabbad_opts {
 		OPT_DAEMONIZE,
+		OPT_PIDFILE,
 		OPT_TCP,
 		OPT_LOCAL,
 		OPT_VERSION,
@@ -129,6 +135,7 @@ int main(int argc, char **argv)
 
 	static const struct option dabbad_long_options[] = {
 		{"daemonize", no_argument, NULL, OPT_DAEMONIZE},
+		{"pidfile", required_argument, NULL, OPT_PIDFILE},
 		{"tcp", optional_argument, NULL, OPT_TCP},
 		{"local", optional_argument, NULL, OPT_LOCAL},
 		{"version", no_argument, NULL, OPT_VERSION},
@@ -136,8 +143,9 @@ int main(int argc, char **argv)
 		{NULL, 0, NULL, 0}
 	};
 
-	int opt, opt_idx;
+	int opt, opt_idx, rc = 0;
 	int daemonize = 0;
+	const char *pidfile = NULL;
 	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
 	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 
@@ -150,6 +158,9 @@ int main(int argc, char **argv)
 		switch (opt) {
 		case OPT_DAEMONIZE:
 			daemonize = 1;
+			break;
+		case OPT_PIDFILE:
+			pidfile = optarg;
 			break;
 		case OPT_VERSION:
 			print_version();
@@ -185,5 +196,8 @@ int main(int argc, char **argv)
 		}
 	}
 
-	return dabbad_rpc_msg_poll(server_id, server_type);
+	if (pidfile)
+		rc = create_pidfile(pidfile);
+
+	return rc ? rc : dabbad_rpc_msg_poll(server_id, server_type);
 }

@@ -21,6 +21,8 @@ test_description='Test dabba interface coalesce command'
 
 . ./dabba-test-lib.sh
 
+pidfile=$(mktemppid)
+
 ethtool_coalesce_parse() {
     local pattern="$1"
     local ethtool_output="$2"
@@ -76,7 +78,7 @@ test_expect_success 'invoke dabba interface coalesce command w/o dabbad' "
 "
 
 test_expect_success "Setup: Start dabbad" "
-    dabbad --daemonize
+    dabbad --daemonize --pidfile '$pidfile'
 "
 
 test_expect_success 'invoke dabba interface coalesce command with dabbad' "
@@ -221,7 +223,7 @@ do
 done
 
 test_expect_success "Cleanup: Stop dabbad" "
-    killall dabbad
+    kill $(cat "$pidfile")
 "
 
 test_done

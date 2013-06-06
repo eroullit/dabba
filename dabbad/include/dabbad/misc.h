@@ -25,5 +25,6 @@
 #define	MISC_H
 
 int fd_to_path(const int fd, char *path, const size_t path_len);
+int create_pidfile(const char *const pidfile);
 
 #endif				/* MISC_H */

@@ -21,6 +21,8 @@ test_description='Test dabba interface offload command'
 
 . ./dabba-test-lib.sh
 
+pidfile=$(mktemppid)
+
 ethtool_offload_long_name_get() {
     case "$1" in
         "rx-csum") echo "rx-checksumming";;
@@ -44,7 +46,7 @@ test_expect_success 'invoke dabba interface offload command w/o dabbad' "
 "
 
 test_expect_success "Setup: Start dabbad" "
-    dabbad --daemonize
+    dabbad --daemonize --pidfile '$pidfile'
 "
 
 test_expect_success 'invoke dabba interface offload command with dabbad' "
@@ -118,7 +120,7 @@ do
 done
 
 test_expect_success "Cleanup: Stop dabbad" "
-    killall dabbad
+    kill $(cat "$pidfile")
 "
 
 test_done

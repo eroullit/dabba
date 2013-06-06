@@ -31,6 +31,11 @@ taskset -h > /dev/null 2>&1 && test_set_prereq TASKSET
 "$ETHTOOL_PATH" -h > /dev/null 2>&1 && test_set_prereq ETHTOOL
 test -n "$TEST_DEV" && test_set_prereq TEST_DEV
 
+mktemppid()
+{
+    mktemp dabbad.pid.XXXXXXXXXXXX
+}
+
 yaml2dict()
 {
     "$PYTHON_PATH" "$SHARNESS_TEST_DIRECTORY"/yaml2dict.py "$@"

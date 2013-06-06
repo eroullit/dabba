@@ -21,6 +21,8 @@ test_description='Test dabba thread command'
 
 . ./dabba-test-lib.sh
 
+pidfile=$(mktemppid)
+
 get_default_cpu_affinity()
 {
     taskset -pc 1 | awk '{ print $NF }'
@@ -55,7 +57,7 @@ check_thread_nr()
 default_cpu_affinity=$(get_default_cpu_affinity)
 
 test_expect_success "Setup: Start dabbad" "
-    dabbad --daemonize
+    dabbad --daemonize --pidfile '$pidfile'
 "
 
 test_expect_success "Setup: Start a basic capture on loopback" "
@@ -207,7 +209,7 @@ test_expect_success "Check if the capture thread is still present" "
 "
 
 test_expect_success "Cleanup: Stop dabbad" "
-    killall dabbad
+    kill $(cat "$pidfile")
 "
 
 test_done

@@ -21,6 +21,8 @@ test_description='Test dabba interface driver command'
 
 . ./dabba-test-lib.sh
 
+pidfile=$(mktemppid)
+
 test_expect_success "Setup: Stop already running dabbad" "
     test_might_fail killall dabbad
 "
@@ -30,7 +32,7 @@ test_expect_success 'invoke dabba interface driver command w/o dabbad' "
 "
 
 test_expect_success "Setup: Start dabbad" "
-    dabbad --daemonize
+    dabbad --daemonize --pidfile '$pidfile'
 "
 
 test_expect_success 'invoke dabba interface driver command with dabbad' "
@@ -57,7 +59,7 @@ do
 done
 
 test_expect_success "Cleanup: Stop dabbad" "
-    killall dabbad
+    kill $(cat "$pidfile")
 "
 
 test_done
