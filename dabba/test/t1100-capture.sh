@@ -160,7 +160,7 @@ test_expect_success PYTHON_YAML "Stop capture thread #0 on loopback" "
 "
 
 test_expect_success "Measure pcap file size before appending" "
-    stat -t '$(pwd)/test0.pcap' | awk '{print \$3}' > before_size
+    stat -c %s '$(pwd)/test0.pcap' > before_size
 "
 
 test_expect_success "Start a capture with pcap append" "
@@ -172,7 +172,7 @@ test_expect_success "Generate some traffic to capture" "
 "
 
 test_expect_success "Measure pcap file size after appending" "
-    stat -t '$(pwd)/test0.pcap' | awk '{print \$3}' > after_size
+    stat -c %s '$(pwd)/test0.pcap' > after_size
 "
 
 test_expect_success "Check that appended pcap file size grows" "
