@@ -55,24 +55,24 @@ check_thread_nr()
 default_cpu_affinity=$(get_default_cpu_affinity)
 
 test_expect_success "Setup: Start dabbad" "
-    '$DABBAD_PATH'/dabbad --daemonize
+    dabbad --daemonize
 "
 
 test_expect_success "Setup: Start a basic capture on loopback" "
-    '$DABBA_PATH'/dabba capture start --interface any --pcap test.pcap --frame-number 8
+    dabba capture start --interface any --pcap test.pcap --frame-number 8
 "
 
 test_expect_success "Check 'dabba thread' help output" "
-    '$DABBA_PATH/dabba' help thread | cat <<EOF
+    dabba help thread | cat <<EOF
     q
     EOF &&
-    '$DABBA_PATH/dabba' thread --help | cat <<EOF
+    dabba thread --help | cat <<EOF
     q
     EOF
 "
 
 test_expect_success "Fetch running thread information" "
-    '$DABBA_PATH'/dabba thread get settings > result
+    dabba thread get settings > result
 "
 
 test_expect_success PYTHON_YAML "Parse thread YAML output" "
@@ -125,8 +125,8 @@ do
         for priority in $min_prio $max_prio
         do
                 test_expect_success PYTHON_YAML "Modify capture thread scheduling policy ($policy:$priority)" "
-                    '$DABBA_PATH'/dabba thread modify --sched-policy '$policy' --sched-prio '$priority' --id '$thread_id' &&
-                    '$DABBA_PATH'/dabba thread get settings > result
+                    dabba thread modify --sched-policy '$policy' --sched-prio '$priority' --id '$thread_id' &&
+                    dabba thread get settings > result
                 "
 
                 test_expect_success PYTHON_YAML "Parse thread YAML output" "
@@ -153,8 +153,8 @@ do
         do
                 # Put back to 'test_must_fail' when proper error reporting is done
                 test_expect_success PYTHON_YAML "Do not modify capture thread out-of-range scheduling policy ($policy:$priority)" "
-                    test_might_fail '$DABBA_PATH'/dabba thread modify --sched-policy '$policy' --sched-prio '$priority' --id '$thread_id' &&
-                    '$DABBA_PATH'/dabba thread get settings > result
+                    test_might_fail dabba thread modify --sched-policy '$policy' --sched-prio '$priority' --id '$thread_id' &&
+                    dabba thread get settings > result
                 "
 
                 test_expect_success PYTHON_YAML "Parse thread YAML output" "
@@ -179,8 +179,8 @@ done
 for cpu_affinity in 0 $default_cpu_affinity
 do
         test_expect_success PYTHON_YAML "Modify capture thread CPU affinity (run on CPU $cpu_affinity)" "
-            '$DABBA_PATH'/dabba thread modify --cpu-affinity '$cpu_affinity' --id '$thread_id' &&
-            '$DABBA_PATH'/dabba thread get settings > result
+            dabba thread modify --cpu-affinity '$cpu_affinity' --id '$thread_id' &&
+            dabba thread get settings > result
         "
 
         test_expect_success PYTHON_YAML "Parse thread YAML output" "
@@ -198,8 +198,8 @@ do
 done
 
 test_expect_success "Stop all running captures" "
-    '$DABBA_PATH'/dabba capture stop-all &&
-    '$DABBA_PATH'/dabba thread get settings > after
+    dabba capture stop-all &&
+    dabba thread get settings > after
 "
 
 test_expect_success "Check if the capture thread is still present" "

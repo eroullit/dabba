@@ -34,7 +34,7 @@ See 'dabba help <command> [<subcommand>]' for more specific information.
 EOF
 
 test_expect_success "Check dabba help output" "
-    '$DABBA_PATH'/dabba --help > result &&
+    dabba --help > result &&
     test_cmp expect result
 "
 

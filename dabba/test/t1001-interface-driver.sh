@@ -26,15 +26,15 @@ test_expect_success "Setup: Stop already running dabbad" "
 "
 
 test_expect_success 'invoke dabba interface driver command w/o dabbad' "
-    test_expect_code 22 $DABBA_PATH/dabba interface driver get
+    test_expect_code 22 dabba interface driver get
 "
 
 test_expect_success "Setup: Start dabbad" "
-    '$DABBAD_PATH'/dabbad --daemonize
+    dabbad --daemonize
 "
 
 test_expect_success 'invoke dabba interface driver command with dabbad' "
-    '$DABBA_PATH'/dabba interface driver get > result
+    dabba interface driver get > result
 "
 
 test_expect_success PYTHON_YAML "Parse interface driver YAML output" "

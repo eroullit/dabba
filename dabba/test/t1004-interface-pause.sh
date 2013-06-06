@@ -26,15 +26,15 @@ test_expect_success "Setup: Stop already running dabbad" "
 "
 
 test_expect_success 'invoke dabba interface pause command w/o dabbad' "
-    test_expect_code 22 $DABBA_PATH/dabba interface pause get 
+    test_expect_code 22 dabba interface pause get
 "
 
 test_expect_success "Setup: Start dabbad" "
-    '$DABBAD_PATH'/dabbad --daemonize
+    dabbad --daemonize
 "
 
 test_expect_success 'invoke dabba interface pause command with dabbad' "
-    '$DABBA_PATH'/dabba interface pause get > result
+    dabba interface pause get > result
 "
 
 test_expect_success PYTHON_YAML "Parse interface pause YAML output" "
@@ -74,7 +74,7 @@ do
 done
 
 test_expect_success TEST_DEV "Fetch '$TEST_DEV' pause settings" "
-    '$DABBA_PATH'/dabba interface pause get --id '$TEST_DEV' > result
+    dabba interface pause get --id '$TEST_DEV' > result
 "
 
 test_expect_success TEST_DEV,PYTHON_YAML "Parse '$TEST_DEV' coalesce YAML output" "
@@ -87,8 +87,8 @@ do
 
     if [ "$value" = "True" ]; then
         test_expect_success TEST_DEV,PYTHON_YAML "Modify '$TEST_DEV' $feature pause settings" "
-            '$DABBA_PATH'/dabba interface pause modify --id '$TEST_DEV' --'$feature' False &&
-            '$DABBA_PATH'/dabba interface pause get --id '$TEST_DEV' > mod_result
+            dabba interface pause modify --id '$TEST_DEV' --'$feature' False &&
+            dabba interface pause get --id '$TEST_DEV' > mod_result
         "
 
         test_expect_success TEST_DEV,PYTHON_YAML "Parse modified '$TEST_DEV' pause YAML output" "
@@ -105,7 +105,7 @@ for feature in autoneg rx tx
 do
     value=$(dictkeys2values interfaces 0 pause "$feature" < parsed)
     test_expect_success TEST_DEV,PYTHON_YAML "Modify '$TEST_DEV' $feature pause to previous value" "
-        '$DABBA_PATH'/dabba interface pause modify --id '$TEST_DEV' --'$feature' '$value'
+        dabba interface pause modify --id '$TEST_DEV' --'$feature' '$value'
     "
 done
 
