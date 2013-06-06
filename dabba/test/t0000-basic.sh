@@ -21,7 +21,7 @@ test_description='Test the basic'
 
 . ./sharness.sh
 
-test_expect_success 'check dabba executable presence' "'$SHARNESS_TEST_DIRECTORY'/../dabba > /dev/null"
+test_expect_success 'check dabba executable presence' "dabba > /dev/null"
 test_expect_success 'success is reported like this' ':'
 test_expect_failure 'pretend we have a known breakage' 'false'
 

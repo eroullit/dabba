@@ -40,41 +40,41 @@ frame_nr="16"
 ring_size="$(($frame_nr * 2048))" # 2kB are allocated for one ethernet frame
 
 test_expect_success "Setup: Start dabbad" "
-    '$DABBAD_PATH'/dabbad --daemonize
+    dabbad --daemonize
 "
 
 test_expect_success "Check 'dabba capture' help output" "
-    '$DABBA_PATH/dabba' help capture | cat <<EOF
+    dabba help capture | cat <<EOF
     q
     EOF &&
-    '$DABBA_PATH/dabba' capture --help | cat <<EOF
+    dabba' capture --help | cat <<EOF
     q
     EOF
 "
 
 test_expect_failure "Start capture thread on an invalid interface (too long)" "
-    test_expect_code 22 '$DABBA_PATH'/dabba capture start --interface lorem-ipsum-dolor-sit --pcap test.pcap --frame-number $frame_nr
+    test_expect_code 22 dabba capture start --interface lorem-ipsum-dolor-sit --pcap test.pcap --frame-number $frame_nr
 "
 
 test_expect_failure "Start capture thread on an invalid interface (does not exist)" "
-    test_expect_code 19 '$DABBA_PATH'/dabba capture start --interface lorem-ipsum --pcap test.pcap --frame-number $frame_nr
+    test_expect_code 19 dabba capture start --interface lorem-ipsum --pcap test.pcap --frame-number $frame_nr
 "
 
 test_expect_failure "Start capture thread with a missing interface" "
-    test_expect_code 22 '$DABBA_PATH'/dabba capture start --pcap test.pcap --frame-number $frame_nr
+    test_expect_code 22 dabba capture start --pcap test.pcap --frame-number $frame_nr
 "
 
 test_expect_failure "Start capture thread with a missing pcap path" "
-    test_expect_code 22 '$DABBA_PATH'/dabba capture start --interface any --frame-number $frame_nr
+    test_expect_code 22 dabba capture start --interface any --frame-number $frame_nr
 "
 
 test_expect_failure "Invoke capture command w/o any parameters" "
-    test_expect_code 38 '$DABBA_PATH'/dabba capture
+    test_expect_code 38 dabba capture
 "
 
 test_expect_success "Start capture thread with a default frame number" "
-    '$DABBA_PATH'/dabba capture start --interface any --pcap test.pcap &&
-    '$DABBA_PATH'/dabba capture get > result
+    dabba capture start --interface any --pcap test.pcap &&
+    dabba capture get > result
 "
 
 test_expect_success PYTHON_YAML "Parse capture YAML output" "
@@ -92,16 +92,16 @@ test_expect_success PYTHON_YAML "Check thread default capture frame number ($def
 "
 
 test_expect_success PYTHON_YAML "Stop capture thread with a default frame number" "
-    '$DABBA_PATH'/dabba capture stop --id '$(cat result_id)' &&
-    '$DABBA_PATH'/dabba capture get > after &&
+    dabba capture stop --id '$(cat result_id)' &&
+    dabba capture get > after &&
     test_must_fail grep -wq -f result_id after
 "
 
 for i in `seq 0 9`
 do
         test_expect_success "Start capture thread #$(($i+1)) on loopback" "
-            '$DABBA_PATH'/dabba capture start --interface any --pcap test$i.pcap --frame-number $frame_nr &&
-            '$DABBA_PATH'/dabba capture get > result
+            dabba capture start --interface any --pcap test$i.pcap --frame-number $frame_nr &&
+            dabba capture get > result
         "
 
         test_expect_success PYTHON_YAML "Parse capture YAML output" "
@@ -110,7 +110,7 @@ do
 
         test_expect_success PYTHON_YAML "Query capture YAML output" "
             echo 'any' > expect_interface &&
-            echo '$(pwd)/test$i.pcap' > expect_pcap &&
+            echo '$SHARNESS_TRASH_DIRECTORY/test$i.pcap' > expect_pcap &&
             echo '$ring_size' > expect_packet_mmap_size &&
             echo '$frame_nr' > expect_frame_number &&
             dictkeys2values captures $i id < parsed > result_id &&
@@ -154,17 +154,17 @@ test_expect_success PYTHON_YAML "Query capture thread id to stop" "
 "
 
 test_expect_success PYTHON_YAML "Stop capture thread #0 on loopback" "
-    '$DABBA_PATH'/dabba capture stop --id '$(cat result_id)' &&
-    '$DABBA_PATH'/dabba capture get > after &&
+    dabba capture stop --id '$(cat result_id)' &&
+    dabba capture get > after &&
     test_must_fail grep -wq -f result_id after
 "
 
 test_expect_success "Measure pcap file size before appending" "
-    stat -c %s '$(pwd)/test0.pcap' > before_size
+    stat -c %s test0.pcap > before_size
 "
 
 test_expect_success "Start a capture with pcap append" "
-    '$DABBA_PATH'/dabba capture start --interface any --pcap test0.pcap --append
+    dabba capture start --interface any --pcap test0.pcap --append
 "
 
 test_expect_success "Generate some traffic to capture" "
@@ -172,7 +172,7 @@ test_expect_success "Generate some traffic to capture" "
 "
 
 test_expect_success "Measure pcap file size after appending" "
-    stat -c %s '$(pwd)/test0.pcap' > after_size
+    stat -c %s test0.pcap > after_size
 "
 
 test_expect_success "Check that appended pcap file size grows" "
@@ -180,8 +180,8 @@ test_expect_success "Check that appended pcap file size grows" "
 "
 
 test_expect_success "Stop all running captures thread" "
-    '$DABBA_PATH'/dabba capture stop-all &&
-    '$DABBA_PATH'/dabba capture get > result
+    dabba capture stop-all &&
+    dabba capture get > result
 "
 
 cat > expect << EOF

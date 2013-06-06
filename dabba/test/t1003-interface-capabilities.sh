@@ -111,15 +111,15 @@ test_expect_success "Setup: Stop already running dabbad" "
 "
 
 test_expect_success 'invoke dabba interface capabilities command w/o dabbad' "
-    test_expect_code 22 $DABBA_PATH/dabba interface capabilities get
+    test_expect_code 22 dabba interface capabilities get
 "
 
 test_expect_success "Setup: Start dabbad" "
-    '$DABBAD_PATH'/dabbad --daemonize
+    dabbad --daemonize
 "
 
 test_expect_success 'invoke dabba interface capabilities command with dabbad' "
-    '$DABBA_PATH'/dabba interface capabilities get > result
+    dabba interface capabilities get > result
 "
 
 test_expect_success PYTHON_YAML "Parse interface capabilities YAML output" "
@@ -167,7 +167,7 @@ do
 done
 
 test_expect_success TEST_DEV "Fetch '$TEST_DEV' capabilities" "
-    '$DABBA_PATH'/dabba interface capabilities get --id '$TEST_DEV' > result
+    dabba interface capabilities get --id '$TEST_DEV' > result
 "
 
 test_expect_success TEST_DEV,PYTHON_YAML "Parse '$TEST_DEV' capabilities YAML output" "
@@ -189,8 +189,8 @@ do
             for status in False True
             do
                 test_expect_success TEST_DEV,PYTHON_YAML "Modify '$TEST_DEV' ${speed}Mbps $duplex duplex to $status" "
-                    '$DABBA_PATH'/dabba interface capabilities modify --id '$TEST_DEV' --speed '$speed' --'$duplex'-duplex '$status' &&
-                    '$DABBA_PATH'/dabba interface capabilities get --id '$TEST_DEV' > mod_result
+                    dabba interface capabilities modify --id '$TEST_DEV' --speed '$speed' --'$duplex'-duplex '$status' &&
+                    dabba interface capabilities get --id '$TEST_DEV' > mod_result
                 "
 
                 test_expect_success TEST_DEV,PYTHON_YAML "Parse modified '$TEST_DEV' capabilities YAML output" "

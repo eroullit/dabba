@@ -43,24 +43,24 @@ test_expect_success "Setup: Stop already running dabbad" "
 "
 
 test_expect_success 'invoke dabba interface status w/o dabbad' "
-    test_expect_code 22 $DABBA_PATH/dabba interface status get
+    test_expect_code 22 dabba interface status get
 "
 
 test_expect_success "Setup: Start dabbad" "
-    '$DABBAD_PATH'/dabbad --daemonize
+    dabbad --daemonize
 "
 
 test_expect_success "Check 'dabba interface' help output" "
-    '$DABBA_PATH/dabba' help interface | cat <<EOF
+    dabba help interface | cat <<EOF
     q
     EOF &&
-    '$DABBA_PATH/dabba' interface --help | cat <<EOF
+    dabba interface --help | cat <<EOF
     q
     EOF
 "
 
 test_expect_success "invoke dabba interface status with dabbad" "
-    '$DABBA_PATH'/dabba interface status get > result &&
+    dabba interface status get > result &&
     grep '\- name: ' result > name_result &&
     generate_yaml_status > expected &&
     sort -o expected_sorted expected &&
@@ -95,11 +95,11 @@ cat > expected_promisc <<EOF
 $bool
 EOF
     test_expect_success TEST_DEV "Modify promiscuous mode on '$TEST_DEV'" "
-        '$DABBA_PATH'/dabba interface status modify --id '$TEST_DEV' --promiscuous '$bool'
+        dabba interface status modify --id '$TEST_DEV' --promiscuous '$bool'
     "
 
     test_expect_success TEST_DEV "Fetch status information of '$TEST_DEV'" "
-        '$DABBA_PATH'/dabba interface status get --id '$TEST_DEV' > result
+        dabba interface status get --id '$TEST_DEV' > result
     "
 
     test_expect_success TEST_DEV,PYTHON_YAML "Parse '$TEST_DEV' interface status YAML output" "

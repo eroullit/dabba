@@ -21,6 +21,7 @@
 
 DABBAD_PATH="$SHARNESS_TEST_DIRECTORY/../../dabbad"
 DABBA_PATH="$SHARNESS_TEST_DIRECTORY/../../dabba"
+PATH="$DABBA_PATH:$DABBAD_PATH:$PATH"
 
 PYTHON_PATH="$(command -v python)"
 ETHTOOL_PATH="$(command -v ethtool)"

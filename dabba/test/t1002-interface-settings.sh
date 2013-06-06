@@ -28,15 +28,15 @@ test_expect_success "Setup: Stop already running dabbad" "
 "
 
 test_expect_success 'invoke dabba interface settings command w/o dabbad' "
-    test_expect_code 22 $DABBA_PATH/dabba interface settings get
+    test_expect_code 22 dabba interface settings get
 "
 
 test_expect_success "Setup: Start dabbad" "
-    '$DABBAD_PATH'/dabbad --daemonize
+    dabbad --daemonize
 "
 
 test_expect_success 'invoke dabba interface settings command with dabbad' "
-    '$DABBA_PATH'/dabba interface settings get > result
+    dabba interface settings get > result
 "
 
 test_expect_success PYTHON_YAML "Parse interface settings YAML output" "
@@ -90,11 +90,11 @@ do
     "
 
     test_expect_success TEST_DEV "Modify test interface $item" "
-        '$DABBA_PATH'/dabba interface settings modify --id '$TEST_DEV' --$item '$test_value'
+        dabba interface settings modify --id '$TEST_DEV' --$item '$test_value'
     "
 
     test_expect_success TEST_DEV "Fetch test interface settings" "
-        '$DABBA_PATH'/dabba interface settings get --id '$TEST_DEV' > result
+        dabba interface settings get --id '$TEST_DEV' > result
     "
 
     test_expect_success TEST_DEV,PYTHON_YAML "Parse test interface settings YAML output" "
