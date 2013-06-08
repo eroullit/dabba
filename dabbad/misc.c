@@ -134,6 +134,14 @@ int fd_to_path(const int fd, char *path, const size_t path_len)
 	return rc;
 }
 
+/**
+ * \brief Create text where the current pid is written in
+ * \param[in]           pidfile                PID file path
+ * \return 0 on success, \c errno on failure.
+ * \note if no file exists at the indicated path, a file is created.
+ * \note if a file already exists at the indicated path, it is overwritten.
+ */
+
 int create_pidfile(const char *const pidfile)
 {
 	int pidfd, len, rc = 0;
@@ -141,7 +149,7 @@ int create_pidfile(const char *const pidfile)
 
 	assert(pidfile);
 
-	pidfd = open(pidfile, O_RDWR | O_CREAT, S_IWUSR | S_IRUSR);
+	pidfd = open(pidfile, O_WRONLY | O_CREAT, S_IWUSR | S_IRUSR);
 
 	if (pidfd < 0)
 		return errno;
