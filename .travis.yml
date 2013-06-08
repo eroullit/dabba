@@ -28,7 +28,6 @@ branches:
   only:
     - master
 
-# Notify the LuaDist Dev group if needed
 notifications:
   recipients:
     - emmanuel.roullit@gmail.com
