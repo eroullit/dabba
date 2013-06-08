@@ -98,7 +98,8 @@ test_expect_success PYTHON_YAML "Check thread number" "
 "
 
 test_expect_success PYTHON_YAML "Check thread ID" "
-    grep -wq -E '^[0-9]+' result_id
+    grep -wq -E '^[0-9]+' result_id &&
+    thread_id=$(cat result_id)
 "
 
 test_expect_success PYTHON_YAML "Check thread type" "
@@ -116,8 +117,6 @@ test_expect_success PYTHON_YAML "Check thread default scheduling priority" "
 test_expect_success TASKSET,PYTHON_YAML "Check thread default CPU affinity" "
     test_cmp expect_cpu_affinity result_cpu_affinity
 "
-
-thread_id="$(dictkeys2values threads 0 id < parsed)"
 
 for policy in fifo rr other
 do
@@ -204,7 +203,7 @@ test_expect_success "Stop all running captures" "
     dabba thread get settings > after
 "
 
-test_expect_success "Check if the capture thread is still present" "
+test_expect_success PYTHON_YAML "Check if the capture thread is still present" "
     test_must_fail grep -wq '$thread_id' after
 "
 
