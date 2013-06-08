@@ -141,7 +141,7 @@ int create_pidfile(const char *const pidfile)
 
 	assert(pidfile);
 
-	pidfd = open(pidfile, O_RDWR | O_CREAT, S_IWUSR | S_IRUSR);
+	pidfd = open(pidfile, O_WRONLY | O_CREAT, S_IWUSR | S_IRUSR);
 
 	if (pidfd < 0)
 		return errno;
