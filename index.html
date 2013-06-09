@@ -1,44 +1,53 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
+    <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=640" />
+
+    <link rel="stylesheet" href="stylesheets/core.css" media="screen"/>
+    <link rel="stylesheet" href="stylesheets/mobile.css" media="handheld, only screen and (max-device-width:640px)"/>
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css"/>
+
+    <script type="text/javascript" src="javascripts/modernizr.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="javascripts/headsmart.min.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function () {
+        $('#main_content').headsmart()
+      })
+    </script>
     <title>Dabba by eroullit</title>
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="javascripts/respond.js"></script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <!--[if lt IE 8]>
-    <link rel="stylesheet" href="stylesheets/ie.css">
-    <![endif]-->
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-
   </head>
+
   <body>
-      <div id="header">
-        <nav>
-          <li class="fork"><a href="https://github.com/eroullit/dabba">View On GitHub</a></li>
-          <li class="downloads"><a href="https://github.com/eroullit/dabba/zipball/master">ZIP</a></li>
-          <li class="downloads"><a href="https://github.com/eroullit/dabba/tarball/master">TAR</a></li>
-          <li class="title">DOWNLOADS</li>
-        </nav>
-      </div><!-- end header -->
+    <a id="forkme_banner" href="https://github.com/eroullit/dabba">View on GitHub</a>
+    <div class="shell">
 
-    <div class="wrapper">
+      <header>
+        <span class="ribbon-outer">
+          <span class="ribbon-inner">
+            <h1>Dabba</h1>
+            <h2></h2>
+          </span>
+          <span class="left-tail"></span>
+          <span class="right-tail"></span>
+        </span>
+      </header>
 
-      <section>
-        <div id="title">
-          <h1>Dabba</h1>
-          <p></p>
-          <hr>
-          <span class="credits left">Project maintained by <a href="https://github.com/eroullit">eroullit</a></span>
-          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></span>
-        </div>
+      <section id="downloads">
+        <span class="inner">
+          <a href="https://github.com/eroullit/dabba/zipball/master" class="zip"><em>download</em> .ZIP</a><a href="https://github.com/eroullit/dabba/tarball/master" class="tgz"><em>download</em> .TGZ</a>
+        </span>
+      </section>
 
-        <h1>What is dabba?</h1>
+
+      <span class="banner-fix"></span>
+
+
+      <section id="main_content">
+        <h1>
+<a name="what-is-dabba" class="anchor" href="#what-is-dabba"><span class="octicon octicon-link"></span></a>What is dabba?</h1>
 
 <p><a href="http://travis-ci.org/eroullit/dabba"><img src="https://secure.travis-ci.org/eroullit/dabba.png?branch=master" alt="Build Status"></a></p>
 
@@ -48,40 +57,51 @@
 meals are regrouped and dispatched throughout the city with a high
 efficiency rate, every day of the year.</p>
 
-<p>The project has 3 main components:</p>
+<p>The project has 4 main components:</p>
 
 <ul>
 <li>
 <code>libdabba</code> - low-level zero-copy network library</li>
 <li>
-<code>dabbad</code> - multi-threaded task manager and IPC query processor</li>
+<code>libdabba-rpc</code> - protobuf-based rpc library for dabbad and dabba</li>
+<li>
+<code>dabbad</code> - multi-threaded task manager and RPC query processor</li>
 <li>
 <code>dabba</code> - CLI 'à la git' to communicate with dabbad and submit tasks</li>
 </ul><p>Currently supported feature are listed in the <a href="https://github.com/eroullit/dabba/blob/master/CODING">CODING</a> file.</p>
 
-<h1>Get the source!</h1>
+<h1>
+<a name="get-the-source" class="anchor" href="#get-the-source"><span class="octicon octicon-link"></span></a>Get the source!</h1>
 
 <pre><code>git clone git://github.com/eroullit/dabba.git
 </code></pre>
 
 <p>Contributions are welcome, <a href="https://github.com/eroullit/dabba/blob/master/CODING">CODING</a> regroups all information about it.</p>
 
-<h1>Prerequisites</h1>
+<h1>
+<a name="prerequisites" class="anchor" href="#prerequisites"><span class="octicon octicon-link"></span></a>Prerequisites</h1>
 
 <p>dabba needs these to compile and run properly:</p>
 
 <ul>
 <li>Linux kernel &gt;= 2.6.31</li>
+<li><code>build-essential</code></li>
 <li><code>cmake</code></li>
 <li><code>pthread</code></li>
+<li><code>libnl-3-dev</code></li>
+<li><code>libnl-genl-3-dev</code></li>
+<li><code>libnl-route-3-dev</code></li>
+<li><code>protobuf-c-compiler</code></li>
+<li><code>libprotobuf-c0-dev</code></li>
 <li>
-<code>setcap</code> (within <code>libcap</code> package)</li>
+<code>setcap</code> (within <code>libcap2</code> package)</li>
 </ul><p>Recommended optional packages:</p>
 
 <ul>
 <li><code>python-yaml</code></li>
 <li><code>doxygen</code></li>
-</ul><h1>Installation</h1>
+</ul><h1>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h1>
 
 <p>To build out-of-tree:</p>
 
@@ -93,14 +113,41 @@ efficiency rate, every day of the year.</p>
 <div class="highlight"><pre><span class="nv">$ </span>sudo make install/strip
 </pre></div>
 
-<h1>Capabilities</h1>
+<h1>
+<a name="capabilities" class="anchor" href="#capabilities"><span class="octicon octicon-link"></span></a>Capabilities</h1>
 
 <p>To configure dabba to run with a regular user account:</p>
 
 <div class="highlight"><pre><span class="nv">$ </span>sudo make setcap
 </pre></div>
 
-<h1>Getting started!</h1>
+<h1>
+<a name="testing" class="anchor" href="#testing"><span class="octicon octicon-link"></span></a>Testing</h1>
+
+<p>Automatic tests are available. There are two kinds:</p>
+
+<ul>
+<li>Read-only (which do not interfere with network interface settings)</li>
+<li>Read-write (which modify network interface settings)</li>
+</ul><p>WARNING: Read-write tests might degrade or disable the
+interface connectivity while tests are running. Avoid to run
+then on production interfaces.</p>
+
+<p>To run read-only automatic tests, make sure proper capabilities are granted and
+run in the build directory:</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>ctest --output-on-failure
+</pre></div>
+
+<p>To run read-only automatic tests, make sure proper capabilities are granted,
+set the <code>TEST_DEV</code> variable with the interface name to modify
+and run in the build directory:</p>
+
+<div class="highlight"><pre><span class="nv">$ TEST_DEV</span><span class="o">=</span>eth0 ctest --output-on-failure
+</pre></div>
+
+<h1>
+<a name="getting-started" class="anchor" href="#getting-started"><span class="octicon octicon-link"></span></a>Getting started!</h1>
 
 <p>Start dabbad:</p>
 
@@ -114,10 +161,11 @@ efficiency rate, every day of the year.</p>
 
 <p>Running captures can be listed in YAML format:</p>
 
-<div class="highlight"><pre><span class="nv">$ </span>dabba capture list
+<div class="highlight"><pre><span class="nv">$ </span>dabba capture get
 ---
   captures:
     - id: 3076324160
+      rc: 0 <span class="c"># Success</span>
       packet mmap size: 32768
       frame number: 16
       pcap: /tmp/example.pcap
@@ -129,7 +177,8 @@ efficiency rate, every day of the year.</p>
 <div class="highlight"><pre><span class="nv">$ </span>dabba capture stop --id 3076324160
 </pre></div>
 
-<h1>Copyright</h1>
+<h1>
+<a name="copyright" class="anchor" href="#copyright"><span class="octicon octicon-link"></span></a>Copyright</h1>
 
 <p>Copyright (C) 2011-2012 Emmanuel Roullit <a href="mailto:emmanuel.roullit@gmail.com">emmanuel.roullit@gmail.com</a></p>
 
@@ -147,7 +196,8 @@ for more details.</p>
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin St, Fifth Floor, Boston, MA 02110, USA</p>
 
-<h1>Contact</h1>
+<h1>
+<a name="contact" class="anchor" href="#contact"><span class="octicon octicon-link"></span></a>Contact</h1>
 
 <p>For questions:
     Send me a message to <a href="https://github.com/eroullit" class="user-mention">@eroullit</a> on GitHub</p>
@@ -156,8 +206,20 @@ with this program; if not, write to the Free Software Foundation, Inc.,
     Feel free to open an issue on the <a href="https://github.com/eroullit/dabba/issues">ticket system</a>.</p>
       </section>
 
+      <footer>
+        <span class="ribbon-outer">
+          <span class="ribbon-inner">
+            <p>this project by <a href="https://github.com/eroullit">eroullit</a> can be found on <a href="https://github.com/eroullit/dabba">GitHub</a></p>
+          </span>
+          <span class="left-tail"></span>
+          <span class="right-tail"></span>
+        </span>
+        <p>Generated with <a href="http://pages.github.com">GitHub Pages</a> using Merlot</p>
+        <span class="octocat"></span>
+      </footer>
+
     </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+
     
   </body>
 </html>
