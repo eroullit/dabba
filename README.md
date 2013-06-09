@@ -39,7 +39,7 @@ dabba needs these to compile and run properly:
 * `libnl-route-3-dev`
 * `protobuf-c-compiler`
 * `libprotobuf-c0-dev`
-* `setcap` (within `libcap` package)
+* `setcap` (within `libcap2-bin` package)
 
 Recommended optional packages:
 * `python-yaml`
