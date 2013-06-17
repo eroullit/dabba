@@ -104,7 +104,8 @@ static void list_common_cmds_help(void)
 	static struct cmdname_help common_cmds[] = {
 		{"interface", "perform an interface related command"},
 		{"thread", "perform a thread related command"},
-		{"capture", "capture live traffic from an interface"}
+		{"capture", "capture live traffic from an interface"},
+		{"replay", "replay traffic from a pcap file"}
 	};
 
 	for (i = 0; i < ARRAY_SIZE(common_cmds); i++) {

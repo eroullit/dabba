@@ -29,6 +29,7 @@ The most commonly used dabba commands are:
    interface   perform an interface related command
    thread      perform a thread related command
    capture     capture live traffic from an interface
+   replay      replay traffic from a pcap file
 
 See 'dabba help <command> [<subcommand>]' for more specific information.
 EOF
