@@ -33,6 +33,7 @@ ADD_EXECUTABLE(${PROJECT_NAME}
 	rpc.c
 	help.c
 	capture.c
+	replay.c
 	misc.c
 	thread.c
 )

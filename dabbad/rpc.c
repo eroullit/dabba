@@ -43,6 +43,7 @@
 #include <dabbad/interface-statistics.h>
 #include <dabbad/thread.h>
 #include <dabbad/capture.h>
+#include <dabbad/replay.h>
 
 /**
  * \brief Protobuf service structure used by dabbad

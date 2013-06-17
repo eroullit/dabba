@@ -79,8 +79,8 @@ void *packet_tx(void *arg)
 				    TPACKET_ALIGN(sizeof(mmap_hdr->tp_h));
 
 				obytes = pcap_read(pkt_tx->pcap_fd, pkt,
-						   pkt_mmap->layout.
-						   tp_frame_size);
+						   pkt_mmap->
+						   layout.tp_frame_size);
 
 				if (obytes <= 0) {
 					eof = 1;
