@@ -318,7 +318,7 @@ pcap_write(const int fd, const uint8_t * const pkt,
  * 		0 if packet header or packet payload could not be read
  */
 
-ssize_t pcap_read(const int fd, uint8_t * pkt, const size_t pkt_len)
+ssize_t pcap_read(const int fd, uint8_t * pkt, const uint32_t pkt_len)
 {
 	struct pcap_sf_pkthdr sf_hdr;
 

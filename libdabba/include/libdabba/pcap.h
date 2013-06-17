@@ -111,7 +111,7 @@ int pcap_link_type_get(int arp_type, enum pcap_linktype *pcap_link_type);
 ssize_t pcap_write(const int fd, const uint8_t * const pkt,
 		   const size_t pkt_len, const size_t pkt_snaplen,
 		   const uint64_t tv_sec, const uint64_t tv_usec);
-ssize_t pcap_read(const int fd, uint8_t * pkt, const size_t pkt_len);
+ssize_t pcap_read(const int fd, uint8_t * pkt, const uint32_t pkt_len);
 void pcap_destroy(const int fd, const char *const pcap_path);
 int pcap_create(const char *const pcap_path, const enum pcap_linktype linktype);
 int pcap_open(const char *const pcap_path, int flags);
