@@ -73,15 +73,14 @@ void *packet_tx(void *arg)
 		for (index = 0; index < pkt_mmap->layout.tp_frame_nr; index++) {
 			mmap_hdr = pkt_mmap->vec[index].iov_base;
 
-			if ((mmap_hdr->tp_h.tp_status & TP_STATUS_AVAILABLE) ==
-			    TP_STATUS_AVAILABLE) {
+			if (mmap_hdr->tp_h.tp_status == TP_STATUS_AVAILABLE) {
 				uint8_t *pkt =
 				    (uint8_t *) mmap_hdr +
 				    TPACKET_ALIGN(sizeof(mmap_hdr->tp_h));
 
 				obytes = pcap_read(pkt_tx->pcap_fd, pkt,
-						   pkt_mmap->
-						   layout.tp_frame_size);
+						   pkt_mmap->layout.
+						   tp_frame_size);
 
 				if (obytes <= 0) {
 					eof = 1;
