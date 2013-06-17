@@ -98,6 +98,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabba/thread.h>
 #include <dabba/interface.h>
 #include <dabba/capture.h>
+#include <dabba/replay.h>
 
 /**
  * \internal
@@ -206,6 +207,7 @@ int main(int argc, const char **argv)
 		{"interface", cmd_interface},
 		{"thread", cmd_thread},
 		{"capture", cmd_capture},
+		{"replay", cmd_replay},
 		{"version", cmd_version},
 		{"help", cmd_help}
 	};
