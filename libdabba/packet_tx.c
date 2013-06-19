@@ -67,35 +67,43 @@ void *packet_tx(void *arg)
 	pfd.events = POLLOUT;
 	pfd.fd = pkt_mmap->pf_sock;
 
-	do {
-		struct packet_mmap_header *mmap_hdr;
+	for (;;) {
+		do {
+			struct packet_mmap_header *mmap_hdr;
 
-		for (index = 0; index < pkt_mmap->layout.tp_frame_nr; index++) {
-			mmap_hdr = pkt_mmap->vec[index].iov_base;
+			for (index = 0; index < pkt_mmap->layout.tp_frame_nr;
+			     index++) {
+				mmap_hdr = pkt_mmap->vec[index].iov_base;
 
-			if (mmap_hdr->tp_h.tp_status == TP_STATUS_AVAILABLE) {
-				uint8_t *pkt =
-				    (uint8_t *) mmap_hdr +
-				    TPACKET_ALIGN(sizeof(mmap_hdr->tp_h));
+				if (mmap_hdr->tp_h.tp_status ==
+				    TP_STATUS_AVAILABLE) {
+					uint8_t *pkt =
+					    (uint8_t *) mmap_hdr +
+					    TPACKET_ALIGN(sizeof
+							  (mmap_hdr->tp_h));
 
-				obytes = pcap_read(pkt_tx->pcap_fd, pkt,
-						   pkt_mmap->
-						   layout.tp_frame_size);
+					obytes = pcap_read(pkt_tx->pcap_fd, pkt,
+							   pkt_mmap->layout.
+							   tp_frame_size);
 
-				if (obytes <= 0) {
-					eof = 1;
-					break;
+					if (obytes <= 0) {
+						eof = 1;
+						break;
+					}
+
+					mmap_hdr->tp_h.tp_len = obytes;
+					mmap_hdr->tp_h.tp_snaplen = obytes;
+					mmap_hdr->tp_h.tp_status =
+					    TP_STATUS_SEND_REQUEST;
 				}
-
-				mmap_hdr->tp_h.tp_len = obytes;
-				mmap_hdr->tp_h.tp_snaplen = obytes;
-				mmap_hdr->tp_h.tp_status =
-				    TP_STATUS_SEND_REQUEST;
 			}
-		}
 
-		send(pkt_mmap->pf_sock, NULL, 0, MSG_DONTWAIT);
-	} while (!eof);
+			send(pkt_mmap->pf_sock, NULL, 0, MSG_DONTWAIT);
+		} while (!eof);
+
+		pcap_rewind(pkt_tx->pcap_fd);
+		eof = 0;
+	}
 
 	return NULL;
 }

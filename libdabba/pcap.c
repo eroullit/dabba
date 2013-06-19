@@ -331,3 +331,14 @@ ssize_t pcap_read(const int fd, uint8_t * pkt, const uint32_t pkt_len)
 
 	return read(fd, pkt, min(sf_hdr.caplen, pkt_len));
 }
+
+/**
+ * \brief Rewind PCAP file to its first packet
+ * \param[in]  fd 	PCAP file descriptor
+ * \return 0 on success, else on failure. Check \c errno for error code.
+ */
+
+int pcap_rewind(const int fd)
+{
+	return lseek(fd, sizeof(struct pcap_file_header), SEEK_SET) == 0;
+}
