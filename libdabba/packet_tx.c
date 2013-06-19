@@ -54,10 +54,12 @@ void *packet_tx(void *arg)
 {
 	struct packet_tx *pkt_tx = arg;
 	struct packet_mmap *pkt_mmap = &pkt_tx->pkt_mmap;
+	struct packet_mmap_header *mmap_hdr;
 	struct pollfd pfd;
-	size_t index = 0;
+	size_t a = 0;
 	ssize_t obytes;
 	int eof = 0;
+	size_t tplen = TPACKET_ALIGN(sizeof(mmap_hdr->tp_h));
 
 	if (!arg)
 		return NULL;
@@ -69,18 +71,13 @@ void *packet_tx(void *arg)
 
 	for (;;) {
 		do {
-			struct packet_mmap_header *mmap_hdr;
-
-			for (index = 0; index < pkt_mmap->layout.tp_frame_nr;
-			     index++) {
-				mmap_hdr = pkt_mmap->vec[index].iov_base;
+			for (a = 0; a < pkt_mmap->layout.tp_frame_nr; a++) {
+				mmap_hdr = pkt_mmap->vec[a].iov_base;
 
 				if (mmap_hdr->tp_h.tp_status ==
 				    TP_STATUS_AVAILABLE) {
 					uint8_t *pkt =
-					    (uint8_t *) mmap_hdr +
-					    TPACKET_ALIGN(sizeof
-							  (mmap_hdr->tp_h));
+					    (uint8_t *) mmap_hdr + tplen;
 
 					obytes = pcap_read(pkt_tx->pcap_fd, pkt,
 							   pkt_mmap->layout.
