@@ -38,7 +38,8 @@
  */
 
 enum packet_mmap_type {
-	PACKET_MMAP_RX = PACKET_RX_RING
+	PACKET_MMAP_RX = PACKET_RX_RING,
+	PACKET_MMAP_TX = PACKET_TX_RING
 };
 
 /**
