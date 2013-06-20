@@ -2,10 +2,10 @@ FILE(GLOB sharness sharness.sh dabba-test-lib.sh dictkeys2values.py yaml2dict.py
 FILE(GLOB test_scripts RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} t*.sh)
 
 FOREACH(sharness_file ${sharness})
-	EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} -E copy ${sharness_file} ${CMAKE_BINARY_DIR}/${PROJECT_NAME}/test)
+	EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} -E copy ${sharness_file} ${CMAKE_CURRENT_BINARY_DIR})
 ENDFOREACH(sharness_file ${sharness})
 
-EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/t1300 ${CMAKE_BINARY_DIR}/${PROJECT_NAME}/test/t1300)
+EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/t1300 ${CMAKE_CURRENT_BINARY_DIR}/t1300)
 
 FOREACH(test_script ${test_scripts})
 	EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/${test_script} ${CMAKE_CURRENT_BINARY_DIR})
