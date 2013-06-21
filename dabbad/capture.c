@@ -124,10 +124,9 @@ static struct packet_capture *dabbad_capture_find(const pthread_t id)
  * \return 0 if the message is invalid, 1 if it is valid.
  * 
  * A valid capture message must fulfill these requirements:
- *      - Interface name length longer than zero, shorter than IFNAMESIZ
- *      - PCAP file name length longer than zero, shorter than IFNAMESIZ
- *      - PCAP file must not contain '/' character
- *      - Frame size must be in supported
+ *      - Interface name length longer than zero, shorter than \c IFNAMESIZ
+ *      - PCAP file name length longer than zero
+ *      - Frame size must be a supported size
  *      - The memory page order must be greater than zero
  */
 

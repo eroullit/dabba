@@ -124,7 +124,7 @@ static struct packet_replay *dabbad_replay_find(const pthread_t id)
  * \return 0 if the message is invalid, 1 if it is valid.
  * 
  * A valid replay message must fulfill these requirements:
- *      - Interface name length longer than zero, shorter than IFNAMESIZ
+ *      - Interface name length longer than zero, shorter than \c IFNAMESIZ
  *      - PCAP file name length longer than zero
  *      - Frame size must be a supported size
  *      - Frame number must be greater than zero
