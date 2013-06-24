@@ -272,6 +272,8 @@ void dabbad_capture_start(Dabba__DabbaService_Service * service,
 		goto out;
 	}
 
+	pkt_capture->thread.type = CAPTURE_THREAD;
+
 	if (capturep->append)
 		pkt_capture->rx.pcap_fd =
 		    pcap_open(capturep->pcap, O_RDWR | O_APPEND);

@@ -41,7 +41,8 @@
  */
 
 enum packet_thread_type {
-	CAPTURE_THREAD
+	CAPTURE_THREAD,
+	REPLAY_THREAD
 };
 
 /**

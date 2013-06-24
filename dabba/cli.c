@@ -195,7 +195,8 @@ const char *sched_policy2str(const int policy)
 const char *thread_type2str(const int type)
 {
 	static const char thread_type[][8] = {
-		[CAPTURE_THREAD] = "capture"
+		[CAPTURE_THREAD] = "capture",
+		[REPLAY_THREAD] = "replay"
 	};
 
 	const int max = ARRAY_SIZE(thread_type);
