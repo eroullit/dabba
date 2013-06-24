@@ -272,6 +272,7 @@ void dabbad_replay_start(Dabba__DabbaService_Service * service,
 		goto out;
 	}
 
+	pkt_replay->thread.type = REPLAY_THREAD;
 	pkt_replay->tx.pcap_fd = pcap_open(replayp->pcap, O_RDONLY);
 
 	if (pkt_replay->tx.pcap_fd < 0) {
