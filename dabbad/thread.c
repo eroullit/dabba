@@ -475,9 +475,10 @@ void dabbad_thread_get(Dabba__DabbaService_Service * service,
 		dabba__error_code__init(settings_list.list[a]->status);
 	}
 
-	settingsp = *settings_list.list;
+	a = 0;
 
 	TAILQ_FOREACH(pkt_thread, &packet_thread_queue.head, entry) {
+		settingsp = settings_list.list[a];
 		settingsp->has_sched_policy = settingsp->has_sched_priority = 1;
 		settingsp->has_type = 1;
 		settingsp->id->id = (uint64_t) pkt_thread->id;
@@ -493,7 +494,7 @@ void dabbad_thread_get(Dabba__DabbaService_Service * service,
 
 		settingsp->status->code = rc;
 		settingsp->type = pkt_thread->type;
-		settingsp++;
+		a++;
 	}
 
 	settings_listp = &settings_list;
