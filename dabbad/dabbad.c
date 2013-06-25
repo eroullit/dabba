@@ -168,7 +168,7 @@ int main(int argc, char **argv)
 			break;
 		case OPT_TCP:
 			server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
-			server_id = DABBA_RPC_DEFAULT_TCP_SERVER_NAME;
+			server_id = DABBA_RPC_DEFAULT_PORT;
 
 			if (optarg)
 				server_id = optarg;
