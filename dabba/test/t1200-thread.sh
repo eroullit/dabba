@@ -64,6 +64,10 @@ test_expect_success "Setup: Start a basic capture on loopback" "
     dabba capture start --interface any --pcap test.pcap --frame-number 8
 "
 
+test_expect_success "Setup: Start a basic replay on loopback" "
+    dabba replay start --interface lo --pcap test.pcap --frame-number 8
+"
+
 test_expect_success "Check 'dabba thread' help output" "
     dabba help thread | cat <<EOF
     q
@@ -81,42 +85,49 @@ test_expect_success PYTHON_YAML "Parse thread YAML output" "
     yaml2dict result > parsed
 "
 
-test_expect_success PYTHON_YAML "Query thread YAML output" "
-    echo 'capture' > expect_type &&
-    echo 'other' > expect_scheduling_policy &&
-    echo '0' > expect_scheduling_priority &&
-    echo '$default_cpu_affinity' > expect_cpu_affinity &&
-    dictkeys2values threads 0 id < parsed > result_id &&
-    dictkeys2values threads 0 type < parsed > result_type &&
-    dictkeys2values threads 0 'scheduling policy' < parsed > result_scheduling_policy &&
-    dictkeys2values threads 0 'scheduling priority' < parsed > result_scheduling_priority &&
-    dictkeys2values threads 0 'cpu affinity' < parsed > result_cpu_affinity
-"
+for i in $(seq 0 1)
+do
+    case $i in
+        0) thread_type="capture";;
+        1) thread_type="replay";;
+    esac
 
-test_expect_success PYTHON_YAML "Check thread number" "
-    check_thread_nr 1 result
-"
+    test_expect_success PYTHON_YAML "Query thread YAML output" "
+        echo '$thread_type' > expect_type &&
+        echo 'other' > expect_scheduling_policy &&
+        echo '0' > expect_scheduling_priority &&
+        echo '$default_cpu_affinity' > expect_cpu_affinity &&
+        dictkeys2values threads $i id < parsed > result_id.$i &&
+        dictkeys2values threads $i type < parsed > result_type &&
+        dictkeys2values threads $i 'scheduling policy' < parsed > result_scheduling_policy &&
+        dictkeys2values threads $i 'scheduling priority' < parsed > result_scheduling_priority &&
+        dictkeys2values threads $i 'cpu affinity' < parsed > result_cpu_affinity
+    "
 
-test_expect_success PYTHON_YAML "Check thread ID" "
-    grep -wq -E '^[0-9]+' result_id &&
-    thread_id=$(cat result_id)
-"
+    test_expect_success PYTHON_YAML "Check thread number" "
+        check_thread_nr 2 result
+    "
 
-test_expect_success PYTHON_YAML "Check thread type" "
-    test_cmp expect_type result_type
-"
+    test_expect_success PYTHON_YAML "Check thread ID" "
+        grep -wq -E '^[0-9]+' 'result_id.$i'
+    "
 
-test_expect_success PYTHON_YAML "Check thread default scheduling policy" "
-    test_cmp expect_scheduling_policy result_scheduling_policy
-"
+    test_expect_success PYTHON_YAML "Check thread type" "
+        test_cmp expect_type result_type
+    "
 
-test_expect_success PYTHON_YAML "Check thread default scheduling priority" "
-    test_cmp expect_scheduling_priority result_scheduling_priority
-"
+    test_expect_success PYTHON_YAML "Check thread default scheduling policy" "
+        test_cmp expect_scheduling_policy result_scheduling_policy
+    "
 
-test_expect_success TASKSET,PYTHON_YAML "Check thread default CPU affinity" "
-    test_cmp expect_cpu_affinity result_cpu_affinity
-"
+    test_expect_success PYTHON_YAML "Check thread default scheduling priority" "
+        test_cmp expect_scheduling_priority result_scheduling_priority
+    "
+
+    test_expect_success TASKSET,PYTHON_YAML "Check thread default CPU affinity" "
+        test_cmp expect_cpu_affinity result_cpu_affinity
+    "
+done
 
 for policy in fifo rr other
 do
@@ -126,7 +137,7 @@ do
         for priority in $min_prio $max_prio
         do
                 test_expect_success PYTHON_YAML "Modify capture thread scheduling policy ($policy:$priority)" "
-                    dabba thread modify --sched-policy '$policy' --sched-prio '$priority' --id '$thread_id' &&
+                    dabba thread modify --sched-policy '$policy' --sched-prio '$priority' --id '$(cat result_id.0)' &&
                     dabba thread get settings > result
                 "
 
@@ -154,7 +165,7 @@ do
         do
                 # Put back to 'test_must_fail' when proper error reporting is done
                 test_expect_success PYTHON_YAML "Do not modify capture thread out-of-range scheduling policy ($policy:$priority)" "
-                    test_might_fail dabba thread modify --sched-policy '$policy' --sched-prio '$priority' --id '$thread_id' &&
+                    test_might_fail dabba thread modify --sched-policy '$policy' --sched-prio '$priority' --id '$(cat result_id.0)' &&
                     dabba thread get settings > result
                 "
 
@@ -180,7 +191,7 @@ done
 for cpu_affinity in 0 $default_cpu_affinity
 do
         test_expect_success PYTHON_YAML "Modify capture thread CPU affinity (run on CPU $cpu_affinity)" "
-            dabba thread modify --cpu-affinity '$cpu_affinity' --id '$thread_id' &&
+            dabba thread modify --cpu-affinity '$cpu_affinity' --id '$(cat result_id.0)' &&
             dabba thread get settings > result
         "
 
@@ -204,7 +215,7 @@ test_expect_success "Stop all running captures" "
 "
 
 test_expect_success PYTHON_YAML "Check if the capture thread is still present" "
-    test_must_fail grep -wq '$thread_id' after
+    test_must_fail grep -wq '$(cat result_id.0)' after
 "
 
 test_expect_success "Cleanup: Stop dabbad" "
