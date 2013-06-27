@@ -35,12 +35,36 @@ dabbad - Multithreaded packet mmap daemon
 
 =head1 SYNOPSIS
 
-dabbad [--daemonize][--pidfile <path>][--help]
+dabbad [--daemonize] [--pidfile <path>] [--tcp[=<port>]] [--local[=<path>]] [--help]
 
 =head1 DESCRIPTION
 
 dabbad (dabba daemon) is here to manage multithreaded network captures.
 It listens a RPC interface and waits for commands to execute.
+
+=head1 OPTIONS
+
+=over
+
+=item --daemonize
+
+Detach process from the terminal and continue to run in the background.
+Redirects stdin, stdout and stderr to /dev/null
+
+=item --pidfile <path>
+
+Creates a file where the pid is written
+
+=item --tcp[=<port>]
+
+Open a TCP socket to receive/transmit RPC messages (By default: 55994)
+
+=item --local[=<path>]
+
+Open a Unix domain socket to receive/transmit RPC messages (By default: /tmp/dabba)
+This socket type is used by default
+
+=back
 
 =head1 EXAMPLES
 
@@ -58,6 +82,10 @@ Start dabbad as a daemon.
 =item dabbad --pidfile /tmp/dabba.pid
 
 Tell dabbad to write its pid in a specific pidfile.
+
+=item dabbad --tcp=12345
+
+Start a dabbad instance listening to messages from TCP port 12345
 
 =item dabbad --help
 
