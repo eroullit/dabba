@@ -1,5 +1,18 @@
 package dabba;
 
+message sock_filter
+{
+    required uint32 code = 1;
+    required uint32 jt = 2;
+    required uint32 jf = 3;
+    required uint32 k = 4;
+}
+
+message sock_fprog
+{
+    repeated sock_filter filter = 1;
+}
+
 message interface_id
 {
     required string name = 1;
