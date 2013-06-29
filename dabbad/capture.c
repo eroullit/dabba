@@ -382,6 +382,8 @@ void dabbad_capture_get(Dabba__DabbaService_Service * service,
 		    malloc(sizeof(*capture_list.list[a]->id));
 		capture_list.list[a]->status =
 		    malloc(sizeof(*capture_list.list[a]->status));
+		capture_list.list[a]->sfp =
+		    malloc(sizeof(*capture_list.list[a]->sfp));
 
 		capture_list.list[a]->pcap =
 		    calloc(NAME_MAX, sizeof(*capture_list.list[a]->pcap));
@@ -389,12 +391,13 @@ void dabbad_capture_get(Dabba__DabbaService_Service * service,
 		    calloc(IFNAMSIZ, sizeof(*capture_list.list[a]->interface));
 
 		if (!capture_list.list[a]->id || !capture_list.list[a]->status
-		    || !capture_list.list[a]->pcap
+		    || !capture_list.list[a]->sfp || !capture_list.list[a]->pcap
 		    || !capture_list.list[a]->interface)
 			goto out;
 
 		dabba__thread_id__init(capture_list.list[a]->id);
 		dabba__error_code__init(capture_list.list[a]->status);
+		dabba__sock_fprog__init(capture_list.list[a]->sfp);
 	}
 
 	a = 0;
@@ -418,6 +421,9 @@ void dabbad_capture_get(Dabba__DabbaService_Service * service,
 		ifindex_to_devname(pkt_capture->rx.pkt_mmap.ifindex,
 				   capture_list.list[a]->interface, IFNAMSIZ);
 
+		dabbad_sfp_2_pbuf_sfp(&pkt_capture->rx.sfp,
+				      capture_list.list[a]->sfp);
+
 		a++;
 	}
 
@@ -428,6 +434,8 @@ void dabbad_capture_get(Dabba__DabbaService_Service * service,
 
 	for (a = 0; a < capture_list.n_list; a++) {
 		if (capture_list.list[a]) {
+			dabbad_pbuf_sfp_destroy(capture_list.list[a]->sfp);
+			free(capture_list.list[a]->sfp);
 			free(capture_list.list[a]->id);
 			free(capture_list.list[a]->status);
 			free(capture_list.list[a]->pcap);

@@ -43,6 +43,19 @@ void dabbad_sfp_destroy(struct sock_fprog *sfp)
 	sfp->len = 0;
 }
 
+void dabbad_pbuf_sfp_destroy(Dabba__SockFprog * pbuf_sfp)
+{
+	size_t a;
+
+	assert(pbuf_sfp);
+
+	for (a = 0; a < pbuf_sfp->n_filter; a++)
+		free(pbuf_sfp->filter[a]);
+
+	free(pbuf_sfp->filter);
+	dabba__sock_fprog__init(pbuf_sfp);
+}
+
 int dabbad_pbuf_sfp_2_sfp(Dabba__SockFprog * pbuf_sf, struct sock_fprog *sfp)
 {
 	size_t a;
@@ -67,6 +80,40 @@ int dabbad_pbuf_sfp_2_sfp(Dabba__SockFprog * pbuf_sf, struct sock_fprog *sfp)
 	if (!sock_filter_is_valid(sfp)) {
 		dabbad_sfp_destroy(sfp);
 		return EINVAL;
+	}
+
+	return 0;
+}
+
+int dabbad_sfp_2_pbuf_sfp(struct sock_fprog *sfp, Dabba__SockFprog * pbuf_sfp)
+{
+	Dabba__SockFilter *sf;
+
+	assert(sfp);
+	assert(pbuf_sfp);
+
+	pbuf_sfp->filter = calloc(sfp->len, sizeof(*pbuf_sfp->filter));
+
+	if (!pbuf_sfp->filter)
+		return ENOMEM;
+
+	for (pbuf_sfp->n_filter = 0; pbuf_sfp->n_filter < sfp->len;
+	     pbuf_sfp->n_filter++) {
+		sf = malloc(sizeof(*sf));
+
+		if (!sf) {
+			dabbad_pbuf_sfp_destroy(pbuf_sfp);
+			return ENOMEM;
+		}
+
+		dabba__sock_filter__init(sf);
+
+		sf->code = sfp->filter[pbuf_sfp->n_filter].code;
+		sf->jt = sfp->filter[pbuf_sfp->n_filter].jt;
+		sf->jf = sfp->filter[pbuf_sfp->n_filter].jf;
+		sf->k = sfp->filter[pbuf_sfp->n_filter].k;
+
+		pbuf_sfp->filter[pbuf_sfp->n_filter] = sf;
 	}
 
 	return 0;
