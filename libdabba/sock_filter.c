@@ -28,6 +28,7 @@
  /* __LICENSE_HEADER_END__ */
 
 #include <inttypes.h>
+#include <sys/socket.h>
 #include <libdabba/sock_filter.h>
 
 /**
@@ -159,4 +160,17 @@ int sock_filter_is_valid(const struct sock_fprog *const bpf)
 	}
 
 	return BPF_CLASS(bpf->filter[bpf->len - 1].code) == BPF_RET;
+}
+
+int sock_filter_attach(const int sock, const struct sock_fprog *const sfp)
+{
+	return setsockopt(sock, SOL_SOCKET, SO_ATTACH_FILTER, sfp,
+			  sizeof(*sfp));
+}
+
+int sock_filter_detach(const int sock)
+{
+	int foo = 0;
+	return setsockopt(sock, SOL_SOCKET, SO_DETACH_FILTER, &foo,
+			  sizeof(foo));
 }
