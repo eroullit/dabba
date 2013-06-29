@@ -66,7 +66,7 @@ int sock_filter_parse(const char *const sf_path, Dabba__SockFprog * pbuf_sfp)
 		ret = sscanf(buff, "{ 0x%x, %d, %d, 0x%08x },",
 			     (unsigned int *)((void *)&(sf.code)),
 			     (int *)((void *)&(sf.jt)),
-			     (int *)((void *)&(sf.jt)), &(sf.k));
+			     (int *)((void *)&(sf.jf)), &(sf.k));
 
 		/* No valid bpf opcode format or a syntax error */
 		if (ret != 4)
