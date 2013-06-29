@@ -35,6 +35,19 @@
 
 #include <libdabba-rpc/rpc.h>
 
+void sock_filter_destroy(Dabba__SockFprog * pbuf_sfp)
+{
+	size_t a;
+
+	assert(pbuf_sfp);
+
+	for (a = 0; a < pbuf_sfp->n_filter; a++)
+		free(pbuf_sfp->filter[a]);
+
+	free(pbuf_sfp->filter);
+	dabba__sock_fprog__init(pbuf_sfp);
+}
+
 int sock_filter_parse(const char *const sf_path, Dabba__SockFprog * pbuf_sfp)
 {
 	int ret;
