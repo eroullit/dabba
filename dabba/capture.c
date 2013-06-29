@@ -173,7 +173,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabba/help.h>
 #include <dabba/macros.h>
 #include <dabba/rpc.h>
-#include <dabba/sock_filter.h>
+#include <dabba/sock-filter.h>
 #include <dabba/thread.h>
 
 #define DEFAULT_CAPTURE_FRAME_NUMBER 32

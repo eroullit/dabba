@@ -1,5 +1,5 @@
 /**
- * \file sock_filter.h
+ * \file sock-filter.h
  * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2013
  * \date 2013
  */

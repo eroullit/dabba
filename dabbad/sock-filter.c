@@ -33,7 +33,7 @@
 #include <string.h>
 #include <linux/filter.h>
 
-#include <libdabba/sock_filter.h>
+#include <libdabba/sock-filter.h>
 #include <libdabba-rpc/rpc.h>
 
 void dabbad_sock_filter_destroy(struct sock_fprog *sfp)

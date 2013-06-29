@@ -29,7 +29,7 @@
 
 #include <inttypes.h>
 #include <sys/socket.h>
-#include <libdabba/sock_filter.h>
+#include <libdabba/sock-filter.h>
 
 /**
  * \brief Checks the input BPF expression validity

@@ -49,9 +49,9 @@
 #include <libdabba/interface.h>
 #include <libdabba/packet_rx.h>
 #include <libdabba/pcap.h>
-#include <libdabba/sock_filter.h>
+#include <libdabba/sock-filter.h>
 #include <dabbad/interface.h>
-#include <dabbad/sock_filter.h>
+#include <dabbad/sock-filter.h>
 #include <dabbad/capture.h>
 #include <dabbad/misc.h>
 
