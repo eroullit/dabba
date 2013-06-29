@@ -34,8 +34,7 @@
 
 struct sock_fprog;
 
-void dabbad_sock_filter_destroy(struct sock_fprog *sfp);
-int dabbad_sock_filter_parse(Dabba__SockFprog * pbuf_sf,
-			     struct sock_fprog *sfp);
+void dabbad_sfp_destroy(struct sock_fprog *sfp);
+int dabbad_pbuf_sfp_2_sfp(Dabba__SockFprog * pbuf_sf, struct sock_fprog *sfp);
 
 #endif				/* DABBAD_SOCK_FILTER_H */

@@ -36,14 +36,14 @@
 #include <libdabba/sock-filter.h>
 #include <libdabba-rpc/rpc.h>
 
-void dabbad_sock_filter_destroy(struct sock_fprog *sfp)
+void dabbad_sfp_destroy(struct sock_fprog *sfp)
 {
 	assert(sfp);
 	free(sfp->filter);
 	sfp->len = 0;
 }
 
-int dabbad_sock_filter_parse(Dabba__SockFprog * pbuf_sf, struct sock_fprog *sfp)
+int dabbad_pbuf_sfp_2_sfp(Dabba__SockFprog * pbuf_sf, struct sock_fprog *sfp)
 {
 	size_t a;
 
@@ -65,7 +65,7 @@ int dabbad_sock_filter_parse(Dabba__SockFprog * pbuf_sf, struct sock_fprog *sfp)
 	sfp->len = pbuf_sf->n_filter;
 
 	if (!sock_filter_is_valid(sfp)) {
-		dabbad_sock_filter_destroy(sfp);
+		dabbad_sfp_destroy(sfp);
 		return EINVAL;
 	}
 
