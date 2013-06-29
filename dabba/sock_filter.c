@@ -39,7 +39,7 @@ int sock_filter_parse(const char *const sf_path, Dabba__SockFprog * pbuf_sfp)
 {
 	int ret;
 	char buff[128] = { 0 };
-	Dabba__SockFilter sf;
+	Dabba__SockFilter *sf;
 	Dabba__SockFilter **tmp;
 
 	assert(pbuf_sfp);
@@ -61,12 +61,17 @@ int sock_filter_parse(const char *const sf_path, Dabba__SockFprog * pbuf_sfp)
 		if (buff[0] != '{')
 			continue;
 
-		dabba__sock_filter__init(&sf);
+		sf = malloc(sizeof(*sf));
+
+		if (!sf)
+			return ENOMEM;
+
+		dabba__sock_filter__init(sf);
 
 		ret = sscanf(buff, "{ 0x%x, %d, %d, 0x%08x },",
-			     (unsigned int *)((void *)&(sf.code)),
-			     (int *)((void *)&(sf.jt)),
-			     (int *)((void *)&(sf.jf)), &(sf.k));
+			     (unsigned int *)((void *)&(sf->code)),
+			     (int *)((void *)&(sf->jt)),
+			     (int *)((void *)&(sf->jf)), &(sf->k));
 
 		/* No valid bpf opcode format or a syntax error */
 		if (ret != 4)
@@ -77,13 +82,11 @@ int sock_filter_parse(const char *const sf_path, Dabba__SockFprog * pbuf_sfp)
 			    sizeof(*pbuf_sfp->filter) * (pbuf_sfp->n_filter +
 							 1));
 
-		if (!tmp) {
-			free(pbuf_sfp->filter);
-			dabba__sock_fprog__init(pbuf_sfp);
+		if (!tmp)
 			return ENOMEM;
-		}
 
-		*pbuf_sfp->filter[pbuf_sfp->n_filter] = sf;
+		pbuf_sfp->filter = tmp;
+		pbuf_sfp->filter[pbuf_sfp->n_filter] = sf;
 		pbuf_sfp->n_filter++;
 
 		memset(buff, 0, sizeof(buff));
