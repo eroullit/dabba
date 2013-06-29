@@ -65,8 +65,7 @@ int dabbad_sock_filter_parse(Dabba__SockFprog * pbuf_sf, struct sock_fprog *sfp)
 	sfp->len = pbuf_sf->n_filter;
 
 	if (!sock_filter_is_valid(sfp)) {
-		free(sfp->filter);
-		memset(sfp, 0, sizeof(*sfp));
+		dabbad_sock_filter_destroy(sfp);
 		return EINVAL;
 	}
 

@@ -49,7 +49,9 @@
 #include <libdabba/interface.h>
 #include <libdabba/packet_rx.h>
 #include <libdabba/pcap.h>
+#include <libdabba/sock_filter.h>
 #include <dabbad/interface.h>
+#include <dabbad/sock_filter.h>
 #include <dabbad/capture.h>
 #include <dabbad/misc.h>
 
@@ -288,11 +290,32 @@ void dabbad_capture_start(Dabba__DabbaService_Service * service,
 		goto out;
 	}
 
+	if (capturep->sfp) {
+		rc = dabbad_sock_filter_parse(capturep->sfp,
+					      &pkt_capture->rx.sfp);
+
+		if (rc) {
+			free(pkt_capture);
+			close(sock);
+			goto out;
+		}
+
+		rc = sock_filter_attach(sock, &pkt_capture->rx.sfp);
+
+		if (rc) {
+			dabbad_sock_filter_destroy(&pkt_capture->rx.sfp);
+			free(pkt_capture);
+			close(sock);
+			goto out;
+		}
+	}
+
 	rc = packet_mmap_create(&pkt_capture->rx.pkt_mmap, capturep->interface,
 				sock, PACKET_MMAP_RX, capturep->frame_size,
 				capturep->frame_nr);
 
 	if (rc) {
+		dabbad_sock_filter_destroy(&pkt_capture->rx.sfp);
 		free(pkt_capture);
 		close(sock);
 		goto out;
@@ -302,6 +325,7 @@ void dabbad_capture_start(Dabba__DabbaService_Service * service,
 
 	if (rc) {
 		packet_mmap_destroy(&pkt_capture->rx.pkt_mmap);
+		dabbad_sock_filter_destroy(&pkt_capture->rx.sfp);
 		free(pkt_capture);
 		close(sock);
 	} else
