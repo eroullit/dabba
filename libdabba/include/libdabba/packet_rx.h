@@ -30,6 +30,7 @@
 #ifndef PACKET_RX_H
 #define	PACKET_RX_H
 
+#include <linux/filter.h>
 #include <libdabba/packet_mmap.h>
 
 /**
@@ -38,6 +39,7 @@
 
 struct packet_rx {
 	struct packet_mmap pkt_mmap; /**< capture packet mmap structure */
+	struct sock_fprog sfp; /**< socket program for the capture packet mmap */
 	int pcap_fd; /**< pcap file descriptor */
 };
 
