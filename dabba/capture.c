@@ -206,7 +206,8 @@ static void capture_settings_print(const Dabba__CaptureList *
 		printf("      frame number: %" PRIu64 "\n", capture->frame_nr);
 		printf("      pcap: %s\n", capture->pcap);
 		printf("      interface: %s\n", capture->interface);
-		printf("      socket filter: %s\n", print_tf(capture->sfp));
+		printf("      socket filter: %s\n",
+		       print_tf(capture->sfp->n_filter));
 	}
 
 	*status = 1;
