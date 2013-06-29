@@ -36,6 +36,13 @@
 #include <libdabba/sock_filter.h>
 #include <libdabba-rpc/rpc.h>
 
+void dabbad_sock_filter_destroy(struct sock_fprog *sfp)
+{
+	assert(sfp);
+	free(sfp->filter);
+	sfp->len = 0;
+}
+
 int dabbad_sock_filter_parse(Dabba__SockFprog * pbuf_sf, struct sock_fprog *sfp)
 {
 	size_t a;
