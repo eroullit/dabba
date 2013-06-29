@@ -399,6 +399,7 @@ static int cmd_capture_start(int argc, const char **argv)
 			if (rc)
 				return rc;
 
+			capture.sfp = &sfp;
 			break;
 		case OPT_HELP:
 		default:
