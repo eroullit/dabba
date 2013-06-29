@@ -52,7 +52,7 @@ int dabbad_sock_filter_parse(Dabba__SockFprog * pbuf_sf, struct sock_fprog *sfp)
 
 	sfp->filter = calloc(pbuf_sf->n_filter, sizeof(*sfp->filter));
 
-	if (sfp->filter)
+	if (!sfp->filter)
 		return ENOMEM;
 
 	for (a = 0; a < pbuf_sf->n_filter; a++) {
