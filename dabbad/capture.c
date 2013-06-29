@@ -184,6 +184,8 @@ void dabbad_capture_stop(Dabba__DabbaService_Service * service,
 
 	if (!rc) {
 		dabbad_capture_remove(pkt_capture);
+		sock_filter_detach(pkt_capture->rx.pkt_mmap.pf_sock);
+		dabbad_sock_filter_destroy(&pkt_capture->rx.sfp);
 		close(pkt_capture->rx.pcap_fd);
 		packet_mmap_destroy(&pkt_capture->rx.pkt_mmap);
 		free(pkt_capture);
@@ -225,6 +227,8 @@ void dabbad_capture_stop_all(Dabba__DabbaService_Service * service,
 			break;
 
 		dabbad_capture_remove(pkt_capture);
+		sock_filter_detach(pkt_capture->rx.pkt_mmap.pf_sock);
+		dabbad_sock_filter_destroy(&pkt_capture->rx.sfp);
 		close(pkt_capture->rx.pcap_fd);
 		packet_mmap_destroy(&pkt_capture->rx.pkt_mmap);
 		free(pkt_capture);
