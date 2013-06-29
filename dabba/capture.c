@@ -171,6 +171,7 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <libdabba/packet_mmap.h>
 #include <dabba/dabba.h>
 #include <dabba/help.h>
+#include <dabba/macros.h>
 #include <dabba/rpc.h>
 #include <dabba/sock_filter.h>
 #include <dabba/thread.h>
@@ -205,6 +206,7 @@ static void capture_settings_print(const Dabba__CaptureList *
 		printf("      frame number: %" PRIu64 "\n", capture->frame_nr);
 		printf("      pcap: %s\n", capture->pcap);
 		printf("      interface: %s\n", capture->interface);
+		printf("      socket filter: %s\n", print_tf(capture->sfp));
 	}
 
 	*status = 1;
