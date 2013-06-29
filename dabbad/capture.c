@@ -294,7 +294,7 @@ void dabbad_capture_start(Dabba__DabbaService_Service * service,
 		goto out;
 	}
 
-	if (capturep->sfp) {
+	if (capturep->sfp && capturep->sfp->n_filter) {
 		rc = dabbad_pbuf_sfp_2_sfp(capturep->sfp, &pkt_capture->rx.sfp);
 
 		if (rc) {
