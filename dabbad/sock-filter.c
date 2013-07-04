@@ -59,6 +59,9 @@ void dabbad_pbuf_sfp_destroy(Dabba__SockFprog * pbuf_sfp)
 
 	assert(pbuf_sfp);
 
+	if (pbuf_sfp->n_filter)
+		assert(pbuf_sfp->filter);
+
 	for (a = 0; a < pbuf_sfp->n_filter; a++)
 		free(pbuf_sfp->filter[a]);
 
