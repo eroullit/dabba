@@ -177,8 +177,8 @@ test_expect_success "Measure pcap file size before appending" "
     stat -c %s result.pcap > before_size
 "
 
-test_expect_success "Expecting 20 packets to be captured" "
-    test $(pktcnt result.pcap) = 20
+test_expect_success "Expecting 40 packets to be captured" "
+    test $(pktcnt result.pcap) = 40
 "
 
 test_expect_success "Start a capture with pcap append" "
@@ -198,8 +198,8 @@ test_expect_success "Check that appended pcap file size grows" "
     test $(cat after_size) -gt $(cat before_size)
 "
 
-test_expect_success "Expecting 40 packets to be captured" "
-    test $(pktcnt result.pcap) = 40
+test_expect_success "Expecting 80 packets to be captured" "
+    test $(pktcnt result.pcap) = 80
 "
 
 test_expect_success "Stop all running captures thread" "
