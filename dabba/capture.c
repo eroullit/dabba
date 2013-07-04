@@ -189,8 +189,9 @@ static void capture_settings_print(const Dabba__CaptureList *
 				   result, void *closure_data)
 {
 	const Dabba__Capture *capture;
+	const Dabba__SockFilter *sf;
 	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
-	size_t a;
+	size_t a, i;
 
 	assert(closure_data);
 
@@ -206,8 +207,14 @@ static void capture_settings_print(const Dabba__CaptureList *
 		printf("      frame number: %" PRIu64 "\n", capture->frame_nr);
 		printf("      pcap: %s\n", capture->pcap);
 		printf("      interface: %s\n", capture->interface);
-		printf("      socket filter: %s\n",
-		       print_tf(capture->sfp->n_filter));
+		printf("      socket filter: \n");
+
+		for (i = 0; i < capture->sfp->n_filter; i++) {
+			sf = capture->sfp->filter[i];
+			printf("        - "
+			       "{ code: %#x, jt: %#x, jf: %#x, k: %#x }\n",
+			       sf->code, sf->jt, sf->jf, sf->k);
+		}
 	}
 
 	*status = 1;
