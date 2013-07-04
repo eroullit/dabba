@@ -1,5 +1,5 @@
 /**
- * \file sock_filter.c
+ * \file sock-filter.c
  * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2013
  * \date 2013
  */
@@ -32,9 +32,9 @@
 #include <libdabba/sock-filter.h>
 
 /**
- * \brief Checks the input BPF expression validity
- * \param[in] bpf Pointer to the BPF expression to check
- * \return 0 is BPF is not valid, 1 when valid
+ * \brief Checks the input socket filter expression validity
+ * \param[in] bpf Pointer to the socket filter to check
+ * \return 0 is socket filter is not valid, 1 when valid
  */
 
 int sock_filter_is_valid(const struct sock_fprog *const bpf)
@@ -162,11 +162,24 @@ int sock_filter_is_valid(const struct sock_fprog *const bpf)
 	return BPF_CLASS(bpf->filter[bpf->len - 1].code) == BPF_RET;
 }
 
+/**
+ * \brief Attach a socket filter to a socket
+ * \param[in] sock	Socket to attach the filter to
+ * \param[in] sfp	Socket filter to attach
+ * \return same return values as \c setsockopt(2)
+ */
+
 int sock_filter_attach(const int sock, const struct sock_fprog *const sfp)
 {
 	return setsockopt(sock, SOL_SOCKET, SO_ATTACH_FILTER, sfp,
 			  sizeof(*sfp));
 }
+
+/**
+ * \brief Clear socket filters attached to a socket
+ * \param[in] sock	Socket to clear
+ * \return same return values as \c setsockopt(2)
+ */
 
 int sock_filter_detach(const int sock)
 {

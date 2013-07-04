@@ -1,5 +1,5 @@
 /**
- * \file sock_filter.c
+ * \file sock-filter.c
  * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2013
  * \date 2013
  */
@@ -36,12 +36,22 @@
 #include <libdabba/sock-filter.h>
 #include <libdabba-rpc/rpc.h>
 
-void dabbad_sfp_destroy(struct sock_fprog *sfp)
+/**
+ * \brief Free and clear a native socket filter
+ * \param[in] sfp	socket filter to free and clear
+ */
+
+void dabbad_sfp_destroy(struct sock_fprog *const sfp)
 {
 	assert(sfp);
 	free(sfp->filter);
 	sfp->len = 0;
 }
+
+/**
+ * \brief Free and clear a protobuf socket filter
+ * \param[in] pbuf_sfp	protobuf socket filter to free and clear
+ */
 
 void dabbad_pbuf_sfp_destroy(Dabba__SockFprog * pbuf_sfp)
 {
@@ -55,6 +65,18 @@ void dabbad_pbuf_sfp_destroy(Dabba__SockFprog * pbuf_sfp)
 	free(pbuf_sfp->filter);
 	dabba__sock_fprog__init(pbuf_sfp);
 }
+
+/**
+ * \brief Convert a protobuf socket filter to a native socket filter
+ * \param[in]  pbuf_sf	protobuf socket filter to convert
+ * \param[out] sfp	result native socket filter
+ * \return \c ENOMEM if the system is out-of-memory
+ *         \c EINVAL if the produced socket filter is invalid
+ *         0 on success.
+ * \note if the function is successful, \c sfp must be freed with
+ *       \c dabbad_sfp_destroy() afterwards.
+ * \see dabbad_sfp_destroy
+ */
 
 int dabbad_pbuf_sfp_2_sfp(Dabba__SockFprog * pbuf_sf, struct sock_fprog *sfp)
 {
@@ -84,6 +106,16 @@ int dabbad_pbuf_sfp_2_sfp(Dabba__SockFprog * pbuf_sf, struct sock_fprog *sfp)
 
 	return 0;
 }
+
+/**
+ * \brief Convert a native socket filter to a protobuf socket filter
+ * \param[in]  sfp	native socket filter to convert
+ * \param[out] pbuf_sfp	resulting protobuf socket filter
+ * \return \c ENOMEM if the system is out-of-memory, 0 on success.
+ * \note if the function is successful, \c pbuf_sfp must be freed with
+ *       \c dabbad_pbuf_sfp_destroy() afterwards.
+ * \see dabbad_pbuf_sfp_destroy
+ */
 
 int dabbad_sfp_2_pbuf_sfp(struct sock_fprog *sfp, Dabba__SockFprog * pbuf_sfp)
 {

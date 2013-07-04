@@ -1,5 +1,5 @@
 /**
- * \file sock_filter.c
+ * \file sock-filter.c
  * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (C) 2013
  * \date 2013
  */
@@ -35,7 +35,12 @@
 
 #include <libdabba-rpc/rpc.h>
 
-void sock_filter_destroy(Dabba__SockFprog * pbuf_sfp)
+/**
+ * \brief Free and clear a protobuf socket filter
+ * \param[in] pbuf_sfp	protobuf socket filter to free and clear
+ */
+/* TODO add this function to libdabba-rpc */
+void sock_filter_destroy(Dabba__SockFprog * const pbuf_sfp)
 {
 	size_t a;
 
@@ -47,6 +52,14 @@ void sock_filter_destroy(Dabba__SockFprog * pbuf_sfp)
 	free(pbuf_sfp->filter);
 	dabba__sock_fprog__init(pbuf_sfp);
 }
+
+/**
+ * \brief Parse a socket filter file to a protobuf socket filter
+ * \param[in]  sf_path	socket filter file path
+ * \param[out] pbuf_sfp	resulting protobuf socket filter
+ * \return -1 if the file could not be open, \c ENOMEM on out-of-memory and
+ *         0 on success.
+ */
 
 int sock_filter_parse(const char *const sf_path, Dabba__SockFprog * pbuf_sfp)
 {
