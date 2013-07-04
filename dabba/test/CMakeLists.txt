@@ -1,3 +1,5 @@
+ADD_SUBDIRECTORY(tools)
+
 FILE(GLOB sharness sharness.sh dabba-test-lib.sh dictkeys2values.py yaml2dict.py)
 FILE(GLOB test_scripts RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} t*.sh)
 

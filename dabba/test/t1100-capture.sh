@@ -177,6 +177,10 @@ test_expect_success "Measure pcap file size before appending" "
     stat -c %s test0.pcap > before_size
 "
 
+test_expect_success "Expecting 20 packets to be captured" "
+    test $(pktcnt result.pcap) = 20
+"
+
 test_expect_success "Start a capture with pcap append" "
     dabba capture start --interface any --pcap test0.pcap --append \
     --sock-filter '$SHARNESS_TEST_DIRECTORY/t1100/localhost-icmp.bpf'
@@ -192,6 +196,10 @@ test_expect_success "Measure pcap file size after appending" "
 
 test_expect_success "Check that appended pcap file size grows" "
     test $(cat after_size) -gt $(cat before_size)
+"
+
+test_expect_success "Expecting 40 packets to be captured" "
+    test $(pktcnt result.pcap) = 40
 "
 
 test_expect_success "Stop all running captures thread" "
