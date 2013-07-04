@@ -156,6 +156,13 @@ test_expect_success "Start a new capture with an localhost ICMP-only filter" "
     --sock-filter '$SHARNESS_TEST_DIRECTORY/t1100/localhost-icmp.bpf'
 "
 
+test_expect_success "Check ICMP-only socket filter output against input file" "
+    awk -F',|{|}' '{\$1=\"\";print}' '$SHARNESS_TEST_DIRECTORY/t1100/localhost-icmp.bpf' | \
+    xargs printf '- { code: %#x, jt: %#x, jf: %#x, k: %#x }\n' > expect_sf_out &&
+    dabba capture get | grep -Eo '\- \{ code:[[:print:]]+$' > result_sf_out &&
+    test_cmp expect_sf_out result_sf_out
+"
+
 test_expect_success "Generate some traffic to capture" "
     ping -c 10 -i 0.2 -s 1500 localhost
 "
