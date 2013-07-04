@@ -60,14 +60,13 @@ void sock_filter_destroy(Dabba__SockFprog * const pbuf_sfp)
  * \brief Parse a socket filter file to a protobuf socket filter
  * \param[in]  sf_path	socket filter file path
  * \param[out] pbuf_sfp	resulting protobuf socket filter
- * \return -1 if the file could not be open, \c ENOMEM on out-of-memory and
- *         0 on success.
+ * \return \c errno on failure, 0 on success.
  */
 
 int sock_filter_parse(const char *const sf_path,
 		      Dabba__SockFprog * const pbuf_sfp)
 {
-	int ret;
+	int ret, rc = 0;
 	char buff[128] = { 0 };
 	Dabba__SockFilter *sf;
 	Dabba__SockFilter **tmp;
@@ -76,13 +75,13 @@ int sock_filter_parse(const char *const sf_path,
 	assert(sf_path);
 
 	FILE *fp = fopen(sf_path, "r");
-	if (!fp) {
-		return (-1);
-	}
+
+	if (!fp)
+		return errno;
 
 	memset(buff, 0, sizeof(buff));
 
-	while (fgets(buff, sizeof(buff), fp) != NULL) {
+	while (fgets(buff, sizeof(buff), fp)) {
 		/* We're using evil sscanf, so we have to assure
 		   that we don't get into a buffer overflow ... */
 		buff[sizeof(buff) - 1] = 0;
@@ -93,8 +92,10 @@ int sock_filter_parse(const char *const sf_path,
 
 		sf = malloc(sizeof(*sf));
 
-		if (!sf)
-			return ENOMEM;
+		if (!sf) {
+			rc = ENOMEM;
+			break;
+		}
 
 		dabba__sock_filter__init(sf);
 
@@ -104,16 +105,20 @@ int sock_filter_parse(const char *const sf_path,
 			     (int *)((void *)&(sf->jf)), &(sf->k));
 
 		/* No valid bpf opcode format or a syntax error */
-		if (ret != 4)
-			return 0;
+		if (ret != 4) {
+			rc = EINVAL;
+			break;
+		}
 
 		tmp =
 		    realloc(pbuf_sfp->filter,
 			    sizeof(*pbuf_sfp->filter) * (pbuf_sfp->n_filter +
 							 1));
 
-		if (!tmp)
-			return ENOMEM;
+		if (!tmp) {
+			rc = ENOMEM;
+			break;
+		}
 
 		pbuf_sfp->filter = tmp;
 		pbuf_sfp->filter[pbuf_sfp->n_filter] = sf;
@@ -122,5 +127,7 @@ int sock_filter_parse(const char *const sf_path,
 		memset(buff, 0, sizeof(buff));
 	}
 
-	return fclose(fp);
+	fclose(fp);
+
+	return rc;
 }
