@@ -101,7 +101,7 @@ test_expect_success PYTHON_YAML "Stop capture thread with a default frame number
 
 for i in `seq 0 9`
 do
-        test_expect_success "Start capture thread #$(($i+1)) on loopback" "
+        test_expect_success "Start capture thread #$(($i+1)) on all interfaces" "
             dabba capture start --interface any --pcap test$i.pcap --frame-number $frame_nr &&
             dabba capture get > result
         "
