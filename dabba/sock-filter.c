@@ -61,7 +61,8 @@ void sock_filter_destroy(Dabba__SockFprog * const pbuf_sfp)
  *         0 on success.
  */
 
-int sock_filter_parse(const char *const sf_path, Dabba__SockFprog * pbuf_sfp)
+int sock_filter_parse(const char *const sf_path,
+		      Dabba__SockFprog * const pbuf_sfp)
 {
 	int ret;
 	char buff[128] = { 0 };

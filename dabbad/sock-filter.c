@@ -78,7 +78,8 @@ void dabbad_pbuf_sfp_destroy(Dabba__SockFprog * pbuf_sfp)
  * \see dabbad_sfp_destroy
  */
 
-int dabbad_pbuf_sfp_2_sfp(Dabba__SockFprog * pbuf_sf, struct sock_fprog *sfp)
+int dabbad_pbuf_sfp_2_sfp(const Dabba__SockFprog * const pbuf_sf,
+			  struct sock_fprog *const sfp)
 {
 	size_t a;
 
@@ -117,7 +118,8 @@ int dabbad_pbuf_sfp_2_sfp(Dabba__SockFprog * pbuf_sf, struct sock_fprog *sfp)
  * \see dabbad_pbuf_sfp_destroy
  */
 
-int dabbad_sfp_2_pbuf_sfp(struct sock_fprog *sfp, Dabba__SockFprog * pbuf_sfp)
+int dabbad_sfp_2_pbuf_sfp(const struct sock_fprog *const sfp,
+			  Dabba__SockFprog * const pbuf_sfp)
 {
 	Dabba__SockFilter *sf;
 
