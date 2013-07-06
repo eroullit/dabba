@@ -171,7 +171,9 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <libdabba/packet_mmap.h>
 #include <dabba/dabba.h>
 #include <dabba/help.h>
+#include <dabba/macros.h>
 #include <dabba/rpc.h>
+#include <dabba/sock-filter.h>
 #include <dabba/thread.h>
 
 #define DEFAULT_CAPTURE_FRAME_NUMBER 32
@@ -187,8 +189,9 @@ static void capture_settings_print(const Dabba__CaptureList *
 				   result, void *closure_data)
 {
 	const Dabba__Capture *capture;
+	const Dabba__SockFilter *sf;
 	protobuf_c_boolean *status = (protobuf_c_boolean *) closure_data;
-	size_t a;
+	size_t a, i;
 
 	assert(closure_data);
 
@@ -204,6 +207,14 @@ static void capture_settings_print(const Dabba__CaptureList *
 		printf("      frame number: %" PRIu64 "\n", capture->frame_nr);
 		printf("      pcap: %s\n", capture->pcap);
 		printf("      interface: %s\n", capture->interface);
+		printf("      socket filter: \n");
+
+		for (i = 0; i < capture->sfp->n_filter; i++) {
+			sf = capture->sfp->filter[i];
+			printf("        - "
+			       "{ code: %#x, jt: %#x, jf: %#x, k: %#x }\n",
+			       sf->code, sf->jt, sf->jf, sf->k);
+		}
 	}
 
 	*status = 1;
@@ -317,14 +328,16 @@ static int cmd_capture_start(int argc, const char **argv)
 		OPT_CAPTURE_PCAP,
 		OPT_CAPTURE_FRAME_NUMBER,
 		OPT_CAPTURE_FRAME_SIZE,
+		OPT_CAPTURE_SOCK_FILTER,
 		OPT_CAPTURE_APPEND,
 		OPT_TCP,
 		OPT_LOCAL,
 		OPT_HELP
 	};
 
-	int ret;
+	int ret, rc;
 	Dabba__Capture capture = DABBA__CAPTURE__INIT;
+	Dabba__SockFprog sfp = DABBA__SOCK_FPROG__INIT;
 	Dabba__ErrorCode err = DABBA__ERROR_CODE__INIT;
 	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
 	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
@@ -336,6 +349,8 @@ static int cmd_capture_start(int argc, const char **argv)
 		{"frame-number", required_argument, NULL,
 		 OPT_CAPTURE_FRAME_NUMBER},
 		{"frame-size", required_argument, NULL, OPT_CAPTURE_FRAME_SIZE},
+		{"sock-filter", required_argument, NULL,
+		 OPT_CAPTURE_SOCK_FILTER},
 		{"append", no_argument, NULL, OPT_CAPTURE_APPEND},
 		{"tcp", optional_argument, NULL, OPT_TCP},
 		{"local", optional_argument, NULL, OPT_LOCAL},
@@ -388,6 +403,14 @@ static int cmd_capture_start(int argc, const char **argv)
 		case OPT_CAPTURE_FRAME_SIZE:
 			capture.frame_size = strtoull(optarg, NULL, 10);
 			break;
+		case OPT_CAPTURE_SOCK_FILTER:
+			rc = sock_filter_parse(optarg, &sfp);
+
+			if (rc)
+				return rc;
+
+			capture.sfp = &sfp;
+			break;
 		case OPT_HELP:
 		default:
 			show_usage(capture_option);
@@ -397,8 +420,14 @@ static int cmd_capture_start(int argc, const char **argv)
 
 	service = dabba_rpc_client_connect(server_id, server_type);
 
-	/* Check error reporting */
-	return service ? rpc_capture_start(service, &capture) : EINVAL;
+	if (service)
+		rc = rpc_capture_start(service, &capture);
+	else
+		rc = EINVAL;
+
+	sock_filter_destroy(&sfp);
+
+	return rc;
 }
 
 /**

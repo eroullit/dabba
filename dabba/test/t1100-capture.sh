@@ -101,7 +101,7 @@ test_expect_success PYTHON_YAML "Stop capture thread with a default frame number
 
 for i in `seq 0 9`
 do
-        test_expect_success "Start capture thread #$(($i+1)) on loopback" "
+        test_expect_success "Start capture thread #$(($i+1)) on all interfaces" "
             dabba capture start --interface any --pcap test$i.pcap --frame-number $frame_nr &&
             dabba capture get > result
         "
@@ -147,26 +147,43 @@ do
         "
 done
 
+test_expect_success "Stop all running captures" "
+    dabba capture stop-all
+"
+
+test_expect_success "Start a new capture with an localhost ICMP-only filter" "
+    dabba capture start --interface any --pcap result.pcap \
+    --sock-filter '$SHARNESS_TEST_DIRECTORY/t1100/localhost-icmp.bpf'
+"
+
+test_expect_success "Check ICMP-only socket filter output against input file" "
+    awk -F',|{|}' '{\$1=\"\";print}' '$SHARNESS_TEST_DIRECTORY/t1100/localhost-icmp.bpf' | \
+    xargs printf '- { code: %#x, jt: %#x, jf: %#x, k: %#x }\n' > expect_sf_out &&
+    dabba capture get | grep -Eo '\- \{ code:[[:print:]]+$' > result_sf_out &&
+    test_cmp expect_sf_out result_sf_out
+"
+
 test_expect_success "Generate some traffic to capture" "
     ping -c 10 -i 0.2 -s 1500 localhost
 "
 
-test_expect_success PYTHON_YAML "Query capture thread id to stop" "
-    dictkeys2values captures 0 id < parsed > result_id
-"
-
-test_expect_success PYTHON_YAML "Stop capture thread #0 on loopback" "
-    dabba capture stop --id '$(cat result_id)' &&
+test_expect_success "Stop capture thread #0 on loopback" "
+    dabba capture stop-all &&
     dabba capture get > after &&
     test_must_fail grep -wq -f result_id after
 "
 
 test_expect_success "Measure pcap file size before appending" "
-    stat -c %s test0.pcap > before_size
+    stat -c %s result.pcap > before_size
+"
+
+test_expect_success "Expecting 40 packets to be captured" "
+    test $(pktcnt result.pcap) = 40
 "
 
 test_expect_success "Start a capture with pcap append" "
-    dabba capture start --interface any --pcap test0.pcap --append
+    dabba capture start --interface any --pcap result.pcap --append \
+    --sock-filter '$SHARNESS_TEST_DIRECTORY/t1100/localhost-icmp.bpf'
 "
 
 test_expect_success "Generate some traffic to capture" "
@@ -174,11 +191,15 @@ test_expect_success "Generate some traffic to capture" "
 "
 
 test_expect_success "Measure pcap file size after appending" "
-    stat -c %s test0.pcap > after_size
+    stat -c %s result.pcap > after_size
 "
 
 test_expect_success "Check that appended pcap file size grows" "
     test $(cat after_size) -gt $(cat before_size)
+"
+
+test_expect_success "Expecting 80 packets to be captured" "
+    test $(pktcnt result.pcap) = 80
 "
 
 test_expect_success "Stop all running captures thread" "
