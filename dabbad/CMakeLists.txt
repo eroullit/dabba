@@ -36,6 +36,7 @@ ADD_EXECUTABLE(${PROJECT_NAME}
 	replay.c
 	misc.c
 	thread.c
+	sock-filter.c
 )
 
 TARGET_LINK_LIBRARIES (${PROJECT_NAME} libdabba libdabba-rpc ${CMAKE_THREAD_LIBS_INIT} ${NL_LIBRARIES})

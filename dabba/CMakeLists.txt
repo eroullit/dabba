@@ -19,6 +19,7 @@ ADD_EXECUTABLE(${PROJECT_NAME}
 	dabba.c
 	help.c
 	cli.c
+	sock-filter.c
 	interface.c
 	interface-status.c
 	interface-settings.c

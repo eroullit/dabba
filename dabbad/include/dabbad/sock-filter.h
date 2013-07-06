@@ -1,13 +1,13 @@
 /**
- * \file packet_rx.h
- * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2011
- * \date 2011
+ * \file sock-filter.h
+ * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2013
+ * \date 2013
  */
 
 /* __LICENSE_HEADER_BEGIN__ */
 
 /*
- * Copyright (C) 2011	Emmanuel Roullit <emmanuel.roullit@gmail.com>
+ * Copyright (C) 2013	Emmanuel Roullit <emmanuel.roullit@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,24 +25,20 @@
  *
  */
 
- /* __LICENSE_HEADER_END__ */
+/* __LICENSE_HEADER_END__ */
 
-#ifndef PACKET_RX_H
-#define	PACKET_RX_H
+#ifndef DABBAD_SOCK_FILTER_H
+#define	DABBAD_SOCK_FILTER_H
 
-#include <linux/filter.h>
-#include <libdabba/packet_mmap.h>
+#include <libdabba-rpc/rpc.h>
 
-/**
- * \brief Packet capture structure
- */
+struct sock_fprog;
 
-struct packet_rx {
-	struct packet_mmap pkt_mmap; /**< capture packet mmap structure */
-	struct sock_fprog sfp; /**< socket program for the capture packet mmap */
-	int pcap_fd; /**< pcap file descriptor */
-};
+void dabbad_sfp_destroy(struct sock_fprog *const sfp);
+void dabbad_pbuf_sfp_destroy(Dabba__SockFprog * pbuf_sfp);
+int dabbad_pbuf_sfp_2_sfp(const Dabba__SockFprog * const pbuf_sf,
+			  struct sock_fprog *const sfp);
+int dabbad_sfp_2_pbuf_sfp(const struct sock_fprog *const sfp,
+			  Dabba__SockFprog * const pbuf_sfp);
 
-void *packet_rx(void *arg);
-
-#endif				/* PACKET_RX_H */
+#endif				/* DABBAD_SOCK_FILTER_H */
