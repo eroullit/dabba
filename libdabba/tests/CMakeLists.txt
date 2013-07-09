@@ -1,17 +1,11 @@
 INCLUDE_DIRECTORIES (${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/include)
 LINK_DIRECTORIES (${CMAKE_SOURCE_DIR}/${PROJECT_NAME})
 
-ADD_EXECUTABLE(test_packet_mmap test-packet-mmap.c)
-TARGET_LINK_LIBRARIES (test_packet_mmap ${PROJECT_NAME})
-ADD_TEST(test_packet_mmap test_packet_mmap)
+FOREACH(COMP test-packet-mmap test-strlcpy test-pcap)
+	ADD_EXECUTABLE(${COMP} ${COMP}.c)
+	TARGET_LINK_LIBRARIES (${COMP} ${PROJECT_NAME})
+	ADD_TEST(${COMP} ${COMP})
+ENDFOREACH(COMP)
 
-ADD_EXECUTABLE(test_strlcpy test-strlcpy.c)
-TARGET_LINK_LIBRARIES (test_strlcpy ${PROJECT_NAME})
-ADD_TEST(test_strlcpy test_strlcpy)
-
-ADD_EXECUTABLE(test_pcap test-pcap.c)
-TARGET_LINK_LIBRARIES (test_pcap ${PROJECT_NAME})
-ADD_TEST(test_pcap test_pcap)
-
-ADD_CUSTOM_TARGET(test_packet_mmap-setcap COMMAND ${SETCAP_EXECUTABLE} cap_net_raw,cap_ipc_lock,cap_net_admin=eip test_packet_mmap)
-ADD_DEPENDENCIES(setcap test_packet_mmap-setcap)
+ADD_CUSTOM_TARGET(test-packet-mmap-setcap COMMAND ${SETCAP_EXECUTABLE} cap_net_raw,cap_ipc_lock,cap_net_admin=eip test-packet-mmap)
+ADD_DEPENDENCIES(setcap test-packet-mmap-setcap)
