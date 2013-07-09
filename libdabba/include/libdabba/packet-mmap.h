@@ -1,5 +1,5 @@
 /**
- * \file packet_mmap.h
+ * \file packet-mmap.h
  * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2011
  * \date 2011
  */

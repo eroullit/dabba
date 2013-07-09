@@ -1,5 +1,5 @@
 /**
- * \file packet_tx.c
+ * \file packet-tx.c
  * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2012
  * \date 2012
  */
@@ -34,7 +34,7 @@
 #include <sys/uio.h>
 #include <poll.h>
 
-#include <libdabba/packet_tx.h>
+#include <libdabba/packet-tx.h>
 #include <libdabba/pcap.h>
 
 int packet_tx_loss_set(const int sock, const int discard)

@@ -1,5 +1,5 @@
 /**
- * \file packet_mmap.c
+ * \file packet-mmap.c
  * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2011
  * \date 2011
  */
@@ -40,7 +40,7 @@
 #include <linux/if_ether.h>
 
 #include <libdabba/macros.h>
-#include <libdabba/packet_mmap.h>
+#include <libdabba/packet-mmap.h>
 #include <libdabba/interface.h>
 
 /**

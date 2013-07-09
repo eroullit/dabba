@@ -1,5 +1,5 @@
 /**
- * \file packet_rx.h
+ * \file packet-rx.h
  * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2011
  * \date 2011
  */
@@ -31,7 +31,7 @@
 #define	PACKET_RX_H
 
 #include <linux/filter.h>
-#include <libdabba/packet_mmap.h>
+#include <libdabba/packet-mmap.h>
 
 /**
  * \brief Packet capture structure

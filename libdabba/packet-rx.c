@@ -1,5 +1,5 @@
 /**
- * \file packet_rx.c
+ * \file packet-rx.c
  * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2011
  * \date 2011
  */
@@ -33,7 +33,7 @@
 #include <sys/uio.h>
 #include <poll.h>
 
-#include <libdabba/packet_rx.h>
+#include <libdabba/packet-rx.h>
 #include <libdabba/pcap.h>
 #include <libdabba/macros.h>
 

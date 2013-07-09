@@ -34,7 +34,7 @@
 
 #include <libdabba/macros.h>
 #include <libdabba/interface.h>
-#include <libdabba/packet_mmap.h>
+#include <libdabba/packet-mmap.h>
 
 #define MIN_FRAME_NR (1<<3)
 #define MAX_FRAME_NR (1<<16)
@@ -48,7 +48,8 @@ int main(int argc, char **argv)
 	enum packet_mmap_type types[] = { PACKET_MMAP_RX, PACKET_MMAP_TX };
 	enum packet_mmap_frame_size fsize[] =
 	    { PACKET_MMAP_ETH_FRAME_LEN, PACKET_MMAP_JUMBO_FRAME_LEN,
-PACKET_MMAP_SUPER_JUMBO_FRAME_LEN };
+		PACKET_MMAP_SUPER_JUMBO_FRAME_LEN
+	};
 
 	assert(argc);
 	assert(argv);

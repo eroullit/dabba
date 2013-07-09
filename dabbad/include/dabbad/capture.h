@@ -31,7 +31,7 @@
 #define	CAPTURE_H
 
 #include <dabbad/thread.h>
-#include <libdabba/packet_rx.h>
+#include <libdabba/packet-rx.h>
 #include <libdabba-rpc/rpc.h>
 
 /**

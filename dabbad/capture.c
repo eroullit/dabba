@@ -47,7 +47,7 @@
 
 #include <libdabba/macros.h>
 #include <libdabba/interface.h>
-#include <libdabba/packet_rx.h>
+#include <libdabba/packet-rx.h>
 #include <libdabba/pcap.h>
 #include <libdabba/sock-filter.h>
 #include <dabbad/interface.h>

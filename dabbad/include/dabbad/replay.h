@@ -31,7 +31,7 @@
 #define	REPLAY_H
 
 #include <dabbad/thread.h>
-#include <libdabba/packet_tx.h>
+#include <libdabba/packet-tx.h>
 #include <libdabba-rpc/rpc.h>
 
 /**

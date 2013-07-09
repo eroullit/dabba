@@ -47,7 +47,7 @@
 
 #include <libdabba/macros.h>
 #include <libdabba/interface.h>
-#include <libdabba/packet_tx.h>
+#include <libdabba/packet-tx.h>
 #include <libdabba/pcap.h>
 #include <dabbad/interface.h>
 #include <dabbad/replay.h>

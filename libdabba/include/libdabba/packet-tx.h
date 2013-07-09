@@ -1,5 +1,5 @@
 /**
- * \file packet_tx.h
+ * \file packet-tx.h
  * \author written by Emmanuel Roullit emmanuel.roullit@gmail.com (c) 2012
  * \date 2012
  */
@@ -30,7 +30,7 @@
 #ifndef PACKET_TX_H
 #define	PACKET_TX_H
 
-#include <libdabba/packet_mmap.h>
+#include <libdabba/packet-mmap.h>
 
 /**
  * \brief Packet replay structure
