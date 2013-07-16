@@ -73,10 +73,6 @@ Query interface coalescing information.
 
 Report which interface offloading features are enabled.
 
-=item modify
-
-Modify status of available network interfaces.
-
 =back
 
 =head1 ACTIONS
