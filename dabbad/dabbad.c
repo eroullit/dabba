@@ -217,14 +217,14 @@ int main(int argc, char **argv)
 		}
 	}
 
-	core_enable();
-
 	if (daemonize) {
 		if (daemon(-1, 0)) {
 			perror("Could not daemonize process");
 			return errno;
 		}
 	}
+
+	core_enable();
 
 	if (pidfile)
 		rc = create_pidfile(pidfile);
