@@ -17,6 +17,15 @@
 # 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
 #
 
+### BEGIN INIT INFO
+# Provides:		dabbad
+# Required-Start:	$remote_fs
+# Required-Stop:	$remote_fs
+# Default-Start:	2 3 4 5
+# Default-Stop:
+# Short-Description:	dabba RPC server
+### END INIT INFO
+
 set -e
 
 # /etc/init.d/dabbad: start and stop the Dabba daemon
