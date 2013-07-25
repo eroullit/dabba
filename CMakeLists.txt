@@ -37,7 +37,7 @@ SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}_${CPACK_PACKAGE_VERSIO
 SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6, libcap2-bin, libprotobuf-c0, libnl-3-200, libnl-genl-3-200, libnl-route-3-200")
 SET(CPACK_PACKAGE_VENDOR "Emmanuel Roullit")
 SET(CPACK_PACKAGE_CONTACT "${CPACK_PACKAGE_VENDOR} <emmanuel.roullit@gmail.com>")
-SET(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_SOURCE_DIR}/debian/postinst;${CMAKE_SOURCE_DIR}/debian/shlibs")
+SET(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_SOURCE_DIR}/debian/postinst;${CMAKE_SOURCE_DIR}/debian/postrm;${CMAKE_SOURCE_DIR}/debian/shlibs")
 SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION
 "Suite of low-level multithreaded zero-copy network tools.
  dabba is based on 4 parts:
