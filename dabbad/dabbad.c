@@ -134,10 +134,19 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <signal.h>
 
 #include <dabbad/rpc.h>
 #include <dabbad/misc.h>
 #include <dabbad/help.h>
+
+static const char *pidfile = DEFAULT_PIDPATH;
+
+static void unlink_pidfile(int arg)
+{
+	unlink(pidfile);
+	exit(arg);
+}
 
 /**
  * \brief Dabbad entry point
@@ -173,7 +182,6 @@ int main(int argc, char **argv)
 
 	int opt, opt_idx, rc = 0;
 	int daemonize = 0;
-	const char *pidfile = DEFAULT_PIDPATH;
 	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
 	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 
@@ -223,6 +231,10 @@ int main(int argc, char **argv)
 			return errno;
 		}
 	}
+
+	signal(SIGTERM, unlink_pidfile);
+	signal(SIGINT, unlink_pidfile);
+	signal(SIGQUIT, unlink_pidfile);
 
 	rc = create_pidfile(pidfile);
 
