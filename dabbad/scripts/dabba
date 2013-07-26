@@ -22,13 +22,13 @@
 # Required-Start:	$remote_fs
 # Required-Stop:	$remote_fs
 # Default-Start:	2 3 4 5
-# Default-Stop:
+# Default-Stop:         0 1 6
 # Short-Description:	dabba RPC server
 ### END INIT INFO
 
 set -e
 
-# /etc/init.d/dabbad: start and stop the Dabba daemon
+# /etc/init.d/dabba: start and stop the Dabba daemon
 
 test -x /usr/sbin/dabbad || exit 0
 
