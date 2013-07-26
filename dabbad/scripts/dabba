@@ -50,7 +50,7 @@ export PATH="${PATH:+$PATH:}/usr/sbin:/sbin"
 case "$1" in
   start)
 	log_daemon_msg "Starting Dabba daemon" "dabbad" || true
-	if start-stop-daemon --start --quiet --oknodo --pidfile /var/run/dabbad.pid --exec /usr/sbin/dabbad -- $DABBAD_OPTS; then
+	if start-stop-daemon --start --quiet --oknodo --pidfile /tmp/dabbad.pid --exec /usr/sbin/dabbad -- $DABBAD_OPTS; then
 	    log_end_msg 0 || true
 	else
 	    log_end_msg 1 || true
@@ -58,7 +58,7 @@ case "$1" in
 	;;
   stop)
 	log_daemon_msg "Stopping Dabba daemon" "dabbad" || true
-	if start-stop-daemon --stop --quiet --oknodo --pidfile /var/run/dabbad.pid; then
+	if start-stop-daemon --stop --quiet --oknodo --pidfile /tmp/dabbad.pid; then
 	    log_end_msg 0 || true
 	else
 	    log_end_msg 1 || true
@@ -67,7 +67,7 @@ case "$1" in
 
   reload|force-reload)
 	log_daemon_msg "Reloading Dabba daemon" "dabbad" || true
-	if start-stop-daemon --stop --signal 1 --quiet --oknodo --pidfile /var/run/dabbad.pid --exec /usr/sbin/dabbad; then
+	if start-stop-daemon --stop --signal 1 --quiet --oknodo --pidfile /tmp/dabbad.pid --exec /usr/sbin/dabbad; then
 	    log_end_msg 0 || true
 	else
 	    log_end_msg 1 || true
@@ -76,8 +76,8 @@ case "$1" in
 
   restart)
 	log_daemon_msg "Restarting Dabba daemon" "dabbad" || true
-	start-stop-daemon --stop --quiet --oknodo --retry 30 --pidfile /var/run/dabbad.pid
-	if start-stop-daemon --start --quiet --oknodo --pidfile /var/run/dabbad.pid --exec /usr/sbin/dabbad -- $DABBAD_OPTS; then
+	start-stop-daemon --stop --quiet --oknodo --retry 30 --pidfile /tmp/dabbad.pid
+	if start-stop-daemon --start --quiet --oknodo --pidfile /tmp/dabbad.pid --exec /usr/sbin/dabbad -- $DABBAD_OPTS; then
 	    log_end_msg 0 || true
 	else
 	    log_end_msg 1 || true
@@ -85,7 +85,7 @@ case "$1" in
 	;;
 
   status)
-	status_of_proc -p /var/run/dabbad.pid /usr/sbin/dabbad dabbad && exit 0 || exit $?
+	status_of_proc -p /tmp/dabbad.pid /usr/sbin/dabbad dabbad && exit 0 || exit $?
 	;;
 
   *)

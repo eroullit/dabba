@@ -173,7 +173,7 @@ int main(int argc, char **argv)
 
 	int opt, opt_idx, rc = 0;
 	int daemonize = 0;
-	const char *pidfile = NULL;
+	const char *pidfile = DEFAULT_PIDPATH;
 	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
 	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 
@@ -224,8 +224,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (pidfile)
-		rc = create_pidfile(pidfile);
+	rc = create_pidfile(pidfile);
 
 	return rc ? rc : dabbad_rpc_msg_poll(server_id, server_type);
 }
