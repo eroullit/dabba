@@ -140,16 +140,24 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabbad/misc.h>
 #include <dabbad/help.h>
 
-static const char *pidfile = DEFAULT_PIDPATH;
-static const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
-static ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+struct dabbad_config {
+	const char *pidfile;
+	const char *server_id;
+	ProtobufC_RPC_AddressType server_type;
+};
+
+static struct dabbad_config conf = {
+	.pidfile = DEFAULT_PIDPATH,.server_id =
+	    DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME,.server_type =
+	    PROTOBUF_C_RPC_ADDRESS_LOCAL
+};
 
 static void exit_cleanup(int arg)
 {
-	unlink(pidfile);
+	unlink(conf.pidfile);
 
-	if (server_type == PROTOBUF_C_RPC_ADDRESS_LOCAL)
-		unlink(server_id);
+	if (conf.server_type == PROTOBUF_C_RPC_ADDRESS_LOCAL)
+		unlink(conf.server_id);
 
 	exit(arg);
 }
@@ -200,25 +208,25 @@ int main(int argc, char **argv)
 			daemonize = 1;
 			break;
 		case OPT_PIDFILE:
-			pidfile = optarg;
+			conf.pidfile = optarg;
 			break;
 		case OPT_VERSION:
 			print_version();
 			return EXIT_SUCCESS;
 			break;
 		case OPT_TCP:
-			server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
-			server_id = DABBA_RPC_DEFAULT_PORT;
+			conf.server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
+			conf.server_id = DABBA_RPC_DEFAULT_PORT;
 
 			if (optarg)
-				server_id = optarg;
+				conf.server_id = optarg;
 			break;
 		case OPT_LOCAL:
-			server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
-			server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+			conf.server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+			conf.server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
 
 			if (optarg)
-				server_id = optarg;
+				conf.server_id = optarg;
 			break;
 		case OPT_HELP:
 		default:
@@ -240,7 +248,7 @@ int main(int argc, char **argv)
 	signal(SIGINT, exit_cleanup);
 	signal(SIGQUIT, exit_cleanup);
 
-	rc = create_pidfile(pidfile);
+	rc = create_pidfile(conf.pidfile);
 
-	return rc ? rc : dabbad_rpc_msg_poll(server_id, server_type);
+	return rc ? rc : dabbad_rpc_msg_poll(conf.server_id, conf.server_type);
 }
