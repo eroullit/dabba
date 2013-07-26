@@ -141,10 +141,16 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <dabbad/help.h>
 
 static const char *pidfile = DEFAULT_PIDPATH;
+static const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+static ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 
-static void unlink_pidfile(int arg)
+static void exit_cleanup(int arg)
 {
 	unlink(pidfile);
+
+	if (server_type == PROTOBUF_C_RPC_ADDRESS_LOCAL)
+		unlink(server_id);
+
 	exit(arg);
 }
 
@@ -182,8 +188,6 @@ int main(int argc, char **argv)
 
 	int opt, opt_idx, rc = 0;
 	int daemonize = 0;
-	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
-	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 
 	assert(argc);
 	assert(argv);
@@ -232,9 +236,9 @@ int main(int argc, char **argv)
 		}
 	}
 
-	signal(SIGTERM, unlink_pidfile);
-	signal(SIGINT, unlink_pidfile);
-	signal(SIGQUIT, unlink_pidfile);
+	signal(SIGTERM, exit_cleanup);
+	signal(SIGINT, exit_cleanup);
+	signal(SIGQUIT, exit_cleanup);
 
 	rc = create_pidfile(pidfile);
 
