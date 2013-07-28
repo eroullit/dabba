@@ -162,6 +162,11 @@ static void exit_cleanup(int arg)
 	exit(arg);
 }
 
+static void atexit_cleanup(void)
+{
+	exit_cleanup(0);
+}
+
 /**
  * \brief Dabbad entry point
  * \param[in]       argc	        Argument counter
@@ -247,6 +252,7 @@ int main(int argc, char **argv)
 	signal(SIGTERM, exit_cleanup);
 	signal(SIGINT, exit_cleanup);
 	signal(SIGQUIT, exit_cleanup);
+	atexit(atexit_cleanup);
 
 	rc = create_pidfile(conf.pidfile);
 
