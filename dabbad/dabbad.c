@@ -152,19 +152,18 @@ static struct dabbad_config conf = {
 	    PROTOBUF_C_RPC_ADDRESS_LOCAL
 };
 
-static void exit_cleanup(int arg)
+static void atexit_cleanup(void)
 {
 	unlink(conf.pidfile);
 
 	if (conf.server_type == PROTOBUF_C_RPC_ADDRESS_LOCAL)
 		unlink(conf.server_id);
-
-	exit(arg);
 }
 
-static void atexit_cleanup(void)
+static void exit_cleanup(int arg)
 {
-	exit_cleanup(0);
+	atexit_cleanup();
+	exit(arg);
 }
 
 /**
