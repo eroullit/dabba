@@ -594,6 +594,10 @@ static int cmd_capture_get(int argc, const char **argv)
 	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 	ProtobufCService *service;
 
+	/* HACK: getopt*() start to parse options at argv[1] */
+	argc++;
+	argv--;
+
 	while ((ret =
 		getopt_long_only(argc, (char **)argv, "", capture_option,
 				 NULL)) != EOF) {
