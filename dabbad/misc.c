@@ -166,17 +166,36 @@ int create_pidfile(const char *const pidfile)
 	return rc;
 }
 
+/**
+ * \brief Fetch current core file size limit settings
+ * \param[out]	lim 	Pointer to file size limit structure
+ * \return 0 on success, \c errno on failure.
+ */
+
 static int core_rlimit_get(struct rlimit *const lim)
 {
 	assert(lim);
 	return getrlimit(RLIMIT_CORE, lim) ? errno : 0;
 }
 
+/**
+ * \brief Set core file size limit settings
+ * \param[in]	lim 	Pointer to file size limit structure
+ * \return 0 on success, \c errno on failure.
+ */
+
 static int core_rlimit_set(const struct rlimit *const lim)
 {
 	assert(lim);
 	return setrlimit(RLIMIT_CORE, lim) ? errno : 0;
 }
+
+/**
+ * \brief Enable dabba to generate a core dump file
+ * \return 0 on success, \c errno on failure.
+ * \note it raises the core file size limit to the maximum allowed
+ * \note it sets process flags to produce core dumps
+ */
 
 int core_enable(void)
 {
