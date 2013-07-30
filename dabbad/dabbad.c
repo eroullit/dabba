@@ -224,6 +224,8 @@ int main(int argc, char **argv)
 		}
 	}
 
+	core_enable();
+
 	if (pidfile)
 		rc = create_pidfile(pidfile);
 
