@@ -184,7 +184,7 @@ void dabbad_capture_stop(Dabba__DabbaService_Service * service,
 
 	if (!rc) {
 		dabbad_capture_remove(pkt_capture);
-		sock_filter_detach(pkt_capture->rx.pkt_mmap.pf_sock);
+		ldab_sock_filter_detach(pkt_capture->rx.pkt_mmap.pf_sock);
 		dabbad_sfp_destroy(&pkt_capture->rx.sfp);
 		close(pkt_capture->rx.pcap_fd);
 		packet_mmap_destroy(&pkt_capture->rx.pkt_mmap);
@@ -227,7 +227,7 @@ void dabbad_capture_stop_all(Dabba__DabbaService_Service * service,
 			break;
 
 		dabbad_capture_remove(pkt_capture);
-		sock_filter_detach(pkt_capture->rx.pkt_mmap.pf_sock);
+		ldab_sock_filter_detach(pkt_capture->rx.pkt_mmap.pf_sock);
 		dabbad_sfp_destroy(&pkt_capture->rx.sfp);
 		close(pkt_capture->rx.pcap_fd);
 		packet_mmap_destroy(&pkt_capture->rx.pkt_mmap);
@@ -303,7 +303,7 @@ void dabbad_capture_start(Dabba__DabbaService_Service * service,
 			goto out;
 		}
 
-		rc = sock_filter_attach(sock, &pkt_capture->rx.sfp);
+		rc = ldab_sock_filter_attach(sock, &pkt_capture->rx.sfp);
 
 		if (rc) {
 			dabbad_sfp_destroy(&pkt_capture->rx.sfp);

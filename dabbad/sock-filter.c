@@ -103,7 +103,7 @@ int dabbad_pbuf_sfp_2_sfp(const Dabba__SockFprog * const pbuf_sf,
 
 	sfp->len = pbuf_sf->n_filter;
 
-	if (!sock_filter_is_valid(sfp)) {
+	if (!ldab_sock_filter_is_valid(sfp)) {
 		dabbad_sfp_destroy(sfp);
 		return EINVAL;
 	}
