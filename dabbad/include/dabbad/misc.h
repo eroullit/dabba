@@ -31,7 +31,7 @@
 #endif				/* DEFAULT_PIDFILE */
 
 #ifndef DEFAULT_PIDPATH
-#define DEFAULT_PIDPATH _PATH_TMP "dabbad.pid"
+#define DEFAULT_PIDPATH _PATH_VARRUN "dabbad.pid"
 #endif				/* DEFAULT_PIDPATH */
 
 int fd_to_path(const int fd, char *path, const size_t path_len);
