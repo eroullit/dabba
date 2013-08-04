@@ -282,10 +282,10 @@ void dabbad_capture_start(Dabba__DabbaService_Service * service,
 
 	if (capturep->append)
 		pkt_capture->rx.pcap_fd =
-		    pcap_open(capturep->pcap, O_RDWR | O_APPEND);
+		    ldab_pcap_open(capturep->pcap, O_RDWR | O_APPEND);
 	else
 		pkt_capture->rx.pcap_fd =
-		    pcap_create(capturep->pcap, LINKTYPE_EN10MB);
+		    ldab_pcap_create(capturep->pcap, LINKTYPE_EN10MB);
 
 	if (pkt_capture->rx.pcap_fd < 0) {
 		rc = errno;

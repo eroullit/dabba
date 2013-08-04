@@ -84,7 +84,7 @@ pcap_file_header_write(const int fd, const int linktype,
  * \return 0 on success, \c EINVAL when the ARP type is not supported
  */
 
-int pcap_link_type_get(int arp_type, enum pcap_linktype *pcap_link_type)
+int ldab_pcap_link_type_get(int arp_type, enum pcap_linktype *pcap_link_type)
 {
 	int rc = 0;
 
@@ -174,7 +174,8 @@ static int pcap_is_valid(const int fd)
  * \note A created PCAP will have by default a snapshot length of 65535 bytes.
  */
 
-int pcap_create(const char *const pcap_path, const enum pcap_linktype linktype)
+int ldab_pcap_create(const char *const pcap_path,
+		    const enum pcap_linktype linktype)
 {
 	assert(pcap_path);
 
@@ -189,7 +190,7 @@ int pcap_create(const char *const pcap_path, const enum pcap_linktype linktype)
 		/* When the PCAP header cannot be written the file
 		 * must be closed and then deleted
 		 */
-		pcap_destroy(fd, pcap_path);
+		ldab_pcap_destroy(fd, pcap_path);
 		fd = -1;
 	}
 
@@ -202,7 +203,7 @@ int pcap_create(const char *const pcap_path, const enum pcap_linktype linktype)
  * \param[in] pcap_path	PCAP file path
  */
 
-void pcap_destroy(const int fd, const char *const pcap_path)
+void ldab_pcap_destroy(const int fd, const char *const pcap_path)
 {
 	assert(pcap_path);
 	assert(fd > 0);
@@ -219,7 +220,7 @@ void pcap_destroy(const int fd, const char *const pcap_path)
  * \note The flags given as parameter are directly given to \c open(2)
  */
 
-int pcap_open(const char *const pcap_path, int flags)
+int ldab_pcap_open(const char *const pcap_path, int flags)
 {
 	int append = 0;
 	int fd;
@@ -237,14 +238,14 @@ int pcap_open(const char *const pcap_path, int flags)
 	}
 
 	if (pcap_is_valid(fd) == 0) {
-		pcap_close(fd);
+		ldab_pcap_close(fd);
 		return (-1);
 	}
 
 	if (append) {
 		/* Go to EOF */
 		if (lseek(fd, 0, SEEK_END) < 0) {
-			pcap_close(fd);
+			ldab_pcap_close(fd);
 			return (-1);
 		}
 	}
@@ -258,7 +259,7 @@ int pcap_open(const char *const pcap_path, int flags)
  * \return same error values as \c close(2)
  */
 
-int pcap_close(const int fd)
+int ldab_pcap_close(const int fd)
 {
 	return (close(fd));
 }
@@ -276,9 +277,9 @@ int pcap_close(const int fd)
  */
 
 ssize_t
-pcap_write(const int fd, const uint8_t * const pkt,
-	   const size_t pkt_len, const size_t pkt_snaplen,
-	   const uint64_t tv_sec, const uint64_t tv_usec)
+ldab_pcap_write(const int fd, const uint8_t * const pkt,
+	       const size_t pkt_len, const size_t pkt_snaplen,
+	       const uint64_t tv_sec, const uint64_t tv_usec)
 {
 	struct pcap_sf_pkthdr sf_hdr;
 	ssize_t written = 0;
@@ -318,7 +319,7 @@ pcap_write(const int fd, const uint8_t * const pkt,
  * 		0 if packet header or packet payload could not be read
  */
 
-ssize_t pcap_read(const int fd, uint8_t * pkt, const uint32_t pkt_len)
+ssize_t ldab_pcap_read(const int fd, uint8_t * pkt, const uint32_t pkt_len)
 {
 	struct pcap_sf_pkthdr sf_hdr;
 
@@ -338,7 +339,7 @@ ssize_t pcap_read(const int fd, uint8_t * pkt, const uint32_t pkt_len)
  * \return 0 on success, else on failure. Check \c errno for error code.
  */
 
-int pcap_rewind(const int fd)
+int ldab_pcap_rewind(const int fd)
 {
 	return lseek(fd, sizeof(struct pcap_file_header), SEEK_SET) == 0;
 }

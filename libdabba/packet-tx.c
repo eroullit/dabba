@@ -79,9 +79,10 @@ void *packet_tx(void *arg)
 					uint8_t *pkt =
 					    (uint8_t *) mmap_hdr + tplen;
 
-					obytes = pcap_read(pkt_tx->pcap_fd, pkt,
-							   pkt_mmap->layout.
-							   tp_frame_size);
+					obytes =
+					    ldab_pcap_read(pkt_tx->pcap_fd, pkt,
+							  pkt_mmap->
+							  layout.tp_frame_size);
 
 					if (obytes <= 0) {
 						eof = 1;
@@ -98,7 +99,7 @@ void *packet_tx(void *arg)
 			send(pkt_mmap->pf_sock, NULL, 0, MSG_DONTWAIT);
 		} while (!eof);
 
-		pcap_rewind(pkt_tx->pcap_fd);
+		ldab_pcap_rewind(pkt_tx->pcap_fd);
 		eof = 0;
 	}
 

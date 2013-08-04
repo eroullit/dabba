@@ -44,7 +44,7 @@ static int pktcnt(const char *const pcap)
 {
 	size_t a;
 	struct pcap_sf_pkthdr sf_hdr;
-	int fd = pcap_open(pcap, 0);
+	int fd = ldab_pcap_open(pcap, 0);
 
 	if (fd < 0)
 		return 0;
