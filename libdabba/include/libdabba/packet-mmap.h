@@ -75,13 +75,13 @@ struct packet_mmap_header {
 	struct sockaddr_ll s_ll __attribute__ ((aligned(TPACKET_ALIGNMENT))); /**< Pocket metadata structure */
 };
 
-int packet_mmap_create(struct packet_mmap *pkt_mmap,
-		       const char *const dev, const int pf_sock,
-		       const enum packet_mmap_type type,
-		       const enum packet_mmap_frame_size frame_size,
-		       const size_t frame_nr);
+int ldab_packet_mmap_create(struct packet_mmap *pkt_mmap,
+			   const char *const dev, const int pf_sock,
+			   const enum packet_mmap_type type,
+			   const enum packet_mmap_frame_size frame_size,
+			   const size_t frame_nr);
 
-void packet_mmap_destroy(struct packet_mmap *pkt_mmap);
+void ldab_packet_mmap_destroy(struct packet_mmap *pkt_mmap);
 
 /**
  * \brief Check if a frame size is valid

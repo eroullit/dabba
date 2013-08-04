@@ -183,7 +183,7 @@ void dabbad_replay_stop(Dabba__DabbaService_Service * service,
 	if (!rc) {
 		dabbad_replay_remove(pkt_replay);
 		close(pkt_replay->tx.pcap_fd);
-		packet_mmap_destroy(&pkt_replay->tx.pkt_mmap);
+		ldab_packet_mmap_destroy(&pkt_replay->tx.pkt_mmap);
 		free(pkt_replay);
 	}
 
@@ -224,7 +224,7 @@ void dabbad_replay_stop_all(Dabba__DabbaService_Service * service,
 
 		dabbad_replay_remove(pkt_replay);
 		close(pkt_replay->tx.pcap_fd);
-		packet_mmap_destroy(&pkt_replay->tx.pkt_mmap);
+		ldab_packet_mmap_destroy(&pkt_replay->tx.pkt_mmap);
 		free(pkt_replay);
 	}
 
@@ -282,9 +282,9 @@ void dabbad_replay_start(Dabba__DabbaService_Service * service,
 		goto out;
 	}
 
-	rc = packet_mmap_create(&pkt_replay->tx.pkt_mmap, replayp->interface,
-				sock, PACKET_MMAP_TX, replayp->frame_size,
-				replayp->frame_nr);
+	rc = ldab_packet_mmap_create(&pkt_replay->tx.pkt_mmap,
+				    replayp->interface, sock, PACKET_MMAP_TX,
+				    replayp->frame_size, replayp->frame_nr);
 
 	if (rc) {
 		free(pkt_replay);
@@ -295,7 +295,7 @@ void dabbad_replay_start(Dabba__DabbaService_Service * service,
 	rc = dabbad_thread_start(&pkt_replay->thread, packet_tx, pkt_replay);
 
 	if (rc) {
-		packet_mmap_destroy(&pkt_replay->tx.pkt_mmap);
+		ldab_packet_mmap_destroy(&pkt_replay->tx.pkt_mmap);
 		free(pkt_replay);
 		close(sock);
 	} else

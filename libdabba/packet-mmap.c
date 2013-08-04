@@ -196,7 +196,7 @@ static void packet_mmap_vector_destroy(struct packet_mmap *pkt_mmap)
  * \param[in,out] pkt_mmap	packet mmap to destroy
  */
 
-void packet_mmap_destroy(struct packet_mmap *pkt_mmap)
+void ldab_packet_mmap_destroy(struct packet_mmap *pkt_mmap)
 {
 	assert(pkt_mmap);
 
@@ -222,11 +222,11 @@ void packet_mmap_destroy(struct packet_mmap *pkt_mmap)
  * two. Also the frame and block number must be bigger than zero.
  */
 
-int packet_mmap_create(struct packet_mmap *pkt_mmap,
-		       const char *const dev, const int pf_sock,
-		       const enum packet_mmap_type type,
-		       const enum packet_mmap_frame_size frame_size,
-		       const size_t frame_nr)
+int ldab_packet_mmap_create(struct packet_mmap *pkt_mmap,
+			   const char *const dev, const int pf_sock,
+			   const enum packet_mmap_type type,
+			   const enum packet_mmap_frame_size frame_size,
+			   const size_t frame_nr)
 {
 	static int (*const pkt_mmap_fn[]) (struct packet_mmap * pkt_mmap) = {
 	packet_mmap_register,
@@ -265,7 +265,7 @@ int packet_mmap_create(struct packet_mmap *pkt_mmap,
 		rc = pkt_mmap_fn[a] (pkt_mmap);
 
 		if (rc) {
-			packet_mmap_destroy(pkt_mmap);
+			ldab_packet_mmap_destroy(pkt_mmap);
 			break;
 		}
 
