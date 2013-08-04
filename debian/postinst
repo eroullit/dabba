@@ -1,5 +1,20 @@
 #!/bin/sh
 set -e
+
+case "$1" in
+  configure)
+    adduser --disabled-password --quiet --system \
+      --home /var/run/dabba \
+      --gecos "Dabba daemon" --group dabba
+  ;;
+  abort-upgrade|abort-remove|abort-deconfigure)
+  ;;
+  *)
+    echo "postinst called with unknown argument \`$1'" >&2
+    exit 1
+  ;;
+esac
+
 setcap cap_net_raw,cap_ipc_lock,cap_net_admin=eip /usr/sbin/dabbad
 ldconfig
 update-rc.d -f dabba defaults
