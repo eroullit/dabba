@@ -324,7 +324,8 @@ void dabbad_capture_start(Dabba__DabbaService_Service * service,
 		goto out;
 	}
 
-	rc = dabbad_thread_start(&pkt_capture->thread, packet_rx, pkt_capture);
+	rc = dabbad_thread_start(&pkt_capture->thread, ldab_packet_rx,
+				 pkt_capture);
 
 	if (rc) {
 		ldab_packet_mmap_destroy(&pkt_capture->rx.pkt_mmap);

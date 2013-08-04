@@ -292,7 +292,8 @@ void dabbad_replay_start(Dabba__DabbaService_Service * service,
 		goto out;
 	}
 
-	rc = dabbad_thread_start(&pkt_replay->thread, packet_tx, pkt_replay);
+	rc = dabbad_thread_start(&pkt_replay->thread, ldab_packet_tx,
+				 pkt_replay);
 
 	if (rc) {
 		ldab_packet_mmap_destroy(&pkt_replay->tx.pkt_mmap);

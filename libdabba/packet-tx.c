@@ -37,7 +37,7 @@
 #include <libdabba/packet-tx.h>
 #include <libdabba/pcap.h>
 
-int packet_tx_loss_set(const int sock, const int discard)
+int ldab_packet_tx_loss_set(const int sock, const int discard)
 {
 	return (setsockopt
 		(sock, SOL_PACKET, PACKET_LOSS, (void *)&discard,
@@ -50,7 +50,7 @@ int packet_tx_loss_set(const int sock, const int discard)
  * \return Always return NULL
  */
 
-void *packet_tx(void *arg)
+void *ldab_packet_tx(void *arg)
 {
 	struct packet_tx *pkt_tx = arg;
 	struct packet_mmap *pkt_mmap = &pkt_tx->pkt_mmap;
@@ -81,8 +81,8 @@ void *packet_tx(void *arg)
 
 					obytes =
 					    ldab_pcap_read(pkt_tx->pcap_fd, pkt,
-							  pkt_mmap->
-							  layout.tp_frame_size);
+							  pkt_mmap->layout.
+							  tp_frame_size);
 
 					if (obytes <= 0) {
 						eof = 1;
