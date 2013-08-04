@@ -117,7 +117,7 @@ static int dev_ethtool_request(const char *const dev, const int cmd, int *value)
  * index related to the interface name.
  */
 
-int devname_to_ifindex(const char *const dev, int *index)
+int ldab_devname_to_ifindex(const char *const dev, int *index)
 {
 	int rc;
 	struct ifreq ifr;
@@ -153,7 +153,7 @@ int devname_to_ifindex(const char *const dev, int *index)
  * index related to the interface name.
  */
 
-int ifindex_to_devname(const int index, char *dev, size_t dev_len)
+int ldab_ifindex_to_devname(const int index, char *dev, size_t dev_len)
 {
 	const char alldev[] = ANY_INTERFACE;
 	struct ifreq ifr;
@@ -187,7 +187,7 @@ int ifindex_to_devname(const int index, char *dev, size_t dev_len)
  * \see dev_kernel_request()
  */
 
-int dev_flags_get(const char *const dev, short *flags)
+int ldab_dev_flags_get(const char *const dev, short *flags)
 {
 	int rc;
 	struct ifreq ifr;
@@ -214,7 +214,7 @@ int dev_flags_get(const char *const dev, short *flags)
  * \see dev_kernel_request()
  */
 
-int dev_flags_set(const char *const dev, const short flags)
+int ldab_dev_flags_set(const char *const dev, const short flags)
 {
 	struct ifreq ifr;
 
@@ -235,7 +235,7 @@ int dev_flags_set(const char *const dev, const short flags)
  * \see dev_kernel_request()
  */
 
-int dev_driver_get(const char *const dev, struct ethtool_drvinfo *driver)
+int ldab_dev_driver_get(const char *const dev, struct ethtool_drvinfo *driver)
 {
 	struct ifreq ifr;
 
@@ -259,7 +259,7 @@ int dev_driver_get(const char *const dev, struct ethtool_drvinfo *driver)
  * \see dev_kernel_request()
  */
 
-int dev_settings_get(const char *const dev, struct ethtool_cmd *settings)
+int ldab_dev_settings_get(const char *const dev, struct ethtool_cmd *settings)
 {
 	struct ifreq ifr;
 
@@ -283,7 +283,7 @@ int dev_settings_get(const char *const dev, struct ethtool_cmd *settings)
  * \see dev_kernel_request()
  */
 
-int dev_settings_set(const char *const dev, struct ethtool_cmd *settings)
+int ldab_dev_settings_set(const char *const dev, struct ethtool_cmd *settings)
 {
 	struct ifreq ifr;
 
@@ -306,7 +306,7 @@ int dev_settings_set(const char *const dev, struct ethtool_cmd *settings)
  * \see dev_kernel_request()
  */
 
-int dev_pause_get(const char *const dev, struct ethtool_pauseparam *pause)
+int ldab_dev_pause_get(const char *const dev, struct ethtool_pauseparam *pause)
 {
 	struct ifreq ifr;
 
@@ -330,7 +330,7 @@ int dev_pause_get(const char *const dev, struct ethtool_pauseparam *pause)
  * \see dev_kernel_request()
  */
 
-int dev_pause_set(const char *const dev, struct ethtool_pauseparam *pause)
+int ldab_dev_pause_set(const char *const dev, struct ethtool_pauseparam *pause)
 {
 	struct ifreq ifr;
 
@@ -353,7 +353,8 @@ int dev_pause_set(const char *const dev, struct ethtool_pauseparam *pause)
  * \see dev_kernel_request()
  */
 
-int dev_coalesce_get(const char *const dev, struct ethtool_coalesce *coalesce)
+int ldab_dev_coalesce_get(const char *const dev,
+			 struct ethtool_coalesce *coalesce)
 {
 	struct ifreq ifr;
 
@@ -377,7 +378,8 @@ int dev_coalesce_get(const char *const dev, struct ethtool_coalesce *coalesce)
  * \see dev_kernel_request()
  */
 
-int dev_coalesce_set(const char *const dev, struct ethtool_coalesce *coalesce)
+int ldab_dev_coalesce_set(const char *const dev,
+			 struct ethtool_coalesce *coalesce)
 {
 	struct ifreq ifr;
 
@@ -400,7 +402,7 @@ int dev_coalesce_set(const char *const dev, struct ethtool_coalesce *coalesce)
  * \see dev_kernel_request()
  */
 
-int dev_rx_csum_offload_get(const char *const dev, int *rx_csum)
+int ldab_dev_rx_csum_offload_get(const char *const dev, int *rx_csum)
 {
 	return dev_ethtool_request(dev, ETHTOOL_GRXCSUM, rx_csum);
 }
@@ -413,7 +415,7 @@ int dev_rx_csum_offload_get(const char *const dev, int *rx_csum)
  * \see dev_kernel_request()
  */
 
-int dev_tx_csum_offload_get(const char *const dev, int *tx_csum)
+int ldab_dev_tx_csum_offload_get(const char *const dev, int *tx_csum)
 {
 	return dev_ethtool_request(dev, ETHTOOL_GTXCSUM, tx_csum);
 }
@@ -426,7 +428,7 @@ int dev_tx_csum_offload_get(const char *const dev, int *tx_csum)
  * \see dev_kernel_request()
  */
 
-int dev_scatter_gather_get(const char *const dev, int *sg)
+int ldab_dev_scatter_gather_get(const char *const dev, int *sg)
 {
 	return dev_ethtool_request(dev, ETHTOOL_GSG, sg);
 }
@@ -439,7 +441,7 @@ int dev_scatter_gather_get(const char *const dev, int *sg)
  * \see dev_kernel_request()
  */
 
-int dev_tcp_seg_offload_get(const char *const dev, int *tso)
+int ldab_dev_tcp_seg_offload_get(const char *const dev, int *tso)
 {
 	return dev_ethtool_request(dev, ETHTOOL_GTSO, tso);
 }
@@ -452,7 +454,7 @@ int dev_tcp_seg_offload_get(const char *const dev, int *tso)
  * * \see dev_kernel_request()
  */
 
-int dev_udp_frag_offload_get(const char *const dev, int *ufo)
+int ldab_dev_udp_frag_offload_get(const char *const dev, int *ufo)
 {
 	return dev_ethtool_request(dev, ETHTOOL_GUFO, ufo);
 }
@@ -465,7 +467,7 @@ int dev_udp_frag_offload_get(const char *const dev, int *ufo)
  * \see dev_kernel_request()
  */
 
-int dev_generic_seg_offload_get(const char *const dev, int *gso)
+int ldab_dev_generic_seg_offload_get(const char *const dev, int *gso)
 {
 	return dev_ethtool_request(dev, ETHTOOL_GGSO, gso);
 }
@@ -478,7 +480,7 @@ int dev_generic_seg_offload_get(const char *const dev, int *gso)
  * \see dev_kernel_request()
  */
 
-int dev_generic_rcv_offload_get(const char *const dev, int *gro)
+int ldab_dev_generic_rcv_offload_get(const char *const dev, int *gro)
 {
 	return dev_ethtool_request(dev, ETHTOOL_GGRO, gro);
 }
@@ -491,7 +493,7 @@ int dev_generic_rcv_offload_get(const char *const dev, int *gro)
  * \see dev_kernel_request()
  */
 
-int dev_large_rcv_offload_get(const char *const dev, int *lro)
+int ldab_dev_large_rcv_offload_get(const char *const dev, int *lro)
 {
 	int rc;
 	int flags = 0;
@@ -510,7 +512,7 @@ int dev_large_rcv_offload_get(const char *const dev, int *lro)
  * \see dev_kernel_request()
  */
 
-int dev_rx_hash_offload_get(const char *const dev, int *rxhash)
+int ldab_dev_rx_hash_offload_get(const char *const dev, int *rxhash)
 {
 	int rc;
 	int flags = 0;
@@ -529,7 +531,7 @@ int dev_rx_hash_offload_get(const char *const dev, int *rxhash)
  * \see dev_kernel_request()
  */
 
-int dev_rx_csum_offload_set(const char *const dev, int rx_csum)
+int ldab_dev_rx_csum_offload_set(const char *const dev, int rx_csum)
 {
 	return dev_ethtool_request(dev, ETHTOOL_SRXCSUM, &rx_csum);
 }
@@ -542,7 +544,7 @@ int dev_rx_csum_offload_set(const char *const dev, int rx_csum)
  * \see dev_kernel_request()
  */
 
-int dev_tx_csum_offload_set(const char *const dev, int tx_csum)
+int ldab_dev_tx_csum_offload_set(const char *const dev, int tx_csum)
 {
 	return dev_ethtool_request(dev, ETHTOOL_STXCSUM, &tx_csum);
 }
@@ -555,7 +557,7 @@ int dev_tx_csum_offload_set(const char *const dev, int tx_csum)
  * \see dev_kernel_request()
  */
 
-int dev_scatter_gather_set(const char *const dev, int sg)
+int ldab_dev_scatter_gather_set(const char *const dev, int sg)
 {
 	return dev_ethtool_request(dev, ETHTOOL_SSG, &sg);
 }
@@ -568,7 +570,7 @@ int dev_scatter_gather_set(const char *const dev, int sg)
  * \see dev_kernel_request()
  */
 
-int dev_tcp_seg_offload_set(const char *const dev, int tso)
+int ldab_dev_tcp_seg_offload_set(const char *const dev, int tso)
 {
 	return dev_ethtool_request(dev, ETHTOOL_STSO, &tso);
 }
@@ -581,7 +583,7 @@ int dev_tcp_seg_offload_set(const char *const dev, int tso)
  * \see dev_kernel_request()
  */
 
-int dev_udp_frag_offload_set(const char *const dev, int ufo)
+int ldab_dev_udp_frag_offload_set(const char *const dev, int ufo)
 {
 	return dev_ethtool_request(dev, ETHTOOL_SUFO, &ufo);
 }
@@ -594,7 +596,7 @@ int dev_udp_frag_offload_set(const char *const dev, int ufo)
  * \see dev_kernel_request()
  */
 
-int dev_generic_seg_offload_set(const char *const dev, int gso)
+int ldab_dev_generic_seg_offload_set(const char *const dev, int gso)
 {
 	return dev_ethtool_request(dev, ETHTOOL_SGSO, &gso);
 }
@@ -607,7 +609,7 @@ int dev_generic_seg_offload_set(const char *const dev, int gso)
  * \see dev_kernel_request()
  */
 
-int dev_generic_rcv_offload_set(const char *const dev, int gro)
+int ldab_dev_generic_rcv_offload_set(const char *const dev, int gro)
 {
 	return dev_ethtool_request(dev, ETHTOOL_SGRO, &gro);
 }
@@ -620,7 +622,7 @@ int dev_generic_rcv_offload_set(const char *const dev, int gro)
  * \see dev_kernel_request()
  */
 
-int dev_large_rcv_offload_set(const char *const dev, int lro)
+int ldab_dev_large_rcv_offload_set(const char *const dev, int lro)
 {
 	int rc;
 	int flags = 0;
@@ -646,7 +648,7 @@ int dev_large_rcv_offload_set(const char *const dev, int lro)
  * \see dev_kernel_request()
  */
 
-int dev_rx_hash_offload_set(const char *const dev, int rxhash)
+int ldab_dev_rx_hash_offload_set(const char *const dev, int rxhash)
 {
 	int rc;
 	int flags = 0;
@@ -672,7 +674,7 @@ int dev_rx_hash_offload_set(const char *const dev, int rxhash)
  * \see dev_kernel_request()
  */
 
-int dev_link_get(const char *const dev, int *link)
+int ldab_dev_link_get(const char *const dev, int *link)
 {
 	return dev_ethtool_request(dev, ETHTOOL_GLINK, link);
 }

@@ -381,8 +381,9 @@ void dabbad_replay_get(Dabba__DabbaService_Service * service,
 		fd_to_path(pkt_replay->tx.pcap_fd, replay_list.list[a]->pcap,
 			   NAME_MAX * sizeof(*replay_list.list[a]->pcap));
 
-		ifindex_to_devname(pkt_replay->tx.pkt_mmap.ifindex,
-				   replay_list.list[a]->interface, IFNAMSIZ);
+		ldab_ifindex_to_devname(pkt_replay->tx.pkt_mmap.ifindex,
+				       replay_list.list[a]->interface,
+				       IFNAMSIZ);
 
 		a++;
 	}

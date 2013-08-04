@@ -418,8 +418,9 @@ void dabbad_capture_get(Dabba__DabbaService_Service * service,
 		fd_to_path(pkt_capture->rx.pcap_fd, capture_list.list[a]->pcap,
 			   NAME_MAX * sizeof(*capture_list.list[a]->pcap));
 
-		ifindex_to_devname(pkt_capture->rx.pkt_mmap.ifindex,
-				   capture_list.list[a]->interface, IFNAMSIZ);
+		ldab_ifindex_to_devname(pkt_capture->rx.pkt_mmap.ifindex,
+				       capture_list.list[a]->interface,
+				       IFNAMSIZ);
 
 		dabbad_sfp_2_pbuf_sfp(&pkt_capture->rx.sfp,
 				      capture_list.list[a]->sfp);

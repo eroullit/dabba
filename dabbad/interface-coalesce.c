@@ -88,7 +88,7 @@ static void __interface_coalesce_get(struct nl_object *obj, void *arg)
 
 	coalescep->id->name = rtnl_link_get_name(link);
 	coalescep->status->code =
-	    dev_coalesce_get(coalescep->id->name, &coalesce);
+	    ldab_dev_coalesce_get(coalescep->id->name, &coalesce);
 
 	coalescep->has_pkt_rate_high = coalescep->has_pkt_rate_low =
 	    coalescep->has_rate_sample_interval =
@@ -223,7 +223,7 @@ void dabbad_interface_coalesce_modify(Dabba__DabbaService_Service * service,
 	assert(service);
 	assert(closure_data);
 
-	rc = dev_coalesce_get(coalescep->id->name, &eth_coalesce);
+	rc = ldab_dev_coalesce_get(coalescep->id->name, &eth_coalesce);
 
 	if (rc)
 		goto out;
@@ -362,7 +362,7 @@ void dabbad_interface_coalesce_modify(Dabba__DabbaService_Service * service,
 	}
 
 	if (apply)
-		rc = dev_coalesce_set(coalescep->id->name, &eth_coalesce);
+		rc = ldab_dev_coalesce_set(coalescep->id->name, &eth_coalesce);
 
  out:
 	coalescep->status->code = rc;

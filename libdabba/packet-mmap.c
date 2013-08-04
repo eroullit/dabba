@@ -243,7 +243,7 @@ int ldab_packet_mmap_create(struct packet_mmap *pkt_mmap,
 
 	memset(pkt_mmap, 0, sizeof(*pkt_mmap));
 
-	rc = devname_to_ifindex(dev, &pkt_mmap->ifindex);
+	rc = ldab_devname_to_ifindex(dev, &pkt_mmap->ifindex);
 
 	if (rc != 0)
 		return rc;
