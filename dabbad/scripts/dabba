@@ -38,6 +38,7 @@ test -r /etc/default/dabba && . /etc/default/dabba
 
 . /lib/lsb/init-functions
 
+DABBAD_OPTS="$DABBAD_OPTS --daemonize"
 test -n "$2" && DABBAD_OPTS="$DABBAD_OPTS $2"
 
 # Are we running from init?
