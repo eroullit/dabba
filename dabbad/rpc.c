@@ -28,6 +28,7 @@
 /* __LICENSE_HEADER_END__ */
 
 #include <string.h>
+#include <sys/stat.h>
 #include <errno.h>
 
 #include <libdabba-rpc/rpc.h>
@@ -62,6 +63,7 @@ DABBA__DABBA_SERVICE__INIT(dabbad_);
 int dabbad_rpc_msg_poll(const char *const name,
 			const ProtobufC_RPC_AddressType type)
 {
+	int rc = 0;
 	ProtobufC_RPC_Server *server;
 
 	assert(name);
@@ -78,10 +80,17 @@ int dabbad_rpc_msg_poll(const char *const name,
 	if (!server)
 		return EINVAL;
 
+	if (type == PROTOBUF_C_RPC_ADDRESS_LOCAL) {
+		rc = chmod(name, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
+
+		if (rc)
+			goto out;
+	}
+
 	for (;;)
 		protobuf_c_dispatch_run(protobuf_c_dispatch_default());
-
+ out:
 	protobuf_c_rpc_server_destroy(server, 0);
 
-	return 0;
+	return rc;
 }
