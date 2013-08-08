@@ -51,6 +51,8 @@ export PATH="${PATH:+$PATH:}/usr/sbin:/sbin"
 case "$1" in
   start)
 	log_daemon_msg "Starting Dabba daemon" "dabbad" || true
+	mkdir -p /var/run/dabba
+	chown dabba:dabba /var/run/dabba
 	if start-stop-daemon --start --quiet --oknodo --pidfile /var/run/dabba/dabbad.pid --exec /usr/sbin/dabbad --chuid dabba -- $DABBAD_OPTS; then
 	    log_end_msg 0 || true
 	else
