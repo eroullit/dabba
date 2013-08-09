@@ -26,8 +26,6 @@
 # Short-Description:	dabba RPC server
 ### END INIT INFO
 
-set -e
-
 # /etc/init.d/dabba: start and stop the Dabba daemon
 
 test -x /usr/sbin/dabbad || exit 0
