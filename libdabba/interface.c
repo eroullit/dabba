@@ -42,7 +42,6 @@
 #include <linux/sockios.h>
 
 #include <libdabba/interface.h>
-#include <libdabba/strlcpy.h>
 
 /**
  * \internal
@@ -93,7 +92,7 @@ static int dev_ethtool_request(const char *const dev, const int cmd, int *value)
 	memset(&e, 0, sizeof(e));
 	memset(&ifr, 0, sizeof(ifr));
 
-	strlcpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name));
+	strncpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name) - 1);
 	e.cmd = cmd;
 	e.data = *value;
 	ifr.ifr_data = (caddr_t) & e;
@@ -131,7 +130,7 @@ int devname_to_ifindex(const char *const dev, int *index)
 	}
 
 	memset(&ifr, 0, sizeof(ifr));
-	strlcpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name));
+	strncpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name) - 1);
 
 	rc = dev_kernel_request(&ifr, SIOCGIFINDEX);
 
@@ -164,7 +163,7 @@ int ifindex_to_devname(const int index, char *dev, size_t dev_len)
 	assert(dev_len >= IFNAMSIZ);
 
 	if (index == 0) {
-		strlcpy(dev, alldev, dev_len);
+		strncpy(dev, alldev, dev_len - 1);
 		return (0);
 	}
 
@@ -174,7 +173,7 @@ int ifindex_to_devname(const int index, char *dev, size_t dev_len)
 	rc = dev_kernel_request(&ifr, SIOCGIFNAME);
 
 	if (!rc)
-		strlcpy(dev, ifr.ifr_name, dev_len);
+		strncpy(dev, ifr.ifr_name, dev_len - 1);
 
 	return rc;
 }
@@ -196,7 +195,7 @@ int dev_flags_get(const char *const dev, short *flags)
 	assert(flags);
 
 	memset(&ifr, 0, sizeof(ifr));
-	strlcpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name));
+	strncpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name) - 1);
 
 	rc = dev_kernel_request(&ifr, SIOCGIFFLAGS);
 
@@ -221,7 +220,7 @@ int dev_flags_set(const char *const dev, const short flags)
 	assert(dev);
 
 	memset(&ifr, 0, sizeof(ifr));
-	strlcpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name));
+	strncpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name) - 1);
 	ifr.ifr_flags = flags;
 
 	return dev_kernel_request(&ifr, SIOCSIFFLAGS);
@@ -244,7 +243,7 @@ int dev_driver_get(const char *const dev, struct ethtool_drvinfo *driver)
 
 	memset(&ifr, 0, sizeof(ifr));
 	memset(driver, 0, sizeof(*driver));
-	strlcpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name));
+	strncpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name) - 1);
 	driver->cmd = ETHTOOL_GDRVINFO;
 	ifr.ifr_data = (caddr_t) driver;
 
@@ -268,7 +267,7 @@ int dev_settings_get(const char *const dev, struct ethtool_cmd *settings)
 
 	memset(&ifr, 0, sizeof(ifr));
 	memset(settings, 0, sizeof(*settings));
-	strlcpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name));
+	strncpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name) - 1);
 	settings->cmd = ETHTOOL_GSET;
 	ifr.ifr_data = (caddr_t) settings;
 
@@ -291,7 +290,7 @@ int dev_settings_set(const char *const dev, struct ethtool_cmd *settings)
 	assert(settings);
 
 	memset(&ifr, 0, sizeof(ifr));
-	strlcpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name));
+	strncpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name) - 1);
 	settings->cmd = ETHTOOL_SSET;
 	ifr.ifr_data = (caddr_t) settings;
 
@@ -315,7 +314,7 @@ int dev_pause_get(const char *const dev, struct ethtool_pauseparam *pause)
 
 	memset(&ifr, 0, sizeof(ifr));
 	memset(pause, 0, sizeof(*pause));
-	strlcpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name));
+	strncpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name) - 1);
 	pause->cmd = ETHTOOL_GPAUSEPARAM;
 	ifr.ifr_data = (caddr_t) pause;
 
@@ -338,7 +337,7 @@ int dev_pause_set(const char *const dev, struct ethtool_pauseparam *pause)
 	assert(pause);
 
 	memset(&ifr, 0, sizeof(ifr));
-	strlcpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name));
+	strncpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name) - 1);
 	pause->cmd = ETHTOOL_SPAUSEPARAM;
 	ifr.ifr_data = (caddr_t) pause;
 
@@ -362,7 +361,7 @@ int dev_coalesce_get(const char *const dev, struct ethtool_coalesce *coalesce)
 
 	memset(&ifr, 0, sizeof(ifr));
 	memset(coalesce, 0, sizeof(*coalesce));
-	strlcpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name));
+	strncpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name) - 1);
 	coalesce->cmd = ETHTOOL_GCOALESCE;
 	ifr.ifr_data = (caddr_t) coalesce;
 
@@ -385,7 +384,7 @@ int dev_coalesce_set(const char *const dev, struct ethtool_coalesce *coalesce)
 	assert(coalesce);
 
 	memset(&ifr, 0, sizeof(ifr));
-	strlcpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name));
+	strncpy(ifr.ifr_name, dev, sizeof(ifr.ifr_name) - 1);
 	coalesce->cmd = ETHTOOL_SCOALESCE;
 	ifr.ifr_data = (caddr_t) coalesce;
 

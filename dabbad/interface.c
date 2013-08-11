@@ -37,7 +37,6 @@
 #include <netlink/cache.h>
 #include <netlink/route/link.h>
 #include <libdabba/macros.h>
-#include <libdabba/strlcpy.h>
 #include <libdabba/interface.h>
 #include <dabbad/interface.h>
 
