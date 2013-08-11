@@ -147,7 +147,7 @@ struct dabbad_config {
 };
 
 static struct dabbad_config conf = {
-	.pidfile = DEFAULT_PIDPATH,.server_id =
+	.pidfile = NULL,.server_id =
 	    DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME,.server_type =
 	    PROTOBUF_C_RPC_ADDRESS_LOCAL
 };
@@ -253,7 +253,8 @@ int main(int argc, char **argv)
 	signal(SIGQUIT, exit_cleanup);
 	atexit(atexit_cleanup);
 
-	rc = create_pidfile(conf.pidfile);
+	if (conf.pidfile)
+		rc = create_pidfile(conf.pidfile);
 
 	return rc ? rc : dabbad_rpc_msg_poll(conf.server_id, conf.server_type);
 }
