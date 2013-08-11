@@ -89,15 +89,4 @@ __extension__                                                   \
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]) + __must_be_array(arr))
 #endif				/* ARRAY_SIZE */
 
-/**
- * \brief Tell if a integer is a power of 2
- * \param[in] n Integer to test
- * \return 1 if true, 0 otherwise
- */
-
-static inline int is_power_of_2(const uint64_t n)
-{
-	return (n != 0 && ((n & (n - 1)) == 0));
-}
-
 #endif				/* MACROS_H */

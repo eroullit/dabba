@@ -35,6 +35,7 @@
 
 #include <sys/mman.h>
 #include <sys/socket.h>
+#include <sys/param.h>
 
 #include <arpa/inet.h>
 #include <linux/if_ether.h>
@@ -238,7 +239,7 @@ int packet_mmap_create(struct packet_mmap *pkt_mmap,
 	assert(pkt_mmap);
 	assert(dev);
 
-	if (!is_power_of_2(frame_size) || !is_power_of_2(frame_nr))
+	if (!powerof2(frame_size) || !powerof2(frame_nr))
 		return EINVAL;
 
 	memset(pkt_mmap, 0, sizeof(*pkt_mmap));
