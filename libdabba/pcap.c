@@ -38,6 +38,7 @@
 #include <byteswap.h>
 
 #include <sys/stat.h>
+#include <sys/param.h>
 
 #include <libdabba/pcap.h>
 #include <libdabba/macros.h>
@@ -329,7 +330,7 @@ ssize_t pcap_read(const int fd, uint8_t * pkt, const uint32_t pkt_len)
 	if (read(fd, &sf_hdr, sizeof(sf_hdr)) != sizeof(sf_hdr))
 		return (0);
 
-	return read(fd, pkt, min(sf_hdr.caplen, pkt_len));
+	return read(fd, pkt, MIN(sf_hdr.caplen, pkt_len));
 }
 
 /**

@@ -31,6 +31,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/uio.h>
+#include <sys/param.h>
 #include <poll.h>
 
 #include <libdabba/packet-rx.h>
@@ -79,7 +80,7 @@ void *packet_rx(void *arg)
 						   (uint8_t *) mmap_hdr +
 						   mmap_hdr->tp_h.tp_mac,
 						   mmap_hdr->tp_h.tp_len,
-						   min(mmap_hdr->tp_h.
+						   MIN(mmap_hdr->tp_h.
 						       tp_snaplen,
 						       pkt_mmap->layout.
 						       tp_frame_size),

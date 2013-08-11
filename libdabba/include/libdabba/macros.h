@@ -101,24 +101,6 @@ static inline int is_power_of_2(const uint64_t n)
 }
 
 /**
- * \brief Returns the minimum value between two variables
- * \param[in] x First variable
- * \param[in] y Second variable
- * \return minimum value between the two variable
- * \note Force a compilation error if the variable types don't match
- */
-
-#ifndef min
-#define min(x, y)                               \
-        __extension__                           \
-        ({                                      \
-	typeof(x) _min1 = (x);			\
-	typeof(y) _min2 = (y);			\
-	(void) (&_min1 == &_min2);		\
-	_min1 < _min2 ? _min1 : _min2; })
-#endif				/* min */
-
-/**
  * \brief Returns the maximum value between two variables
  * \param[in] x First variable
  * \param[in] y Second variable
