@@ -100,22 +100,4 @@ static inline int is_power_of_2(const uint64_t n)
 	return (n != 0 && ((n & (n - 1)) == 0));
 }
 
-/**
- * \brief Returns the maximum value between two variables
- * \param[in] x First variable
- * \param[in] y Second variable
- * \return maximum value between the two variable
- * \note Force a compilation error if the variable types don't match
- */
-
-#ifndef max
-#define max(x, y)                               \
-        __extension__                           \
-        ({                                      \
-	typeof(x) _max1 = (x);			\
-	typeof(y) _max2 = (y);			\
-	(void) (&_max1 == &_max2);		\
-	_max1 > _max2 ? _max1 : _max2; })
-#endif				/* max */
-
 #endif				/* MACROS_H */
