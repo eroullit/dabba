@@ -112,8 +112,8 @@ static int cmd_thread_capabilities_get(int argc, const char **argv)
 
 	int ret, rc = 0;
 	Dabba__ThreadIdList id_list = DABBA__THREAD_ID_LIST__INIT;
-	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
-	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+	const char *server_id = DABBA_RPC_DEFAULT_TCP_SERVER_NAME;
+	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
 	ProtobufCService *service;
 
 	/* HACK: getopt*() start to parse options at argv[1] */

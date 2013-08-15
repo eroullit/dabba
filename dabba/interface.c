@@ -176,8 +176,8 @@ int rpc_interface_get(int argc, const char **argv,
 
 	int ret, rc = 0;
 	size_t a;
-	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
-	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+	const char *server_id = DABBA_RPC_DEFAULT_TCP_SERVER_NAME;
+	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
 	ProtobufCService *service;
 	Dabba__InterfaceIdList id_list = DABBA__INTERFACE_ID_LIST__INIT;
 	Dabba__InterfaceId **idpp;
