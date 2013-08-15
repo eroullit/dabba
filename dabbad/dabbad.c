@@ -148,8 +148,8 @@ struct dabbad_config {
 
 static struct dabbad_config conf = {
 	.pidfile = NULL,.server_id =
-	    DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME,.server_type =
-	    PROTOBUF_C_RPC_ADDRESS_LOCAL
+	    DABBA_RPC_DEFAULT_PORT,.server_type =
+	    PROTOBUF_C_RPC_ADDRESS_TCP
 };
 
 static void atexit_cleanup(void)
