@@ -36,7 +36,8 @@ test -r /etc/default/dabba && . /etc/default/dabba
 
 . /lib/lsb/init-functions
 
-DABBAD_OPTS="$DABBAD_OPTS --daemonize"
+DABBAD_PIDFILE="/var/run/dabba/dabbad.pid"
+DABBAD_OPTS="$DABBAD_OPTS --daemonize --pidfile $DABBAD_PIDFILE"
 test -n "$2" && DABBAD_OPTS="$DABBAD_OPTS $2"
 
 # Are we running from init?
@@ -51,7 +52,7 @@ case "$1" in
 	log_daemon_msg "Starting Dabba daemon" "dabbad" || true
 	mkdir -p /var/run/dabba
 	chown dabba:dabba /var/run/dabba
-	if start-stop-daemon --start --quiet --oknodo --pidfile /var/run/dabba/dabbad.pid --exec /usr/sbin/dabbad --chuid dabba -- $DABBAD_OPTS; then
+	if start-stop-daemon --start --quiet --oknodo --pidfile "$DABBAD_PIDFILE" --exec /usr/sbin/dabbad --chuid dabba -- $DABBAD_OPTS; then
 	    log_end_msg 0 || true
 	else
 	    log_end_msg 1 || true
@@ -59,7 +60,7 @@ case "$1" in
 	;;
   stop)
 	log_daemon_msg "Stopping Dabba daemon" "dabbad" || true
-	if start-stop-daemon --stop --quiet --oknodo --pidfile /var/run/dabba/dabbad.pid; then
+	if start-stop-daemon --stop --quiet --oknodo --pidfile "$DABBAD_PIDFILE"; then
 	    log_end_msg 0 || true
 	else
 	    log_end_msg 1 || true
@@ -68,7 +69,7 @@ case "$1" in
 
   reload|force-reload)
 	log_daemon_msg "Reloading Dabba daemon" "dabbad" || true
-	if start-stop-daemon --stop --signal 1 --quiet --oknodo --pidfile /var/run/dabba/dabbad.pid --exec /usr/sbin/dabbad; then
+	if start-stop-daemon --stop --signal 1 --quiet --oknodo --pidfile "$DABBAD_PIDFILE" --exec /usr/sbin/dabbad; then
 	    log_end_msg 0 || true
 	else
 	    log_end_msg 1 || true
@@ -77,8 +78,8 @@ case "$1" in
 
   restart)
 	log_daemon_msg "Restarting Dabba daemon" "dabbad" || true
-	start-stop-daemon --stop --quiet --oknodo --retry 30 --pidfile /var/run/dabba/dabbad.pid
-	if start-stop-daemon --start --quiet --oknodo --pidfile /var/run/dabba/dabbad.pid --exec /usr/sbin/dabbad --chuid dabba -- $DABBAD_OPTS; then
+	start-stop-daemon --stop --quiet --oknodo --retry 30 --pidfile "$DABBAD_PIDFILE"
+	if start-stop-daemon --start --quiet --oknodo --pidfile "$DABBAD_PIDFILE" --exec /usr/sbin/dabbad --chuid dabba -- $DABBAD_OPTS; then
 	    log_end_msg 0 || true
 	else
 	    log_end_msg 1 || true
@@ -86,7 +87,7 @@ case "$1" in
 	;;
 
   status)
-	status_of_proc -p /var/run/dabba/dabbad.pid /usr/sbin/dabbad dabbad && exit 0 || exit $?
+	status_of_proc -p "$DABBAD_PIDFILE" /usr/sbin/dabbad dabbad && exit 0 || exit $?
 	;;
 
   *)
