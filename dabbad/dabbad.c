@@ -142,14 +142,13 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 
 struct dabbad_config {
 	const char *pidfile;
-	const char *server_id;
+	ProtobufC_RPC_Server *server;
 	ProtobufC_RPC_AddressType server_type;
 };
 
 static struct dabbad_config conf = {
-	.pidfile = NULL,.server_id =
-	    DABBA_RPC_DEFAULT_PORT,.server_type =
-	    PROTOBUF_C_RPC_ADDRESS_TCP
+	.pidfile = NULL, .server = NULL,
+	.server_type = PROTOBUF_C_RPC_ADDRESS_TCP
 };
 
 static void atexit_cleanup(void)
@@ -157,8 +156,7 @@ static void atexit_cleanup(void)
 	if (conf.pidfile)
 		unlink(conf.pidfile);
 
-	if (conf.server_type == PROTOBUF_C_RPC_ADDRESS_LOCAL)
-		unlink(conf.server_id);
+	dabbad_rpc_server_stop(conf.server);
 }
 
 static void exit_cleanup(int arg)
@@ -201,6 +199,7 @@ int main(int argc, char **argv)
 
 	int opt, opt_idx, rc = 0;
 	int daemonize = 0;
+	char *server_id = DABBA_RPC_DEFAULT_PORT;
 
 	assert(argc);
 	assert(argv);
@@ -221,17 +220,17 @@ int main(int argc, char **argv)
 			break;
 		case OPT_TCP:
 			conf.server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
-			conf.server_id = DABBA_RPC_DEFAULT_PORT;
+			server_id = DABBA_RPC_DEFAULT_PORT;
 
 			if (optarg)
-				conf.server_id = optarg;
+				server_id = optarg;
 			break;
 		case OPT_LOCAL:
 			conf.server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
-			conf.server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
+			server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
 
 			if (optarg)
-				conf.server_id = optarg;
+				server_id = optarg;
 			break;
 		case OPT_HELP:
 		default:
@@ -257,5 +256,12 @@ int main(int argc, char **argv)
 	if (conf.pidfile)
 		rc = create_pidfile(conf.pidfile);
 
-	return rc ? rc : dabbad_rpc_msg_poll(conf.server_id, conf.server_type);
+	if (!rc) {
+		conf.server = dabbad_rpc_server_start(server_id, conf.server_type);
+
+		if (!conf.server)
+			rc = EINVAL;
+	}
+
+	return rc ? rc : dabbad_rpc_msg_poll();
 }

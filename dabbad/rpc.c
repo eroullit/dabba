@@ -27,6 +27,7 @@
 
 /* __LICENSE_HEADER_END__ */
 
+#include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <errno.h>
@@ -53,6 +54,17 @@ static Dabba__DabbaService_Service dabba_service =
 DABBA__DABBA_SERVICE__INIT(dabbad_);
 
 /**
+ * \brief Destroy a new dabbad RPC server instance
+ * \param[in]       server	        Pointer to the server context
+ */
+
+void dabbad_rpc_server_stop(ProtobufC_RPC_Server* server)
+{
+	if (server)
+		protobuf_c_rpc_server_destroy(server, 0);
+}
+
+/**
  * \brief Create a new dabbad RPC server instance
  * \param[in]       name	        String to RPC server address
  * \param[in]       type	        Tell if the RPC server listens to Unix or TCP sockets
@@ -73,68 +85,27 @@ ProtobufC_RPC_Server * dabbad_rpc_server_start(const char * const name, const Pr
 					   (ProtobufCService *) & dabba_service,
 					   NULL);
 
-	if (!server)
-		return EINVAL;
-
-	if (type == PROTOBUF_C_RPC_ADDRESS_LOCAL) {
+	if (server && type == PROTOBUF_C_RPC_ADDRESS_LOCAL) {
 		rc = chmod(name, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
 
-		if (rc)
+		if (rc) {
 			dabbad_rpc_server_stop(server);
+			server = NULL;
+		}
 	}
 
-	return rc;
-}
-
-/**
- * \brief Destroy a new dabbad RPC server instance
- * \param[in]       server	        Pointer to the server context
- */
-
-void dabbad_rpc_server_stop(ProtobufC_RPC_Server* server)
-{
-	protobuf_c_rpc_server_destroy(server, 0);
+	return server;
 }
 
 /**
  * \brief Poll server for new RPC queries to process
- * \param[in]       name	        String to RPC server address
- * \param[in]       type	        Tell if the RPC server listens to Unix or TCP sockets
- * \return 0 if the server successfully exited, \c EINVAL is the server could not be started
  * \note This function polls for new RPC queries endlessly
  */
 
-int dabbad_rpc_msg_poll(const char *const name,
-			const ProtobufC_RPC_AddressType type)
+int dabbad_rpc_msg_poll(void)
 {
-	int rc = 0;
-	ProtobufC_RPC_Server *server;
-
-	assert(name);
-	assert(type == PROTOBUF_C_RPC_ADDRESS_LOCAL
-	       || type == PROTOBUF_C_RPC_ADDRESS_TCP);
-
-	if (strlen(name) == 0)
-		return EINVAL;
-
-	server = protobuf_c_rpc_server_new(type, name,
-					   (ProtobufCService *) & dabba_service,
-					   NULL);
-
-	if (!server)
-		return EINVAL;
-
-	if (type == PROTOBUF_C_RPC_ADDRESS_LOCAL) {
-		rc = chmod(name, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
-
-		if (rc)
-			goto out;
-	}
-
 	for (;;)
 		protobuf_c_dispatch_run(protobuf_c_dispatch_default());
- out:
-	protobuf_c_rpc_server_destroy(server, 0);
 
-	return rc;
+	return 0;
 }
