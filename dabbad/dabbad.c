@@ -251,7 +251,6 @@ int main(int argc, char **argv)
 	signal(SIGTERM, exit_cleanup);
 	signal(SIGINT, exit_cleanup);
 	signal(SIGQUIT, exit_cleanup);
-	atexit(atexit_cleanup);
 
 	if (conf.pidfile)
 		rc = create_pidfile(conf.pidfile);
