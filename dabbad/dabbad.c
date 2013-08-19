@@ -241,19 +241,9 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (daemonize) {
-		if (daemon(-1, 0)) {
-			perror("Could not daemonize process");
-			return errno;
-		}
-	}
-
 	signal(SIGTERM, exit_cleanup);
 	signal(SIGINT, exit_cleanup);
 	signal(SIGQUIT, exit_cleanup);
-
-	if (conf.pidfile)
-		rc = create_pidfile(conf.pidfile);
 
 	if (!rc) {
 		conf.server = dabbad_rpc_server_start(server_id, conf.server_type);
@@ -261,6 +251,13 @@ int main(int argc, char **argv)
 		if (!conf.server)
 			rc = EINVAL;
 	}
+
+	if (!rc && daemonize)
+		if (daemon(-1, 0))
+			rc = errno;
+
+	if (!rc && conf.pidfile)
+		rc = create_pidfile(conf.pidfile);
 
 	return rc ? rc : dabbad_rpc_msg_poll();
 }
