@@ -293,8 +293,8 @@ static int cmd_interface_settings_modify(int argc, const char **argv)
 	};
 
 	int ret, rc = 0;
-	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
-	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+	const char *server_id = DABBA_RPC_DEFAULT_TCP_SERVER_NAME;
+	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
 	ProtobufCService *service;
 	Dabba__InterfaceSettings settings = DABBA__INTERFACE_SETTINGS__INIT;
 	Dabba__ErrorCode err = DABBA__ERROR_CODE__INIT;

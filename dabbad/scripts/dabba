@@ -1,0 +1,98 @@
+#! /bin/sh
+#
+# Copyright (C) 2013	Emmanuel Roullit <emmanuel.roullit@gmail.com>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or (at
+# your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+#
+
+### BEGIN INIT INFO
+# Provides:		dabbad
+# Required-Start:	$remote_fs
+# Required-Stop:	$remote_fs
+# Default-Start:	2 3 4 5
+# Default-Stop:         0 1 6
+# Short-Description:	dabba RPC server
+### END INIT INFO
+
+# /etc/init.d/dabba: start and stop the Dabba daemon
+
+test -x /usr/sbin/dabbad || exit 0
+
+umask 022
+
+test -r /etc/default/dabba && . /etc/default/dabba
+
+. /lib/lsb/init-functions
+
+DABBAD_PIDFILE="/var/run/dabba/dabbad.pid"
+DABBAD_OPTS="$DABBAD_OPTS --daemonize --pidfile $DABBAD_PIDFILE"
+test -n "$2" && DABBAD_OPTS="$DABBAD_OPTS $2"
+
+# Are we running from init?
+run_by_init() {
+    (test "$previous" && test "$runlevel") || test "$runlevel" = "S"
+}
+
+export PATH="${PATH:+$PATH:}/usr/sbin:/sbin"
+
+case "$1" in
+  start)
+	log_daemon_msg "Starting Dabba daemon" "dabbad" || true
+	mkdir -p /var/run/dabba
+	chown dabba:dabba /var/run/dabba
+	if start-stop-daemon --start --quiet --oknodo --pidfile "$DABBAD_PIDFILE" --exec /usr/sbin/dabbad --chuid dabba -- $DABBAD_OPTS; then
+	    log_end_msg 0 || true
+	else
+	    log_end_msg 1 || true
+	fi
+	;;
+  stop)
+	log_daemon_msg "Stopping Dabba daemon" "dabbad" || true
+	if start-stop-daemon --stop --quiet --oknodo --pidfile "$DABBAD_PIDFILE"; then
+	    log_end_msg 0 || true
+	else
+	    log_end_msg 1 || true
+	fi
+	;;
+
+  reload|force-reload)
+	log_daemon_msg "Reloading Dabba daemon" "dabbad" || true
+	if start-stop-daemon --stop --signal 1 --quiet --oknodo --pidfile "$DABBAD_PIDFILE" --exec /usr/sbin/dabbad; then
+	    log_end_msg 0 || true
+	else
+	    log_end_msg 1 || true
+	fi
+	;;
+
+  restart)
+	log_daemon_msg "Restarting Dabba daemon" "dabbad" || true
+	start-stop-daemon --stop --quiet --oknodo --retry 30 --pidfile "$DABBAD_PIDFILE"
+	if start-stop-daemon --start --quiet --oknodo --pidfile "$DABBAD_PIDFILE" --exec /usr/sbin/dabbad --chuid dabba -- $DABBAD_OPTS; then
+	    log_end_msg 0 || true
+	else
+	    log_end_msg 1 || true
+	fi
+	;;
+
+  status)
+	status_of_proc -p "$DABBAD_PIDFILE" /usr/sbin/dabbad dabbad && exit 0 || exit $?
+	;;
+
+  *)
+	log_action_msg "Usage: /etc/init.d/dabbad {start|stop|reload|force-reload|restart|status}" || true
+	exit 1
+esac
+
+exit 0

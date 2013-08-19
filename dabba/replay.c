@@ -321,8 +321,8 @@ static int cmd_replay_start(int argc, const char **argv)
 	int ret;
 	Dabba__Replay replay = DABBA__REPLAY__INIT;
 	Dabba__ErrorCode err = DABBA__ERROR_CODE__INIT;
-	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
-	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+	const char *server_id = DABBA_RPC_DEFAULT_TCP_SERVER_NAME;
+	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
 	ProtobufCService *service;
 
 	static struct option replay_option[] = {
@@ -409,8 +409,8 @@ static int cmd_replay_stop(int argc, const char **argv)
 
 	int ret;
 	Dabba__ThreadId id = DABBA__THREAD_ID__INIT;
-	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
-	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+	const char *server_id = DABBA_RPC_DEFAULT_TCP_SERVER_NAME;
+	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
 	ProtobufCService *service;
 
 	static struct option replay_option[] = {
@@ -477,8 +477,8 @@ static int cmd_replay_stop_all(int argc, const char **argv)
 
 	int ret;
 	Dabba__Dummy dummy = DABBA__DUMMY__INIT;
-	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
-	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+	const char *server_id = DABBA_RPC_DEFAULT_TCP_SERVER_NAME;
+	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
 	ProtobufCService *service;
 
 	static struct option replay_option[] = {
@@ -551,8 +551,8 @@ static int cmd_replay_get(int argc, const char **argv)
 	int ret, rc = 0;
 	Dabba__ThreadIdList id_list = DABBA__THREAD_ID_LIST__INIT;
 	Dabba__ThreadId **idpp;
-	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
-	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+	const char *server_id = DABBA_RPC_DEFAULT_TCP_SERVER_NAME;
+	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
 	ProtobufCService *service;
 
 	while ((ret =

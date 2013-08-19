@@ -134,10 +134,36 @@ Written by Emmanuel Roullit <emmanuel.roullit@gmail.com>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <signal.h>
 
 #include <dabbad/rpc.h>
 #include <dabbad/misc.h>
 #include <dabbad/help.h>
+
+struct dabbad_config {
+	const char *pidfile;
+	ProtobufC_RPC_Server *server;
+	ProtobufC_RPC_AddressType server_type;
+};
+
+static struct dabbad_config conf = {
+	.pidfile = NULL,.server = NULL,
+	.server_type = PROTOBUF_C_RPC_ADDRESS_TCP
+};
+
+static void atexit_cleanup(void)
+{
+	if (conf.pidfile)
+		unlink(conf.pidfile);
+
+	dabbad_rpc_server_stop(conf.server);
+}
+
+static void exit_cleanup(int arg)
+{
+	atexit_cleanup();
+	exit(arg);
+}
 
 /**
  * \brief Dabbad entry point
@@ -173,9 +199,7 @@ int main(int argc, char **argv)
 
 	int opt, opt_idx, rc = 0;
 	int daemonize = 0;
-	const char *pidfile = NULL;
-	const char *server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
-	ProtobufC_RPC_AddressType server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+	char *server_id = DABBA_RPC_DEFAULT_PORT;
 
 	assert(argc);
 	assert(argv);
@@ -188,21 +212,21 @@ int main(int argc, char **argv)
 			daemonize = 1;
 			break;
 		case OPT_PIDFILE:
-			pidfile = optarg;
+			conf.pidfile = optarg;
 			break;
 		case OPT_VERSION:
 			print_version();
 			return EXIT_SUCCESS;
 			break;
 		case OPT_TCP:
-			server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
+			conf.server_type = PROTOBUF_C_RPC_ADDRESS_TCP;
 			server_id = DABBA_RPC_DEFAULT_PORT;
 
 			if (optarg)
 				server_id = optarg;
 			break;
 		case OPT_LOCAL:
-			server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
+			conf.server_type = PROTOBUF_C_RPC_ADDRESS_LOCAL;
 			server_id = DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME;
 
 			if (optarg)
@@ -217,17 +241,25 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if (daemonize) {
-		if (daemon(-1, 0)) {
-			perror("Could not daemonize process");
-			return errno;
-		}
-	}
-
+	signal(SIGTERM, exit_cleanup);
+	signal(SIGINT, exit_cleanup);
+	signal(SIGQUIT, exit_cleanup);
 	core_enable();
 
-	if (pidfile)
-		rc = create_pidfile(pidfile);
+	if (!rc) {
+		conf.server =
+		    dabbad_rpc_server_start(server_id, conf.server_type);
 
-	return rc ? rc : dabbad_rpc_msg_poll(server_id, server_type);
+		if (!conf.server)
+			rc = EINVAL;
+	}
+
+	if (!rc && daemonize)
+		if (daemon(-1, 0))
+			rc = errno;
+
+	if (!rc && conf.pidfile)
+		rc = create_pidfile(conf.pidfile);
+
+	return rc ? rc : dabbad_rpc_msg_poll();
 }

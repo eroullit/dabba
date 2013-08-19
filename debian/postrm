@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+case "$1" in
+  remove)
+    ldconfig
+    update-rc.d -f dabba remove
+  ;;
+  purge)
+    deluser --quiet --system dabba > /dev/null || true
+  ;;
+esac
