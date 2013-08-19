@@ -43,6 +43,6 @@ struct packet_rx {
 	int pcap_fd; /**< pcap file descriptor */
 };
 
-void *packet_rx(void *arg);
+void *ldab_packet_rx(void *arg);
 
 #endif				/* PACKET_RX_H */

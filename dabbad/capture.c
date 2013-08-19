@@ -184,10 +184,10 @@ void dabbad_capture_stop(Dabba__DabbaService_Service * service,
 
 	if (!rc) {
 		dabbad_capture_remove(pkt_capture);
-		sock_filter_detach(pkt_capture->rx.pkt_mmap.pf_sock);
+		ldab_sock_filter_detach(pkt_capture->rx.pkt_mmap.pf_sock);
 		dabbad_sfp_destroy(&pkt_capture->rx.sfp);
 		close(pkt_capture->rx.pcap_fd);
-		packet_mmap_destroy(&pkt_capture->rx.pkt_mmap);
+		ldab_packet_mmap_destroy(&pkt_capture->rx.pkt_mmap);
 		free(pkt_capture);
 	}
 
@@ -227,10 +227,10 @@ void dabbad_capture_stop_all(Dabba__DabbaService_Service * service,
 			break;
 
 		dabbad_capture_remove(pkt_capture);
-		sock_filter_detach(pkt_capture->rx.pkt_mmap.pf_sock);
+		ldab_sock_filter_detach(pkt_capture->rx.pkt_mmap.pf_sock);
 		dabbad_sfp_destroy(&pkt_capture->rx.sfp);
 		close(pkt_capture->rx.pcap_fd);
-		packet_mmap_destroy(&pkt_capture->rx.pkt_mmap);
+		ldab_packet_mmap_destroy(&pkt_capture->rx.pkt_mmap);
 		free(pkt_capture);
 	}
 
@@ -282,10 +282,10 @@ void dabbad_capture_start(Dabba__DabbaService_Service * service,
 
 	if (capturep->append)
 		pkt_capture->rx.pcap_fd =
-		    pcap_open(capturep->pcap, O_RDWR | O_APPEND);
+		    ldab_pcap_open(capturep->pcap, O_RDWR | O_APPEND);
 	else
 		pkt_capture->rx.pcap_fd =
-		    pcap_create(capturep->pcap, LINKTYPE_EN10MB);
+		    ldab_pcap_create(capturep->pcap, LINKTYPE_EN10MB);
 
 	if (pkt_capture->rx.pcap_fd < 0) {
 		rc = errno;
@@ -303,7 +303,7 @@ void dabbad_capture_start(Dabba__DabbaService_Service * service,
 			goto out;
 		}
 
-		rc = sock_filter_attach(sock, &pkt_capture->rx.sfp);
+		rc = ldab_sock_filter_attach(sock, &pkt_capture->rx.sfp);
 
 		if (rc) {
 			dabbad_sfp_destroy(&pkt_capture->rx.sfp);
@@ -313,9 +313,9 @@ void dabbad_capture_start(Dabba__DabbaService_Service * service,
 		}
 	}
 
-	rc = packet_mmap_create(&pkt_capture->rx.pkt_mmap, capturep->interface,
-				sock, PACKET_MMAP_RX, capturep->frame_size,
-				capturep->frame_nr);
+	rc = ldab_packet_mmap_create(&pkt_capture->rx.pkt_mmap,
+				    capturep->interface, sock, PACKET_MMAP_RX,
+				    capturep->frame_size, capturep->frame_nr);
 
 	if (rc) {
 		dabbad_sfp_destroy(&pkt_capture->rx.sfp);
@@ -324,10 +324,11 @@ void dabbad_capture_start(Dabba__DabbaService_Service * service,
 		goto out;
 	}
 
-	rc = dabbad_thread_start(&pkt_capture->thread, packet_rx, pkt_capture);
+	rc = dabbad_thread_start(&pkt_capture->thread, ldab_packet_rx,
+				 pkt_capture);
 
 	if (rc) {
-		packet_mmap_destroy(&pkt_capture->rx.pkt_mmap);
+		ldab_packet_mmap_destroy(&pkt_capture->rx.pkt_mmap);
 		dabbad_sfp_destroy(&pkt_capture->rx.sfp);
 		free(pkt_capture);
 		close(sock);
@@ -418,8 +419,9 @@ void dabbad_capture_get(Dabba__DabbaService_Service * service,
 		fd_to_path(pkt_capture->rx.pcap_fd, capture_list.list[a]->pcap,
 			   NAME_MAX * sizeof(*capture_list.list[a]->pcap));
 
-		ifindex_to_devname(pkt_capture->rx.pkt_mmap.ifindex,
-				   capture_list.list[a]->interface, IFNAMSIZ);
+		ldab_ifindex_to_devname(pkt_capture->rx.pkt_mmap.ifindex,
+				       capture_list.list[a]->interface,
+				       IFNAMSIZ);
 
 		dabbad_sfp_2_pbuf_sfp(&pkt_capture->rx.sfp,
 				      capture_list.list[a]->sfp);

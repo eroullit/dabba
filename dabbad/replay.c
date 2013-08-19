@@ -183,7 +183,7 @@ void dabbad_replay_stop(Dabba__DabbaService_Service * service,
 	if (!rc) {
 		dabbad_replay_remove(pkt_replay);
 		close(pkt_replay->tx.pcap_fd);
-		packet_mmap_destroy(&pkt_replay->tx.pkt_mmap);
+		ldab_packet_mmap_destroy(&pkt_replay->tx.pkt_mmap);
 		free(pkt_replay);
 	}
 
@@ -224,7 +224,7 @@ void dabbad_replay_stop_all(Dabba__DabbaService_Service * service,
 
 		dabbad_replay_remove(pkt_replay);
 		close(pkt_replay->tx.pcap_fd);
-		packet_mmap_destroy(&pkt_replay->tx.pkt_mmap);
+		ldab_packet_mmap_destroy(&pkt_replay->tx.pkt_mmap);
 		free(pkt_replay);
 	}
 
@@ -273,7 +273,7 @@ void dabbad_replay_start(Dabba__DabbaService_Service * service,
 	}
 
 	pkt_replay->thread.type = REPLAY_THREAD;
-	pkt_replay->tx.pcap_fd = pcap_open(replayp->pcap, O_RDONLY);
+	pkt_replay->tx.pcap_fd = ldab_pcap_open(replayp->pcap, O_RDONLY);
 
 	if (pkt_replay->tx.pcap_fd < 0) {
 		rc = errno;
@@ -282,9 +282,9 @@ void dabbad_replay_start(Dabba__DabbaService_Service * service,
 		goto out;
 	}
 
-	rc = packet_mmap_create(&pkt_replay->tx.pkt_mmap, replayp->interface,
-				sock, PACKET_MMAP_TX, replayp->frame_size,
-				replayp->frame_nr);
+	rc = ldab_packet_mmap_create(&pkt_replay->tx.pkt_mmap,
+				    replayp->interface, sock, PACKET_MMAP_TX,
+				    replayp->frame_size, replayp->frame_nr);
 
 	if (rc) {
 		free(pkt_replay);
@@ -292,10 +292,11 @@ void dabbad_replay_start(Dabba__DabbaService_Service * service,
 		goto out;
 	}
 
-	rc = dabbad_thread_start(&pkt_replay->thread, packet_tx, pkt_replay);
+	rc = dabbad_thread_start(&pkt_replay->thread, ldab_packet_tx,
+				 pkt_replay);
 
 	if (rc) {
-		packet_mmap_destroy(&pkt_replay->tx.pkt_mmap);
+		ldab_packet_mmap_destroy(&pkt_replay->tx.pkt_mmap);
 		free(pkt_replay);
 		close(sock);
 	} else
@@ -381,8 +382,9 @@ void dabbad_replay_get(Dabba__DabbaService_Service * service,
 		fd_to_path(pkt_replay->tx.pcap_fd, replay_list.list[a]->pcap,
 			   NAME_MAX * sizeof(*replay_list.list[a]->pcap));
 
-		ifindex_to_devname(pkt_replay->tx.pkt_mmap.ifindex,
-				   replay_list.list[a]->interface, IFNAMSIZ);
+		ldab_ifindex_to_devname(pkt_replay->tx.pkt_mmap.ifindex,
+				       replay_list.list[a]->interface,
+				       IFNAMSIZ);
 
 		a++;
 	}

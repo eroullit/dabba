@@ -32,8 +32,8 @@
 
 #include <linux/filter.h>
 
-int sock_filter_attach(const int sock, const struct sock_fprog *const sfp);
-int sock_filter_detach(const int sock);
-int sock_filter_is_valid(const struct sock_fprog *const bpf);
+int ldab_sock_filter_attach(const int sock, const struct sock_fprog *const sfp);
+int ldab_sock_filter_detach(const int sock);
+int ldab_sock_filter_is_valid(const struct sock_fprog *const bpf);
 
 #endif				/* SOCK_FILTER_H */

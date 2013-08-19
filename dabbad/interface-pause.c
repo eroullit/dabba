@@ -86,7 +86,7 @@ static void __interface_pause_get(struct nl_object *obj, void *arg)
 	dabba__error_code__init(pausep->status);
 
 	pausep->id->name = rtnl_link_get_name(link);
-	pausep->status->code = dev_pause_get(pausep->id->name, &pause);
+	pausep->status->code = ldab_dev_pause_get(pausep->id->name, &pause);
 
 	pausep->has_autoneg = pausep->has_rx_pause = pausep->has_tx_pause = 1;
 	pausep->autoneg = pause.autoneg;
@@ -172,7 +172,7 @@ void dabbad_interface_pause_modify(Dabba__DabbaService_Service * service,
 	assert(service);
 	assert(closure_data);
 
-	rc = dev_pause_get(pause->id->name, &p);
+	rc = ldab_dev_pause_get(pause->id->name, &p);
 
 	if (rc)
 		goto out;
@@ -186,7 +186,7 @@ void dabbad_interface_pause_modify(Dabba__DabbaService_Service * service,
 	if (pause->has_autoneg)
 		p.autoneg = pause->autoneg;
 
-	rc = dev_pause_set(pause->id->name, &p);
+	rc = ldab_dev_pause_set(pause->id->name, &p);
 
  out:
 	pause->status->code = rc;
