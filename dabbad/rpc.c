@@ -53,6 +53,50 @@ static Dabba__DabbaService_Service dabba_service =
 DABBA__DABBA_SERVICE__INIT(dabbad_);
 
 /**
+ * \brief Create a new dabbad RPC server instance
+ * \param[in]       name	        String to RPC server address
+ * \param[in]       type	        Tell if the RPC server listens to Unix or TCP sockets
+ * \return Pointer to RPC server context on success, \c NULL on failure
+ */
+
+ProtobufC_RPC_Server * dabbad_rpc_server_start(const char * const name, const ProtobufC_RPC_AddressType type)
+{
+	int rc = 0;
+	ProtobufC_RPC_Server *server;
+
+	assert(name);
+	assert(strlen(name));
+	assert(type == PROTOBUF_C_RPC_ADDRESS_LOCAL
+	       || type == PROTOBUF_C_RPC_ADDRESS_TCP);
+
+	server = protobuf_c_rpc_server_new(type, name,
+					   (ProtobufCService *) & dabba_service,
+					   NULL);
+
+	if (!server)
+		return EINVAL;
+
+	if (type == PROTOBUF_C_RPC_ADDRESS_LOCAL) {
+		rc = chmod(name, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
+
+		if (rc)
+			dabbad_rpc_server_stop(server);
+	}
+
+	return rc;
+}
+
+/**
+ * \brief Destroy a new dabbad RPC server instance
+ * \param[in]       server	        Pointer to the server context
+ */
+
+void dabbad_rpc_server_stop(ProtobufC_RPC_Server* server)
+{
+	protobuf_c_rpc_server_destroy(server, 0);
+}
+
+/**
  * \brief Poll server for new RPC queries to process
  * \param[in]       name	        String to RPC server address
  * \param[in]       type	        Tell if the RPC server listens to Unix or TCP sockets
