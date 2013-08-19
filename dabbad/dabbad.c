@@ -154,7 +154,8 @@ static struct dabbad_config conf = {
 
 static void atexit_cleanup(void)
 {
-	unlink(conf.pidfile);
+	if (conf.pidfile)
+		unlink(conf.pidfile);
 
 	if (conf.server_type == PROTOBUF_C_RPC_ADDRESS_LOCAL)
 		unlink(conf.server_id);
