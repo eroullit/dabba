@@ -86,7 +86,7 @@ static void __interface_driver_get(struct nl_object *obj, void *arg)
 
 	driverp->id->name = rtnl_link_get_name(link);
 
-	driverp->status->code = dev_driver_get(driverp->id->name, &drvinfo);
+	driverp->status->code = ldab_dev_driver_get(driverp->id->name, &drvinfo);
 
 	driverp->name = strndup(drvinfo.driver, sizeof(drvinfo.driver));
 	driverp->version = strndup(drvinfo.version, sizeof(drvinfo.version));

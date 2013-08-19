@@ -93,7 +93,7 @@ static void __interface_settings_get(struct nl_object *obj, void *arg)
 	settingsp->has_maxrxpkt = settingsp->has_maxtxpkt = 1;
 
 	settingsp->status->code =
-	    dev_settings_get(settingsp->id->name, &settings);
+	    ldab_dev_settings_get(settingsp->id->name, &settings);
 	settingsp->mtu = rtnl_link_get_mtu(link);
 	settingsp->tx_qlen = rtnl_link_get_txqlen(link);
 
@@ -201,7 +201,7 @@ void dabbad_interface_settings_modify(Dabba__DabbaService_Service * service,
 		goto out;
 	}
 
-	rc = dev_settings_get(settingsp->id->name, &eth_set);
+	rc = ldab_dev_settings_get(settingsp->id->name, &eth_set);
 
 	if (!rc) {
 		if (settingsp->has_speed) {
@@ -246,7 +246,7 @@ void dabbad_interface_settings_modify(Dabba__DabbaService_Service * service,
 	}
 
 	if (!rc && eth_apply)
-		rc = dev_settings_set(settingsp->id->name, &eth_set);
+		rc = ldab_dev_settings_set(settingsp->id->name, &eth_set);
 
 	if (nl_apply)
 		rc = rtnl_link_change(sock, link, change, 0);

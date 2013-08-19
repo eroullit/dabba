@@ -41,7 +41,7 @@ struct packet_tx {
 	int pcap_fd; /**< pcap file descriptor */
 };
 
-int packet_tx_loss_set(const int sock, const int discard);
-void *packet_tx(void *arg);
+int ldab_packet_tx_loss_set(const int sock, const int discard);
+void *ldab_packet_tx(void *arg);
 
 #endif				/* PACKET_TX_H */

@@ -59,9 +59,10 @@ int main(int argc, char **argv)
 	for (a = 0; a < ARRAY_SIZE(types); a++)
 		for (i = 0; i < ARRAY_SIZE(fsize); i++)
 			for (fnr = MIN_FRAME_NR; fnr < MAX_FRAME_NR; fnr <<= 1) {
-				rc = packet_mmap_create(&pkt_rx, ANY_INTERFACE,
-							pf_sock, types[a],
-							fsize[i], fnr);
+				rc = ldab_packet_mmap_create(&pkt_rx,
+							    ANY_INTERFACE,
+							    pf_sock, types[a],
+							    fsize[i], fnr);
 
 				printf("packet mmap type: %i frame number=%zu",
 				       types[a], fnr);
@@ -69,7 +70,7 @@ int main(int argc, char **argv)
 				       strerror(rc));
 
 				assert(rc == 0);
-				packet_mmap_destroy(&pkt_rx);
+				ldab_packet_mmap_destroy(&pkt_rx);
 			}
 
 	return (EXIT_SUCCESS);

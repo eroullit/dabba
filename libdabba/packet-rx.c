@@ -47,7 +47,7 @@
  * for PCAP function to dump the frames into a file or for a packet dissectors.
  */
 
-void *packet_rx(void *arg)
+void *ldab_packet_rx(void *arg)
 {
 	struct packet_rx *pkt_rx = arg;
 	struct packet_mmap *pkt_mmap = &pkt_rx->pkt_mmap;
@@ -75,16 +75,16 @@ void *packet_rx(void *arg)
 			if ((mmap_hdr->tp_h.tp_status & TP_STATUS_USER) ==
 			    TP_STATUS_USER) {
 				if (pkt_rx->pcap_fd > 0) {
-					pcap_write(pkt_rx->pcap_fd,
-						   (uint8_t *) mmap_hdr +
-						   mmap_hdr->tp_h.tp_mac,
-						   mmap_hdr->tp_h.tp_len,
-						   min(mmap_hdr->tp_h.
-						       tp_snaplen,
-						       pkt_mmap->layout.
-						       tp_frame_size),
-						   mmap_hdr->tp_h.tp_sec,
-						   mmap_hdr->tp_h.tp_usec);
+					ldab_pcap_write(pkt_rx->pcap_fd,
+						       (uint8_t *) mmap_hdr +
+						       mmap_hdr->tp_h.tp_mac,
+						       mmap_hdr->tp_h.tp_len,
+						       min(mmap_hdr->tp_h.
+							   tp_snaplen,
+							   pkt_mmap->layout.
+							   tp_frame_size),
+						       mmap_hdr->tp_h.tp_sec,
+						       mmap_hdr->tp_h.tp_usec);
 				}
 
 				mmap_hdr->tp_h.tp_status = TP_STATUS_KERNEL;

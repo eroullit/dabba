@@ -76,7 +76,7 @@ int test_pcap_write(const int fd, const uint8_t * const payload,
 
 	gettimeofday(&tv, NULL);
 
-	if (pcap_write(fd, payload, len, len, tv.tv_sec, tv.tv_usec) != len) {
+	if (ldab_pcap_write(fd, payload, len, len, tv.tv_sec, tv.tv_usec) != len) {
 		return (-1);
 	}
 
@@ -90,19 +90,19 @@ int main(void)
 
 	swapped_pcap_file_header_init(&pcap_hdr);
 
-	assert((fd = pcap_create(test_path, LINKTYPE_EN10MB)) > 0);
+	assert((fd = ldab_pcap_create(test_path, LINKTYPE_EN10MB)) > 0);
 	assert(test_pcap_write(fd, icmp_dns, sizeof(icmp_dns)) == 0);
-	assert(pcap_close(fd) == 0);
+	assert(ldab_pcap_close(fd) == 0);
 
-	assert((fd = pcap_open(test_path, O_RDONLY)) > 0);
-	assert(pcap_close(fd) == 0);
+	assert((fd = ldab_pcap_open(test_path, O_RDONLY)) > 0);
+	assert(ldab_pcap_close(fd) == 0);
 
-	assert((fd = pcap_open(test_path, O_RDWR | O_APPEND)) > 0);
+	assert((fd = ldab_pcap_open(test_path, O_RDWR | O_APPEND)) > 0);
 	assert(test_pcap_write(fd, icmp_dns, sizeof(icmp_dns)) == 0);
-	assert(pcap_close(fd) == 0);
+	assert(ldab_pcap_close(fd) == 0);
 
-	assert((fd = pcap_open(test_path, O_RDONLY)) > 0);
-	assert(pcap_close(fd) == 0);
+	assert((fd = ldab_pcap_open(test_path, O_RDONLY)) > 0);
+	assert(ldab_pcap_close(fd) == 0);
 
 	/* Test swapped PCAP file header support */
 	assert((fd = open(test_path, O_WRONLY)) > 0);
@@ -110,10 +110,10 @@ int main(void)
 	assert(test_pcap_write(fd, icmp_dns, sizeof(icmp_dns)) == 0);
 	assert(close(fd) == 0);
 
-	assert((fd = pcap_open(test_path, O_RDONLY)) > 0);
-	assert(pcap_close(fd) == 0);
+	assert((fd = ldab_pcap_open(test_path, O_RDONLY)) > 0);
+	assert(ldab_pcap_close(fd) == 0);
 
-	pcap_destroy(fd, test_path);
+	ldab_pcap_destroy(fd, test_path);
 
 	return (EXIT_SUCCESS);
 }

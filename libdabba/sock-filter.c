@@ -37,7 +37,7 @@
  * \return 0 is socket filter is not valid, 1 when valid
  */
 
-int sock_filter_is_valid(const struct sock_fprog *const bpf)
+int ldab_sock_filter_is_valid(const struct sock_fprog *const bpf)
 {
 	uint32_t i, from;
 	const struct sock_filter *p;
@@ -169,7 +169,7 @@ int sock_filter_is_valid(const struct sock_fprog *const bpf)
  * \return same return values as \c setsockopt(2)
  */
 
-int sock_filter_attach(const int sock, const struct sock_fprog *const sfp)
+int ldab_sock_filter_attach(const int sock, const struct sock_fprog *const sfp)
 {
 	return setsockopt(sock, SOL_SOCKET, SO_ATTACH_FILTER, sfp,
 			  sizeof(*sfp));
@@ -181,7 +181,7 @@ int sock_filter_attach(const int sock, const struct sock_fprog *const sfp)
  * \return same return values as \c setsockopt(2)
  */
 
-int sock_filter_detach(const int sock)
+int ldab_sock_filter_detach(const int sock)
 {
 	int foo = 0;
 	return setsockopt(sock, SOL_SOCKET, SO_DETACH_FILTER, &foo,

@@ -91,13 +91,17 @@ static void __interface_offload_get(struct nl_object *obj, void *arg)
 	offloadp->has_gro = offloadp->has_lro = offloadp->rxhash = 1;
 
 	/* FIXME find a way to report error separately */
-	rc = dev_rx_csum_offload_get(offloadp->id->name, &offloadp->rx_csum);
-	rc = dev_tx_csum_offload_get(offloadp->id->name, &offloadp->tx_csum);
-	rc = dev_scatter_gather_get(offloadp->id->name, &offloadp->sg);
-	rc = dev_tcp_seg_offload_get(offloadp->id->name, &offloadp->tso);
-	rc = dev_udp_frag_offload_get(offloadp->id->name, &offloadp->ufo);
-	rc = dev_generic_seg_offload_get(offloadp->id->name, &offloadp->gso);
-	rc = dev_generic_rcv_offload_get(offloadp->id->name, &offloadp->gro);
+	rc = ldab_dev_rx_csum_offload_get(offloadp->id->name,
+					 &offloadp->rx_csum);
+	rc = ldab_dev_tx_csum_offload_get(offloadp->id->name,
+					 &offloadp->tx_csum);
+	rc = ldab_dev_scatter_gather_get(offloadp->id->name, &offloadp->sg);
+	rc = ldab_dev_tcp_seg_offload_get(offloadp->id->name, &offloadp->tso);
+	rc = ldab_dev_udp_frag_offload_get(offloadp->id->name, &offloadp->ufo);
+	rc = ldab_dev_generic_seg_offload_get(offloadp->id->name,
+					     &offloadp->gso);
+	rc = ldab_dev_generic_rcv_offload_get(offloadp->id->name,
+					     &offloadp->gro);
 
 	offloadp->status->code = rc;
 
@@ -199,30 +203,32 @@ void dabbad_interface_offload_modify(Dabba__DabbaService_Service * service,
 	}
 
 	if (!rc && offloadp->has_rx_csum)
-		rc = dev_rx_csum_offload_set(offloadp->id->name,
-					     offloadp->rx_csum);
+		rc = ldab_dev_rx_csum_offload_set(offloadp->id->name,
+						 offloadp->rx_csum);
 
 	if (!rc && offloadp->has_tx_csum)
-		rc = dev_tx_csum_offload_set(offloadp->id->name,
-					     offloadp->tx_csum);
+		rc = ldab_dev_tx_csum_offload_set(offloadp->id->name,
+						 offloadp->tx_csum);
 
 	if (!rc && offloadp->has_sg)
-		rc = dev_scatter_gather_set(offloadp->id->name, offloadp->sg);
+		rc = ldab_dev_scatter_gather_set(offloadp->id->name,
+						offloadp->sg);
 
 	if (!rc && offloadp->has_tso)
-		rc = dev_tcp_seg_offload_set(offloadp->id->name, offloadp->tso);
+		rc = ldab_dev_tcp_seg_offload_set(offloadp->id->name,
+						 offloadp->tso);
 
 	if (!rc && offloadp->has_ufo)
-		rc = dev_udp_frag_offload_set(offloadp->id->name,
-					      offloadp->ufo);
+		rc = ldab_dev_udp_frag_offload_set(offloadp->id->name,
+						  offloadp->ufo);
 
 	if (!rc && offloadp->has_gso)
-		rc = dev_generic_seg_offload_set(offloadp->id->name,
-						 offloadp->gso);
+		rc = ldab_dev_generic_seg_offload_set(offloadp->id->name,
+						     offloadp->gso);
 
 	if (!rc && offloadp->has_gro)
-		rc = dev_generic_rcv_offload_set(offloadp->id->name,
-						 offloadp->gro);
+		rc = ldab_dev_generic_rcv_offload_set(offloadp->id->name,
+						     offloadp->gro);
 
  out:
 	offloadp->status->code = rc;

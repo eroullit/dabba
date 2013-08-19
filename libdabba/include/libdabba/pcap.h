@@ -107,15 +107,16 @@ struct pcap_sf_pkthdr {
 	uint32_t len;		/**< length this packet (off wire) */
 };
 
-int pcap_link_type_get(int arp_type, enum pcap_linktype *pcap_link_type);
-ssize_t pcap_write(const int fd, const uint8_t * const pkt,
-		   const size_t pkt_len, const size_t pkt_snaplen,
-		   const uint64_t tv_sec, const uint64_t tv_usec);
-ssize_t pcap_read(const int fd, uint8_t * pkt, const uint32_t pkt_len);
-void pcap_destroy(const int fd, const char *const pcap_path);
-int pcap_create(const char *const pcap_path, const enum pcap_linktype linktype);
-int pcap_open(const char *const pcap_path, int flags);
-int pcap_close(const int fd);
-int pcap_rewind(const int fd);
+int ldab_pcap_link_type_get(int arp_type, enum pcap_linktype *pcap_link_type);
+ssize_t ldab_pcap_write(const int fd, const uint8_t * const pkt,
+		       const size_t pkt_len, const size_t pkt_snaplen,
+		       const uint64_t tv_sec, const uint64_t tv_usec);
+ssize_t ldab_pcap_read(const int fd, uint8_t * pkt, const uint32_t pkt_len);
+void ldab_pcap_destroy(const int fd, const char *const pcap_path);
+int ldab_pcap_create(const char *const pcap_path,
+		    const enum pcap_linktype linktype);
+int ldab_pcap_open(const char *const pcap_path, int flags);
+int ldab_pcap_close(const int fd);
+int ldab_pcap_rewind(const int fd);
 
 #endif				/* PCAP_H */

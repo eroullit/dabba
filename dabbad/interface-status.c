@@ -93,7 +93,7 @@ static void __interface_status_get(struct nl_object *obj, void *arg)
 	flags = rtnl_link_get_flags(link);
 
 	statusp->status->code =
-	    dev_link_get(statusp->id->name, &statusp->connectivity);
+	    ldab_dev_link_get(statusp->id->name, &statusp->connectivity);
 
 	statusp->loopback = (flags & IFF_LOOPBACK) == IFF_LOOPBACK;
 	statusp->up = (flags & IFF_UP) == IFF_UP;
