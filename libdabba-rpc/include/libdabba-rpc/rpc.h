@@ -24,6 +24,7 @@
 #ifndef LIBDABBARPC_RPC_H
 #define	LIBDABBARPC_RPC_H
 
+#include <paths.h>
 #include <google/protobuf-c/protobuf-c-rpc.h>
 #include <libdabba-rpc/dabba.pb-c.h>
 
@@ -41,7 +42,7 @@
 #endif				/* DABBA_RPC_DEFAULT_TCP_SERVER_NAME */
 
 #ifndef DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME
-#define DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME "/var/run/dabba/dabba"
+#define DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME _PATH_VARRUN "dabba/dabba"
 #endif				/* DABBA_RPC_DEFAULT_LOCAL_SERVER_NAME */
 
 #endif				/* LIBDABBARPC_RPC_H */
