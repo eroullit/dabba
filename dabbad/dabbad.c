@@ -61,7 +61,7 @@ Open a TCP socket to receive/transmit RPC messages (By default: 55994)
 
 =item --local[=<path>]
 
-Open a Unix domain socket to receive/transmit RPC messages (By default: /tmp/dabba)
+Open a Unix domain socket to receive/transmit RPC messages (By default: /var/run/dabba/dabba)
 This socket type is used by default
 
 =back
