@@ -1,3 +1,42 @@
+dabba (0.4) unstable; urgency=low
+  * dabbad: do not register dtor on atexit().
+  * dabbad: use tcp socket as default connector.
+  * deb: apply proper permissions to conffiles.
+  * cmake: add 'adduser' to the list of dependencies.
+  * init.d: start dabbad server with the dabba user.
+  * libdabba: add prefix to function names to avoid collisions.
+  * dabbad: cleanup pidfile/socket on exit.
+  * cmake: install dabba service script in /etc/init.d
+  * dabbad: enable core dump after daemonizing.
+  * cmake: refactor libdabba include/link path command.
+  * test: add tool to count packets in a pcap.
+  * dabba: print socket program on 'capture get'.
+  * dabbad: attach sock filter to capture when present.
+  * rpc: add socket filter rpc message.
+  * dabbad: fix default port settings for TCP RPC server.
+  * libdabba: replay the pcap in an endless loop.
+  * dabba: add 'replay' cli command to manage replays.
+  * tx: add thread function to replay pcap file.
+  * cmake: clear up the libcap2-bin dependency.
+  * travis: run tests without elevated privileges.
+  * travis: add libcap2-bin package to have setcap.
+  * travis: ask travis to install python-yaml package.
+  * dabbad: add pidfile input parameter.
+  * test: add dabba and dabbad build path to $PATH.
+  * rpc: add capture stop all rpc call.
+  * rpc: add capture append flag to capture rpc msg.
+  * dabbad: refactor thread management
+  * deb: add package dependency info in debian package.
+  * deb: use 'set -e' instead of 'sh -e' in postinst.
+  * cmake: add small script to fix debian file perms.
+  * cmake: do not install libdabba shlib symlink.
+  * cmake: do not install libdabba-rpc shlib symlink.
+  * test: bumped sharness to v0.3.
+  * doc: update deb package description.
+  * git: add .gitignore file.
+
+ -- Emmanuel Roullit <emmanuel.roullit@gmail.com>  Tue, 20 Aug 2013 22:25:45 +0200
+
 dabba (0.3) unstable; urgency=low
   * cmake: add libnl3 dependency
   * cmake: add libprotobuf-c/protoc-c dependency
