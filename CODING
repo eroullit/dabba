@@ -1,10 +1,9 @@
 Roadmap
 =======
 
-2. Traffic generation
-3. BPF support
-5. PCAP file rolling
-6. Scatter-Gather I/O
+1. Traffic generation
+2. PCAP file rolling
+3. Scatter-Gather I/O
 
 Present features
 ================
@@ -14,6 +13,8 @@ Present features
  - Thread Management
  - Thread scheduling tuning
  - PCAP read/write/validation support
+ - Replay traffic PCAP files
+ - BPF support
 
 Feature implementation
 ======================
