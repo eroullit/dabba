@@ -39,7 +39,6 @@
 #include <sys/prctl.h>
 #include <dirent.h>
 
-#include <libdabba/strlcpy.h>
 #include <unistd.h>
 
 /**
@@ -127,7 +126,7 @@ int fd_to_path(const int fd, char *path, const size_t path_len)
 		goto out;
 	}
 
-	strlcpy(path, resolved_path, path_len);
+	strncpy(path, resolved_path, path_len - 1);
 
 	free(resolved_path);
 

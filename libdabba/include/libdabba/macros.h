@@ -44,12 +44,7 @@
  */
 
 #ifndef container_of
-#define container_of(ptr, type, member)                         \
-__extension__                                                   \
-({                                                              \
-        const typeof(((type *)0)->member) * __mptr = (ptr);	\
-        (type *)((char *)__mptr - offsetof(type, member));      \
-})
+#define container_of(ptr, type, member)	((type *)(((uint8_t *)(ptr)) - offsetof(type, member)))
 #endif				/* container_of */
 
 /**
@@ -88,52 +83,5 @@ __extension__                                                   \
 #ifndef ARRAY_SIZE
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]) + __must_be_array(arr))
 #endif				/* ARRAY_SIZE */
-
-/**
- * \brief Tell if a integer is a power of 2
- * \param[in] n Integer to test
- * \return 1 if true, 0 otherwise
- */
-
-static inline int is_power_of_2(const uint64_t n)
-{
-	return (n != 0 && ((n & (n - 1)) == 0));
-}
-
-/**
- * \brief Returns the minimum value between two variables
- * \param[in] x First variable
- * \param[in] y Second variable
- * \return minimum value between the two variable
- * \note Force a compilation error if the variable types don't match
- */
-
-#ifndef min
-#define min(x, y)                               \
-        __extension__                           \
-        ({                                      \
-	typeof(x) _min1 = (x);			\
-	typeof(y) _min2 = (y);			\
-	(void) (&_min1 == &_min2);		\
-	_min1 < _min2 ? _min1 : _min2; })
-#endif				/* min */
-
-/**
- * \brief Returns the maximum value between two variables
- * \param[in] x First variable
- * \param[in] y Second variable
- * \return maximum value between the two variable
- * \note Force a compilation error if the variable types don't match
- */
-
-#ifndef max
-#define max(x, y)                               \
-        __extension__                           \
-        ({                                      \
-	typeof(x) _max1 = (x);			\
-	typeof(y) _max2 = (y);			\
-	(void) (&_max1 == &_max2);		\
-	_max1 > _max2 ? _max1 : _max2; })
-#endif				/* max */
 
 #endif				/* MACROS_H */
