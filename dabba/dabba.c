@@ -131,6 +131,9 @@ int cmd_run_action(const struct cmd_struct *cmd, const size_t cmd_len,
 	const char *cmd_str = argv[0];
 	size_t a;
 
+	if (!cmd_str)
+		return cmd_help(argc, argv);
+
 	for (a = 0; a < cmd_len; a++) {
 		if (strcmp(cmd[a].cmd, cmd_str))
 			continue;
