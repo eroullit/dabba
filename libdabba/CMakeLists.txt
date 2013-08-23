@@ -15,7 +15,7 @@ IF(DOXYGEN_FOUND)
 	ADD_DEPENDENCIES(doc ${PROJECT_NAME}-doc)
 ENDIF(DOXYGEN_FOUND)
 
-ADD_LIBRARY(${PROJECT_NAME} SHARED packet-mmap.c interface.c pcap.c sock-filter.c packet-rx.c packet-tx.c)
+ADD_LIBRARY(${PROJECT_NAME} packet-mmap.c interface.c pcap.c sock-filter.c packet-rx.c packet-tx.c)
 
 SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES PREFIX "")
 SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES VERSION "${CPACK_PACKAGE_VERSION}")
