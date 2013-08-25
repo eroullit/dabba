@@ -13,5 +13,5 @@ ENDFOREACH(test_dir)
 
 FOREACH(test_script ${test_scripts})
 	EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/${test_script} ${CMAKE_CURRENT_BINARY_DIR})
-	ADD_TEST(${test_script} sh ${test_script})
+	ADD_TEST(${test_script} sh ${test_script} -i)
 ENDFOREACH(test_script ${test_scripts})
