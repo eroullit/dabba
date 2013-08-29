@@ -20,7 +20,7 @@
 
 int main(int argc, char **argv)
 {
-	int rc;
+	int rc, success = 0;
 	size_t a, i, fnr;
 	int pf_sock = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
 	struct packet_mmap pkt_rx;
@@ -39,9 +39,9 @@ int main(int argc, char **argv)
 		for (i = 0; i < ARRAY_SIZE(fsize); i++)
 			for (fnr = MIN_FRAME_NR; fnr < MAX_FRAME_NR; fnr <<= 1) {
 				rc = ldab_packet_mmap_create(&pkt_rx,
-							    ANY_INTERFACE,
-							    pf_sock, types[a],
-							    fsize[i], fnr);
+							     ANY_INTERFACE,
+							     pf_sock, types[a],
+							     fsize[i], fnr);
 
 				printf("packet mmap type: %i frame number=%zu",
 				       types[a], fnr);
@@ -52,8 +52,12 @@ int main(int argc, char **argv)
 				 * if the allocation will fail or succeed
 				 */
 				assert(rc == 0 || rc == ENOMEM);
+
+				if (!rc)
+					success = 1;
+
 				ldab_packet_mmap_destroy(&pkt_rx);
 			}
 
-	return (EXIT_SUCCESS);
+	return (success ? EXIT_SUCCESS : EXIT_FAILURE);
 }
