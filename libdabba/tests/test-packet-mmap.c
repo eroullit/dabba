@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <errno.h>
 #include <assert.h>
 #include <sys/socket.h>
 #include <sys/user.h>
@@ -46,8 +47,11 @@ int main(int argc, char **argv)
 				       types[a], fnr);
 				printf(" frame size=%i rc=%s\n", fsize[i],
 				       strerror(rc));
-
-				assert(rc == 0);
+				/*
+				 * Tolerate ENOMEM as we cannot accurately foresee
+				 * if the allocation will fail or succeed
+				 */
+				assert(rc == 0 || rc == ENOMEM);
 				ldab_packet_mmap_destroy(&pkt_rx);
 			}
 
