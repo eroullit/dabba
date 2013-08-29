@@ -25,6 +25,7 @@ install_manifest.txt
 
 # vim swp
 *.swp
+*.swo
 
 # patch files
 *.patch
