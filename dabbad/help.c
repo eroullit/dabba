@@ -4,7 +4,6 @@
  * \date 2013
  */
 
-
 #include <stdio.h>
 #include <assert.h>
 #include <getopt.h>
@@ -44,6 +43,6 @@ void show_usage(const struct option *opt)
 
 int print_version(void)
 {
-	printf("dabbad version %s\n", DABBA_VERSION);
+	printf("dabbad version %s (%s)\n", DABBA_VERSION, DABBA_GIT_REVISION);
 	return 0;
 }

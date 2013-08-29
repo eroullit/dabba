@@ -4,7 +4,6 @@
  * \date 2013
  */
 
-
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -146,6 +145,6 @@ int cmd_version(int argc, const char **argv)
 	(void)argc;
 	(void)argv;
 
-	printf("dabba version %s\n", DABBA_VERSION);
+	printf("dabba version %s (%s)\n", DABBA_VERSION, DABBA_GIT_REVISION);
 	return 0;
 }
