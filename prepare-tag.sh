@@ -23,8 +23,6 @@ version="$major"
 test -n "$minor" && version="$version.$minor" &&
 test -n "$patch" && version="$version.$patch"
 
-git tag "v$version"
-
 echo "SET(CPACK_PACKAGE_VERSION_MAJOR \"$major\")" >> "$version_file"
 echo "SET(CPACK_PACKAGE_VERSION_MINOR \"$minor\")" >> "$version_file"
 echo "SET(CPACK_PACKAGE_VERSION_PATCH \"$patch\")" >> "$version_file"
@@ -32,5 +30,8 @@ echo "SET(CPACK_PACKAGE_VERSION \"$version\")" >> "$version_file"
 
 echo "libdabba $version" >> "$shlibs_file"
 echo "libdabba-rpc $version" >> "$shlibs_file"
+
+git commit -a -s -m "release: tagging v$version"
+git tag "v$version"
 
 # vim: ft=sh:tabstop=4:et
