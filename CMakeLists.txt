@@ -4,9 +4,10 @@ PROJECT(dabba C)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
+
 # Activate this when you want to build a shared lib out the the lib/ directory
 # Bear in mind that no profiling will be available on 64-bit arch when on
-# SET(BUILD_SHARED_LIBS ON)
+SET(BUILD_SHARED_LIBS ON)
 
 FIND_PACKAGE(Threads REQUIRED)
 
